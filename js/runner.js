@@ -79,7 +79,7 @@ CW.runDOM = function (code, pageHtml, container, onDone) {
   let finished = false;
   container.innerHTML = "";
   const frame = document.createElement("iframe");
-  frame.setAttribute("sandbox", "allow-scripts");
+  frame.setAttribute("sandbox", "allow-scripts allow-forms");
   frame.className = "preview-frame";
   const finish = () => {
     if (finished) return;
@@ -93,7 +93,7 @@ CW.runDOM = function (code, pageHtml, container, onDone) {
   };
   window.addEventListener("message", onMsg);
   const safe = s => JSON.stringify(s).replace(/<\//g, "<\\/");
-  frame.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+  frame.srcdoc = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><style>
       body{font-family:system-ui,sans-serif;padding:12px;margin:0;color:#1a2233;line-height:1.6}
       button{padding:6px 14px;cursor:pointer;font:inherit} .hidden{display:none} .active{color:#1d4ed8;font-weight:bold}
     </style><script>
@@ -110,7 +110,9 @@ CW.runDOM = function (code, pageHtml, container, onDone) {
         get length() { return Object.keys(mem).length; }
       }});
     }
-  <\/script></head><body>${pageHtml}<script>__run(${safe(code)});<\/script></body></html>`;
+    // يُشغَّل الكود بعد بناء الصفحة، ومن الرأس حتى لا يظهر وسم script ضمن عناصر body
+    document.addEventListener("DOMContentLoaded", () => __run(${safe(code)}));
+  <\/script></head><body>${pageHtml}</body></html>`;
   container.appendChild(frame);
   setTimeout(() => {
     if (!finished) lines.push({ kind: "err", text: "انتهت مهلة التشغيل (5 ثوانٍ)" });

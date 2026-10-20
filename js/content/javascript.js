@@ -827,5 +827,217 @@ CW.registerContent("javascript", [
     }
    ]
   }
+ ],
+ [
+  {
+   "body": "<h2>الجسر بين JavaScript والصفحة</h2>\n<p>كل ما تعلمناه حتى الآن كان يعمل في المخرجات فقط. الآن سنجعل JavaScript تتحكم في <strong>صفحة الويب نفسها</strong>: تغيّر النصوص، وتخفي العناصر، وتستجيب للضغطات.</p>\n<p>عندما يقرأ المتصفح ملف HTML، يحوّله إلى <strong>شجرة من الكائنات</strong> في الذاكرة تسمى <strong>DOM</strong> (اختصار Document Object Model). كل وسم في الصفحة يصبح كائناً يمكن لـ JavaScript قراءته وتعديله.</p>\n<h2>الصفحة كشجرة</h2>\n<p>خذ هذا الـ HTML:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;body&gt;\n  &lt;h1&gt;متجري&lt;/h1&gt;\n  &lt;ul&gt;\n    &lt;li&gt;قميص&lt;/li&gt;\n    &lt;li&gt;حذاء&lt;/li&gt;\n  &lt;/ul&gt;\n&lt;/body&gt;</code></pre></div>\n<p>يراه المتصفح كشجرة:</p>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>document\n └─ body\n     ├─ h1  ← &quot;متجري&quot;\n     └─ ul\n         ├─ li ← &quot;قميص&quot;\n         └─ li ← &quot;حذاء&quot;</code></pre></div>\n<ul><li><strong>العقدة (Node):</strong> كل عنصر أو نص في الشجرة.</li><li><strong>الأب (parent):</strong> العنصر الذي يحتوي غيره، مثل <code dir=\"ltr\">ul</code> بالنسبة لـ <code dir=\"ltr\">li</code>.</li><li><strong>الأبناء (children):</strong> العناصر داخل عنصر آخر.</li><li><strong>الإخوة (siblings):</strong> العناصر التي تشترك في نفس الأب.</li></ul>\n<h2>الكائن document</h2>\n<p>نقطة الدخول إلى كل شيء هي الكائن <code dir=\"ltr\">document</code>، وهو يمثل الصفحة كاملة:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;h1&gt;مرحباً&lt;/h1&gt;\n&lt;p&gt;هذه فقرة&lt;/p&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>console.log(document.title === &quot;&quot;);\nconsole.log(document.body.children.length);\nconsole.log(document.body.children[0].textContent);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>true\n2\nمرحباً</code></pre></div>\n<ul><li><code dir=\"ltr\">document.body</code> عنصر <code dir=\"ltr\">&lt;body&gt;</code>.</li><li><code dir=\"ltr\">children</code> أبناء العنصر (عناصر HTML فقط).</li><li><code dir=\"ltr\">textContent</code> النص الموجود داخل العنصر.</li></ul>\n<h2>كيف تربط JavaScript بصفحتك؟</h2>\n<p>في المشاريع الحقيقية تكتب الكود في ملف منفصل وتربطه في نهاية HTML:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;!DOCTYPE html&gt;\n&lt;html lang=&quot;ar&quot; dir=&quot;rtl&quot;&gt;\n&lt;head&gt;\n  &lt;title&gt;موقعي&lt;/title&gt;\n&lt;/head&gt;\n&lt;body&gt;\n  &lt;h1 id=&quot;title&quot;&gt;مرحباً&lt;/h1&gt;\n\n  &lt;script src=&quot;app.js&quot;&gt;&lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;</code></pre></div>\n<div class=\"callout tip\">💡 نضع وسم <code dir=\"ltr\">&lt;script&gt;</code> في <strong>نهاية</strong> <code dir=\"ltr\">body</code> حتى تكون كل العناصر قد أُنشئت قبل أن يحاول الكود الوصول إليها. وبديله الحديث: وضعه في <code dir=\"ltr\">head</code> مع الخاصية <code dir=\"ltr\">defer</code>.</div>\n<h2>ماذا نستطيع أن نفعل بـ DOM؟</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>الإمكانية</th><th>مثال</th></tr></thead><tbody><tr><td>تحديد العناصر</td><td>الوصول لزر أو حقل إدخال</td></tr><tr><td>تغيير المحتوى</td><td>تحديث عدد المنتجات في السلة</td></tr><tr><td>تغيير الأنماط</td><td>تفعيل الوضع الليلي</td></tr><tr><td>إنشاء وحذف العناصر</td><td>إضافة تعليق جديد</td></tr><tr><td>الاستجابة للأحداث</td><td>تنفيذ كود عند الضغط على زر</td></tr></tbody></table></div>\n<p>وهذا ما سنتعلمه في بقية هذه الوحدة. في تمارين هذه الوحدة سترى <strong>معاينة الصفحة</strong> فوق المخرجات، وتتغير مباشرة حسب كودك.</p>\n<h2>ملخص الدرس</h2>\n<ul><li>DOM شجرة كائنات يبنيها المتصفح من HTML.</li><li>كل وسم عقدة لها أب وأبناء وإخوة.</li><li><code dir=\"ltr\">document</code> نقطة الدخول للصفحة كاملة.</li><li>نربط ملف JavaScript في نهاية <code dir=\"ltr\">body</code> أو بـ <code dir=\"ltr\">defer</code>.</li></ul>",
+   "exercise": {
+    "prompt": "<p>الصفحة في المعاينة تحتوي عنواناً وقائمة. استخدم <code dir=\"ltr\">document.body.children</code> لطباعة:</p>\n<ol><li>عدد العناصر المباشرة داخل <code dir=\"ltr\">body</code>.</li><li>النص داخل أول عنصر (العنوان).</li><li>عدد عناصر القائمة (أبناء العنصر الثاني).</li></ol>",
+    "html": "<h1>قائمة المهام</h1>\n<ul>\n  <li>الدراسة</li>\n  <li>الرياضة</li>\n  <li>القراءة</li>\n</ul>",
+    "starter": "// استخدم document.body.children",
+    "expected": "2\nقائمة المهام\n3",
+    "solution": "const items = document.body.children;\nconsole.log(items.length);\nconsole.log(items[0].textContent);\nconsole.log(items[1].children.length);"
+   },
+   "quiz": [
+    {
+     "q": "ما هو DOM؟",
+     "o": [
+      "لغة برمجة جديدة",
+      "تمثيل الصفحة كشجرة كائنات يمكن لـ JavaScript التعامل معها",
+      "ملف CSS خاص"
+     ],
+     "a": 1,
+     "why": "يبني المتصفح DOM من HTML، و JavaScript تقرأه وتعدّله."
+    },
+    {
+     "q": "في <code dir=\"ltr\">&lt;ul&gt;&lt;li&gt;أ&lt;/li&gt;&lt;/ul&gt;</code>، ما علاقة <code dir=\"ltr\">ul</code> بـ <code dir=\"ltr\">li</code>؟",
+     "o": [
+      "<code dir=\"ltr\">ul</code> هو الأب و <code dir=\"ltr\">li</code> الابن",
+      "<code dir=\"ltr\">li</code> هو الأب",
+      "هما إخوة"
+     ],
+     "a": 0,
+     "why": "العنصر الذي يحتوي غيره هو الأب."
+    },
+    {
+     "q": "لماذا يوضع وسم <code dir=\"ltr\">&lt;script&gt;</code> عادة في نهاية <code dir=\"ltr\">body</code>؟",
+     "o": [
+      "لأنه يعمل أسرع هناك",
+      "حتى تكون عناصر الصفحة قد أُنشئت قبل أن يصل إليها الكود",
+      "لأنه إلزامي في HTML"
+     ],
+     "a": 1,
+     "why": "إذا نُفّذ الكود قبل إنشاء العناصر لن يجدها."
+    }
+   ]
+  },
+  {
+   "body": "<h2>الوصول إلى العنصر الذي تريده</h2>\n<p>قبل أن تغيّر أي شيء في الصفحة، يجب أن <strong>تحدد</strong> العنصر. الطريقة الحديثة والأقوى هي استخدام <strong>محددات CSS</strong> نفسها التي تعرفها.</p>\n<h2>querySelector: أول عنصر مطابق</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;h1 id=&quot;main-title&quot;&gt;المتجر&lt;/h1&gt;\n&lt;p class=&quot;note&quot;&gt;ملاحظة أولى&lt;/p&gt;\n&lt;p class=&quot;note&quot;&gt;ملاحظة ثانية&lt;/p&gt;\n&lt;button&gt;اشترِ الآن&lt;/button&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const title = document.querySelector(&quot;#main-title&quot;);\nconst firstNote = document.querySelector(&quot;.note&quot;);\nconst button = document.querySelector(&quot;button&quot;);\n\nconsole.log(title.textContent);\nconsole.log(firstNote.textContent);\nconsole.log(button.textContent);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>المتجر\nملاحظة أولى\nاشترِ الآن</code></pre></div>\n<div class=\"table-wrap\"><table><thead><tr><th>المحدد</th><th>يختار</th></tr></thead><tbody><tr><td><code dir=\"ltr\">&quot;#id&quot;</code></td><td>العنصر الذي له هذا المعرّف</td></tr><tr><td><code dir=\"ltr\">&quot;.class&quot;</code></td><td>العناصر التي لها هذا الصنف</td></tr><tr><td><code dir=\"ltr\">&quot;tag&quot;</code></td><td>العناصر من هذا الوسم</td></tr><tr><td><code dir=\"ltr\">&quot;ul li&quot;</code></td><td>كل <code dir=\"ltr\">li</code> داخل <code dir=\"ltr\">ul</code></td></tr><tr><td><code dir=\"ltr\">&quot;input[type=email]&quot;</code></td><td>حسب خاصية معينة</td></tr></tbody></table></div>\n<h2>querySelectorAll: كل العناصر المطابقة</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;ul&gt;\n  &lt;li class=&quot;item&quot;&gt;خبز&lt;/li&gt;\n  &lt;li class=&quot;item&quot;&gt;حليب&lt;/li&gt;\n  &lt;li class=&quot;item&quot;&gt;بيض&lt;/li&gt;\n&lt;/ul&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const items = document.querySelectorAll(&quot;.item&quot;);\nconsole.log(items.length);\n\nitems.forEach(item =&gt; console.log(item.textContent));\n\nconst names = [...items].map(li =&gt; li.textContent);\nconsole.log(names);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>3\nخبز\nحليب\nبيض\n[&quot;خبز&quot;,&quot;حليب&quot;,&quot;بيض&quot;]</code></pre></div>\n<p><code dir=\"ltr\">querySelectorAll</code> تُرجع <strong>NodeList</strong>: تشبه المصفوفة وتدعم <code dir=\"ltr\">forEach</code> و <code dir=\"ltr\">length</code>، لكنها لا تدعم <code dir=\"ltr\">map</code> و <code dir=\"ltr\">filter</code>. لذلك نحولها لمصفوفة حقيقية بـ <code dir=\"ltr\">[...items]</code>.</p>\n<h2>الطرق الأقدم</h2>\n<p>ستراها في أكواد كثيرة:</p>\n<div class=\"table-wrap\"><table><thead><tr><th>الطريقة</th><th>تعادل</th></tr></thead><tbody><tr><td><code dir=\"ltr\">getElementById(&quot;x&quot;)</code></td><td><code dir=\"ltr\">querySelector(&quot;#x&quot;)</code></td></tr><tr><td><code dir=\"ltr\">getElementsByClassName(&quot;x&quot;)</code></td><td><code dir=\"ltr\">querySelectorAll(&quot;.x&quot;)</code> تقريباً</td></tr><tr><td><code dir=\"ltr\">getElementsByTagName(&quot;p&quot;)</code></td><td><code dir=\"ltr\">querySelectorAll(&quot;p&quot;)</code> تقريباً</td></tr></tbody></table></div>\n<p><code dir=\"ltr\">getElementById</code> أسرع قليلاً، لكن <code dir=\"ltr\">querySelector</code> أكثر مرونة وتكفيك في كل الحالات.</p>\n<h2>إذا لم يُعثر على العنصر</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;p&gt;فقرة&lt;/p&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const missing = document.querySelector(&quot;#not-here&quot;);\nconsole.log(missing);\nconsole.log(document.querySelectorAll(&quot;.nothing&quot;).length);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>null\n0</code></pre></div>\n<div class=\"callout warn\">⚠️ أشهر خطأ للمبتدئين: <code dir=\"ltr\">Cannot read properties of null</code>. يعني أن <code dir=\"ltr\">querySelector</code> لم تجد العنصر (اسم خاطئ، أو الكود نُفّذ قبل إنشاء العنصر)، ثم حاولت استخدام النتيجة <code dir=\"ltr\">null</code>.</div>\n<h2>التنقل في الشجرة</h2>\n<p>بعد تحديد عنصر، يمكنك الانتقال إلى أقاربه:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;div class=&quot;card&quot;&gt;\n  &lt;h3&gt;العنوان&lt;/h3&gt;\n  &lt;p&gt;الوصف&lt;/p&gt;\n&lt;/div&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const heading = document.querySelector(&quot;.card h3&quot;);\nconsole.log(heading.parentElement.className);\nconsole.log(heading.nextElementSibling.textContent);\nconsole.log(heading.closest(&quot;.card&quot;) !== null);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>card\nالوصف\ntrue</code></pre></div>\n<p><code dir=\"ltr\">closest(selector)</code> تبحث صعوداً عن أقرب أب يطابق المحدد، وهي مفيدة جداً مع الأحداث.</p>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">querySelector</code> تُرجع أول عنصر مطابق أو <code dir=\"ltr\">null</code>.</li><li><code dir=\"ltr\">querySelectorAll</code> تُرجع كل العناصر كـ NodeList.</li><li>المحددات نفسها التي في CSS: <code dir=\"ltr\">#id</code> و <code dir=\"ltr\">.class</code> و <code dir=\"ltr\">tag</code>.</li><li><code dir=\"ltr\">parentElement</code> و <code dir=\"ltr\">children</code> و <code dir=\"ltr\">nextElementSibling</code> و <code dir=\"ltr\">closest</code> للتنقل.</li></ul>",
+   "exercise": {
+    "prompt": "<p>في الصفحة قائمة منتجات. استخدم المحددات المناسبة لطباعة:</p>\n<ol><li>نص العنصر الذي معرّفه <code dir=\"ltr\">shop-name</code>.</li><li>عدد المنتجات (العناصر التي لها الصنف <code dir=\"ltr\">product</code>).</li><li>مصفوفة أسماء المنتجات التي لها أيضاً الصنف <code dir=\"ltr\">sale</code> (محدد: <code dir=\"ltr\">.product.sale</code>).</li></ol>",
+    "html": "<h2 id=\"shop-name\">متجر الأناقة</h2>\n<ul>\n  <li class=\"product\">قميص</li>\n  <li class=\"product sale\">بنطال</li>\n  <li class=\"product\">حزام</li>\n  <li class=\"product sale\">حذاء</li>\n</ul>",
+    "starter": "// أكمل هنا",
+    "expected": "متجر الأناقة\n4\n[\"بنطال\",\"حذاء\"]",
+    "solution": "console.log(document.querySelector(\"#shop-name\").textContent);\nconsole.log(document.querySelectorAll(\".product\").length);\nconst onSale = [...document.querySelectorAll(\".product.sale\")].map(li => li.textContent);\nconsole.log(onSale);"
+   },
+   "quiz": [
+    {
+     "q": "ماذا تُرجع <code dir=\"ltr\">document.querySelector(&quot;.btn&quot;)</code> إذا كان هناك 3 عناصر بالصنف btn؟",
+     "o": [
+      "أول عنصر فقط",
+      "كل العناصر الثلاثة",
+      "آخر عنصر"
+     ],
+     "a": 0,
+     "why": "querySelector تُرجع أول تطابق، و querySelectorAll تُرجع الكل."
+    },
+    {
+     "q": "ماذا تُرجع <code dir=\"ltr\">querySelector</code> إذا لم تجد أي عنصر؟",
+     "o": [
+      "مصفوفة فارغة",
+      "<code dir=\"ltr\">null</code>",
+      "<code dir=\"ltr\">undefined</code>"
+     ],
+     "a": 1,
+     "why": "لذلك يجب التأكد من وجود العنصر قبل استخدامه."
+    },
+    {
+     "q": "لماذا نكتب <code dir=\"ltr\">[...document.querySelectorAll(&quot;li&quot;)]</code> قبل استخدام <code dir=\"ltr\">map</code>؟",
+     "o": [
+      "لتسريع الكود",
+      "لأن NodeList لا تدعم <code dir=\"ltr\">map</code>، فنحوّلها لمصفوفة حقيقية",
+      "لأن querySelectorAll تُرجع null"
+     ],
+     "a": 1,
+     "why": "NodeList تدعم forEach لكن ليس map و filter."
+    }
+   ]
+  },
+  {
+   "body": "<h2>تغيير ما يراه المستخدم</h2>\n<p>بعد تحديد العنصر، يمكننا تعديل نصه ومحتواه وأنماطه وخصائصه. هنا تبدأ الصفحة بالحياة.</p>\n<h2>تغيير النص</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;p id=&quot;msg&quot;&gt;جاري التحميل...&lt;/p&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const msg = document.querySelector(&quot;#msg&quot;);\nmsg.textContent = &quot;تم التحميل بنجاح ✓&quot;;\nconsole.log(msg.textContent);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>تم التحميل بنجاح ✓</code></pre></div>\n<h2>textContent أم innerHTML؟</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;div id=&quot;box&quot;&gt;&lt;/div&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const box = document.querySelector(&quot;#box&quot;);\n\nbox.textContent = &quot;&lt;b&gt;نص عريض؟&lt;/b&gt;&quot;;\nconsole.log(box.children.length);\n\nbox.innerHTML = &quot;&lt;b&gt;نص عريض!&lt;/b&gt;&quot;;\nconsole.log(box.children.length);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>0\n1</code></pre></div>\n<ul><li><code dir=\"ltr\">textContent</code> يضع النص <strong>كما هو</strong>، حتى لو احتوى وسوماً.</li><li><code dir=\"ltr\">innerHTML</code> يفسّر النص كـ HTML وينشئ عناصر.</li></ul>\n<div class=\"callout warn\">⚠️ لا تضع أبداً نصاً أدخله المستخدم في <code dir=\"ltr\">innerHTML</code>! قد يكتب كوداً خبيثاً يُنفَّذ في صفحتك، وهذه ثغرة أمنية مشهورة اسمها <strong>XSS</strong>. استخدم <code dir=\"ltr\">textContent</code> لأي نص من المستخدم.</div>\n<h2>تغيير الأنماط</h2>\n<p>الطريقة المباشرة عبر <code dir=\"ltr\">style</code>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;p id=&quot;note&quot;&gt;ملاحظة مهمة&lt;/p&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const note = document.querySelector(&quot;#note&quot;);\nnote.style.color = &quot;crimson&quot;;\nnote.style.fontSize = &quot;20px&quot;;\nnote.style.backgroundColor = &quot;#fff3cd&quot;;\nconsole.log(note.style.fontSize);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>20px</code></pre></div>\n<p>لاحظ أن خصائص CSS ذات الشرطة مثل <code dir=\"ltr\">font-size</code> تُكتب بأسلوب camelCase: <code dir=\"ltr\">fontSize</code>.</p>\n<h2>الطريقة الأفضل: classList</h2>\n<p>بدلاً من كتابة الأنماط في JavaScript، نعرّفها في CSS كصنف، ثم نضيف الصنف أو نزيله:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;button id=&quot;btn&quot;&gt;زر&lt;/button&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const btn = document.querySelector(&quot;#btn&quot;);\n\nbtn.classList.add(&quot;active&quot;);\nbtn.classList.add(&quot;big&quot;);\nbtn.classList.remove(&quot;big&quot;);\nconsole.log(btn.className);\n\nbtn.classList.toggle(&quot;active&quot;);\nconsole.log(btn.classList.contains(&quot;active&quot;));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>active\nfalse</code></pre></div>\n<div class=\"table-wrap\"><table><thead><tr><th>الدالة</th><th>وظيفتها</th></tr></thead><tbody><tr><td><code dir=\"ltr\">add(&quot;x&quot;)</code></td><td>إضافة صنف</td></tr><tr><td><code dir=\"ltr\">remove(&quot;x&quot;)</code></td><td>إزالة صنف</td></tr><tr><td><code dir=\"ltr\">toggle(&quot;x&quot;)</code></td><td>إضافة إن لم يكن موجوداً، وإزالة إن كان موجوداً</td></tr><tr><td><code dir=\"ltr\">contains(&quot;x&quot;)</code></td><td>هل الصنف موجود؟</td></tr></tbody></table></div>\n<div class=\"callout tip\">💡 <code dir=\"ltr\">toggle</code> مثالية للأشياء التي تُفتح وتُغلق: القوائم، والوضع الليلي، وزر الإعجاب.</div>\n<h2>الخصائص (Attributes)</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;img id=&quot;photo&quot; src=&quot;cat.jpg&quot; alt=&quot;قطة&quot;&gt;\n&lt;input id=&quot;email&quot; type=&quot;email&quot;&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const photo = document.querySelector(&quot;#photo&quot;);\nconsole.log(photo.getAttribute(&quot;alt&quot;));\nphoto.setAttribute(&quot;alt&quot;, &quot;قطة لطيفة&quot;);\nconsole.log(photo.alt);\n\nconst email = document.querySelector(&quot;#email&quot;);\nemail.value = &quot;user@mail.com&quot;;\nemail.disabled = true;\nconsole.log(email.value, email.disabled);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>قطة\nقطة لطيفة\nuser@mail.com true</code></pre></div>\n<h2>إنشاء العناصر وحذفها</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;ul id=&quot;list&quot;&gt;&lt;li&gt;أول&lt;/li&gt;&lt;/ul&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const list = document.querySelector(&quot;#list&quot;);\n\nconst li = document.createElement(&quot;li&quot;);\nli.textContent = &quot;عنصر جديد&quot;;\nlist.append(li);\n\nconsole.log(list.children.length);\n\nlist.children[0].remove();\nconsole.log(list.children[0].textContent);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>2\nعنصر جديد</code></pre></div>\n<p>الخطوات دائماً: <strong>أنشئ</strong> العنصر بـ <code dir=\"ltr\">createElement</code>، ثم <strong>املأه</strong> بالنص والأصناف، ثم <strong>أضفه</strong> للصفحة بـ <code dir=\"ltr\">append</code> (في النهاية) أو <code dir=\"ltr\">prepend</code> (في البداية).</p>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">textContent</code> للنص الآمن، و <code dir=\"ltr\">innerHTML</code> للـ HTML (لا تستخدمه مع مدخلات المستخدم).</li><li><code dir=\"ltr\">style.prop</code> لتعديل نمط مباشرة، و <code dir=\"ltr\">classList</code> هي الطريقة المفضلة.</li><li><code dir=\"ltr\">getAttribute</code> و <code dir=\"ltr\">setAttribute</code> والخصائص المباشرة مثل <code dir=\"ltr\">value</code>.</li><li><code dir=\"ltr\">createElement</code> ثم <code dir=\"ltr\">append</code> لإضافة عنصر، و <code dir=\"ltr\">remove()</code> لحذفه.</li></ul>",
+   "exercise": {
+    "prompt": "<p>في الصفحة قائمة مهام فارغة وعنوان. المطلوب:</p>\n<ol><li>غيّر نص العنوان <code dir=\"ltr\">#title</code> إلى <code dir=\"ltr\">مهامي اليوم</code>.</li><li>باستخدام حلقة على المصفوفة <code dir=\"ltr\">tasks</code>، أنشئ عنصر <code dir=\"ltr\">li</code> لكل مهمة وأضفه للقائمة <code dir=\"ltr\">#todo</code>.</li><li>أضف الصنف <code dir=\"ltr\">done</code> لأول مهمة.</li><li>اطبع عدد عناصر القائمة، ثم نص العنوان.</li></ol>",
+    "html": "<h2 id=\"title\">بدون عنوان</h2>\n<ul id=\"todo\"></ul>\n<style>.done { text-decoration: line-through; color: gray; }</style>",
+    "starter": "const tasks = [\"مراجعة الدرس\", \"حل التمرين\", \"كتابة ملخص\"];\n\n// أكمل هنا",
+    "expected": "3\nمهامي اليوم",
+    "solution": "const tasks = [\"مراجعة الدرس\", \"حل التمرين\", \"كتابة ملخص\"];\n\ndocument.querySelector(\"#title\").textContent = \"مهامي اليوم\";\n\nconst list = document.querySelector(\"#todo\");\nfor (const task of tasks) {\n  const li = document.createElement(\"li\");\n  li.textContent = task;\n  list.append(li);\n}\n\nlist.children[0].classList.add(\"done\");\n\nconsole.log(list.children.length);\nconsole.log(document.querySelector(\"#title\").textContent);"
+   },
+   "quiz": [
+    {
+     "q": "أيهما آمن لعرض نص كتبه المستخدم؟",
+     "o": [
+      "<code dir=\"ltr\">textContent</code>",
+      "<code dir=\"ltr\">innerHTML</code>",
+      "كلاهما آمن"
+     ],
+     "a": 0,
+     "why": "innerHTML يفسّر الوسوم وقد يُنفّذ كوداً خبيثاً (XSS)."
+    },
+    {
+     "q": "ماذا تفعل <code dir=\"ltr\">classList.toggle(&quot;open&quot;)</code>؟",
+     "o": [
+      "تضيف الصنف دائماً",
+      "تضيفه إن لم يكن موجوداً وتزيله إن كان موجوداً",
+      "تحذف كل الأصناف"
+     ],
+     "a": 1,
+     "why": "toggle تبدّل الحالة بين وجود الصنف وغيابه."
+    },
+    {
+     "q": "كيف نكتب خاصية CSS <code dir=\"ltr\">background-color</code> في JavaScript؟",
+     "o": [
+      "<code dir=\"ltr\">style.background-color</code>",
+      "<code dir=\"ltr\">style.backgroundColor</code>",
+      "<code dir=\"ltr\">style[&quot;background color&quot;]</code>"
+     ],
+     "a": 1,
+     "why": "الخصائص ذات الشرطة تُكتب بأسلوب camelCase."
+    }
+   ]
+  },
+  {
+   "body": "<h2>الصفحة تستجيب</h2>\n<p><strong>الحدث (Event)</strong> هو شيء يحدث في الصفحة: ضغطة زر، كتابة في حقل، تحريك الفأرة، إرسال نموذج. ونحن نكتب كوداً <strong>يستمع</strong> للحدث وينفّذ دالة عندما يقع.</p>\n<h2>addEventListener</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;button id=&quot;like&quot;&gt;أعجبني 👍&lt;/button&gt;\n&lt;p id=&quot;count&quot;&gt;0&lt;/p&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const button = document.querySelector(&quot;#like&quot;);\nconst countEl = document.querySelector(&quot;#count&quot;);\nlet likes = 0;\n\nbutton.addEventListener(&quot;click&quot;, () =&gt; {\n  likes++;\n  countEl.textContent = likes;\n});\n\n// محاكاة ثلاث ضغطات للتجربة\nbutton.click();\nbutton.click();\nbutton.click();\nconsole.log(countEl.textContent);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>3</code></pre></div>\n<p>الصيغة: <code dir=\"ltr\">element.addEventListener(&quot;نوع الحدث&quot;, دالة)</code>. الدالة لا تُنفَّذ الآن، بل <strong>كلما</strong> وقع الحدث، ولهذا تسمى <strong>معالج الحدث (event handler)</strong>.</p>\n<div class=\"callout tip\">💡 في الصفحات الحقيقية المستخدم هو من يضغط. استخدمنا <code dir=\"ltr\">button.click()</code> هنا فقط لمحاكاة الضغط في التمرين. جرّب أيضاً الضغط بنفسك على الزر في المعاينة!</div>\n<h2>أشهر الأحداث</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>الحدث</th><th>يقع عندما</th></tr></thead><tbody><tr><td><code dir=\"ltr\">click</code></td><td>الضغط على العنصر</td></tr><tr><td><code dir=\"ltr\">input</code></td><td>تتغير قيمة حقل الإدخال (مع كل حرف)</td></tr><tr><td><code dir=\"ltr\">change</code></td><td>تتغير القيمة ويغادر المستخدم الحقل</td></tr><tr><td><code dir=\"ltr\">submit</code></td><td>إرسال نموذج</td></tr><tr><td><code dir=\"ltr\">keydown</code></td><td>الضغط على مفتاح في لوحة المفاتيح</td></tr><tr><td><code dir=\"ltr\">mouseenter</code> و <code dir=\"ltr\">mouseleave</code></td><td>دخول الفأرة للعنصر وخروجها</td></tr></tbody></table></div>\n<h2>كائن الحدث (event)</h2>\n<p>دالة المعالج تستقبل كائناً فيه تفاصيل ما حدث:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;input id=&quot;search&quot; placeholder=&quot;ابحث...&quot;&gt;\n&lt;p id=&quot;preview&quot;&gt;&lt;/p&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const search = document.querySelector(&quot;#search&quot;);\nconst preview = document.querySelector(&quot;#preview&quot;);\n\nsearch.addEventListener(&quot;input&quot;, event =&gt; {\n  preview.textContent = `تبحث عن: ${event.target.value}`;\n});\n\nsearch.value = &quot;لابتوب&quot;;\nsearch.dispatchEvent(new Event(&quot;input&quot;));\nconsole.log(preview.textContent);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>تبحث عن: لابتوب</code></pre></div>\n<ul><li><code dir=\"ltr\">event.target</code> العنصر الذي وقع عليه الحدث.</li><li><code dir=\"ltr\">event.target.value</code> قيمة الحقل.</li><li><code dir=\"ltr\">event.key</code> المفتاح المضغوط في أحداث لوحة المفاتيح.</li></ul>\n<h2>منع السلوك الافتراضي</h2>\n<p>بعض العناصر لها سلوك تلقائي: النموذج يعيد تحميل الصفحة عند إرساله، والرابط ينقلك لصفحة أخرى. <code dir=\"ltr\">preventDefault()</code> توقف ذلك:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;form id=&quot;login&quot;&gt;\n  &lt;input name=&quot;user&quot; value=&quot;ali&quot;&gt;\n  &lt;button&gt;دخول&lt;/button&gt;\n&lt;/form&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const form = document.querySelector(&quot;#login&quot;);\n\nform.addEventListener(&quot;submit&quot;, event =&gt; {\n  event.preventDefault();\n  const user = form.elements.user.value;\n  console.log(`محاولة دخول: ${user}`);\n});\n\nform.requestSubmit();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>محاولة دخول: ali</code></pre></div>\n<p>بدون <code dir=\"ltr\">preventDefault()</code> كانت الصفحة ستُعاد تحميلها وتضيع البيانات. هذا السطر موجود في كل نموذج تتعامل معه JavaScript تقريباً.</p>\n<h2>إزالة المستمع</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;button id=&quot;once&quot;&gt;اضغط مرة واحدة&lt;/button&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const btn = document.querySelector(&quot;#once&quot;);\nlet clicks = 0;\n\nfunction handleClick() {\n  clicks++;\n  btn.removeEventListener(&quot;click&quot;, handleClick);\n}\nbtn.addEventListener(&quot;click&quot;, handleClick);\n\nbtn.click();\nbtn.click();\nconsole.log(clicks);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1</code></pre></div>\n<p>لإزالة مستمع يجب أن تمرر <strong>نفس الدالة</strong>، لذلك عرّفناها باسم بدلاً من دالة سهمية مجهولة. وهناك اختصار: <code dir=\"ltr\">addEventListener(&quot;click&quot;, fn, { once: true })</code>.</p>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">addEventListener(type, handler)</code> ينفّذ الدالة عند وقوع الحدث.</li><li>أشهر الأحداث: <code dir=\"ltr\">click</code> و <code dir=\"ltr\">input</code> و <code dir=\"ltr\">submit</code> و <code dir=\"ltr\">keydown</code>.</li><li><code dir=\"ltr\">event.target</code> العنصر الذي وقع عليه الحدث.</li><li><code dir=\"ltr\">event.preventDefault()</code> يمنع السلوك التلقائي مثل إعادة تحميل الصفحة عند الإرسال.</li></ul>",
+   "exercise": {
+    "prompt": "<p>ابنِ عدّاداً بثلاثة أزرار: <code dir=\"ltr\">+</code> يزيد، و <code dir=\"ltr\">-</code> ينقص، و <code dir=\"ltr\">تصفير</code> يعيد إلى 0. والعدد يظهر في <code dir=\"ltr\">#value</code>.</p>\n<p>شرط إضافي: العدد <strong>لا ينزل تحت الصفر</strong>.</p>\n<p>أسطر المحاكاة في نهاية الكود تضغط الأزرار، لا تعدّلها. وبعد نجاحك جرّب الأزرار بنفسك في المعاينة.</p>",
+    "html": "<h2 id=\"value\">0</h2>\n<button id=\"plus\">+</button>\n<button id=\"minus\">-</button>\n<button id=\"reset\">تصفير</button>",
+    "starter": "const valueEl = document.querySelector(\"#value\");\nlet count = 0;\n\n// أضف المستمعين للأزرار الثلاثة هنا\n\n\n// --- محاكاة الضغطات (لا تعدّل) ---\nconst press = id => document.querySelector(id).click();\npress(\"#plus\"); press(\"#plus\"); press(\"#plus\");\nconsole.log(valueEl.textContent);\npress(\"#minus\");\nconsole.log(valueEl.textContent);\npress(\"#reset\"); press(\"#minus\");\nconsole.log(valueEl.textContent);",
+    "expected": "3\n2\n0",
+    "solution": "const valueEl = document.querySelector(\"#value\");\nlet count = 0;\n\nconst render = () => { valueEl.textContent = count; };\n\ndocument.querySelector(\"#plus\").addEventListener(\"click\", () => {\n  count++;\n  render();\n});\ndocument.querySelector(\"#minus\").addEventListener(\"click\", () => {\n  if (count > 0) count--;\n  render();\n});\ndocument.querySelector(\"#reset\").addEventListener(\"click\", () => {\n  count = 0;\n  render();\n});\n\n// --- محاكاة الضغطات (لا تعدّل) ---\nconst press = id => document.querySelector(id).click();\npress(\"#plus\"); press(\"#plus\"); press(\"#plus\");\nconsole.log(valueEl.textContent);\npress(\"#minus\");\nconsole.log(valueEl.textContent);\npress(\"#reset\"); press(\"#minus\");\nconsole.log(valueEl.textContent);"
+   },
+   "quiz": [
+    {
+     "q": "متى تُنفَّذ الدالة الممررة إلى <code dir=\"ltr\">addEventListener(&quot;click&quot;, fn)</code>؟",
+     "o": [
+      "فوراً عند كتابة السطر",
+      "كلما ضُغط على العنصر",
+      "مرة واحدة فقط بعد تحميل الصفحة"
+     ],
+     "a": 1,
+     "why": "المعالج ينتظر وقوع الحدث، ويُنفَّذ في كل مرة يقع فيها."
+    },
+    {
+     "q": "ما فائدة <code dir=\"ltr\">event.preventDefault()</code> في حدث <code dir=\"ltr\">submit</code>؟",
+     "o": [
+      "تمنع إعادة تحميل الصفحة عند إرسال النموذج",
+      "تحذف النموذج",
+      "تمنع الكتابة في الحقول"
+     ],
+     "a": 0,
+     "why": "السلوك الافتراضي للنموذج هو إرسال البيانات وإعادة تحميل الصفحة."
+    },
+    {
+     "q": "أي حدث يقع مع كل حرف يكتبه المستخدم في حقل الإدخال؟",
+     "o": [
+      "<code dir=\"ltr\">change</code>",
+      "<code dir=\"ltr\">input</code>",
+      "<code dir=\"ltr\">submit</code>"
+     ],
+     "a": 1,
+     "why": "<code dir=\"ltr\">input</code> يقع فوراً مع كل تغيير، و <code dir=\"ltr\">change</code> عند مغادرة الحقل."
+    }
+   ]
+  },
+  {
+   "body": "<h2>مشكلة: مئات المستمعين</h2>\n<p>تخيّل قائمة فيها 500 منتج، ولكل منتج زر حذف. هل نضيف 500 مستمع؟ وماذا عن المنتجات التي تُضاف لاحقاً، ولم تكن موجودة عندما أضفنا المستمعين؟</p>\n<p>الحل الذكي اسمه <strong>تفويض الأحداث (Event Delegation)</strong>، وهو يعتمد على ظاهرة تسمى <strong>الفقاعة (Bubbling)</strong>.</p>\n<h2>فقاعة الأحداث (Bubbling)</h2>\n<p>عندما تضغط على عنصر، لا يقع الحدث عليه وحده. بل <strong>يصعد</strong> الحدث كالفقاعة إلى أبيه، ثم أب أبيه، وهكذا حتى <code dir=\"ltr\">document</code>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;div id=&quot;outer&quot;&gt;\n  &lt;button id=&quot;inner&quot;&gt;اضغطني&lt;/button&gt;\n&lt;/div&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>document.querySelector(&quot;#outer&quot;).addEventListener(&quot;click&quot;, () =&gt; {\n  console.log(&quot;وصل الحدث إلى div&quot;);\n});\ndocument.querySelector(&quot;#inner&quot;).addEventListener(&quot;click&quot;, () =&gt; {\n  console.log(&quot;ضُغط الزر&quot;);\n});\n\ndocument.querySelector(&quot;#inner&quot;).click();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>ضُغط الزر\nوصل الحدث إلى div</code></pre></div>\n<p>ضغطنا الزر فقط، لكن مستمع الـ <code dir=\"ltr\">div</code> نُفّذ أيضاً لأن الحدث صعد إليه.</p>\n<h2>الفكرة: مستمع واحد على الأب</h2>\n<p>بدلاً من مستمع لكل عنصر، نضع <strong>مستمعاً واحداً على الأب</strong>، ونعرف من <code dir=\"ltr\">event.target</code> أي ابن ضُغط بالضبط:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;ul id=&quot;menu&quot;&gt;\n  &lt;li&gt;الرئيسية&lt;/li&gt;\n  &lt;li&gt;المنتجات&lt;/li&gt;\n  &lt;li&gt;تواصل معنا&lt;/li&gt;\n&lt;/ul&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const menu = document.querySelector(&quot;#menu&quot;);\n\nmenu.addEventListener(&quot;click&quot;, event =&gt; {\n  if (event.target.tagName === &quot;LI&quot;) {\n    console.log(`اخترت: ${event.target.textContent}`);\n  }\n});\n\nmenu.children[1].click();\nmenu.children[2].click();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>اخترت: المنتجات\nاخترت: تواصل معنا</code></pre></div>\n<h2>الميزة الكبرى: العناصر الجديدة تعمل تلقائياً</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;ul id=&quot;list&quot;&gt;&lt;li&gt;عنصر 1&lt;/li&gt;&lt;/ul&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const list = document.querySelector(&quot;#list&quot;);\nlist.addEventListener(&quot;click&quot;, e =&gt; {\n  if (e.target.tagName === &quot;LI&quot;) console.log(`ضغطت ${e.target.textContent}`);\n});\n\nconst li = document.createElement(&quot;li&quot;);\nli.textContent = &quot;عنصر جديد&quot;;\nlist.append(li);\n\nli.click();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>ضغطت عنصر جديد</code></pre></div>\n<p>العنصر الجديد لم يكن موجوداً عند إضافة المستمع، ومع ذلك يعمل، لأن المستمع على الأب.</p>\n<h2>closest و data-attributes: الأسلوب الاحترافي</h2>\n<p>في الواقع، العنصر المضغوط قد يكون أيقونة داخل الزر وليس الزر نفسه. لذلك نستخدم <code dir=\"ltr\">closest</code>، ونخزّن بيانات العنصر في خصائص <code dir=\"ltr\">data-*</code>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;div id=&quot;products&quot;&gt;\n  &lt;div class=&quot;card&quot; data-id=&quot;7&quot;&gt;\n    &lt;span&gt;سماعة&lt;/span&gt;\n    &lt;button class=&quot;delete&quot; data-id=&quot;7&quot;&gt;&lt;b&gt;✕&lt;/b&gt; حذف&lt;/button&gt;\n  &lt;/div&gt;\n&lt;/div&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>document.querySelector(&quot;#products&quot;).addEventListener(&quot;click&quot;, event =&gt; {\n  const btn = event.target.closest(&quot;.delete&quot;);\n  if (!btn) return;\n  console.log(`حذف المنتج رقم ${btn.dataset.id}`);\n  btn.closest(&quot;.card&quot;).remove();\n});\n\ndocument.querySelector(&quot;.delete b&quot;).click();\nconsole.log(document.querySelectorAll(&quot;.card&quot;).length);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>حذف المنتج رقم 7\n0</code></pre></div>\n<ul><li><code dir=\"ltr\">closest(&quot;.delete&quot;)</code> تجد الزر حتى لو ضُغط على <code dir=\"ltr\">&lt;b&gt;</code> داخله.</li><li><code dir=\"ltr\">data-id=&quot;7&quot;</code> في HTML تُقرأ في JavaScript عبر <code dir=\"ltr\">element.dataset.id</code>.</li><li><code dir=\"ltr\">if (!btn) return;</code> تتجاهل الضغطات على أي مكان آخر داخل الأب.</li></ul>\n<h2>إيقاف الفقاعة</h2>\n<p>في حالات نادرة تريد منع الحدث من الصعود: <code dir=\"ltr\">event.stopPropagation()</code>. لكن استخدمها بحذر، لأنها قد تعطّل مستمعين آخرين يعتمدون على الفقاعة.</p>\n<h2>ملخص الدرس</h2>\n<ul><li>الأحداث تصعد من العنصر إلى آبائه (Bubbling).</li><li>التفويض: مستمع واحد على الأب بدلاً من مستمع لكل ابن.</li><li>يعمل تلقائياً مع العناصر المضافة لاحقاً.</li><li><code dir=\"ltr\">event.target.closest(selector)</code> و <code dir=\"ltr\">dataset</code> هما الأسلوب الاحترافي.</li></ul>",
+   "exercise": {
+    "prompt": "<p>لديك قائمة مهام، لكل مهمة زر <code dir=\"ltr\">✓</code> لإنهائها وزر <code dir=\"ltr\">✕</code> لحذفها. باستخدام <strong>مستمع واحد فقط</strong> على <code dir=\"ltr\">#tasks</code>:</p>\n<ul><li>الضغط على زر له الصنف <code dir=\"ltr\">toggle</code> يضيف/يزيل الصنف <code dir=\"ltr\">done</code> للعنصر <code dir=\"ltr\">li</code> الذي يحتويه.</li><li>الضغط على زر له الصنف <code dir=\"ltr\">remove</code> يحذف العنصر <code dir=\"ltr\">li</code> الذي يحتويه.</li></ul>\n<p>أسطر المحاكاة في النهاية تختبر الحل، لا تعدّلها.</p>",
+    "html": "<ul id=\"tasks\">\n  <li>شراء الخبز <button class=\"toggle\">✓</button><button class=\"remove\">✕</button></li>\n  <li>دفع الفاتورة <button class=\"toggle\">✓</button><button class=\"remove\">✕</button></li>\n  <li>الاتصال بالطبيب <button class=\"toggle\">✓</button><button class=\"remove\">✕</button></li>\n</ul>\n<style>.done { text-decoration: line-through; color: gray; }</style>",
+    "starter": "const tasks = document.querySelector(\"#tasks\");\n\n// أضف مستمعاً واحداً هنا\n\n\n// --- اختبار (لا تعدّل) ---\nconst items = () => [...tasks.querySelectorAll(\"li\")];\nitems()[0].querySelector(\".toggle\").click();\nconsole.log(items()[0].classList.contains(\"done\"));\nitems()[1].querySelector(\".remove\").click();\nconsole.log(items().length);\nitems()[0].querySelector(\".toggle\").click();\nconsole.log(items()[0].classList.contains(\"done\"));",
+    "expected": "true\n2\nfalse",
+    "solution": "const tasks = document.querySelector(\"#tasks\");\n\ntasks.addEventListener(\"click\", event => {\n  const li = event.target.closest(\"li\");\n  if (!li) return;\n  if (event.target.closest(\".toggle\")) {\n    li.classList.toggle(\"done\");\n  } else if (event.target.closest(\".remove\")) {\n    li.remove();\n  }\n});\n\n// --- اختبار (لا تعدّل) ---\nconst items = () => [...tasks.querySelectorAll(\"li\")];\nitems()[0].querySelector(\".toggle\").click();\nconsole.log(items()[0].classList.contains(\"done\"));\nitems()[1].querySelector(\".remove\").click();\nconsole.log(items().length);\nitems()[0].querySelector(\".toggle\").click();\nconsole.log(items()[0].classList.contains(\"done\"));"
+   },
+   "quiz": [
+    {
+     "q": "ما هي فقاعة الأحداث (Bubbling)؟",
+     "o": [
+      "صعود الحدث من العنصر المضغوط إلى آبائه",
+      "تكرار الحدث مرتين",
+      "حذف الحدث بعد وقوعه"
+     ],
+     "a": 0,
+     "why": "يقع الحدث على العنصر ثم يصعد إلى كل آبائه."
+    },
+    {
+     "q": "ما الميزة الأساسية لتفويض الأحداث؟",
+     "o": [
+      "يجعل الأحداث أسرع",
+      "مستمع واحد يكفي لكل الأبناء، بما فيهم العناصر المضافة لاحقاً",
+      "يمنع الأحداث من الصعود"
+     ],
+     "a": 1,
+     "why": "المستمع على الأب يلتقط أحداث كل أبنائه الحاليين والمستقبليين."
+    },
+    {
+     "q": "كيف نقرأ <code dir=\"ltr\">data-price=&quot;50&quot;</code> من عنصر في JavaScript؟",
+     "o": [
+      "<code dir=\"ltr\">el.data.price</code>",
+      "<code dir=\"ltr\">el.dataset.price</code>",
+      "<code dir=\"ltr\">el.price</code>"
+     ],
+     "a": 1,
+     "why": "خصائص <code dir=\"ltr\">data-*</code> تُقرأ عبر <code dir=\"ltr\">dataset</code>."
+    }
+   ]
+  }
  ]
 ]);

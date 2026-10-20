@@ -19,12 +19,42 @@ require(path.resolve(__dirname, "..", "js", "content", course + ".js"));
   const page = await browser.newPage();
   const errors = [];
   page.on("pageerror", e => errors.push(e.message));
-  let fails = 0, n = 0;
+  let fails = 0, n = 0, domN = 0;
   for (let m = 0; m < CW.modules.length; m++) {
     for (let l = 0; l < CW.modules[m].length; l++) {
       const ex = CW.modules[m][l].exercise;
       await page.goto(`${root}lesson.html?c=${course}&m=${m}&l=${l}`);
       await page.waitForSelector(".prose");
+      // أمثلة DOM في الشرح: كتلة HTML ثم JavaScript ثم المخرجات
+      const domFails = await page.evaluate(() => new Promise(resolve => {
+        const blocks = [...document.querySelectorAll(".prose .code-block")].map(b => ({
+          label: b.querySelector(".code-label").textContent, code: b.querySelector("code").textContent }));
+        const jobs = [];
+        let html = "";
+        blocks.forEach((b, i) => {
+          if (b.label === "HTML") html = b.code;
+          const next = blocks[i + 1];
+          if (b.label === "JavaScript" && /document/.test(b.code) && next && next.label === "المخرجات")
+            jobs.push({ code: b.code, html, want: next.code });
+        });
+        const norm = s => s.split("\n").map(x => x.trim()).join("\n").trim();
+        const fails = [], count = jobs.length;
+        const box = document.createElement("div");
+        box.style.display = "none";
+        document.body.append(box);
+        const next = () => {
+          const job = jobs.shift();
+          if (!job) return resolve({ fails, count });
+          CW.runDOM(job.code, job.html, box, lines => {
+            const got = norm(lines.map(l => (l.kind === "err" ? "ERR: " : "") + l.text).join("\n"));
+            if (got !== norm(job.want)) fails.push(`المتوقع:\n${norm(job.want)}\nالفعلي:\n${got}`);
+            next();
+          });
+        };
+        next();
+      }));
+      domN += domFails.count;
+      domFails.fails.forEach(f => { fails++; console.log(`✗ وحدة ${m + 1} درس ${l + 1} مثال DOM\n  ${f.replace(/\n/g, "\n  ")}`); });
       if (!ex) continue;
       n++;
       const tryCode = async code => {
@@ -47,6 +77,6 @@ require(path.resolve(__dirname, "..", "js", "content", course + ".js"));
   }
   await browser.close();
   if (errors.length) { fails += errors.length; console.log("أخطاء الصفحة:", errors); }
-  console.log(fails ? `\n${fails} مشكلة` : `✓ ${n} تمريناً نجحت في المتصفح`);
+  console.log(fails ? `\n${fails} مشكلة` : `✓ ${n} تمريناً و ${domN} مثال DOM نجحت في المتصفح`);
   process.exit(fails ? 1 : 0);
 })();
