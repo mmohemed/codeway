@@ -11,6 +11,7 @@
     return;
   }
   document.title = title + " | " + c.name + " | CodeWay";
+  CW.applyBrand(c.color);
 
   // قائمة مسطحة لكل الدروس لتسهيل السابق والتالي
   const flat = [];
@@ -24,8 +25,11 @@
   const hasEditor = jsCourses.includes(c.id);
 
   app.innerHTML = `
+    <div class="lesson-head"><div class="container">
+      <span class="lang-badge">${CW.esc(c.short)}</span>
+      <div class="crumbs"><a href="index.html">الرئيسية</a> / <a href="course.html?id=${c.id}">${CW.esc(c.name)}</a> / <span>الوحدة ${m + 1}: ${CW.esc(mod.t)}</span></div>
+    </div></div>
     <div class="page-body"><div class="container">
-      <div class="crumbs" style="margin-bottom:16px"><a href="index.html">الرئيسية</a> / <a href="course.html?id=${c.id}">${CW.esc(c.name)}</a> / <span>الوحدة ${m + 1}</span></div>
       <div class="lesson-layout">
         <aside class="card lesson-nav" id="lesson-nav"></aside>
         <article class="card lesson-content">

@@ -24,6 +24,36 @@
   CW.pathsUsing = id => CW.paths.filter(p => p.steps.includes(id));
   CW.fieldsUsing = id => CW.fields.filter(f => f.languages.includes(id) || f.tools.includes(id));
 
+  // ---------- هوية اللون ----------
+  // يحوّل لون اللغة أو المجال إلى متغيرات CSS: خلفية الرأس، ولون مقروء على الأبيض، ولون النص فوقه
+  const rgb = hex => { const n = parseInt(hex.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+  const toHex = c => "#" + c.map(v => Math.round(v).toString(16).padStart(2, "0")).join("");
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+  const lum = c => {
+    const [r, g, b] = c.map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); });
+    return .2126 * r + .7152 * g + .0722 * b;
+  };
+  CW.applyBrand = hex => {
+    const c = rgb(hex);
+    let ink = c;
+    // نغمّق اللون حتى يصبح مقروءاً كنص أو زر على خلفية بيضاء
+    while (lum(ink) > .18) ink = mix(ink, [0, 0, 0], .12);
+    const st = document.documentElement.style;
+    st.setProperty("--brand", hex);
+    st.setProperty("--brand-ink", toHex(ink));
+    st.setProperty("--brand-soft", toHex(mix(c, [255, 255, 255], .88)));
+    st.setProperty("--on-brand", lum(c) > .45 ? "#141a26" : "#ffffff");
+  };
+  // نقش ثابت لكل عنصر حسب ترتيبه في قائمته، حتى لا تتشابه الصفحات المتجاورة
+  CW.patternClass = id => {
+    const lists = [CW.languages, CW.tools, CW.fields, CW.paths];
+    for (const list of lists) {
+      const i = list.findIndex(x => x.id === id);
+      if (i >= 0) return "pat-" + (i % 5);
+    }
+    return "pat-0";
+  };
+
   // ---------- تتبّع التقدّم ----------
   // يُحفظ كقائمة مفاتيح "رقم الوحدة-رقم الدرس" لكل دورة
   CW.progress = {
@@ -49,7 +79,7 @@
   CW.courseCard = c => {
     const pct = CW.progress.percent(c.id);
     return `
-      <a class="card" href="course.html?id=${c.id}">
+      <a class="card tinted" style="--c:${c.color}" href="course.html?id=${c.id}">
         <div class="card-top">
           <span class="lang-badge" style="background:${c.color}">${CW.esc(c.short)}</span>
           <div><h3>${CW.esc(c.name)}</h3><span class="muted" style="font-size:13px">${c.kind || "لغة برمجة"}</span></div>
@@ -66,8 +96,8 @@
   };
 
   CW.fieldCard = f => `
-    <a class="card" href="field.html?id=${f.id}">
-      <div class="card-top"><span class="field-icon">${f.icon}</span><h3>${CW.esc(f.name)}</h3></div>
+    <a class="card tinted" style="--c:${f.color}" href="field.html?id=${f.id}">
+      <div class="card-top"><span class="field-icon" style="background:${f.color}1f">${f.icon}</span><h3>${CW.esc(f.name)}</h3></div>
       <p>${CW.esc(f.desc)}</p>
       <div class="meta">
         <span class="tag">${f.languages.length} لغات</span>
@@ -76,8 +106,8 @@
     </a>`;
 
   CW.pathCard = p => `
-    <a class="card" href="path.html?id=${p.id}">
-      <div class="card-top"><span class="field-icon">${p.icon}</span>
+    <a class="card tinted" style="--c:${CW.getField(p.field).color}" href="path.html?id=${p.id}">
+      <div class="card-top"><span class="field-icon" style="background:${CW.getField(p.field).color}1f">${p.icon}</span>
         <div><h3>${CW.esc(p.name)}</h3><span class="muted" style="font-size:13px">مسار مهني</span></div></div>
       <p>${CW.esc(p.desc)}</p>
       <div class="meta">
@@ -118,21 +148,11 @@
           <form class="nav-search" action="catalog.html">
             <input type="search" name="q" placeholder="ابحث عن لغة أو أداة..." aria-label="بحث">
           </form>
-          <button class="icon-btn" id="theme-toggle" aria-label="تبديل الوضع">🌙</button>
           <a class="btn btn-ghost" href="#">دخول</a>
           <a class="btn btn-primary" href="catalog.html">ابدأ مجاناً</a>
         </div>
       </div>`;
     document.getElementById("menu-toggle").onclick = () => document.getElementById("nav-links").classList.toggle("open");
-    const tBtn = document.getElementById("theme-toggle");
-    const syncIcon = () => { tBtn.textContent = document.documentElement.dataset.theme === "dark" ? "☀️" : "🌙"; };
-    syncIcon();
-    tBtn.onclick = () => {
-      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-      document.documentElement.dataset.theme = next;
-      CW.store.set("cw-theme", next);
-      syncIcon();
-    };
   }
 
   function renderFooter() {
@@ -158,11 +178,6 @@
         </div>
       </div>`;
   }
-
-  // تطبيق الوضع المحفوظ قبل العرض
-  const saved = CW.store.get("cw-theme", null);
-  const prefersDark = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches;
-  document.documentElement.dataset.theme = saved || (prefersDark ? "dark" : "light");
 
   document.addEventListener("DOMContentLoaded", () => { renderHeader(); renderFooter(); });
 })();

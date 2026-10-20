@@ -19,38 +19,64 @@
     return [0, 0];
   }
 
+  CW.applyBrand(c.color);
+  const side = c.hello
+    ? `<div class="hello-card">
+         <div class="editor-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="file">${CW.esc(c.ext)}</span></div>
+         <pre>${CW.esc(c.hello)}</pre>
+       </div>`
+    : `<div class="hello-card"><pre style="direction:rtl;font-family:var(--font);font-size:15px">🛠️ ستبني في هذه الدورة:\n${CW.esc(c.project)}</pre></div>`;
+
   app.innerHTML = `
-    <div class="page-hero"><div class="container">
-      <div class="crumbs"><a href="index.html">الرئيسية</a> / <a href="catalog.html?tab=${c.type === "lang" ? "languages" : "tools"}">${c.type === "lang" ? "اللغات" : "الأدوات والمكتبات"}</a> / <span>${CW.esc(c.name)}</span></div>
-      <div class="card-top" style="margin-top:12px">
-        <span class="lang-badge" style="background:${c.color};width:64px;height:64px;font-size:20px">${CW.esc(c.short)}</span>
-        <div><h1>${CW.esc(c.name)}</h1><span class="tag tag-primary">${c.kind || "لغة برمجة"}</span></div>
+    <div class="brand-hero ${CW.patternClass(c.id)}">
+      <span class="watermark">${CW.esc(c.short)}</span>
+      <div class="container brand-grid">
+        <div>
+          <div class="crumbs"><a href="index.html">الرئيسية</a> / <a href="catalog.html?tab=${c.type === "lang" ? "languages" : "tools"}">${c.type === "lang" ? "اللغات" : "الأدوات والمكتبات"}</a> / <span>${CW.esc(c.name)}</span></div>
+          <div class="card-top" style="margin-top:14px">
+            <span class="lang-badge">${CW.esc(c.short)}</span>
+            <div><h1>${CW.esc(c.name)}</h1><span class="tag">${c.kind || "لغة برمجة"} · ${c.level}</span></div>
+          </div>
+          <p style="margin-top:14px">${CW.esc(c.desc)}</p>
+          <div class="hero-meta">
+            <div><b>${c.modules.length}</b><span>وحدات</span></div>
+            <div><b>${total}</b><span>درساً</span></div>
+            <div><b>${c.hours}</b><span>ساعة تقريباً</span></div>
+            <div><b>${c.level}</b><span>المستوى</span></div>
+          </div>
+        </div>
+        ${side}
       </div>
-      <p style="margin-top:12px">${CW.esc(c.desc)}</p>
-      <div class="hero-meta">
-        <div><b>${c.modules.length}</b><span>وحدات</span></div>
-        <div><b>${total}</b><span>درساً</span></div>
-        <div><b>${c.hours}</b><span>ساعة تقريباً</span></div>
-        <div><b>${c.level}</b><span>المستوى</span></div>
-      </div>
-    </div></div>
+    </div>
 
     <div class="page-body"><div class="container layout-side">
       <div>
         <h2 style="margin-top:0">محتوى الدورة</h2>
         <div class="modules" id="modules"></div>
-        <div class="card" style="margin-top:20px">
+        <div class="card id-card" style="margin-top:20px">
           <h3>🛠️ مشروع التخرج</h3>
           <p>${CW.esc(c.project)}</p>
         </div>
       </div>
-      <aside class="card side-card">
-        <h3>تقدّمك</h3>
-        <div class="progress"><i id="pbar"></i></div>
-        <span class="muted" id="ptext"></span>
-        <a class="btn btn-primary" id="continue">ابدأ التعلّم</a>
-        ${fields.length ? `<h4 style="margin:10px 0 0">ضمن المجالات</h4><div class="meta">${fields.map(f => `<a class="tag" href="field.html?id=${f.id}">${f.icon} ${f.name}</a>`).join("")}</div>` : ""}
-        ${paths.length ? `<h4 style="margin:10px 0 0">ضمن المسارات المهنية</h4><div class="meta">${paths.map(p => `<a class="tag tag-primary" href="path.html?id=${p.id}">${p.name}</a>`).join("")}</div>` : ""}
+      <aside class="side-stack">
+        <div class="card side-card">
+          <h3>تقدّمك</h3>
+          <div class="progress"><i id="pbar"></i></div>
+          <span class="muted" id="ptext"></span>
+          <a class="btn btn-primary" id="continue">ابدأ التعلّم</a>
+        </div>
+        <div class="card side-card id-card">
+          <h3>بطاقة ${CW.esc(c.name)}</h3>
+          <div>
+            ${c.year ? `<div class="id-row"><span>سنة الإصدار</span><b>${c.year}</b></div>` : ""}
+            ${c.by ? `<div class="id-row"><span>المطوّر</span><b>${c.by}</b></div>` : ""}
+            ${c.uses ? `<div class="id-row"><span>تُستخدم في</span><b>${c.uses}</b></div>` : ""}
+            <div class="id-row"><span>النوع</span><b>${c.kind || "لغة برمجة"}</b></div>
+            <div class="id-row"><span>المستوى</span><b>${c.level}</b></div>
+          </div>
+          ${fields.length ? `<h4 style="margin:6px 0 0">ضمن المجالات</h4><div class="meta">${fields.map(f => `<a class="tag" href="field.html?id=${f.id}">${f.icon} ${f.name}</a>`).join("")}</div>` : ""}
+          ${paths.length ? `<h4 style="margin:6px 0 0">ضمن المسارات المهنية</h4><div class="meta">${paths.map(p => `<a class="tag tag-primary" href="path.html?id=${p.id}">${p.name}</a>`).join("")}</div>` : ""}
+        </div>
       </aside>
     </div></div>`;
 

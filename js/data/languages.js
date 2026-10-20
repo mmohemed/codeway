@@ -250,3 +250,40 @@ CW.languages = [
     project: "سكربت نسخ احتياطي تلقائي"
   }
 ];
+
+// بطاقة الهوية لكل لغة: مثال بأسلوبها، وسنة الإصدار، والمطوّر، وأبرز الاستخدامات
+const ID = {
+  "html-css": { year: "1993 / 1996", by: "تيم بيرنرز لي و W3C", uses: "صفحات الويب وتصميمها", ext: "index.html",
+    hello: '<h1 class="title">Hello, World!</h1>\n\n<style>\n  .title { color: #e34c26; }\n</style>' },
+  javascript: { year: "1995", by: "بريندان آيك (Netscape)", uses: "الويب، الخوادم، الجوال", ext: "hello.js",
+    hello: 'const name = "World";\nconsole.log(`Hello, ${name}!`);' },
+  typescript: { year: "2012", by: "Microsoft", uses: "تطبيقات الويب الكبيرة", ext: "hello.ts",
+    hello: 'const greet = (name: string): string =>\n  `Hello, ${name}!`;\n\nconsole.log(greet("World"));' },
+  python: { year: "1991", by: "جايدو فان روسم", uses: "الذكاء الاصطناعي، البيانات، الأتمتة", ext: "hello.py",
+    hello: 'def greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("World"))' },
+  java: { year: "1995", by: "جيمس جوسلينج (Sun)", uses: "أنظمة الشركات، Android", ext: "Main.java",
+    hello: 'public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, World!");\n  }\n}' },
+  c: { year: "1972", by: "دينيس ريتشي (Bell Labs)", uses: "أنظمة التشغيل، الأنظمة المدمجة", ext: "hello.c",
+    hello: '#include <stdio.h>\n\nint main(void) {\n  printf("Hello, World!\\n");\n  return 0;\n}' },
+  cpp: { year: "1985", by: "بيارن ستروستروب", uses: "الألعاب، البرامج عالية الأداء", ext: "hello.cpp",
+    hello: '#include <iostream>\n\nint main() {\n  std::cout << "Hello, World!\\n";\n}' },
+  csharp: { year: "2000", by: "Microsoft", uses: "الويب بـ .NET، الألعاب بـ Unity", ext: "Program.cs",
+    hello: 'var name = "World";\nConsole.WriteLine($"Hello, {name}!");' },
+  go: { year: "2009", by: "Google", uses: "الخوادم، الخدمات السحابية", ext: "main.go",
+    hello: 'package main\n\nimport "fmt"\n\nfunc main() {\n  fmt.Println("Hello, World!")\n}' },
+  rust: { year: "2015", by: "Mozilla", uses: "أنظمة آمنة وسريعة", ext: "main.rs",
+    hello: 'fn main() {\n    let name = "World";\n    println!("Hello, {}!", name);\n}' },
+  php: { year: "1995", by: "راسموس ليردورف", uses: "مواقع الويب، WordPress", ext: "index.php",
+    hello: '<?php\n$name = "World";\necho "Hello, $name!";' },
+  kotlin: { year: "2011", by: "JetBrains", uses: "تطبيقات Android", ext: "Main.kt",
+    hello: 'fun main() {\n    val name = "World"\n    println("Hello, $name!")\n}' },
+  swift: { year: "2014", by: "Apple", uses: "تطبيقات iPhone و Mac", ext: "main.swift",
+    hello: 'let name = "World"\nprint("Hello, \\(name)!")' },
+  dart: { year: "2011", by: "Google", uses: "تطبيقات Flutter", ext: "main.dart",
+    hello: "void main() {\n  var name = 'World';\n  print('Hello, $name!');\n}" },
+  sql: { year: "1974", by: "IBM", uses: "قواعد البيانات والتحليل", ext: "query.sql",
+    hello: "SELECT name, price\nFROM products\nWHERE price > 100\nORDER BY price DESC;" },
+  bash: { year: "1989", by: "براين فوكس (GNU)", uses: "الأتمتة وإدارة الخوادم", ext: "hello.sh",
+    hello: '#!/bin/bash\nname="World"\necho "Hello, $name!"' }
+};
+CW.languages.forEach(l => Object.assign(l, ID[l.id]));

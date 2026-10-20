@@ -13,21 +13,25 @@
   const done = steps.reduce((n, c) => n + CW.progress.list(c.id).length, 0);
   const pct = Math.round((done / lessons) * 100);
   const field = CW.getField(p.field);
+  CW.applyBrand(field.color);
 
   app.innerHTML = `
-    <div class="page-hero"><div class="container">
-      <div class="crumbs"><a href="index.html">الرئيسية</a> / <a href="catalog.html?tab=paths">المسارات المهنية</a> / <span>${CW.esc(p.name)}</span></div>
-      <div class="card-top" style="margin-top:12px"><span class="field-icon" style="width:72px;height:72px;font-size:38px">${p.icon}</span>
-        <div><h1>${CW.esc(p.name)}</h1><span class="tag tag-primary">مسار مهني · ${p.level}</span></div></div>
-      <p style="margin-top:12px">${CW.esc(p.desc)}</p>
-      <div class="hero-meta">
-        <div><b>${p.months}</b><span>أشهر تقريباً</span></div>
-        <div><b>${steps.length}</b><span>خطوات</span></div>
-        <div><b>${lessons}</b><span>درساً</span></div>
-        <div><b>${hours}</b><span>ساعة</span></div>
-        <div><b>${p.projects.length + 1}</b><span>مشاريع</span></div>
+    <div class="brand-hero ${CW.patternClass(p.id)}">
+      <span class="watermark">${p.icon}</span>
+      <div class="container">
+        <div class="crumbs"><a href="index.html">الرئيسية</a> / <a href="catalog.html?tab=paths">المسارات المهنية</a> / <span>${CW.esc(p.name)}</span></div>
+        <div class="card-top" style="margin-top:14px"><span class="field-icon">${p.icon}</span>
+          <div><h1>${CW.esc(p.name)}</h1><span class="tag">مسار مهني · ${p.level}${field ? " · " + field.name : ""}</span></div></div>
+        <p style="margin-top:14px">${CW.esc(p.desc)}</p>
+        <div class="hero-meta">
+          <div><b>${p.months}</b><span>أشهر تقريباً</span></div>
+          <div><b>${steps.length}</b><span>خطوات</span></div>
+          <div><b>${lessons}</b><span>درساً</span></div>
+          <div><b>${hours}</b><span>ساعة</span></div>
+          <div><b>${p.projects.length + 1}</b><span>مشاريع</span></div>
+        </div>
       </div>
-    </div></div>
+    </div>
 
     <div class="page-body"><div class="container layout-side">
       <div>
@@ -36,7 +40,7 @@
           ${steps.map((c, i) => {
             const cp = CW.progress.percent(c.id);
             return `<div class="t-item${cp === 100 ? " done" : ""}" data-n="${i + 1}">
-              <a class="card" href="course.html?id=${c.id}">
+              <a class="card tinted" style="--c:${c.color}" href="course.html?id=${c.id}">
                 <div class="card-top"><span class="lang-badge" style="background:${c.color}">${CW.esc(c.short)}</span>
                   <div><span class="muted" style="font-size:13px">الخطوة ${i + 1} · ${c.kind || "لغة برمجة"}</span><h3>${CW.esc(c.name)}</h3></div></div>
                 <p>${CW.esc(c.desc)}</p>

@@ -18,7 +18,7 @@
   $("home-paths").innerHTML = CW.paths.slice(0, 6).map(CW.pathCard).join("");
   $("home-fields").innerHTML = CW.fields.slice(0, 8).map(CW.fieldCard).join("");
   $("home-langs").innerHTML = CW.languages.map(c => `
-    <a class="card" href="course.html?id=${c.id}">
+    <a class="card tinted" style="--c:${c.color}" href="course.html?id=${c.id}">
       <div class="card-top"><span class="lang-badge" style="background:${c.color}">${CW.esc(c.short)}</span>
       <div><h3>${CW.esc(c.name)}</h3><span class="muted" style="font-size:13px">${CW.lessonCount(c)} درساً · ${c.level}</span></div></div>
     </a>`).join("");
