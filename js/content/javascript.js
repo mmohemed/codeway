@@ -206,5 +206,212 @@ CW.registerContent("javascript", [
     }
    ]
   }
+ ],
+ [
+  {
+   "body": "<h2>البرنامج يتخذ قرارات</h2>\n<p>حتى الآن كانت برامجنا تنفّذ كل الأسطر بالترتيب. لكن البرامج الحقيقية تتخذ قرارات: إذا كانت كلمة المرور صحيحة ادخل، وإلا اعرض رسالة خطأ. هذا ما تفعله <strong>الجمل الشرطية</strong>.</p>\n<h2>الجملة if</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const temperature = 35;\n\nif (temperature &gt; 30) {\n  console.log(&quot;الجو حار، اشرب ماء كثيراً&quot;);\n}\nconsole.log(&quot;انتهى البرنامج&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>الجو حار، اشرب ماء كثيراً\nانتهى البرنامج</code></pre></div>\n<p>الصيغة: <code dir=\"ltr\">if (شرط) { كود }</code>. إذا كان الشرط <code dir=\"ltr\">true</code> يُنفَّذ الكود داخل الأقواس المعقوفة <code dir=\"ltr\">{ }</code>، وإذا كان <code dir=\"ltr\">false</code> يُتخطى.</p>\n<h2>if و else</h2>\n<p><code dir=\"ltr\">else</code> تحدد ما يحدث عندما يكون الشرط خاطئاً:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const age = 15;\n\nif (age &gt;= 18) {\n  console.log(&quot;يمكنك استخراج رخصة قيادة&quot;);\n} else {\n  console.log(`انتظر ${18 - age} سنوات أخرى`);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>انتظر 3 سنوات أخرى</code></pre></div>\n<h2>شروط متعددة: else if</h2>\n<p>عندما يكون لدينا أكثر من احتمالين:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const score = 78;\n\nif (score &gt;= 90) {\n  console.log(&quot;ممتاز&quot;);\n} else if (score &gt;= 75) {\n  console.log(&quot;جيد جداً&quot;);\n} else if (score &gt;= 60) {\n  console.log(&quot;جيد&quot;);\n} else {\n  console.log(&quot;راسب&quot;);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>جيد جداً</code></pre></div>\n<p>تُفحص الشروط <strong>بالترتيب من الأعلى</strong>، وعند أول شرط صحيح يُنفَّذ كوده ويُتجاهل الباقي. لذلك 78 لم تصل إلى شرط <code dir=\"ltr\">&gt;= 60</code> مع أنه صحيح أيضاً.</p>\n<div class=\"callout warn\">⚠️ الترتيب مهم: لو وضعنا <code dir=\"ltr\">score &gt;= 60</code> أولاً، لحصل كل من تجاوز 60 على &quot;جيد&quot; حتى صاحب الـ 95!</div>\n<h2>دمج الشروط</h2>\n<p>نستخدم العوامل المنطقية التي تعلمناها:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const hasAccount = true;\nconst isBanned = false;\n\nif (hasAccount &amp;&amp; !isBanned) {\n  console.log(&quot;مرحباً بعودتك&quot;);\n}\n\nconst day = &quot;الجمعة&quot;;\nif (day === &quot;الجمعة&quot; || day === &quot;السبت&quot;) {\n  console.log(&quot;عطلة نهاية الأسبوع&quot;);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>مرحباً بعودتك\nعطلة نهاية الأسبوع</code></pre></div>\n<h2>القيم الصادقة والكاذبة (Truthy و Falsy)</h2>\n<p>الشرط لا يجب أن يكون <code dir=\"ltr\">true</code> أو <code dir=\"ltr\">false</code> حرفياً. أي قيمة تُعامل كصادقة، <strong>ما عدا</strong> هذه القيم الست الكاذبة:</p>\n<p><code dir=\"ltr\">false</code> و <code dir=\"ltr\">0</code> و <code dir=\"ltr\">&quot;&quot;</code> (نص فارغ) و <code dir=\"ltr\">null</code> و <code dir=\"ltr\">undefined</code> و <code dir=\"ltr\">NaN</code></p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const username = &quot;&quot;;\n\nif (username) {\n  console.log(`أهلاً ${username}`);\n} else {\n  console.log(&quot;الرجاء إدخال اسمك&quot;);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>الرجاء إدخال اسمك</code></pre></div>\n<h2>العامل الثلاثي (Ternary)</h2>\n<p>اختصار لـ if/else البسيطة التي تختار بين قيمتين:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const stock = 0;\nconst status = stock &gt; 0 ? &quot;متوفر&quot; : &quot;نفد من المخزون&quot;;\nconsole.log(status);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>نفد من المخزون</code></pre></div>\n<p>الصيغة: <code dir=\"ltr\">شرط ? قيمة_إذا_صح : قيمة_إذا_خطأ</code>. استخدمه للحالات القصيرة فقط، أما المنطق الطويل فـ if أوضح.</p>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">if</code> تنفّذ كوداً عندما يكون الشرط صحيحاً، و <code dir=\"ltr\">else</code> عندما يكون خاطئاً.</li><li><code dir=\"ltr\">else if</code> لاحتمالات متعددة، والترتيب مهم.</li><li>القيم الكاذبة: <code dir=\"ltr\">false</code> و <code dir=\"ltr\">0</code> و <code dir=\"ltr\">&quot;&quot;</code> و <code dir=\"ltr\">null</code> و <code dir=\"ltr\">undefined</code> و <code dir=\"ltr\">NaN</code>.</li><li><code dir=\"ltr\">? :</code> اختصار لاختيار قيمة من اثنتين.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب برنامجاً يحدد تقدير الطالب حسب درجته في المتغير <code dir=\"ltr\">score</code>:</p>\n<ul><li>90 فأكثر: <code dir=\"ltr\">ممتاز</code></li><li>75 إلى 89: <code dir=\"ltr\">جيد جداً</code></li><li>60 إلى 74: <code dir=\"ltr\">مقبول</code></li><li>أقل من 60: <code dir=\"ltr\">راسب</code></li></ul>\n<p>ثم اطبع في سطر ثانٍ <code dir=\"ltr\">ناجح</code> أو <code dir=\"ltr\">راسب</code> باستخدام <strong>العامل الثلاثي</strong> (النجاح من 60).</p>",
+    "starter": "const score = 64;\n\n// اطبع التقدير\n\n// اطبع ناجح أو راسب بالعامل الثلاثي",
+    "expected": "مقبول\nناجح",
+    "solution": "const score = 64;\n\nif (score >= 90) {\n  console.log(\"ممتاز\");\n} else if (score >= 75) {\n  console.log(\"جيد جداً\");\n} else if (score >= 60) {\n  console.log(\"مقبول\");\n} else {\n  console.log(\"راسب\");\n}\n\nconsole.log(score >= 60 ? \"ناجح\" : \"راسب\");"
+   },
+   "quiz": [
+    {
+     "q": "ما الذي يُطبع؟ <code dir=\"ltr\">if (0) { console.log(&quot;A&quot;); } else { console.log(&quot;B&quot;); }</code>",
+     "o": [
+      "<code dir=\"ltr\">A</code>",
+      "<code dir=\"ltr\">B</code>",
+      "لا شيء"
+     ],
+     "a": 1,
+     "why": "الرقم <code dir=\"ltr\">0</code> من القيم الكاذبة، فيُنفَّذ فرع <code dir=\"ltr\">else</code>."
+    },
+    {
+     "q": "في سلسلة <code dir=\"ltr\">if / else if</code>، إذا تحقق أكثر من شرط، ماذا يُنفَّذ؟",
+     "o": [
+      "أول شرط صحيح فقط",
+      "كل الشروط الصحيحة",
+      "آخر شرط صحيح"
+     ],
+     "a": 0,
+     "why": "تتوقف السلسلة عند أول شرط صحيح وتتجاهل الباقي."
+    },
+    {
+     "q": "ما قيمة <code dir=\"ltr\">x</code> في: <code dir=\"ltr\">const x = 10 &gt; 5 ? &quot;نعم&quot; : &quot;لا&quot;;</code>؟",
+     "o": [
+      "<code dir=\"ltr\">&quot;نعم&quot;</code>",
+      "<code dir=\"ltr\">&quot;لا&quot;</code>",
+      "<code dir=\"ltr\">true</code>"
+     ],
+     "a": 0,
+     "why": "الشرط <code dir=\"ltr\">10 &gt; 5</code> صحيح، فيعيد العامل الثلاثي القيمة الأولى."
+    }
+   ]
+  },
+  {
+   "body": "<h2>عندما تكثر المقارنات</h2>\n<p>تخيّل أنك تريد عرض اسم اليوم حسب رقمه من 1 إلى 7. باستخدام <code dir=\"ltr\">if</code> ستكتب سبعة شروط <code dir=\"ltr\">else if (day === ...)</code>. الجملة <code dir=\"ltr\">switch</code> تجعل هذا أنظف عندما نقارن <strong>متغيراً واحداً بقيم محددة</strong>.</p>\n<h2>صيغة switch</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const day = 3;\n\nswitch (day) {\n  case 1:\n    console.log(&quot;الأحد&quot;);\n    break;\n  case 2:\n    console.log(&quot;الاثنين&quot;);\n    break;\n  case 3:\n    console.log(&quot;الثلاثاء&quot;);\n    break;\n  default:\n    console.log(&quot;يوم غير معروف&quot;);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>الثلاثاء</code></pre></div>\n<ul><li><code dir=\"ltr\">switch (day)</code> القيمة التي نفحصها.</li><li><code dir=\"ltr\">case 3:</code> إذا كانت القيمة تساوي 3 (بمقارنة صارمة <code dir=\"ltr\">===</code>).</li><li><code dir=\"ltr\">break</code> تخرج من الـ switch بعد تنفيذ الحالة.</li><li><code dir=\"ltr\">default</code> تُنفَّذ إذا لم تطابق أي حالة، وهي تشبه <code dir=\"ltr\">else</code>.</li></ul>\n<h2>خطورة نسيان break</h2>\n<p>بدون <code dir=\"ltr\">break</code> يستمر التنفيذ إلى الحالات التالية، حتى لو لم تطابق! وهذا يسمى <strong>السقوط (fall-through)</strong>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const level = 1;\n\nswitch (level) {\n  case 1:\n    console.log(&quot;المستوى الأول&quot;);\n  case 2:\n    console.log(&quot;المستوى الثاني&quot;);\n  case 3:\n    console.log(&quot;المستوى الثالث&quot;);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>المستوى الأول\nالمستوى الثاني\nالمستوى الثالث</code></pre></div>\n<div class=\"callout warn\">⚠️ نسيان <code dir=\"ltr\">break</code> من أشهر الأخطاء مع switch. اجعل كتابتها عادة بعد كل حالة.</div>\n<h2>استخدام السقوط عمداً</h2>\n<p>أحياناً نريد أن تشترك عدة قيم في نفس الكود، فنضع الحالات متتالية:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const month = &quot;فبراير&quot;;\n\nswitch (month) {\n  case &quot;ديسمبر&quot;:\n  case &quot;يناير&quot;:\n  case &quot;فبراير&quot;:\n    console.log(&quot;الشتاء&quot;);\n    break;\n  case &quot;يونيو&quot;:\n  case &quot;يوليو&quot;:\n  case &quot;أغسطس&quot;:\n    console.log(&quot;الصيف&quot;);\n    break;\n  default:\n    console.log(&quot;الربيع أو الخريف&quot;);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>الشتاء</code></pre></div>\n<h2>switch أم if؟</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>استخدم switch عندما</th><th>استخدم if عندما</th></tr></thead><tbody><tr><td>تقارن متغيراً واحداً بقيم ثابتة محددة</td><td>تحتاج نطاقات مثل <code dir=\"ltr\">score &gt; 90</code></td></tr><tr><td>الحالات كثيرة ومتشابهة</td><td>الشروط مختلفة أو مركبة بـ <code dir=\"ltr\">&amp;&amp;</code> و <code dir=\"ltr\">||</code></td></tr></tbody></table></div>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">switch</code> تقارن قيمة واحدة بعدة حالات باستخدام <code dir=\"ltr\">===</code>.</li><li><code dir=\"ltr\">break</code> ضرورية للخروج بعد كل حالة، وإلا يحدث السقوط.</li><li><code dir=\"ltr\">default</code> للحالة التي لا تطابق أي <code dir=\"ltr\">case</code>.</li><li>يمكن جمع عدة حالات لتشترك في نفس الكود.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب <code dir=\"ltr\">switch</code> يطبع سعر المشروب حسب المتغير <code dir=\"ltr\">drink</code>:</p>\n<ul><li><code dir=\"ltr\">قهوة</code> و <code dir=\"ltr\">شاي</code> سعرهما: <code dir=\"ltr\">10 ريال</code></li><li><code dir=\"ltr\">عصير</code>: <code dir=\"ltr\">15 ريال</code></li><li>أي مشروب آخر: <code dir=\"ltr\">غير متوفر</code></li></ul>\n<p>ثم غيّر قيمة <code dir=\"ltr\">drink</code> في السطر الثالث إلى <code dir=\"ltr\">ماء</code> واطبع مرة أخرى، بحيث تكون المخرجات سطرين.</p>",
+    "starter": "let drink = \"شاي\";\n// اكتب switch هنا\n\ndrink = \"ماء\";\n// انسخ نفس الـ switch هنا",
+    "expected": "10 ريال\nغير متوفر",
+    "solution": "let drink = \"شاي\";\nswitch (drink) {\n  case \"قهوة\":\n  case \"شاي\":\n    console.log(\"10 ريال\");\n    break;\n  case \"عصير\":\n    console.log(\"15 ريال\");\n    break;\n  default:\n    console.log(\"غير متوفر\");\n}\n\ndrink = \"ماء\";\nswitch (drink) {\n  case \"قهوة\":\n  case \"شاي\":\n    console.log(\"10 ريال\");\n    break;\n  case \"عصير\":\n    console.log(\"15 ريال\");\n    break;\n  default:\n    console.log(\"غير متوفر\");\n}"
+   },
+   "quiz": [
+    {
+     "q": "ما وظيفة <code dir=\"ltr\">break</code> داخل <code dir=\"ltr\">switch</code>؟",
+     "o": [
+      "تعيد تشغيل الـ switch",
+      "تخرج من الـ switch بعد تنفيذ الحالة",
+      "تتخطى الحالة الحالية"
+     ],
+     "a": 1,
+     "why": "بدون <code dir=\"ltr\">break</code> يستمر التنفيذ إلى الحالات التالية."
+    },
+    {
+     "q": "متى تُنفَّذ <code dir=\"ltr\">default</code>؟",
+     "o": [
+      "دائماً في النهاية",
+      "عندما لا تطابق القيمة أي <code dir=\"ltr\">case</code>",
+      "عندما تطابق القيمة أول <code dir=\"ltr\">case</code>"
+     ],
+     "a": 1,
+     "why": "<code dir=\"ltr\">default</code> تشبه <code dir=\"ltr\">else</code> في جملة if."
+    },
+    {
+     "q": "أي مقارنة تستخدمها <code dir=\"ltr\">switch</code> بين القيمة والحالات؟",
+     "o": [
+      "<code dir=\"ltr\">==</code>",
+      "<code dir=\"ltr\">===</code>",
+      "<code dir=\"ltr\">&gt;=</code>"
+     ],
+     "a": 1,
+     "why": "تستخدم switch المقارنة الصارمة، لذلك <code dir=\"ltr\">case &quot;1&quot;:</code> لا تطابق الرقم <code dir=\"ltr\">1</code>."
+    }
+   ]
+  },
+  {
+   "body": "<h2>لماذا نحتاج الحلقات؟</h2>\n<p>اطبع الأرقام من 1 إلى 5... سهل، خمسة أسطر. لكن ماذا عن 1 إلى 1000؟ <strong>الحلقات (Loops)</strong> تكرر كوداً عدداً من المرات دون أن نكتبه مراراً.</p>\n<h2>حلقة for</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>for (let i = 1; i &lt;= 5; i++) {\n  console.log(i);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1\n2\n3\n4\n5</code></pre></div>\n<p>الحلقة لها ثلاثة أجزاء داخل الأقواس، مفصولة بفاصلة منقوطة:</p>\n<div class=\"table-wrap\"><table><thead><tr><th>الجزء</th><th>الكود</th><th>معناه</th></tr></thead><tbody><tr><td>البداية</td><td><code dir=\"ltr\">let i = 1</code></td><td>يُنفَّذ مرة واحدة قبل أن تبدأ الحلقة</td></tr><tr><td>الشرط</td><td><code dir=\"ltr\">i &lt;= 5</code></td><td>يُفحص قبل كل دورة، وتتوقف الحلقة عندما يصبح خاطئاً</td></tr><tr><td>التحديث</td><td><code dir=\"ltr\">i++</code></td><td>يُنفَّذ بعد كل دورة</td></tr></tbody></table></div>\n<p>يسمى المتغير <code dir=\"ltr\">i</code> <strong>العدّاد</strong>، والاسم <code dir=\"ltr\">i</code> عرف متبع (من كلمة index).</p>\n<h2>تتبّع الحلقة خطوة بخطوة</h2>\n<p>من المفيد أن تتخيل ما يحدث:</p>\n<ol><li><code dir=\"ltr\">i = 1</code>، هل <code dir=\"ltr\">1 &lt;= 5</code>؟ نعم، اطبع 1، ثم <code dir=\"ltr\">i</code> تصبح 2.</li><li>هل <code dir=\"ltr\">2 &lt;= 5</code>؟ نعم، اطبع 2، ثم <code dir=\"ltr\">i</code> تصبح 3.</li><li>... وهكذا حتى <code dir=\"ltr\">i = 6</code>، هل <code dir=\"ltr\">6 &lt;= 5</code>؟ لا، توقف.</li></ol>\n<h2>أمثلة متنوعة</h2>\n<p>العدّ التنازلي:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>for (let i = 3; i &gt;= 1; i--) {\n  console.log(`${i}...`);\n}\nconsole.log(&quot;انطلق!&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>3...\n2...\n1...\nانطلق!</code></pre></div>\n<p>القفز بخطوات أكبر، مثلاً الأرقام الزوجية:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>for (let i = 0; i &lt;= 10; i += 2) {\n  console.log(i);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>0\n2\n4\n6\n8\n10</code></pre></div>\n<h2>التجميع داخل الحلقة</h2>\n<p>من أشهر استخدامات الحلقات <strong>تجميع</strong> نتيجة. مثلاً مجموع الأرقام من 1 إلى 100:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>let sum = 0;\nfor (let i = 1; i &lt;= 100; i++) {\n  sum += i;\n}\nconsole.log(sum);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>5050</code></pre></div>\n<p>لاحظ أن <code dir=\"ltr\">sum</code> عُرّف <strong>خارج</strong> الحلقة، لأننا نريده أن يحتفظ بقيمته بين الدورات.</p>\n<h2>الحلقة مع الشروط</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>for (let i = 1; i &lt;= 6; i++) {\n  if (i % 2 === 0) {\n    console.log(`${i} زوجي`);\n  } else {\n    console.log(`${i} فردي`);\n  }\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1 فردي\n2 زوجي\n3 فردي\n4 زوجي\n5 فردي\n6 زوجي</code></pre></div>\n<h2>المرور على أحرف نص</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const word = &quot;كود&quot;;\nfor (let i = 0; i &lt; word.length; i++) {\n  console.log(`الحرف ${i}: ${word[i]}`);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>الحرف 0: ك\nالحرف 1: و\nالحرف 2: د</code></pre></div>\n<p>لاحظ استخدام <code dir=\"ltr\">&lt;</code> وليس <code dir=\"ltr\">&lt;=</code>، لأن آخر موقع هو <code dir=\"ltr\">length - 1</code>.</p>\n<div class=\"callout warn\">⚠️ احذر <strong>الحلقة اللانهائية</strong>: إذا لم يصبح الشرط خاطئاً أبداً (مثلاً نسيت <code dir=\"ltr\">i++</code>) ستعمل الحلقة للأبد ويتجمد البرنامج. محرر CodeWay يوقفها بعد 5 ثوانٍ.</div>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">for (بداية; شرط; تحديث) { ... }</code> تكرر الكود ما دام الشرط صحيحاً.</li><li>يمكن العد تصاعدياً أو تنازلياً أو بخطوات.</li><li>لتجميع نتيجة، عرّف المتغير قبل الحلقة.</li><li><code dir=\"ltr\">i &lt; str.length</code> للمرور على كل أحرف نص.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب حلقة <code dir=\"ltr\">for</code> تمر على الأرقام من 1 إلى 15، وتطبع:</p>\n<ul><li><code dir=\"ltr\">FizzBuzz</code> إذا كان الرقم يقبل القسمة على 3 و 5 معاً</li><li><code dir=\"ltr\">Fizz</code> إذا كان يقبل القسمة على 3 فقط</li><li><code dir=\"ltr\">Buzz</code> إذا كان يقبل القسمة على 5 فقط</li><li>الرقم نفسه في غير ذلك</li></ul>\n<p>هذا تمرين مشهور جداً في مقابلات التوظيف! تلميح: افحص حالة 3 و 5 معاً <strong>أولاً</strong>.</p>",
+    "starter": "for (let i = 1; i <= 15; i++) {\n  // أكمل هنا\n}",
+    "expected": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz",
+    "solution": "for (let i = 1; i <= 15; i++) {\n  if (i % 3 === 0 && i % 5 === 0) {\n    console.log(\"FizzBuzz\");\n  } else if (i % 3 === 0) {\n    console.log(\"Fizz\");\n  } else if (i % 5 === 0) {\n    console.log(\"Buzz\");\n  } else {\n    console.log(i);\n  }\n}"
+   },
+   "quiz": [
+    {
+     "q": "كم مرة تُنفَّذ هذه الحلقة؟ <code dir=\"ltr\">for (let i = 0; i &lt; 4; i++)</code>",
+     "o": [
+      "3 مرات",
+      "4 مرات",
+      "5 مرات"
+     ],
+     "a": 1,
+     "why": "القيم هي 0 و 1 و 2 و 3، أي أربع دورات. عند 4 يصبح الشرط خاطئاً."
+    },
+    {
+     "q": "متى يُفحص شرط حلقة for؟",
+     "o": [
+      "قبل كل دورة",
+      "بعد كل دورة",
+      "مرة واحدة في البداية"
+     ],
+     "a": 0,
+     "why": "يُفحص الشرط قبل كل دورة، وإذا كان خاطئاً من البداية لا تُنفَّذ الحلقة أبداً."
+    },
+    {
+     "q": "لماذا نعرّف متغير المجموع <code dir=\"ltr\">sum</code> قبل الحلقة وليس داخلها؟",
+     "o": [
+      "لأن JavaScript لا تسمح بتعريف متغيرات داخل الحلقات",
+      "لأن تعريفه داخلها يعيده إلى الصفر في كل دورة",
+      "لأن ذلك أسرع فقط"
+     ],
+     "a": 1,
+     "why": "لو عُرّف داخل الحلقة لأُنشئ من جديد في كل دورة وفُقد ما جمعناه."
+    }
+   ]
+  },
+  {
+   "body": "<h2>حلقة while</h2>\n<p>تستخدم <code dir=\"ltr\">for</code> عندما نعرف <strong>عدد التكرارات</strong> مسبقاً. أما <code dir=\"ltr\">while</code> فنستخدمها عندما نريد التكرار <strong>ما دام شرط معين صحيحاً</strong>، دون معرفة عدد المرات.</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>let balance = 1000;\nlet months = 0;\n\nwhile (balance &gt; 0) {\n  balance -= 300;\n  months++;\n}\nconsole.log(`نفد الرصيد بعد ${months} أشهر`);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>نفد الرصيد بعد 4 أشهر</code></pre></div>\n<p>الصيغة: <code dir=\"ltr\">while (شرط) { كود }</code>. يُفحص الشرط قبل كل دورة تماماً مثل for.</p>\n<h2>مثال: مضاعفة حتى حد معين</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>let n = 1;\nwhile (n &lt; 100) {\n  n *= 2;\n}\nconsole.log(n);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>128</code></pre></div>\n<p>لا نعرف مسبقاً كم مرة سنضاعف، لذلك <code dir=\"ltr\">while</code> مناسبة هنا.</p>\n<h2>for و while وجهان لعملة واحدة</h2>\n<p>أي حلقة for يمكن كتابتها بـ while:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>let i = 1;\nwhile (i &lt;= 3) {\n  console.log(i);\n  i++;\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1\n2\n3</code></pre></div>\n<p>لكن لاحظ أن البداية والتحديث تفرقا في أماكن مختلفة، ولهذا <code dir=\"ltr\">for</code> أوضح عندما نعدّ.</p>\n<h2>حلقة do...while</h2>\n<p>الفرق الوحيد: <code dir=\"ltr\">do...while</code> تنفّذ الكود <strong>مرة واحدة على الأقل</strong> قبل فحص الشرط، لأن الشرط في الأسفل:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>let attempts = 10;\n\ndo {\n  console.log(`المحاولة رقم ${attempts}`);\n  attempts++;\n} while (attempts &lt; 3);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>المحاولة رقم 10</code></pre></div>\n<p>الشرط <code dir=\"ltr\">10 &lt; 3</code> خاطئ من البداية، ومع ذلك نُفّذ الكود مرة واحدة. لو استخدمنا <code dir=\"ltr\">while</code> العادية لما طُبع شيء.</p>\n<p>متى نحتاجها؟ مثلاً عند طلب إدخال من المستخدم: نسأل مرة على الأقل، ثم نكرر السؤال إذا كانت الإجابة غير صالحة.</p>\n<h2>مقارنة سريعة</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>الحلقة</th><th>متى تستخدمها</th></tr></thead><tbody><tr><td><code dir=\"ltr\">for</code></td><td>عدد التكرارات معروف (عدّ، أو المرور على نص أو قائمة)</td></tr><tr><td><code dir=\"ltr\">while</code></td><td>التكرار حتى يتغير شرط ما، وعدد المرات غير معروف</td></tr><tr><td><code dir=\"ltr\">do...while</code></td><td>مثل while لكن يجب التنفيذ مرة واحدة على الأقل</td></tr></tbody></table></div>\n<div class=\"callout warn\">⚠️ في <code dir=\"ltr\">while</code> تأكد أن شيئاً داخل الحلقة <strong>يغيّر الشرط</strong> في النهاية، وإلا ستحصل على حلقة لا نهائية.</div>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">while</code> تكرر ما دام الشرط صحيحاً، وتناسب الحالات التي لا نعرف فيها عدد التكرارات.</li><li><code dir=\"ltr\">do...while</code> تنفّذ مرة واحدة على الأقل لأن الشرط يُفحص بعد التنفيذ.</li><li>تأكد دائماً من أن الشرط سيصبح خاطئاً يوماً ما.</li></ul>",
+   "exercise": {
+    "prompt": "<p>لديك رقم <code dir=\"ltr\">n</code>. استخدم حلقة <code dir=\"ltr\">while</code> لحساب <strong>عدد أرقامه</strong>: اقسم الرقم على 10 باستخدام <code dir=\"ltr\">Math.floor(n / 10)</code> في كل دورة، وعدّ الدورات حتى يصبح 0.</p>\n<p>مثال: 4096 ← 409 ← 40 ← 4 ← 0، أي 4 أرقام.</p>\n<p>اطبع النتيجة بالشكل: <code dir=\"ltr\">عدد الأرقام: 4</code></p>",
+    "starter": "let n = 4096;\nlet digits = 0;\n\n// اكتب حلقة while هنا",
+    "expected": "عدد الأرقام: 4",
+    "solution": "let n = 4096;\nlet digits = 0;\n\nwhile (n > 0) {\n  n = Math.floor(n / 10);\n  digits++;\n}\nconsole.log(`عدد الأرقام: ${digits}`);"
+   },
+   "quiz": [
+    {
+     "q": "ما الفرق بين <code dir=\"ltr\">while</code> و <code dir=\"ltr\">do...while</code>؟",
+     "o": [
+      "لا يوجد فرق",
+      "<code dir=\"ltr\">do...while</code> تنفّذ الكود مرة واحدة على الأقل حتى لو كان الشرط خاطئاً",
+      "<code dir=\"ltr\">while</code> أسرع دائماً"
+     ],
+     "a": 1,
+     "why": "في do...while يأتي الشرط بعد الكود، فيُنفَّذ الكود مرة قبل أي فحص."
+    },
+    {
+     "q": "كم مرة يُطبع &quot;مرحبا&quot;؟ <code dir=\"ltr\">let x = 5; while (x &lt; 5) { console.log(&quot;مرحبا&quot;); x++; }</code>",
+     "o": [
+      "ولا مرة",
+      "مرة واحدة",
+      "5 مرات"
+     ],
+     "a": 0,
+     "why": "الشرط <code dir=\"ltr\">5 &lt; 5</code> خاطئ من البداية، فلا تُنفَّذ الحلقة."
+    },
+    {
+     "q": "أي حلقة هي الأنسب لتكرار طلب كلمة المرور حتى يدخل المستخدم كلمة صحيحة؟",
+     "o": [
+      "<code dir=\"ltr\">for</code> بعدد ثابت من التكرارات",
+      "<code dir=\"ltr\">do...while</code> لأننا نطلب مرة واحدة على الأقل",
+      "لا نحتاج حلقة"
+     ],
+     "a": 1,
+     "why": "نطلب كلمة المرور مرة على الأقل، ثم نكرر ما دامت خاطئة."
+    }
+   ]
+  },
+  {
+   "body": "<h2>التحكم في سير الحلقة</h2>\n<p>أحياناً نحتاج أن نتوقف عن الحلقة قبل نهايتها، أو نتخطى دورة معينة. هنا تأتي <code dir=\"ltr\">break</code> و <code dir=\"ltr\">continue</code>.</p>\n<h2>break: الخروج من الحلقة فوراً</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const numbers = &quot;3 8 12 7 15 4&quot;;\nconst list = numbers.split(&quot; &quot;);\n\nfor (let i = 0; i &lt; list.length; i++) {\n  const n = Number(list[i]);\n  if (n &gt; 10) {\n    console.log(`أول رقم أكبر من 10 هو ${n}`);\n    break;\n  }\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>أول رقم أكبر من 10 هو 12</code></pre></div>\n<p>بمجرد أن وجدنا ما نبحث عنه لا داعي لإكمال البحث، فـ <code dir=\"ltr\">break</code> توقف الحلقة كلياً. بدونها لكانت طبعت 15 أيضاً.</p>\n<h2>continue: تخطي الدورة الحالية</h2>\n<p><code dir=\"ltr\">continue</code> لا توقف الحلقة، بل تقفز إلى <strong>الدورة التالية</strong> مباشرة متجاهلة باقي الكود في الدورة الحالية:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>for (let i = 1; i &lt;= 7; i++) {\n  if (i % 3 === 0) {\n    continue;\n  }\n  console.log(i);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1\n2\n4\n5\n7</code></pre></div>\n<p>تخطينا 3 و 6 لأنهما يقبلان القسمة على 3.</p>\n<h2>الفرق بالصورة</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>الأمر</th><th>ماذا يحدث</th></tr></thead><tbody><tr><td><code dir=\"ltr\">break</code></td><td>يخرج من الحلقة نهائياً ويكمل الكود الذي بعدها</td></tr><tr><td><code dir=\"ltr\">continue</code></td><td>يترك الدورة الحالية وينتقل للدورة التالية</td></tr></tbody></table></div>\n<h2>مثال واقعي: البحث مع break</h2>\n<p>لنتحقق هل الرقم أولي (لا يقبل القسمة إلا على 1 ونفسه):</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const n = 29;\nlet isPrime = n &gt; 1;\n\nfor (let d = 2; d &lt; n; d++) {\n  if (n % d === 0) {\n    isPrime = false;\n    break;\n  }\n}\nconsole.log(isPrime ? `${n} عدد أولي` : `${n} ليس أولياً`);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>29 عدد أولي</code></pre></div>\n<p>إذا وجدنا قاسماً واحداً نعرف الجواب فوراً، فلا داعي لفحص باقي الأرقام.</p>\n<h2>الحلقات المتداخلة</h2>\n<p>يمكن وضع حلقة داخل حلقة. مثلاً جدول ضرب صغير:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>for (let row = 1; row &lt;= 3; row++) {\n  let line = &quot;&quot;;\n  for (let col = 1; col &lt;= 3; col++) {\n    line += `${row * col}\\t`;\n  }\n  console.log(line);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1\t2\t3\n2\t4\t6\n3\t6\t9</code></pre></div>\n<p>الرمز <code dir=\"ltr\">\\t</code> يضيف مسافة جدولة (Tab). لاحظ أن الحلقة الداخلية تكتمل بالكامل في كل دورة من الحلقة الخارجية.</p>\n<div class=\"callout tip\">💡 <code dir=\"ltr\">break</code> و <code dir=\"ltr\">continue</code> تؤثران على <strong>أقرب حلقة</strong> فقط. إذا استخدمت <code dir=\"ltr\">break</code> داخل الحلقة الداخلية، تخرج منها فقط وتستمر الخارجية.</div>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">break</code> توقف الحلقة كلياً، وهي مفيدة عند إيجاد ما نبحث عنه.</li><li><code dir=\"ltr\">continue</code> تتخطى بقية الدورة الحالية وتنتقل للتالية.</li><li>يمكن تداخل الحلقات، و <code dir=\"ltr\">break</code> و <code dir=\"ltr\">continue</code> تؤثران على أقرب حلقة فقط.</li></ul>",
+   "exercise": {
+    "prompt": "<p>لديك نص يحتوي أرقاماً مفصولة بمسافات. مرّ عليها بحلقة <code dir=\"ltr\">for</code> و:</p>\n<ul><li><strong>تخطَّ</strong> الأرقام السالبة باستخدام <code dir=\"ltr\">continue</code>.</li><li><strong>توقف</strong> تماماً عند الوصول إلى الرقم <code dir=\"ltr\">0</code> باستخدام <code dir=\"ltr\">break</code>.</li><li>اجمع باقي الأرقام.</li></ul>\n<p>في النهاية اطبع: <code dir=\"ltr\">المجموع: 18</code></p>",
+    "starter": "const data = \"5 -2 7 -9 6 0 10 3\".split(\" \");\nlet sum = 0;\n\nfor (let i = 0; i < data.length; i++) {\n  const n = Number(data[i]);\n  // أكمل هنا\n}",
+    "expected": "المجموع: 18",
+    "solution": "const data = \"5 -2 7 -9 6 0 10 3\".split(\" \");\nlet sum = 0;\n\nfor (let i = 0; i < data.length; i++) {\n  const n = Number(data[i]);\n  if (n === 0) {\n    break;\n  }\n  if (n < 0) {\n    continue;\n  }\n  sum += n;\n}\nconsole.log(`المجموع: ${sum}`);"
+   },
+   "quiz": [
+    {
+     "q": "ماذا تفعل <code dir=\"ltr\">continue</code>؟",
+     "o": [
+      "تنهي الحلقة",
+      "تتخطى بقية الدورة الحالية وتنتقل للدورة التالية",
+      "تعيد الحلقة من البداية"
+     ],
+     "a": 1,
+     "why": "continue لا توقف الحلقة، بل تقفز للدورة التالية فقط."
+    },
+    {
+     "q": "ما مخرجات: <code dir=\"ltr\">for (let i = 1; i &lt;= 5; i++) { if (i === 3) break; console.log(i); }</code>؟",
+     "o": [
+      "1 و 2",
+      "1 و 2 و 4 و 5",
+      "1 و 2 و 3"
+     ],
+     "a": 0,
+     "why": "عند <code dir=\"ltr\">i === 3</code> تتوقف الحلقة تماماً قبل الطباعة."
+    },
+    {
+     "q": "إذا استُخدمت <code dir=\"ltr\">break</code> داخل حلقة داخلية ضمن حلقة خارجية، ماذا يحدث؟",
+     "o": [
+      "تتوقف الحلقتان",
+      "تتوقف الحلقة الداخلية فقط وتستمر الخارجية",
+      "يحدث خطأ"
+     ],
+     "a": 1,
+     "why": "break تؤثر على أقرب حلقة تحيط بها فقط."
+    }
+   ]
+  }
  ]
 ]);
