@@ -1,18 +1,52 @@
-// تشغيل كود JavaScript في Web Worker معزول وإرجاع مخرجات console
-// الـ Worker يعمل في خيط منفصل، فلا تتجمد الصفحة ويمكن إيقافه عند الحلقات اللانهائية
+// تشغيل كود الطالب وإرجاع مخرجات console
+// - كود JavaScript العادي: Web Worker في خيط منفصل (لا تتجمد الصفحة ويمكن إيقافه)
+// - كود يتعامل مع DOM: إطار iframe معزول ظاهر للطالب
 window.CW = window.CW || {};
 
+// شيفرة مشتركة تُحقن قبل كود الطالب: تلتقط console وتنتظر انتهاء المؤقتات والوعود
+// قبل إعلان انتهاء التشغيل، حتى تظهر مخرجات setTimeout و Promise
+CW.runnerShim = `
+  const __fmt = v => {
+    if (typeof v === "string") return v;
+    if (v instanceof Error) return v.name + ": " + v.message;
+    if (v === undefined) return "undefined";
+    if (typeof v === "number" || typeof v === "boolean" || typeof v === "bigint") return String(v);
+    if (typeof v === "function") return "[Function: " + (v.name || "anonymous") + "]";
+    if (v instanceof Map) return "Map(" + v.size + ") " + JSON.stringify([...v]);
+    if (v instanceof Set) return "Set(" + v.size + ") " + JSON.stringify([...v]);
+    try { return JSON.stringify(v); } catch (e) { return String(v); }
+  };
+  const __send = (kind, args) => __post({ kind, text: args.map(__fmt).join(" ") });
+  console.log = console.info = console.warn = (...a) => __send("log", a);
+  console.error = (...a) => __send("err", a);
+  let __pending = 0, __started = false;
+  const __timers = new Set();
+  const __st = setTimeout, __ct = clearTimeout, __si = setInterval, __ci = clearInterval;
+  const __check = () => { if (__started && __pending === 0) __st(() => { if (__pending === 0) __post({ done: true }); }, 20); };
+  self.setTimeout = (fn, ms, ...a) => {
+    __pending++;
+    const id = __st(() => { __timers.delete(id); __pending--; try { typeof fn === "function" ? fn(...a) : 0; } catch (e) { __send("err", [e]); } __check(); }, ms);
+    __timers.add(id);
+    return id;
+  };
+  self.clearTimeout = id => { if (__timers.delete(id)) { __pending--; __check(); } __ct(id); };
+  self.setInterval = (fn, ms, ...a) => {
+    __pending++;
+    const id = __si(() => { try { fn(...a); } catch (e) { __send("err", [e]); } }, ms);
+    __timers.add(id);
+    return id;
+  };
+  self.clearInterval = id => { if (__timers.delete(id)) { __pending--; __check(); } __ci(id); };
+  self.addEventListener("unhandledrejection", e => { __send("err", ["Uncaught (in promise) " + __fmt(e.reason)]); });
+  const __run = code => {
+    try { (0, eval)(code); } catch (e) { __send("err", [e.name + ": " + e.message]); }
+    __started = true;
+    __check();
+  };
+`;
+
 CW.runJS = function (code, onDone) {
-  const workerSrc = `
-    const fmt = v => typeof v === "string" ? v : (() => { try { return JSON.stringify(v); } catch (e) { return String(v); } })();
-    const send = (kind, args) => postMessage({ kind, text: args.map(fmt).join(" ") });
-    console.log = console.info = console.warn = (...a) => send("log", a);
-    console.error = (...a) => send("err", a);
-    onmessage = e => {
-      try { (0, eval)(e.data); }
-      catch (err) { send("err", [err.name + ": " + err.message]); }
-      postMessage({ done: true });
-    };`;
+  const workerSrc = `const __post = m => postMessage(m);\n${CW.runnerShim}\nonmessage = e => __run(e.data);`;
   const lines = [];
   let worker, timer, finished = false;
   const finish = () => {
@@ -31,28 +65,81 @@ CW.runJS = function (code, onDone) {
   worker.onmessage = e => { e.data.done ? finish() : lines.push(e.data); };
   worker.onerror = e => { lines.push({ kind: "err", text: e.message }); finish(); };
   timer = setTimeout(() => {
-    lines.push({ kind: "err", text: "انتهت مهلة التشغيل (3 ثوانٍ). هل توجد حلقة لا تنتهي؟" });
+    lines.push({ kind: "err", text: "انتهت مهلة التشغيل (5 ثوانٍ). هل توجد حلقة لا تنتهي أو مؤقت لم يُلغَ؟" });
     finish();
-  }, 3000);
+  }, 5000);
   worker.postMessage(code);
 };
 
-// ربط محرر (textarea + زر + منطقة مخرجات)
-CW.bindEditor = function (textarea, button, output) {
-  const run = () => {
-    output.innerHTML = '<span class="hint">جاري التشغيل...</span>';
-    CW.runJS(textarea.value, lines => {
-      output.innerHTML = lines.length
-        ? lines.map(l => `<div class="${l.kind === "err" ? "err" : ""}">${CW.esc(l.text)}</div>`).join("")
-        : '<span class="hint">لا توجد مخرجات. استخدم console.log لطباعة النتائج.</span>';
-    });
+// تشغيل كود يتعامل مع DOM داخل إطار معزول ظاهر (الـ Worker لا يملك DOM)
+// ملاحظة: الحلقة اللانهائية هنا قد تجمّد الصفحة، لذلك نستخدمه لدروس DOM فقط
+CW.runDOM = function (code, pageHtml, container, onDone) {
+  const token = Math.random().toString(36).slice(2);
+  const lines = [];
+  let finished = false;
+  container.innerHTML = "";
+  const frame = document.createElement("iframe");
+  frame.setAttribute("sandbox", "allow-scripts");
+  frame.className = "preview-frame";
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    window.removeEventListener("message", onMsg);
+    onDone(lines);
   };
-  button.addEventListener("click", run);
+  const onMsg = e => {
+    if (e.source !== frame.contentWindow || !e.data || e.data.token !== token) return;
+    e.data.done ? finish() : lines.push({ kind: e.data.kind, text: e.data.text });
+  };
+  window.addEventListener("message", onMsg);
+  const safe = s => JSON.stringify(s).replace(/<\//g, "<\\/");
+  frame.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+      body{font-family:system-ui,sans-serif;padding:12px;margin:0;color:#1a2233;line-height:1.6}
+      button{padding:6px 14px;cursor:pointer;font:inherit} .hidden{display:none} .active{color:#1d4ed8;font-weight:bold}
+    </style><script>
+    const __T = ${safe(token)};
+    const __post = m => parent.postMessage(Object.assign({ token: __T }, m), "*");
+    ${CW.runnerShim}
+    window.onerror = m => { __send("err", [String(m)]); };
+    // الإطار المعزول يمنع localStorage، فنوفر بديلاً في الذاكرة يحاكيه
+    try { localStorage.getItem("x"); } catch (e) {
+      const mem = {};
+      Object.defineProperty(window, "localStorage", { configurable: true, value: {
+        getItem: k => (k in mem ? mem[k] : null), setItem: (k, v) => { mem[k] = String(v); },
+        removeItem: k => { delete mem[k]; }, clear: () => { for (const k in mem) delete mem[k]; },
+        get length() { return Object.keys(mem).length; }
+      }});
+    }
+  <\/script></head><body>${pageHtml}<script>__run(${safe(code)});<\/script></body></html>`;
+  container.appendChild(frame);
+  setTimeout(() => {
+    if (!finished) lines.push({ kind: "err", text: "انتهت مهلة التشغيل (5 ثوانٍ)" });
+    finish();
+  }, 5000);
+};
+
+// ربط محرر بسيط (textarea + زر + منطقة مخرجات) كما في الصفحة الرئيسية
+CW.renderOutput = (output, lines) => {
+  output.innerHTML = lines.length
+    ? lines.map(l => `<div class="${l.kind === "err" ? "err" : ""}">${CW.esc(l.text)}</div>`).join("")
+    : '<span class="hint">لا توجد مخرجات. استخدم console.log لطباعة النتائج.</span>';
+};
+
+CW.editorKeys = (textarea, run) => {
   textarea.addEventListener("keydown", e => {
     if (e.key === "Tab") {
       e.preventDefault();
       textarea.setRangeText("  ", textarea.selectionStart, textarea.selectionEnd, "end");
     }
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) run();
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(); }
   });
+};
+
+CW.bindEditor = function (textarea, button, output) {
+  const run = () => {
+    output.innerHTML = '<span class="hint">جاري التشغيل...</span>';
+    CW.runJS(textarea.value, lines => CW.renderOutput(output, lines));
+  };
+  button.addEventListener("click", run);
+  CW.editorKeys(textarea, run);
 };

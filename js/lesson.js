@@ -1,4 +1,4 @@
-// صفحة الدرس: المحتوى، والتمرين، والتنقل بين الدروس
+// صفحة الدرس: الشرح، والتمرين المصحَّح تلقائياً، والاختبار، والتنقل بين الدروس
 (function () {
   const app = document.getElementById("app");
   const c = CW.getCourse(CW.param("c"));
@@ -20,10 +20,6 @@
   const prev = flat[idx - 1], next = flat[idx + 1];
   const link = ([a, b]) => `lesson.html?c=${c.id}&m=${a}&l=${b}`;
 
-  // المحرر التفاعلي متاح حالياً لدروس JavaScript فقط
-  const jsCourses = ["javascript", "typescript", "react", "nodejs", "vue", "nextjs", "frontend-testing", "phaser"];
-  const hasEditor = jsCourses.includes(c.id);
-
   app.innerHTML = `
     <div class="lesson-head"><div class="container">
       <span class="lang-badge">${CW.esc(c.short)}</span>
@@ -35,33 +31,8 @@
         <article class="card lesson-content">
           <span class="tag tag-primary">الوحدة ${m + 1}: ${CW.esc(mod.t)} · الدرس ${l + 1} من ${mod.l.length}</span>
           <h1 style="margin-top:12px">${CW.esc(title)}</h1>
-          <p class="muted">${CW.esc(c.name)} · مدة الدرس التقريبية 10–15 دقيقة</p>
-
-          <h2>🎯 أهداف الدرس</h2>
-          <ul class="check-list">
-            <li>فهم مفهوم «${CW.esc(title)}» وأين يُستخدم</li>
-            <li>كتابة أمثلة عملية عليه بنفسك</li>
-            <li>حل تمرين قصير للتأكد من الفهم</li>
-          </ul>
-
-          <h2>📖 الشرح</h2>
-          <div class="placeholder">مساحة محتوى الدرس: يضاف هنا الشرح النصي، والأمثلة البرمجية، والصور أو فيديو الدرس.</div>
-
-          <h2>⌨️ التمرين العملي</h2>
-          ${hasEditor ? `
-          <div class="editor">
-            <div class="editor-bar">
-              <span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>
-              <span class="file">exercise.js</span>
-              <button class="btn btn-success btn-sm" id="run-btn">▶ Run</button>
-            </div>
-            <textarea id="code" wrap="off" spellcheck="false">// اكتب حلّك هنا ثم اضغط Run (أو Ctrl+Enter)\nconsole.log("بدأت درس: ${CW.esc(title).replace(/"/g, "")}");</textarea>
-            <pre class="editor-out" id="output"><span class="hint">// المخرجات تظهر هنا</span></pre>
-          </div>` : `<div class="placeholder">مساحة التمرين: يضاف هنا محرر ${CW.esc(c.name)} التفاعلي مع التصحيح التلقائي.</div>`}
-
-          <h2>📝 اختبار سريع</h2>
-          <div class="placeholder">مساحة أسئلة الاختيار من متعدد الخاصة بهذا الدرس.</div>
-
+          <p class="muted" id="lesson-meta">${CW.esc(c.name)}</p>
+          <div id="lesson-body"><div class="placeholder">جاري تحميل الدرس...</div></div>
           <div class="lesson-footer">
             ${prev ? `<a class="btn btn-ghost" href="${link(prev)}">→ الدرس السابق</a>` : `<a class="btn btn-ghost" href="course.html?id=${c.id}">→ صفحة الدورة</a>`}
             <button class="btn" id="done-btn"></button>
@@ -70,8 +41,6 @@
         </article>
       </div>
     </div></div>`;
-
-  if (hasEditor) CW.bindEditor(document.getElementById("code"), document.getElementById("run-btn"), document.getElementById("output"));
 
   function renderNav() {
     document.getElementById("lesson-nav").innerHTML = c.modules.map((md, mi) => `
@@ -83,10 +52,122 @@
     btn.className = "btn " + (done ? "btn-success" : "btn-ghost");
     btn.textContent = done ? "✓ أنجزت هذا الدرس" : "علّم كمنجز";
   }
+  const markDone = () => { if (!CW.progress.isDone(c.id, m, l)) CW.progress.toggle(c.id, m, l); renderNav(); };
   document.getElementById("done-btn").onclick = () => { CW.progress.toggle(c.id, m, l); renderNav(); };
   renderNav();
-  // تمرير القائمة الجانبية إلى الدرس الحالي دون تحريك الصفحة
   const nav = document.getElementById("lesson-nav");
   const cur = nav.querySelector("a.current");
   if (cur) nav.scrollTop = cur.offsetTop - nav.clientHeight / 2;
+
+  // ---------- المحتوى ----------
+  const body = document.getElementById("lesson-body");
+  CW.loadContent(c.id, modules => {
+    const lesson = modules && modules[m] && modules[m][l];
+    if (!lesson) {
+      body.innerHTML = `
+        <div class="placeholder">📝 محتوى هذا الدرس قيد الإعداد وسيُضاف قريباً.<br>
+        المحتوى الكامل متاح حالياً في دورة <a style="color:var(--brand-ink);font-weight:600" href="course.html?id=javascript">JavaScript</a>.</div>`;
+      return;
+    }
+    const words = lesson.body.replace(/<[^>]+>/g, " ").split(/\s+/).length;
+    document.getElementById("lesson-meta").textContent = `${c.name} · وقت القراءة ${Math.max(3, Math.round(words / 130))} دقائق تقريباً`;
+    body.innerHTML = `
+      <div class="prose">${lesson.body}</div>
+      ${lesson.exercise ? `<h2 class="sec-title">⌨️ التمرين العملي</h2><div id="exercise"></div>` : ""}
+      ${lesson.quiz ? `<h2 class="sec-title">📝 اختبر فهمك</h2><div id="quiz"></div>` : ""}`;
+    if (lesson.exercise) renderExercise(lesson.exercise);
+    if (lesson.quiz) renderQuiz(lesson.quiz);
+  });
+
+  // ---------- التمرين ----------
+  function renderExercise(ex) {
+    const box = document.getElementById("exercise");
+    const isDom = !!ex.html;
+    const key = `cw-code-${c.id}-${m}-${l}`;
+    const saved = CW.store.get(key, null);
+    box.innerHTML = `
+      <div class="exercise">
+        <div class="prose">${ex.prompt}</div>
+        <div class="editor">
+          <div class="editor-bar">
+            <span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>
+            <span class="file">${isDom ? "script.js" : "exercise.js"}</span>
+            <span class="editor-actions">
+              <button class="btn btn-sm btn-dark" id="ex-reset" title="إرجاع الكود الأصلي">↺</button>
+              <button class="btn btn-sm btn-dark" id="ex-run">▶ تشغيل</button>
+              <button class="btn btn-sm btn-success" id="ex-check">✓ تحقق من الحل</button>
+            </span>
+          </div>
+          <textarea id="ex-code" wrap="off" spellcheck="false" aria-label="محرر التمرين"></textarea>
+          ${isDom ? `<div class="preview"><span class="preview-label">معاينة الصفحة</span><div id="ex-preview"></div></div>` : ""}
+          <pre class="editor-out" id="ex-out"><span class="hint">// اضغط «تشغيل» لرؤية المخرجات، أو «تحقق من الحل» لتصحيح التمرين (Ctrl+Enter للتشغيل)</span></pre>
+        </div>
+        <div id="ex-result"></div>
+        <details class="acc hint-box"><summary>💡 عرض الحل النموذجي</summary><div class="acc-body">
+          <p>حاول أولاً بنفسك، ثم قارن حلك بهذا الحل:</p>
+          <div class="code-block src"><pre dir="ltr"><code>${CW.esc(ex.solution)}</code></pre></div>
+        </div></details>
+      </div>`;
+    const ta = document.getElementById("ex-code");
+    const out = document.getElementById("ex-out");
+    const result = document.getElementById("ex-result");
+    ta.value = saved != null ? saved : ex.starter;
+    ta.style.minHeight = Math.min(420, Math.max(160, ex.starter.split("\n").length * 24 + 40)) + "px";
+    ta.addEventListener("input", () => CW.store.set(key, ta.value));
+
+    const execute = done => {
+      out.innerHTML = '<span class="hint">جاري التشغيل...</span>';
+      const finish = lines => { CW.renderOutput(out, lines); done && done(lines); };
+      isDom ? CW.runDOM(ta.value, ex.html, document.getElementById("ex-preview"), finish) : CW.runJS(ta.value, finish);
+    };
+    const norm = s => s.split("\n").map(x => x.trim()).join("\n").trim();
+    const check = () => execute(lines => {
+      const errors = lines.filter(x => x.kind === "err");
+      const got = norm(lines.filter(x => x.kind !== "err").map(x => x.text).join("\n"));
+      const want = norm(ex.expected);
+      if (!errors.length && got === want) {
+        result.innerHTML = `<div class="result ok">🎉 أحسنت! حلّك صحيح، وتم تسجيل الدرس كمنجز.</div>`;
+        markDone();
+      } else {
+        result.innerHTML = `<div class="result bad">
+          <b>${errors.length ? "⚠️ يوجد خطأ في الكود، اقرأ رسالة الخطأ في المخرجات." : "✗ ليس بعد، المخرجات لا تطابق المطلوب."}</b>
+          <div class="compare">
+            <div><span>المطلوب</span><pre dir="ltr">${CW.esc(want)}</pre></div>
+            <div><span>مخرجاتك</span><pre dir="ltr">${CW.esc(got) || "(لا شيء)"}</pre></div>
+          </div></div>`;
+      }
+    });
+    document.getElementById("ex-run").onclick = () => { result.innerHTML = ""; execute(); };
+    document.getElementById("ex-check").onclick = check;
+    document.getElementById("ex-reset").onclick = () => { ta.value = ex.starter; CW.store.set(key, null); result.innerHTML = ""; };
+    CW.editorKeys(ta, () => execute());
+    if (isDom) execute();
+  }
+
+  // ---------- الاختبار ----------
+  function renderQuiz(qs) {
+    const box = document.getElementById("quiz");
+    box.innerHTML = qs.map((q, qi) => `
+      <div class="q-card" data-q="${qi}">
+        <p class="q-text">${qi + 1}. ${q.q}</p>
+        <div class="q-opts">${q.o.map((o, oi) => `<button class="q-opt" data-o="${oi}">${o}</button>`).join("")}</div>
+        <div class="q-why"></div>
+      </div>`).join("") + `<div id="quiz-score"></div>`;
+    let answered = 0, correct = 0;
+    box.querySelectorAll(".q-card").forEach(card => {
+      const q = qs[+card.dataset.q];
+      card.querySelectorAll(".q-opt").forEach(btn => btn.onclick = () => {
+        if (card.classList.contains("answered")) return;
+        card.classList.add("answered");
+        const pick = +btn.dataset.o;
+        card.querySelectorAll(".q-opt")[q.a].classList.add("right");
+        if (pick !== q.a) btn.classList.add("wrong");
+        else correct++;
+        answered++;
+        card.querySelector(".q-why").innerHTML = `${pick === q.a ? "✓ إجابة صحيحة. " : "✗ الإجابة الصحيحة مظللة بالأخضر. "}${q.why}`;
+        if (answered === qs.length)
+          document.getElementById("quiz-score").innerHTML = `<div class="result ${correct === qs.length ? "ok" : "info"}">نتيجتك: ${correct} من ${qs.length}${correct === qs.length ? " 🌟 ممتاز!" : ". راجع الشرح للنقاط التي أخطأت فيها."}</div>`;
+      });
+    });
+  }
 })();

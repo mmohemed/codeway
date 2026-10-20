@@ -54,6 +54,19 @@
     return "pat-0";
   };
 
+  // ---------- محتوى الدروس ----------
+  // كل دورة لها ملف js/content/<id>.js يُحمَّل عند الحاجة فقط حتى يبقى الموقع سريعاً
+  CW.content = {};
+  CW.registerContent = (id, modules) => { CW.content[id] = modules; };
+  CW.loadContent = (id, done) => {
+    if (CW.content[id]) return done(CW.content[id]);
+    const s = document.createElement("script");
+    s.src = "js/content/" + id + ".js";
+    s.onload = () => done(CW.content[id] || null);
+    s.onerror = () => done(null);
+    document.head.appendChild(s);
+  };
+
   // ---------- تتبّع التقدّم ----------
   // يُحفظ كقائمة مفاتيح "رقم الوحدة-رقم الدرس" لكل دورة
   CW.progress = {
