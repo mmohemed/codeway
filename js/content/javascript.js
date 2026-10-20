@@ -620,5 +620,212 @@ CW.registerContent("javascript", [
     }
    ]
   }
+ ],
+ [
+  {
+   "body": "<h2>قائمة من القيم</h2>\n<p>لو أردت تخزين درجات 30 طالباً، هل ستنشئ 30 متغيراً؟ بالطبع لا. <strong>المصفوفة (Array)</strong> قائمة مرتبة تخزّن عدة قيم في متغير واحد.</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const fruits = [&quot;تفاح&quot;, &quot;موز&quot;, &quot;برتقال&quot;];\nconsole.log(fruits);\nconsole.log(fruits.length);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[&quot;تفاح&quot;,&quot;موز&quot;,&quot;برتقال&quot;]\n3</code></pre></div>\n<ul><li>المصفوفة تُكتب بين قوسين مربعين <code dir=\"ltr\">[ ]</code>، والعناصر مفصولة بفواصل.</li><li><code dir=\"ltr\">length</code> يعطي عدد العناصر.</li><li>يمكن أن تحتوي أي نوع: أرقاماً ونصوصاً، وحتى مصفوفات أخرى.</li></ul>\n<div class=\"callout tip\">💡 يعرض محرر CodeWay المصفوفات والكائنات بصيغة JSON المختصرة. وحدة التحكم في المتصفح تعرضها بشكل تفاعلي مختلف قليلاً، لكن المحتوى واحد.</div>\n<h2>الوصول إلى العناصر</h2>\n<p>كل عنصر له <strong>فهرس (index)</strong> يبدأ من 0، تماماً مثل أحرف النص:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const colors = [&quot;أحمر&quot;, &quot;أخضر&quot;, &quot;أزرق&quot;];\nconsole.log(colors[0]);\nconsole.log(colors[2]);\nconsole.log(colors[colors.length - 1]);\nconsole.log(colors[10]);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>أحمر\nأزرق\nأزرق\nundefined</code></pre></div>\n<p>الوصول لفهرس غير موجود يُرجع <code dir=\"ltr\">undefined</code> ولا يسبب خطأ.</p>\n<h2>تعديل العناصر</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const scores = [70, 85, 90];\nscores[0] = 75;\nconsole.log(scores);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[75,85,90]</code></pre></div>\n<p>لاحظ أن <code dir=\"ltr\">scores</code> معرّفة بـ <code dir=\"ltr\">const</code> ومع ذلك عدّلنا محتواها. <code dir=\"ltr\">const</code> تمنع <strong>إعادة إسناد</strong> المتغير إلى مصفوفة أخرى، لكنها لا تمنع تعديل محتوى المصفوفة نفسها.</p>\n<h2>الإضافة والحذف</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>الدالة</th><th>ماذا تفعل</th></tr></thead><tbody><tr><td><code dir=\"ltr\">push(x)</code></td><td>تضيف x في <strong>النهاية</strong></td></tr><tr><td><code dir=\"ltr\">pop()</code></td><td>تحذف آخر عنصر وتُرجعه</td></tr><tr><td><code dir=\"ltr\">unshift(x)</code></td><td>تضيف x في <strong>البداية</strong></td></tr><tr><td><code dir=\"ltr\">shift()</code></td><td>تحذف أول عنصر وتُرجعه</td></tr></tbody></table></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const cart = [&quot;قلم&quot;];\ncart.push(&quot;دفتر&quot;);\ncart.push(&quot;مسطرة&quot;);\ncart.unshift(&quot;حقيبة&quot;);\nconsole.log(cart);\n\nconst removed = cart.pop();\nconsole.log(removed);\nconsole.log(cart);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[&quot;حقيبة&quot;,&quot;قلم&quot;,&quot;دفتر&quot;,&quot;مسطرة&quot;]\nمسطرة\n[&quot;حقيبة&quot;,&quot;قلم&quot;,&quot;دفتر&quot;]</code></pre></div>\n<h2>البحث في المصفوفة</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const users = [&quot;أحمد&quot;, &quot;سارة&quot;, &quot;خالد&quot;];\nconsole.log(users.includes(&quot;سارة&quot;));\nconsole.log(users.indexOf(&quot;خالد&quot;));\nconsole.log(users.indexOf(&quot;منى&quot;));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>true\n2\n-1</code></pre></div>\n<h2>المرور على كل العناصر</h2>\n<p>الطريقة الأوضح هي حلقة <code dir=\"ltr\">for...of</code> التي تعطيك كل عنصر مباشرة:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const prices = [10, 25, 40];\nlet total = 0;\n\nfor (const price of prices) {\n  total += price;\n}\nconsole.log(`الإجمالي: ${total}`);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>الإجمالي: 75</code></pre></div>\n<p>وإذا احتجت الفهرس أيضاً، استخدم حلقة <code dir=\"ltr\">for</code> العادية:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const tasks = [&quot;الدراسة&quot;, &quot;الرياضة&quot;];\nfor (let i = 0; i &lt; tasks.length; i++) {\n  console.log(`${i + 1}. ${tasks[i]}`);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1. الدراسة\n2. الرياضة</code></pre></div>\n<h2>دوال مفيدة أخرى</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const nums = [3, 1, 4, 1, 5];\nconsole.log(nums.slice(1, 3));\nconsole.log(nums.join(&quot; - &quot;));\nconsole.log([...nums].reverse());\nconsole.log(nums.concat([9, 2]));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[1,4]\n3 - 1 - 4 - 1 - 5\n[5,1,4,1,3]\n[3,1,4,1,5,9,2]</code></pre></div>\n<ul><li><code dir=\"ltr\">slice(a, b)</code> نسخة من جزء المصفوفة دون تعديل الأصلية.</li><li><code dir=\"ltr\">join(x)</code> تحويل المصفوفة إلى نص مع فاصل.</li><li><code dir=\"ltr\">reverse()</code> تعكس المصفوفة <strong>وتعدّل الأصلية</strong>، لذلك نسخناها أولاً بـ <code dir=\"ltr\">[...nums]</code> (سنشرح <code dir=\"ltr\">...</code> في الوحدة 7).</li><li><code dir=\"ltr\">concat</code> دمج مصفوفتين في مصفوفة جديدة.</li></ul>\n<h2>ملخص الدرس</h2>\n<ul><li>المصفوفة قائمة مرتبة <code dir=\"ltr\">[ ]</code> والفهرس يبدأ من 0.</li><li><code dir=\"ltr\">push</code> و <code dir=\"ltr\">pop</code> للنهاية، و <code dir=\"ltr\">unshift</code> و <code dir=\"ltr\">shift</code> للبداية.</li><li><code dir=\"ltr\">includes</code> و <code dir=\"ltr\">indexOf</code> للبحث.</li><li><code dir=\"ltr\">for...of</code> أسهل طريقة للمرور على العناصر.</li></ul>",
+   "exercise": {
+    "prompt": "<p>لديك مصفوفة درجات. المطلوب طباعة:</p>\n<ol><li>عدد الدرجات.</li><li>أعلى درجة (استخدم حلقة <code dir=\"ltr\">for...of</code> ومتغيراً يحتفظ بأكبر قيمة).</li><li>المتوسط (مجموع الدرجات ÷ عددها).</li><li>بعد إضافة الدرجة <code dir=\"ltr\">100</code> في نهاية المصفوفة بـ <code dir=\"ltr\">push</code>، اطبع المصفوفة كاملة.</li></ol>",
+    "starter": "const grades = [78, 92, 65, 88, 77];\n\n// أكمل هنا",
+    "expected": "5\n92\n80\n[78,92,65,88,77,100]",
+    "solution": "const grades = [78, 92, 65, 88, 77];\n\nconsole.log(grades.length);\n\nlet max = grades[0];\nlet sum = 0;\nfor (const g of grades) {\n  if (g > max) max = g;\n  sum += g;\n}\nconsole.log(max);\nconsole.log(sum / grades.length);\n\ngrades.push(100);\nconsole.log(grades);"
+   },
+   "quiz": [
+    {
+     "q": "ما قيمة <code dir=\"ltr\">[&quot;أ&quot;, &quot;ب&quot;, &quot;ج&quot;][1]</code>؟",
+     "o": [
+      "<code dir=\"ltr\">&quot;أ&quot;</code>",
+      "<code dir=\"ltr\">&quot;ب&quot;</code>",
+      "<code dir=\"ltr\">&quot;ج&quot;</code>"
+     ],
+     "a": 1,
+     "why": "الفهرس يبدأ من 0، فالفهرس 1 هو العنصر الثاني."
+    },
+    {
+     "q": "ماذا تفعل <code dir=\"ltr\">push</code>؟",
+     "o": [
+      "تضيف عنصراً في نهاية المصفوفة",
+      "تضيف عنصراً في بدايتها",
+      "تحذف آخر عنصر"
+     ],
+     "a": 0,
+     "why": "<code dir=\"ltr\">push</code> للنهاية و <code dir=\"ltr\">unshift</code> للبداية."
+    },
+    {
+     "q": "هل يمكن تعديل عناصر مصفوفة معرّفة بـ <code dir=\"ltr\">const</code>؟",
+     "o": [
+      "نعم، <code dir=\"ltr\">const</code> تمنع إعادة الإسناد فقط وليس تعديل المحتوى",
+      "لا، أبداً",
+      "فقط إذا كانت فارغة"
+     ],
+     "a": 0,
+     "why": "يمكن تعديل العناصر أو إضافتها، لكن لا يمكن كتابة <code dir=\"ltr\">arr = [...]</code> من جديد."
+    }
+   ]
+  },
+  {
+   "body": "<h2>البرمجة الوظيفية مع المصفوفات</h2>\n<p>في الدرس السابق استخدمنا الحلقات لمعالجة المصفوفات. لكن JavaScript الحديثة توفر دوالاً أقوى وأوضح تأخذ <strong>دالة callback</strong> وتطبقها على كل عنصر. أهمها ثلاث: <code dir=\"ltr\">map</code> و <code dir=\"ltr\">filter</code> و <code dir=\"ltr\">reduce</code>. ستراها في كل مشروع حقيقي، خاصة في React.</p>\n<h2>map: تحويل كل عنصر</h2>\n<p>تُنشئ مصفوفة <strong>جديدة</strong> بنفس الطول، كل عنصر فيها هو نتيجة تطبيق الدالة على العنصر الأصلي:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const prices = [100, 250, 80];\nconst withTax = prices.map(p =&gt; p * 1.5);\nconsole.log(withTax);\nconsole.log(prices);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[150,375,120]\n[100,250,80]</code></pre></div>\n<p>المصفوفة الأصلية لم تتغير. <code dir=\"ltr\">map</code> تُرجع مصفوفة جديدة دائماً.</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const names = [&quot;sara&quot;, &quot;ali&quot;];\nconst greetings = names.map((name, index) =&gt; `${index + 1}. مرحباً ${name}`);\nconsole.log(greetings);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[&quot;1. مرحباً sara&quot;,&quot;2. مرحباً ali&quot;]</code></pre></div>\n<p>الـ callback يستقبل العنصر، ويمكنه أيضاً استقبال الفهرس كمعامل ثانٍ.</p>\n<h2>filter: الاختيار حسب شرط</h2>\n<p>تُنشئ مصفوفة جديدة فيها فقط العناصر التي أرجعت الدالة لها <code dir=\"ltr\">true</code>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const ages = [12, 25, 17, 30, 15];\nconst adults = ages.filter(age =&gt; age &gt;= 18);\nconsole.log(adults);\n\nconst words = [&quot;قلم&quot;, &quot;حاسوب&quot;, &quot;كتاب&quot;, &quot;هاتف ذكي&quot;];\nconsole.log(words.filter(w =&gt; w.length &gt; 4));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[25,30]\n[&quot;حاسوب&quot;,&quot;هاتف ذكي&quot;]</code></pre></div>\n<h2>reduce: اختزال المصفوفة إلى قيمة واحدة</h2>\n<p><code dir=\"ltr\">reduce</code> تمر على العناصر وتجمعها في قيمة واحدة: مجموع، أو أكبر قيمة، أو حتى كائن:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const cart = [30, 45, 25];\nconst total = cart.reduce((sum, price) =&gt; sum + price, 0);\nconsole.log(total);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>100</code></pre></div>\n<p>الـ callback يستقبل:</p>\n<ul><li><code dir=\"ltr\">sum</code> <strong>المُجمِّع</strong>: النتيجة حتى الآن.</li><li><code dir=\"ltr\">price</code> العنصر الحالي.</li><li>و <code dir=\"ltr\">0</code> في النهاية هي <strong>القيمة الابتدائية</strong> للمُجمِّع.</li></ul>\n<p>خطوة بخطوة: <code dir=\"ltr\">0 + 30 = 30</code>، ثم <code dir=\"ltr\">30 + 45 = 75</code>، ثم <code dir=\"ltr\">75 + 25 = 100</code>.</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const nums = [4, 9, 2, 7];\nconst max = nums.reduce((best, n) =&gt; (n &gt; best ? n : best), nums[0]);\nconsole.log(max);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>9</code></pre></div>\n<h2>السلسلة: قوة الدمج</h2>\n<p>لأن <code dir=\"ltr\">map</code> و <code dir=\"ltr\">filter</code> تُرجعان مصفوفات، يمكن ربطها معاً في سلسلة:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const orders = [120, 40, 300, 75, 500];\n\nconst bigOrdersTotal = orders\n  .filter(o =&gt; o &gt;= 100)\n  .map(o =&gt; o * 0.9)\n  .reduce((sum, o) =&gt; sum + o, 0);\n\nconsole.log(bigOrdersTotal);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>828</code></pre></div>\n<p>اقرأها كجملة: &quot;من الطلبات، اختر ما يساوي 100 أو أكثر، ثم طبّق خصم 10%، ثم اجمعها&quot;.</p>\n<h2>دوال أخرى مهمة</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>الدالة</th><th>تُرجع</th></tr></thead><tbody><tr><td><code dir=\"ltr\">find(fn)</code></td><td><strong>أول</strong> عنصر يحقق الشرط، أو <code dir=\"ltr\">undefined</code></td></tr><tr><td><code dir=\"ltr\">findIndex(fn)</code></td><td>فهرس أول عنصر يحقق الشرط، أو -1</td></tr><tr><td><code dir=\"ltr\">some(fn)</code></td><td><code dir=\"ltr\">true</code> إذا حقق عنصر <strong>واحد على الأقل</strong> الشرط</td></tr><tr><td><code dir=\"ltr\">every(fn)</code></td><td><code dir=\"ltr\">true</code> إذا حققت <strong>كل</strong> العناصر الشرط</td></tr><tr><td><code dir=\"ltr\">forEach(fn)</code></td><td>لا شيء، تنفّذ الدالة على كل عنصر فقط</td></tr><tr><td><code dir=\"ltr\">sort(fn)</code></td><td>ترتب المصفوفة <strong>وتعدّل الأصلية</strong></td></tr></tbody></table></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const temps = [22, 35, 28, 41];\nconsole.log(temps.find(t =&gt; t &gt; 30));\nconsole.log(temps.some(t =&gt; t &gt; 40));\nconsole.log(temps.every(t =&gt; t &gt; 20));\nconsole.log([...temps].sort((a, b) =&gt; a - b));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>35\ntrue\ntrue\n[22,28,35,41]</code></pre></div>\n<div class=\"callout warn\">⚠️ <code dir=\"ltr\">sort()</code> بدون دالة مقارنة ترتب العناصر كنصوص، فيصبح <code dir=\"ltr\">[10, 9, 100]</code> مرتباً <code dir=\"ltr\">[10, 100, 9]</code>! استخدم دائماً <code dir=\"ltr\">(a, b) =&gt; a - b</code> للأرقام تصاعدياً، و <code dir=\"ltr\">(a, b) =&gt; b - a</code> تنازلياً.</div>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">map</code> تحوّل كل عنصر، و <code dir=\"ltr\">filter</code> تختار، و <code dir=\"ltr\">reduce</code> تجمع في قيمة واحدة.</li><li>كلها تُرجع نتيجة جديدة ولا تعدّل الأصلية، ويمكن ربطها في سلسلة.</li><li><code dir=\"ltr\">find</code> و <code dir=\"ltr\">some</code> و <code dir=\"ltr\">every</code> للبحث والتحقق.</li><li><code dir=\"ltr\">sort</code> تحتاج دالة مقارنة للأرقام.</li></ul>",
+   "exercise": {
+    "prompt": "<p>لديك أسعار منتجات في متجر. استخدم <code dir=\"ltr\">filter</code> و <code dir=\"ltr\">map</code> و <code dir=\"ltr\">reduce</code> (بدون حلقات for) لطباعة:</p>\n<ol><li>مصفوفة المنتجات التي سعرها أقل من 50.</li><li>مصفوفة كل الأسعار بعد خصم 20% (أي السعر × 0.8).</li><li>مجموع كل الأسعار الأصلية.</li><li>هل يوجد منتج سعره أكثر من 100؟ (استخدم <code dir=\"ltr\">some</code>)</li></ol>",
+    "starter": "const prices = [20, 75, 40, 150, 35];\n\n// أكمل هنا",
+    "expected": "[20,40,35]\n[16,60,32,120,28]\n320\ntrue",
+    "solution": "const prices = [20, 75, 40, 150, 35];\n\nconsole.log(prices.filter(p => p < 50));\nconsole.log(prices.map(p => p * 0.8));\nconsole.log(prices.reduce((sum, p) => sum + p, 0));\nconsole.log(prices.some(p => p > 100));"
+   },
+   "quiz": [
+    {
+     "q": "ما الفرق بين <code dir=\"ltr\">map</code> و <code dir=\"ltr\">filter</code>؟",
+     "o": [
+      "<code dir=\"ltr\">map</code> تحوّل كل العناصر وتُرجع مصفوفة بنفس الطول، و <code dir=\"ltr\">filter</code> تختار بعضها حسب شرط",
+      "لا فرق",
+      "<code dir=\"ltr\">filter</code> تعدّل المصفوفة الأصلية"
+     ],
+     "a": 0,
+     "why": "map للتحويل، و filter للاختيار."
+    },
+    {
+     "q": "ما ناتج <code dir=\"ltr\">[1, 2, 3].reduce((acc, n) =&gt; acc + n, 10)</code>؟",
+     "o": [
+      "<code dir=\"ltr\">6</code>",
+      "<code dir=\"ltr\">16</code>",
+      "<code dir=\"ltr\">10</code>"
+     ],
+     "a": 1,
+     "why": "القيمة الابتدائية 10، ثم نضيف 1 و 2 و 3."
+    },
+    {
+     "q": "ما ناتج <code dir=\"ltr\">[5, 12, 8].find(n =&gt; n &gt; 6)</code>؟",
+     "o": [
+      "<code dir=\"ltr\">[12, 8]</code>",
+      "<code dir=\"ltr\">12</code>",
+      "<code dir=\"ltr\">true</code>"
+     ],
+     "a": 1,
+     "why": "<code dir=\"ltr\">find</code> تُرجع أول عنصر يحقق الشرط فقط."
+    }
+   ]
+  },
+  {
+   "body": "<h2>وصف شيء بخصائصه</h2>\n<p>المصفوفة ممتازة لقائمة عناصر متشابهة. لكن كيف نخزّن بيانات <strong>طالب</strong>: اسمه وعمره ومدينته ودرجاته؟ هنا نستخدم <strong>الكائن (Object)</strong>: مجموعة أزواج من <strong>مفتاح وقيمة</strong>.</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const student = {\n  name: &quot;ريم&quot;,\n  age: 21,\n  city: &quot;الرياض&quot;,\n  isActive: true\n};\nconsole.log(student);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>{&quot;name&quot;:&quot;ريم&quot;,&quot;age&quot;:21,&quot;city&quot;:&quot;الرياض&quot;,&quot;isActive&quot;:true}</code></pre></div>\n<ul><li>الكائن يُكتب بين أقواس معقوفة <code dir=\"ltr\">{ }</code>.</li><li>كل خاصية: <code dir=\"ltr\">مفتاح: قيمة</code>، والخصائص مفصولة بفواصل.</li></ul>\n<h2>الوصول للخصائص</h2>\n<p>هناك طريقتان:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const car = { brand: &quot;تويوتا&quot;, year: 2022 };\n\nconsole.log(car.brand);\nconsole.log(car[&quot;year&quot;]);\n\nconst key = &quot;brand&quot;;\nconsole.log(car[key]);\nconsole.log(car.color);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>تويوتا\n2022\nتويوتا\nundefined</code></pre></div>\n<ul><li><strong>النقطة</strong> <code dir=\"ltr\">car.brand</code> هي الطريقة المعتادة.</li><li><strong>الأقواس</strong> <code dir=\"ltr\">car[&quot;year&quot;]</code> ضرورية عندما يكون اسم الخاصية في متغير، أو يحتوي مسافات.</li><li>الخاصية غير الموجودة تُرجع <code dir=\"ltr\">undefined</code>.</li></ul>\n<h2>الإضافة والتعديل والحذف</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const user = { name: &quot;سامي&quot; };\n\nuser.email = &quot;sami@mail.com&quot;;\nuser.name = &quot;سامي أحمد&quot;;\ndelete user.email;\nuser.age = 30;\n\nconsole.log(user);\nconsole.log(&quot;age&quot; in user);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>{&quot;name&quot;:&quot;سامي أحمد&quot;,&quot;age&quot;:30}\ntrue</code></pre></div>\n<h2>الدوال داخل الكائنات (Methods)</h2>\n<p>يمكن أن تكون قيمة الخاصية دالة، وتسمى عندها <strong>طريقة (method)</strong>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const calculator = {\n  brand: &quot;Casio&quot;,\n  add(a, b) {\n    return a + b;\n  },\n  multiply(a, b) {\n    return a * b;\n  }\n};\n\nconsole.log(calculator.add(2, 3));\nconsole.log(calculator.multiply(4, 5));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>5\n20</code></pre></div>\n<p>هذا ما كنت تفعله طوال الوقت: <code dir=\"ltr\">console</code> كائن، و <code dir=\"ltr\">log</code> طريقة فيه!</p>\n<h2>المرور على خصائص الكائن</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const product = { name: &quot;سماعة&quot;, price: 199, stock: 12 };\n\nfor (const key in product) {\n  console.log(`${key}: ${product[key]}`);\n}\n\nconsole.log(Object.keys(product));\nconsole.log(Object.values(product));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>name: سماعة\nprice: 199\nstock: 12\n[&quot;name&quot;,&quot;price&quot;,&quot;stock&quot;]\n[&quot;سماعة&quot;,199,12]</code></pre></div>\n<p><code dir=\"ltr\">Object.entries(obj)</code> تعطيك مصفوفة من أزواج <code dir=\"ltr\">[مفتاح, قيمة]</code>، وهي مفيدة جداً مع <code dir=\"ltr\">for...of</code>.</p>\n<h2>مصفوفة من الكائنات</h2>\n<p>هذا الشكل هو أكثر ما ستتعامل معه في الحياة الحقيقية، فهكذا تصل البيانات من الخوادم:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const products = [\n  { name: &quot;قميص&quot;, price: 80, inStock: true },\n  { name: &quot;حذاء&quot;, price: 250, inStock: false },\n  { name: &quot;قبعة&quot;, price: 45, inStock: true }\n];\n\nconst available = products\n  .filter(p =&gt; p.inStock)\n  .map(p =&gt; p.name);\nconsole.log(available);\n\nconst total = products.reduce((sum, p) =&gt; sum + p.price, 0);\nconsole.log(total);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[&quot;قميص&quot;,&quot;قبعة&quot;]\n375</code></pre></div>\n<h2>الكائنات المتداخلة</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const order = {\n  id: 1024,\n  customer: { name: &quot;هند&quot;, phone: &quot;0500000000&quot; },\n  items: [&quot;كتاب&quot;, &quot;قلم&quot;]\n};\n\nconsole.log(order.customer.name);\nconsole.log(order.items[1]);\nconsole.log(order.items.length);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>هند\nقلم\n2</code></pre></div>\n<div class=\"callout warn\">⚠️ الكائنات والمصفوفات تُنسخ <strong>بالمرجع</strong>: <code dir=\"ltr\">const b = a;</code> لا ينشئ نسخة جديدة، بل اسماً آخر لنفس الكائن، فتعديل <code dir=\"ltr\">b</code> يغيّر <code dir=\"ltr\">a</code> أيضاً. لإنشاء نسخة حقيقية استخدم <code dir=\"ltr\">{ ...a }</code>، وسنفصّل ذلك في الوحدة 7.</div>\n<h2>ملخص الدرس</h2>\n<ul><li>الكائن أزواج <code dir=\"ltr\">مفتاح: قيمة</code> داخل <code dir=\"ltr\">{ }</code>.</li><li>الوصول بـ <code dir=\"ltr\">obj.key</code> أو <code dir=\"ltr\">obj[&quot;key&quot;]</code>.</li><li>الخصائص يمكن إضافتها وتعديلها وحذفها بـ <code dir=\"ltr\">delete</code>.</li><li><code dir=\"ltr\">Object.keys</code> و <code dir=\"ltr\">Object.values</code> و <code dir=\"ltr\">Object.entries</code> للمرور على الخصائص.</li><li>مصفوفة الكائنات هي الشكل الأكثر شيوعاً للبيانات.</li></ul>",
+   "exercise": {
+    "prompt": "<p>لديك قائمة موظفين. المطلوب:</p>\n<ol><li>اطبع اسم أول موظف.</li><li>أضف خاصية <code dir=\"ltr\">salary</code> قيمتها <code dir=\"ltr\">9000</code> للموظف الثاني، ثم اطبع الكائن.</li><li>اطبع مصفوفة أسماء موظفي قسم <code dir=\"ltr\">IT</code> فقط.</li><li>اطبع مجموع أعمار كل الموظفين.</li></ol>",
+    "starter": "const employees = [\n  { name: \"فهد\", age: 30, department: \"IT\" },\n  { name: \"نوف\", age: 26, department: \"HR\" },\n  { name: \"ماجد\", age: 35, department: \"IT\" }\n];\n\n// أكمل هنا",
+    "expected": "فهد\n{\"name\":\"نوف\",\"age\":26,\"department\":\"HR\",\"salary\":9000}\n[\"فهد\",\"ماجد\"]\n91",
+    "solution": "const employees = [\n  { name: \"فهد\", age: 30, department: \"IT\" },\n  { name: \"نوف\", age: 26, department: \"HR\" },\n  { name: \"ماجد\", age: 35, department: \"IT\" }\n];\n\nconsole.log(employees[0].name);\n\nemployees[1].salary = 9000;\nconsole.log(employees[1]);\n\nconsole.log(employees.filter(e => e.department === \"IT\").map(e => e.name));\nconsole.log(employees.reduce((sum, e) => sum + e.age, 0));"
+   },
+   "quiz": [
+    {
+     "q": "كيف نصل لخاصية اسمها مخزن في المتغير <code dir=\"ltr\">key</code>؟",
+     "o": [
+      "<code dir=\"ltr\">obj.key</code>",
+      "<code dir=\"ltr\">obj[key]</code>",
+      "<code dir=\"ltr\">obj-&gt;key</code>"
+     ],
+     "a": 1,
+     "why": "<code dir=\"ltr\">obj.key</code> تبحث عن خاصية اسمها حرفياً &quot;key&quot;، أما <code dir=\"ltr\">obj[key]</code> فتستخدم قيمة المتغير."
+    },
+    {
+     "q": "ما ناتج <code dir=\"ltr\">Object.keys({ a: 1, b: 2 })</code>؟",
+     "o": [
+      "<code dir=\"ltr\">[&quot;a&quot;,&quot;b&quot;]</code>",
+      "<code dir=\"ltr\">[1,2]</code>",
+      "<code dir=\"ltr\">2</code>"
+     ],
+     "a": 0,
+     "why": "<code dir=\"ltr\">Object.keys</code> تُرجع مصفوفة أسماء الخصائص."
+    },
+    {
+     "q": "ماذا يُرجع <code dir=\"ltr\">user.phone</code> إذا لم تكن الخاصية موجودة؟",
+     "o": [
+      "خطأ",
+      "<code dir=\"ltr\">undefined</code>",
+      "<code dir=\"ltr\">null</code>"
+     ],
+     "a": 1,
+     "why": "الوصول لخاصية غير موجودة يُرجع <code dir=\"ltr\">undefined</code> دون خطأ."
+    }
+   ]
+  },
+  {
+   "body": "<h2>هياكل بيانات إضافية</h2>\n<p>المصفوفات والكائنات تغطي معظم الحالات، لكن JavaScript توفر هيكلين متخصصين يحلان مشاكل معينة بشكل أفضل: <code dir=\"ltr\">Set</code> و <code dir=\"ltr\">Map</code>.</p>\n<h2>Set: مجموعة بلا تكرار</h2>\n<p><code dir=\"ltr\">Set</code> مجموعة من القيم <strong>الفريدة</strong>: لا يمكن أن تتكرر فيها قيمة.</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const tags = new Set();\ntags.add(&quot;js&quot;);\ntags.add(&quot;css&quot;);\ntags.add(&quot;js&quot;);\n\nconsole.log(tags.size);\nconsole.log(tags.has(&quot;css&quot;));\nconsole.log(tags.has(&quot;python&quot;));\ntags.delete(&quot;css&quot;);\nconsole.log(tags);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>2\ntrue\nfalse\nSet(1) [&quot;js&quot;]</code></pre></div>\n<p>أضفنا <code dir=\"ltr\">&quot;js&quot;</code> مرتين، لكنها خُزنت مرة واحدة.</p>\n<div class=\"table-wrap\"><table><thead><tr><th>الدالة</th><th>وظيفتها</th></tr></thead><tbody><tr><td><code dir=\"ltr\">add(x)</code></td><td>إضافة قيمة (تُتجاهل إن كانت موجودة)</td></tr><tr><td><code dir=\"ltr\">has(x)</code></td><td>هل القيمة موجودة؟</td></tr><tr><td><code dir=\"ltr\">delete(x)</code></td><td>حذف قيمة</td></tr><tr><td><code dir=\"ltr\">size</code></td><td>عدد القيم</td></tr></tbody></table></div>\n<h2>أشهر استخدام: إزالة التكرار</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const visits = [&quot;أحمد&quot;, &quot;سارة&quot;, &quot;أحمد&quot;, &quot;علي&quot;, &quot;سارة&quot;];\nconst uniqueVisitors = [...new Set(visits)];\nconsole.log(uniqueVisitors);\nconsole.log(uniqueVisitors.length);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[&quot;أحمد&quot;,&quot;سارة&quot;,&quot;علي&quot;]\n3</code></pre></div>\n<p>حوّلنا المصفوفة إلى Set فزال التكرار، ثم أعدناها مصفوفة بـ <code dir=\"ltr\">[...]</code>.</p>\n<h2>Map: قاموس أكثر مرونة</h2>\n<p><code dir=\"ltr\">Map</code> تخزّن أزواج مفتاح وقيمة مثل الكائن، لكن بمزايا إضافية:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const prices = new Map();\nprices.set(&quot;قهوة&quot;, 12);\nprices.set(&quot;شاي&quot;, 8);\n\nconsole.log(prices.get(&quot;قهوة&quot;));\nconsole.log(prices.has(&quot;عصير&quot;));\nconsole.log(prices.size);\n\nfor (const [item, price] of prices) {\n  console.log(`${item}: ${price} ريال`);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>12\nfalse\n2\nقهوة: 12 ريال\nشاي: 8 ريال</code></pre></div>\n<h2>متى أستخدم Map بدل الكائن؟</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>Map</th><th>الكائن العادي</th></tr></thead><tbody><tr><td>المفاتيح يمكن أن تكون <strong>أي نوع</strong>: أرقام، كائنات، دوال</td><td>المفاتيح نصوص فقط</td></tr><tr><td>تحفظ ترتيب الإضافة دائماً</td><td>الترتيب قد يختلف مع المفاتيح الرقمية</td></tr><tr><td><code dir=\"ltr\">size</code> مباشرة</td><td>تحتاج <code dir=\"ltr\">Object.keys(obj).length</code></td></tr><tr><td>أسرع عند الإضافة والحذف المتكرر</td><td>أنسب لوصف شيء بخصائص ثابتة</td></tr></tbody></table></div>\n<p>القاعدة البسيطة: استخدم <strong>الكائن</strong> لوصف شيء (مستخدم، منتج)، واستخدم <strong>Map</strong> كقاموس بيانات يتغير كثيراً.</p>\n<h2>مثال عملي: عدّ التكرارات</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const text = &quot;تفاح موز تفاح برتقال موز تفاح&quot;;\nconst counts = new Map();\n\nfor (const word of text.split(&quot; &quot;)) {\n  counts.set(word, (counts.get(word) || 0) + 1);\n}\n\nconsole.log(counts.get(&quot;تفاح&quot;));\nconsole.log([...counts]);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>3\n[[&quot;تفاح&quot;,3],[&quot;موز&quot;,2],[&quot;برتقال&quot;,1]]</code></pre></div>\n<p>لاحظ <code dir=\"ltr\">(counts.get(word) || 0)</code>: إذا لم تكن الكلمة موجودة بعد، ترجع <code dir=\"ltr\">get</code> القيمة <code dir=\"ltr\">undefined</code>، فنستخدم <code dir=\"ltr\">0</code> بدلاً منها.</p>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">Set</code> تخزّن قيماً فريدة، وأشهر استخدام لها إزالة التكرار: <code dir=\"ltr\">[...new Set(arr)]</code>.</li><li><code dir=\"ltr\">Map</code> قاموس بمفاتيح من أي نوع، مع <code dir=\"ltr\">set</code> و <code dir=\"ltr\">get</code> و <code dir=\"ltr\">has</code> و <code dir=\"ltr\">size</code>.</li><li>الكائن لوصف شيء، و Map لقاموس بيانات متغير.</li></ul>",
+   "exercise": {
+    "prompt": "<p>لديك قائمة بأسماء طلاب سجلوا في دورات (بعضهم سجل أكثر من مرة).</p>\n<ol><li>اطبع عدد الطلاب <strong>الفريدين</strong> باستخدام <code dir=\"ltr\">Set</code>.</li><li>استخدم <code dir=\"ltr\">Map</code> لعدّ مرات تسجيل كل طالب، ثم اطبع عدد مرات تسجيل <code dir=\"ltr\">ريم</code>.</li><li>اطبع مصفوفة الطلاب الذين سجلوا <strong>أكثر من مرة</strong>، بترتيب ظهورهم الأول.</li></ol>",
+    "starter": "const registrations = [\"ريم\", \"عمر\", \"ريم\", \"دانة\", \"عمر\", \"ريم\", \"زياد\"];\n\n// أكمل هنا",
+    "expected": "4\n3\n[\"ريم\",\"عمر\"]",
+    "solution": "const registrations = [\"ريم\", \"عمر\", \"ريم\", \"دانة\", \"عمر\", \"ريم\", \"زياد\"];\n\nconsole.log(new Set(registrations).size);\n\nconst counts = new Map();\nfor (const name of registrations) {\n  counts.set(name, (counts.get(name) || 0) + 1);\n}\nconsole.log(counts.get(\"ريم\"));\n\nconst repeated = [...counts].filter(([name, n]) => n > 1).map(([name]) => name);\nconsole.log(repeated);"
+   },
+   "quiz": [
+    {
+     "q": "ما ناتج <code dir=\"ltr\">new Set([1, 2, 2, 3, 3, 3]).size</code>؟",
+     "o": [
+      "<code dir=\"ltr\">6</code>",
+      "<code dir=\"ltr\">3</code>",
+      "<code dir=\"ltr\">1</code>"
+     ],
+     "a": 1,
+     "why": "Set تحتفظ بالقيم الفريدة فقط: 1 و 2 و 3."
+    },
+    {
+     "q": "كيف نقرأ قيمة من Map؟",
+     "o": [
+      "<code dir=\"ltr\">map[key]</code>",
+      "<code dir=\"ltr\">map.get(key)</code>",
+      "<code dir=\"ltr\">map.key</code>"
+     ],
+     "a": 1,
+     "why": "نستخدم <code dir=\"ltr\">set</code> للكتابة و <code dir=\"ltr\">get</code> للقراءة."
+    },
+    {
+     "q": "متى يكون Map أفضل من الكائن العادي؟",
+     "o": [
+      "لوصف بيانات مستخدم بخصائص ثابتة",
+      "عندما نحتاج مفاتيح من أي نوع أو قاموساً يتغير كثيراً",
+      "لا يوجد فرق أبداً"
+     ],
+     "a": 1,
+     "why": "Map مصممة كقاموس بيانات مرن وسريع."
+    }
+   ]
+  },
+  {
+   "body": "<h2>لغة تبادل البيانات</h2>\n<p>عندما يرسل تطبيقك بيانات إلى خادم، أو يستقبل منه قائمة منتجات، يجب أن تكون البيانات بصيغة <strong>نصية</strong> يفهمها الطرفان. الصيغة الأشهر عالمياً هي <strong>JSON</strong> (اختصار JavaScript Object Notation).</p>\n<p>JSON تشبه كائنات JavaScript جداً، لكنها <strong>نص</strong> وليست كائناً:</p>\n<div class=\"code-block src\"><span class=\"code-label\">json</span><pre dir=\"ltr\"><code>{\n  &quot;name&quot;: &quot;منى&quot;,\n  &quot;age&quot;: 28,\n  &quot;skills&quot;: [&quot;JavaScript&quot;, &quot;SQL&quot;],\n  &quot;isAdmin&quot;: false,\n  &quot;manager&quot;: null\n}</code></pre></div>\n<h2>قواعد JSON الصارمة</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>مسموح في JavaScript</th><th>في JSON</th></tr></thead><tbody><tr><td>مفاتيح بدون علامات تنصيص <code dir=\"ltr\">name: &quot;x&quot;</code></td><td>يجب <code dir=\"ltr\">&quot;name&quot;: &quot;x&quot;</code></td></tr><tr><td>علامات تنصيص مفردة <code dir=\"ltr\">&#x27;x&#x27;</code></td><td>مزدوجة فقط <code dir=\"ltr\">&quot;x&quot;</code></td></tr><tr><td>فاصلة بعد آخر عنصر</td><td>ممنوعة</td></tr><tr><td>دوال و <code dir=\"ltr\">undefined</code></td><td>غير مدعومة</td></tr><tr><td>التعليقات</td><td>غير مدعومة</td></tr></tbody></table></div>\n<p>القيم المسموحة في JSON: نصوص، أرقام، <code dir=\"ltr\">true</code> و <code dir=\"ltr\">false</code>، <code dir=\"ltr\">null</code>، مصفوفات، وكائنات.</p>\n<h2>من كائن إلى نص: JSON.stringify</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const user = { name: &quot;منى&quot;, age: 28, skills: [&quot;JS&quot;, &quot;SQL&quot;] };\nconst json = JSON.stringify(user);\n\nconsole.log(json);\nconsole.log(typeof json);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>{&quot;name&quot;:&quot;منى&quot;,&quot;age&quot;:28,&quot;skills&quot;:[&quot;JS&quot;,&quot;SQL&quot;]}\nstring</code></pre></div>\n<p>لجعل النص منسقاً وسهل القراءة، نمرر عدد المسافات كوسيط ثالث:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const settings = { theme: &quot;light&quot;, fontSize: 16 };\nconsole.log(JSON.stringify(settings, null, 2));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>{\n  &quot;theme&quot;: &quot;light&quot;,\n  &quot;fontSize&quot;: 16\n}</code></pre></div>\n<h2>من نص إلى كائن: JSON.parse</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const response = &#x27;{&quot;product&quot;:&quot;لابتوب&quot;,&quot;price&quot;:3500,&quot;tags&quot;:[&quot;جديد&quot;,&quot;عرض&quot;]}&#x27;;\nconst data = JSON.parse(response);\n\nconsole.log(typeof data);\nconsole.log(data.product);\nconsole.log(data.price * 2);\nconsole.log(data.tags[1]);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>object\nلابتوب\n7000\nعرض</code></pre></div>\n<p>بعد <code dir=\"ltr\">JSON.parse</code> أصبح لدينا كائن حقيقي نتعامل معه بشكل طبيعي.</p>\n<h2>التعامل مع JSON غير الصالح</h2>\n<p>إذا كان النص بصيغة خاطئة، يرمي <code dir=\"ltr\">JSON.parse</code> خطأ يوقف البرنامج. لذلك نحميه بـ <code dir=\"ltr\">try...catch</code> (سنتعلمها بالتفصيل في الوحدة 8):</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const badJson = &quot;{name: &#x27;خطأ&#x27;}&quot;;\n\ntry {\n  JSON.parse(badJson);\n} catch (error) {\n  console.log(&quot;صيغة JSON غير صالحة&quot;);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>صيغة JSON غير صالحة</code></pre></div>\n<h2>أين ستستخدم JSON؟</h2>\n<ul><li><strong>APIs:</strong> تقريباً كل خادم يرسل ويستقبل JSON (الوحدة 6).</li><li><strong>التخزين المحلي:</strong> <code dir=\"ltr\">localStorage</code> يخزّن نصوصاً فقط، فنحوّل الكائنات بـ <code dir=\"ltr\">stringify</code> (الوحدة 8).</li><li><strong>ملفات الإعدادات:</strong> مثل <code dir=\"ltr\">package.json</code> في كل مشروع JavaScript.</li></ul>\n<div class=\"callout tip\">💡 حيلة شائعة: <code dir=\"ltr\">JSON.parse(JSON.stringify(obj))</code> تنشئ نسخة عميقة مستقلة من كائن بسيط. لكن الطريقة الحديثة هي <code dir=\"ltr\">structuredClone(obj)</code>.</div>\n<h2>ملخص الدرس</h2>\n<ul><li>JSON صيغة نصية لتبادل البيانات، وقواعدها أصرم من كائنات JavaScript.</li><li><code dir=\"ltr\">JSON.stringify(obj)</code> يحوّل الكائن إلى نص.</li><li><code dir=\"ltr\">JSON.parse(text)</code> يحوّل النص إلى كائن.</li><li>احمِ <code dir=\"ltr\">JSON.parse</code> بـ <code dir=\"ltr\">try...catch</code> عند التعامل مع بيانات خارجية.</li></ul>",
+   "exercise": {
+    "prompt": "<p>وصلتك استجابة من خادم كنص JSON فيها طلب شراء.</p>\n<ol><li>حوّل النص إلى كائن.</li><li>اطبع اسم العميل.</li><li>اطبع إجمالي الطلب (مجموع <code dir=\"ltr\">price * qty</code> لكل عنصر).</li><li>أضف للكائن خاصية <code dir=\"ltr\">status</code> قيمتها <code dir=\"ltr\">&quot;تم الشحن&quot;</code>، ثم حوّله إلى نص JSON واطبعه.</li></ol>",
+    "starter": "const response = '{\"customer\":\"سلمان\",\"items\":[{\"name\":\"كتاب\",\"price\":40,\"qty\":2},{\"name\":\"قلم\",\"price\":5,\"qty\":4}]}';\n\n// أكمل هنا",
+    "expected": "سلمان\n100\n{\"customer\":\"سلمان\",\"items\":[{\"name\":\"كتاب\",\"price\":40,\"qty\":2},{\"name\":\"قلم\",\"price\":5,\"qty\":4}],\"status\":\"تم الشحن\"}",
+    "solution": "const response = '{\"customer\":\"سلمان\",\"items\":[{\"name\":\"كتاب\",\"price\":40,\"qty\":2},{\"name\":\"قلم\",\"price\":5,\"qty\":4}]}';\n\nconst order = JSON.parse(response);\nconsole.log(order.customer);\n\nconst total = order.items.reduce((sum, item) => sum + item.price * item.qty, 0);\nconsole.log(total);\n\norder.status = \"تم الشحن\";\nconsole.log(JSON.stringify(order));"
+   },
+   "quiz": [
+    {
+     "q": "ما نوع القيمة التي يُرجعها <code dir=\"ltr\">JSON.stringify</code>؟",
+     "o": [
+      "نص (string)",
+      "كائن (object)",
+      "مصفوفة"
+     ],
+     "a": 0,
+     "why": "stringify تحوّل الكائن إلى نص يمكن إرساله أو تخزينه."
+    },
+    {
+     "q": "أي من هذه صيغة JSON صحيحة؟",
+     "o": [
+      "<code dir=\"ltr\">{name: &quot;علي&quot;}</code>",
+      "<code dir=\"ltr\">{&#x27;name&#x27;: &#x27;علي&#x27;}</code>",
+      "<code dir=\"ltr\">{&quot;name&quot;: &quot;علي&quot;}</code>"
+     ],
+     "a": 2,
+     "why": "JSON تتطلب علامات تنصيص مزدوجة حول المفاتيح والنصوص."
+    },
+    {
+     "q": "ماذا يحدث عند <code dir=\"ltr\">JSON.parse</code> لنص بصيغة خاطئة؟",
+     "o": [
+      "يُرجع <code dir=\"ltr\">null</code>",
+      "يرمي خطأ (SyntaxError)",
+      "يُرجع النص كما هو"
+     ],
+     "a": 1,
+     "why": "لذلك نحميه بـ try...catch عند التعامل مع بيانات غير مضمونة."
+    }
+   ]
+  }
  ]
 ]);
