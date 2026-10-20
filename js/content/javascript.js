@@ -1246,5 +1246,212 @@ CW.registerContent("javascript", [
     }
    ]
   }
+ ],
+ [
+  {
+   "body": "<h2>استخراج القيم بسطر واحد</h2>\n<p><strong>التفكيك (Destructuring)</strong> صيغة تتيح لك استخراج قيم من مصفوفة أو كائن وتخزينها في متغيرات مباشرة. ستراها في كل كود حديث، خاصة في React.</p>\n<h2>تفكيك الكائنات</h2>\n<p>بدلاً من:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const user = { name: &quot;ياسر&quot;, age: 27, city: &quot;الدمام&quot; };\nconst name1 = user.name;\nconst age1 = user.age;\nconsole.log(name1, age1);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>ياسر 27</code></pre></div>\n<p>نكتب:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const user = { name: &quot;ياسر&quot;, age: 27, city: &quot;الدمام&quot; };\nconst { name, age } = user;\nconsole.log(name, age);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>ياسر 27</code></pre></div>\n<p>أسماء المتغيرات بين <code dir=\"ltr\">{ }</code> يجب أن تطابق أسماء الخصائص، والترتيب لا يهم.</p>\n<h3>إعادة التسمية والقيم الافتراضية</h3>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const product = { title: &quot;حقيبة&quot;, price: 120 };\n\nconst { title: productName, price, discount = 0 } = product;\nconsole.log(productName, price, discount);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>حقيبة 120 0</code></pre></div>\n<ul><li><code dir=\"ltr\">title: productName</code> يعني: خذ الخاصية <code dir=\"ltr\">title</code> وخزّنها في متغير اسمه <code dir=\"ltr\">productName</code>.</li><li><code dir=\"ltr\">discount = 0</code> قيمة افتراضية إذا لم تكن الخاصية موجودة.</li></ul>\n<h3>التفكيك المتداخل</h3>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const order = { id: 5, customer: { name: &quot;رنا&quot;, address: { city: &quot;مكة&quot; } } };\nconst { customer: { name, address: { city } } } = order;\nconsole.log(name, city);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>رنا مكة</code></pre></div>\n<h2>تفكيك المصفوفات</h2>\n<p>هنا يعتمد التفكيك على <strong>الترتيب</strong> وليس الأسماء:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const rgb = [255, 128, 0];\nconst [red, green, blue] = rgb;\nconsole.log(red, green, blue);\n\nconst [first, , third] = [&quot;أ&quot;, &quot;ب&quot;, &quot;ج&quot;];\nconsole.log(first, third);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>255 128 0\nأ ج</code></pre></div>\n<p>الفاصلة الفارغة تتخطى عنصراً.</p>\n<h3>حيلة: تبديل متغيرين</h3>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>let a = 1;\nlet b = 2;\n[a, b] = [b, a];\nconsole.log(a, b);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>2 1</code></pre></div>\n<h2>التفكيك في معاملات الدوال</h2>\n<p>هذا هو الاستخدام الأكثر شيوعاً على الإطلاق:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function createCard({ name, role = &quot;عضو&quot;, skills }) {\n  return `${name} (${role}) - ${skills.length} مهارات`;\n}\n\nconsole.log(createCard({ name: &quot;دانة&quot;, skills: [&quot;JS&quot;, &quot;CSS&quot;] }));\nconsole.log(createCard({ name: &quot;فارس&quot;, role: &quot;مدير&quot;, skills: [&quot;قيادة&quot;] }));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>دانة (عضو) - 2 مهارات\nفارس (مدير) - 1 مهارات</code></pre></div>\n<p>مزايا تمرير كائن بدلاً من معاملات متعددة: الترتيب لا يهم، والخيارات الاختيارية واضحة، ومن يقرأ الاستدعاء يعرف معنى كل قيمة.</p>\n<h2>مع الحلقات</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const scores = { &quot;علي&quot;: 90, &quot;منى&quot;: 85 };\nfor (const [student, score] of Object.entries(scores)) {\n  console.log(`${student}: ${score}`);\n}\n\nconst users = [{ id: 1, name: &quot;هيا&quot; }, { id: 2, name: &quot;بدر&quot; }];\nconsole.log(users.map(({ name }) =&gt; name));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>علي: 90\nمنى: 85\n[&quot;هيا&quot;,&quot;بدر&quot;]</code></pre></div>\n<h2>ملخص الدرس</h2>\n<ul><li>تفكيك الكائن <code dir=\"ltr\">const { a, b } = obj</code> يعتمد على الأسماء.</li><li>تفكيك المصفوفة <code dir=\"ltr\">const [x, y] = arr</code> يعتمد على الترتيب.</li><li>يمكن إعادة التسمية <code dir=\"ltr\">{ a: newName }</code> ووضع قيم افتراضية <code dir=\"ltr\">{ a = 5 }</code>.</li><li>التفكيك في معاملات الدوال يجعلها أوضح وأكثر مرونة.</li></ul>",
+   "exercise": {
+    "prompt": "<p>أكمل الكود باستخدام التفكيك فقط (بدون <code dir=\"ltr\">obj.prop</code>):</p>\n<ol><li>استخرج <code dir=\"ltr\">title</code> و <code dir=\"ltr\">year</code> من الكائن <code dir=\"ltr\">movie</code>، واستخرج <code dir=\"ltr\">director</code> باسم جديد <code dir=\"ltr\">directorName</code>، واطبع الثلاثة في سطر واحد.</li><li>استخرج أول تقييمين من المصفوفة <code dir=\"ltr\">movie.ratings</code> في متغيرين <code dir=\"ltr\">best</code> و <code dir=\"ltr\">second</code> واطبعهما.</li><li>أكمل الدالة <code dir=\"ltr\">describe</code> لتستقبل كائناً وتفككه في المعاملات، مع قيمة افتراضية <code dir=\"ltr\">&quot;غير مصنف&quot;</code> للخاصية <code dir=\"ltr\">genre</code>.</li></ol>",
+    "starter": "const movie = { title: \"الرحلة\", year: 2021, director: \"سعد\", ratings: [9, 8, 7] };\n\n// 1)\n\n// 2)\n\n// 3)\nfunction describe(/* فكّك هنا */) {\n  return `${title} - ${genre}`;\n}\nconsole.log(describe({ title: \"المدينة\", genre: \"دراما\" }));\nconsole.log(describe({ title: \"البحر\" }));",
+    "expected": "الرحلة 2021 سعد\n9 8\nالمدينة - دراما\nالبحر - غير مصنف",
+    "solution": "const movie = { title: \"الرحلة\", year: 2021, director: \"سعد\", ratings: [9, 8, 7] };\n\nconst { title, year, director: directorName } = movie;\nconsole.log(title, year, directorName);\n\nconst [best, second] = movie.ratings;\nconsole.log(best, second);\n\nfunction describe({ title, genre = \"غير مصنف\" }) {\n  return `${title} - ${genre}`;\n}\nconsole.log(describe({ title: \"المدينة\", genre: \"دراما\" }));\nconsole.log(describe({ title: \"البحر\" }));"
+   },
+   "quiz": [
+    {
+     "q": "ما قيمة <code dir=\"ltr\">x</code> بعد <code dir=\"ltr\">const { x = 10 } = { y: 5 };</code>؟",
+     "o": [
+      "<code dir=\"ltr\">5</code>",
+      "<code dir=\"ltr\">10</code>",
+      "<code dir=\"ltr\">undefined</code>"
+     ],
+     "a": 1,
+     "why": "الخاصية <code dir=\"ltr\">x</code> غير موجودة، فتُستخدم القيمة الافتراضية."
+    },
+    {
+     "q": "على ماذا يعتمد تفكيك المصفوفات؟",
+     "o": [
+      "ترتيب العناصر",
+      "أسماء العناصر",
+      "أنواع العناصر"
+     ],
+     "a": 0,
+     "why": "المتغير الأول يأخذ العنصر الأول، والثاني يأخذ الثاني، وهكذا."
+    },
+    {
+     "q": "ماذا يعني <code dir=\"ltr\">const { name: fullName } = user;</code>؟",
+     "o": [
+      "ينشئ متغيرين: name و fullName",
+      "يأخذ الخاصية name ويخزّنها في متغير اسمه fullName",
+      "يغيّر اسم الخاصية داخل user"
+     ],
+     "a": 1,
+     "why": "هذه صيغة إعادة التسمية أثناء التفكيك."
+    }
+   ]
+  },
+  {
+   "body": "<h2>ثلاث نقاط بوظيفتين</h2>\n<p>العلامة <code dir=\"ltr\">...</code> لها وظيفتان متعاكستان حسب مكانها:</p>\n<ul><li><strong>الانتشار (Spread):</strong> تفرد عناصر المصفوفة أو خصائص الكائن.</li><li><strong>التجميع (Rest):</strong> تجمع عدة عناصر في مصفوفة أو كائن واحد.</li></ul>\n<h2>Spread مع المصفوفات</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const fruits = [&quot;تفاح&quot;, &quot;موز&quot;];\nconst veggies = [&quot;جزر&quot;, &quot;خس&quot;];\n\nconst all = [...fruits, ...veggies, &quot;ليمون&quot;];\nconsole.log(all);\n\nconst copy = [...fruits];\ncopy.push(&quot;عنب&quot;);\nconsole.log(fruits.length, copy.length);\n\nconsole.log(Math.max(...[4, 18, 7]));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[&quot;تفاح&quot;,&quot;موز&quot;,&quot;جزر&quot;,&quot;خس&quot;,&quot;ليمون&quot;]\n2 3\n18</code></pre></div>\n<ul><li>دمج المصفوفات بسهولة.</li><li>إنشاء <strong>نسخة</strong> مستقلة، فتعديل <code dir=\"ltr\">copy</code> لا يغيّر <code dir=\"ltr\">fruits</code>.</li><li>تمرير عناصر مصفوفة كوسائط منفصلة لدالة.</li></ul>\n<h2>Spread مع الكائنات</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const defaults = { theme: &quot;light&quot;, fontSize: 14, lang: &quot;ar&quot; };\nconst userSettings = { fontSize: 18 };\n\nconst settings = { ...defaults, ...userSettings };\nconsole.log(settings);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>{&quot;theme&quot;:&quot;light&quot;,&quot;fontSize&quot;:18,&quot;lang&quot;:&quot;ar&quot;}</code></pre></div>\n<p>عند تكرار خاصية، <strong>الأخيرة تفوز</strong>. وهذا نمط شائع لدمج الإعدادات الافتراضية مع إعدادات المستخدم.</p>\n<h2>التحديث دون تعديل الأصل</h2>\n<p>في React والتطبيقات الحديثة نفضّل <strong>عدم تعديل</strong> البيانات الأصلية، بل إنشاء نسخة جديدة معدّلة:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const user = { name: &quot;لمى&quot;, age: 24, city: &quot;جدة&quot; };\nconst updated = { ...user, age: 25 };\n\nconsole.log(user.age, updated.age);\n\nconst todos = [&quot;أ&quot;, &quot;ب&quot;];\nconst withNew = [...todos, &quot;ج&quot;];\nconst withoutFirst = todos.filter((_, i) =&gt; i !== 0);\nconsole.log(todos, withNew, withoutFirst);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>24 25\n[&quot;أ&quot;,&quot;ب&quot;] [&quot;أ&quot;,&quot;ب&quot;,&quot;ج&quot;] [&quot;ب&quot;]</code></pre></div>\n<h2>تذكير: النسخ بالمرجع</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const original = { tags: [&quot;js&quot;] };\n\nconst sameRef = original;\nsameRef.tags = [&quot;css&quot;];\nconsole.log(original.tags);\n\nconst shallow = { ...original };\nshallow.tags.push(&quot;html&quot;);\nconsole.log(original.tags);\n\nconst deep = structuredClone(original);\ndeep.tags.push(&quot;node&quot;);\nconsole.log(original.tags.length, deep.tags.length);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[&quot;css&quot;]\n[&quot;css&quot;,&quot;html&quot;]\n2 3</code></pre></div>\n<div class=\"callout warn\">⚠️ <code dir=\"ltr\">...</code> تنشئ <strong>نسخة سطحية</strong>: المستوى الأول جديد، لكن الكائنات والمصفوفات المتداخلة ما زالت مشتركة. للنسخ العميق استخدم <code dir=\"ltr\">structuredClone</code>.</div>\n<h2>Rest في الدوال: عدد غير محدود من الوسائط</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function sum(...numbers) {\n  return numbers.reduce((total, n) =&gt; total + n, 0);\n}\n\nconsole.log(sum(1, 2));\nconsole.log(sum(5, 10, 15, 20));\n\nfunction log(level, ...messages) {\n  console.log(`[${level}] ${messages.join(&quot; | &quot;)}`);\n}\nlog(&quot;خطأ&quot;, &quot;فشل الاتصال&quot;, &quot;إعادة المحاولة&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>3\n50\n[خطأ] فشل الاتصال | إعادة المحاولة</code></pre></div>\n<p>معامل الـ rest يجب أن يكون <strong>الأخير</strong> دائماً.</p>\n<h2>Rest مع التفكيك</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const [winner, ...others] = [&quot;سلمى&quot;, &quot;حمد&quot;, &quot;ريان&quot;];\nconsole.log(winner, others);\n\nconst { password, ...publicData } = { id: 1, name: &quot;زيد&quot;, password: &quot;123&quot; };\nconsole.log(publicData);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>سلمى [&quot;حمد&quot;,&quot;ريان&quot;]\n{&quot;id&quot;:1,&quot;name&quot;:&quot;زيد&quot;}</code></pre></div>\n<p>المثال الثاني نمط مفيد جداً: إزالة خاصية حساسة قبل إرسال البيانات.</p>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">...</code> في مكان <strong>القيم</strong> = انتشار: تفرد العناصر (دمج، نسخ، تمرير).</li><li><code dir=\"ltr\">...</code> في مكان <strong>المتغيرات أو المعاملات</strong> = تجميع: تجمع الباقي.</li><li><code dir=\"ltr\">{ ...obj, key: newValue }</code> لتحديث كائن دون تعديل الأصل.</li><li>النسخ بـ <code dir=\"ltr\">...</code> سطحي، و <code dir=\"ltr\">structuredClone</code> للنسخ العميق.</li></ul>",
+   "exercise": {
+    "prompt": "<ol><li>اكتب دالة <code dir=\"ltr\">average(...nums)</code> تُرجع متوسط أي عدد من الأرقام.</li><li>ادمج <code dir=\"ltr\">baseConfig</code> مع <code dir=\"ltr\">override</code> في كائن جديد <code dir=\"ltr\">config</code> بحيث تفوز قيم <code dir=\"ltr\">override</code>، واطبعه.</li><li>من الكائن <code dir=\"ltr\">account</code> أنشئ <code dir=\"ltr\">safeAccount</code> يحتوي كل الخصائص <strong>ما عدا</strong> <code dir=\"ltr\">pin</code> باستخدام rest، واطبعه.</li><li>تأكد أن <code dir=\"ltr\">baseConfig</code> لم يتغير: اطبع <code dir=\"ltr\">baseConfig.debug</code>.</li></ol>",
+    "starter": "const baseConfig = { debug: false, retries: 3, lang: \"ar\" };\nconst override = { debug: true, retries: 5 };\nconst account = { id: 7, owner: \"مشاري\", pin: \"9876\", balance: 500 };\n\nfunction average(/* ... */) {\n  // أكمل\n}\n\nconsole.log(average(10, 20, 30));\nconsole.log(average(5, 7));\n// أكمل 2 و 3 و 4",
+    "expected": "20\n6\n{\"debug\":true,\"retries\":5,\"lang\":\"ar\"}\n{\"id\":7,\"owner\":\"مشاري\",\"balance\":500}\nfalse",
+    "solution": "const baseConfig = { debug: false, retries: 3, lang: \"ar\" };\nconst override = { debug: true, retries: 5 };\nconst account = { id: 7, owner: \"مشاري\", pin: \"9876\", balance: 500 };\n\nfunction average(...nums) {\n  return nums.reduce((sum, n) => sum + n, 0) / nums.length;\n}\n\nconsole.log(average(10, 20, 30));\nconsole.log(average(5, 7));\n\nconst config = { ...baseConfig, ...override };\nconsole.log(config);\n\nconst { pin, ...safeAccount } = account;\nconsole.log(safeAccount);\n\nconsole.log(baseConfig.debug);"
+   },
+   "quiz": [
+    {
+     "q": "ما ناتج <code dir=\"ltr\">[...[1, 2], ...[3]]</code>؟",
+     "o": [
+      "<code dir=\"ltr\">[1, 2, 3]</code>",
+      "<code dir=\"ltr\">[[1, 2], [3]]</code>",
+      "<code dir=\"ltr\">[1, 2, [3]]</code>"
+     ],
+     "a": 0,
+     "why": "الانتشار يفرد عناصر كل مصفوفة داخل المصفوفة الجديدة."
+    },
+    {
+     "q": "في <code dir=\"ltr\">{ ...a, ...b }</code> إذا كانت الخاصية <code dir=\"ltr\">x</code> موجودة في الاثنين، أي قيمة تبقى؟",
+     "o": [
+      "قيمة a",
+      "قيمة b",
+      "خطأ"
+     ],
+     "a": 1,
+     "why": "الخاصية الأخيرة تفوز."
+    },
+    {
+     "q": "أين يجب أن يكون معامل الـ rest في الدالة؟",
+     "o": [
+      "الأول",
+      "الأخير",
+      "في أي مكان"
+     ],
+     "a": 1,
+     "why": "rest يجمع &quot;الباقي&quot;، لذلك يجب أن يأتي في النهاية."
+    }
+   ]
+  },
+  {
+   "body": "<h2>تقسيم المشروع إلى ملفات</h2>\n<p>المشاريع الحقيقية فيها آلاف الأسطر. وضعها في ملف واحد كارثة. <strong>الوحدات (Modules)</strong> تتيح تقسيم الكود إلى ملفات صغيرة، كل ملف مسؤول عن شيء واحد، ويختار ما يشاركه مع الملفات الأخرى.</p>\n<h2>export: ما يشاركه الملف</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>// ملف math.js\nexport const PI = 3.14159;\n\nexport function circleArea(r) {\n  return PI * r * r;\n}\n\nfunction secretHelper() {\n  // غير مُصدَّرة، فلا يراها أي ملف آخر\n}</code></pre></div>\n<h2>import: استخدام ما شاركه ملف آخر</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>// ملف app.js\nimport { PI, circleArea } from &quot;./math.js&quot;;\n\nconsole.log(circleArea(2));</code></pre></div>\n<ul><li><code dir=\"ltr\">export</code> قبل التعريف يجعله متاحاً للخارج.</li><li><code dir=\"ltr\">import { ... } from &quot;مسار&quot;</code> يستورد بالاسم، وصيغتها تشبه التفكيك.</li><li>كل ما لم يُصدَّر يبقى <strong>خاصاً</strong> بالملف.</li></ul>\n<h2>التصدير الافتراضي (default)</h2>\n<p>كل ملف يمكن أن يكون له تصدير <strong>افتراضي واحد</strong>، عادة الشيء الرئيسي فيه:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>// ملف User.js\nexport default class User {\n  constructor(name) { this.name = name; }\n}\n\n// ملف app.js\nimport User from &quot;./User.js&quot;;       // بدون { }، وبأي اسم تختاره\nimport { PI as pi } from &quot;./math.js&quot;; // إعادة تسمية الاستيراد المسمى\nimport * as math from &quot;./math.js&quot;;    // استيراد كل شيء في كائن واحد</code></pre></div>\n<div class=\"table-wrap\"><table><thead><tr><th>النوع</th><th>التصدير</th><th>الاستيراد</th></tr></thead><tbody><tr><td>مسمّى</td><td><code dir=\"ltr\">export const x</code></td><td><code dir=\"ltr\">import { x } from</code></td></tr><tr><td>افتراضي</td><td><code dir=\"ltr\">export default ...</code></td><td><code dir=\"ltr\">import anyName from</code></td></tr></tbody></table></div>\n<h2>استخدام الوحدات في المتصفح</h2>\n<p>نضيف <code dir=\"ltr\">type=&quot;module&quot;</code> لوسم script:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;script type=&quot;module&quot; src=&quot;app.js&quot;&gt;&lt;/script&gt;</code></pre></div>\n<p>مزايا هذا النوع: يعمل تلقائياً بعد تحميل الصفحة مثل <code dir=\"ltr\">defer</code>، ويعمل بالوضع الصارم، ومتغيراته لا تتسرب للنطاق العام.</p>\n<div class=\"callout warn\">⚠️ الوحدات لا تعمل عند فتح الملف مباشرة بـ <code dir=\"ltr\">file://</code> بسبب قيود الأمان. تحتاج خادماً محلياً مثل إضافة Live Server في VS Code، أو أداة مثل Vite.</div>\n<h2>مكتبات npm</h2>\n<p>نفس الصيغة تستخدم لاستيراد المكتبات المثبتة بـ npm:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>import { format } from &quot;date-fns&quot;;\nimport React, { useState } from &quot;react&quot;;</code></pre></div>\n<h2>قبل الوحدات: نمط الوحدة (Module Pattern)</h2>\n<p>قبل وجود <code dir=\"ltr\">import</code> و <code dir=\"ltr\">export</code>، كان المطورون يحققون نفس الفكرة بالإغلاق (Closures) الذي تعلمناه: دالة تُستدعى فوراً، تخفي ما بداخلها، وتُرجع فقط ما تريد مشاركته:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const counterModule = (() =&gt; {\n  let count = 0;\n  const log = msg =&gt; `[عدّاد] ${msg}`;\n\n  return {\n    increment() { count++; return log(count); },\n    reset() { count = 0; return log(&quot;تم التصفير&quot;); }\n  };\n})();\n\nconsole.log(counterModule.increment());\nconsole.log(counterModule.increment());\nconsole.log(counterModule.reset());\nconsole.log(typeof count, typeof counterModule.log);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[عدّاد] 1\n[عدّاد] 2\n[عدّاد] تم التصفير\nundefined undefined</code></pre></div>\n<p><code dir=\"ltr\">count</code> و <code dir=\"ltr\">log</code> خاصّان تماماً، كما في الوحدة التي لم تُصدّرهما. ستقابل هذا النمط في الأكواد القديمة، وفهمه يعمّق فهمك للإغلاق والوحدات معاً.</p>\n<h2>ملخص الدرس</h2>\n<ul><li>الوحدات تقسّم المشروع إلى ملفات، وكل ملف يختار ما يُصدّره.</li><li><code dir=\"ltr\">export</code> و <code dir=\"ltr\">import { x }</code> للتصدير المسمّى، و <code dir=\"ltr\">export default</code> لتصدير رئيسي واحد.</li><li>في المتصفح: <code dir=\"ltr\">&lt;script type=&quot;module&quot;&gt;</code> وتحتاج خادماً محلياً.</li><li>نمط الوحدة القديم يعتمد على الإغلاق لإخفاء التفاصيل.</li></ul>",
+   "exercise": {
+    "prompt": "<p>بما أن محرر التمارين ملف واحد، سنطبّق فكرة الوحدات بـ <strong>نمط الوحدة</strong>.</p>\n<p>أنشئ <code dir=\"ltr\">cartModule</code> كدالة تُستدعى فوراً، فيها مصفوفة خاصة <code dir=\"ltr\">items</code>، وتُرجع ثلاث دوال فقط:</p>\n<ul><li><code dir=\"ltr\">add(name, price)</code> تضيف منتجاً <code dir=\"ltr\">{ name, price }</code>.</li><li><code dir=\"ltr\">total()</code> تُرجع مجموع الأسعار.</li><li><code dir=\"ltr\">count()</code> تُرجع عدد المنتجات.</li></ul>\n<p>ثم &quot;استورد&quot; الدوال بالتفكيك كما في <code dir=\"ltr\">import</code>، واستخدمها. الكود في الأسفل جاهز.</p>",
+    "starter": "const cartModule = (() => {\n  // مصفوفة خاصة + الدوال\n})();\n\n// \"استيراد\" بالتفكيك:\nconst { add, total, count } = cartModule;\n\nadd(\"كتاب\", 45);\nadd(\"قلم\", 5);\nconsole.log(count());\nconsole.log(total());\nconsole.log(cartModule.items);",
+    "expected": "2\n50\nundefined",
+    "solution": "const cartModule = (() => {\n  const items = [];\n  return {\n    add(name, price) {\n      items.push({ name, price });\n    },\n    total() {\n      return items.reduce((sum, item) => sum + item.price, 0);\n    },\n    count() {\n      return items.length;\n    }\n  };\n})();\n\n// \"استيراد\" بالتفكيك:\nconst { add, total, count } = cartModule;\n\nadd(\"كتاب\", 45);\nadd(\"قلم\", 5);\nconsole.log(count());\nconsole.log(total());\nconsole.log(cartModule.items);"
+   },
+   "quiz": [
+    {
+     "q": "كيف نستورد دالة صُدّرت بـ <code dir=\"ltr\">export function save()</code> من الملف <code dir=\"ltr\">db.js</code>؟",
+     "o": [
+      "<code dir=\"ltr\">import { save } from &quot;./db.js&quot;;</code>",
+      "<code dir=\"ltr\">import save from &quot;./db.js&quot;;</code>",
+      "<code dir=\"ltr\">require save from db</code>"
+     ],
+     "a": 0,
+     "why": "التصدير المسمّى يُستورد بين أقواس معقوفة وبنفس الاسم."
+    },
+    {
+     "q": "كم تصديراً افتراضياً (default) يمكن أن يحتوي ملف واحد؟",
+     "o": [
+      "واحد فقط",
+      "اثنان",
+      "بلا حد"
+     ],
+     "a": 0,
+     "why": "كل ملف له تصدير افتراضي واحد كحد أقصى، وما شاء من التصديرات المسمّاة."
+    },
+    {
+     "q": "ما الذي يجب إضافته لوسم script لاستخدام import و export في المتصفح؟",
+     "o": [
+      "<code dir=\"ltr\">defer</code>",
+      "<code dir=\"ltr\">type=&quot;module&quot;</code>",
+      "<code dir=\"ltr\">async</code>"
+     ],
+     "a": 1,
+     "why": "بدون type=&quot;module&quot; يعامل المتصفح الملف كسكربت عادي ويرفض import."
+    }
+   ]
+  },
+  {
+   "body": "<h2>قالب لإنشاء كائنات متشابهة</h2>\n<p>تخيّل أنك تبني لعبة فيها 100 لاعب، لكل منهم اسم ونقاط ومستوى، وكلهم يستطيعون <code dir=\"ltr\">attack()</code> و <code dir=\"ltr\">levelUp()</code>. كتابة 100 كائن يدوياً مستحيل. <strong>الصنف (Class)</strong> هو <strong>قالب</strong> نصنع منه كائنات بنفس البنية والسلوك.</p>\n<h2>تعريف صنف وإنشاء كائنات</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>class Player {\n  constructor(name) {\n    this.name = name;\n    this.score = 0;\n    this.level = 1;\n  }\n\n  addPoints(points) {\n    this.score += points;\n    if (this.score &gt;= 100) {\n      this.level++;\n      this.score -= 100;\n    }\n  }\n\n  describe() {\n    return `${this.name} - المستوى ${this.level} (${this.score} نقطة)`;\n  }\n}\n\nconst p1 = new Player(&quot;صقر&quot;);\nconst p2 = new Player(&quot;غيمة&quot;);\np1.addPoints(130);\np2.addPoints(40);\nconsole.log(p1.describe());\nconsole.log(p2.describe());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>صقر - المستوى 2 (30 نقطة)\nغيمة - المستوى 1 (40 نقطة)</code></pre></div>\n<ul><li><code dir=\"ltr\">class Player</code> تعريف القالب، واسم الصنف يبدأ بحرف كبير عرفاً.</li><li><code dir=\"ltr\">constructor</code> دالة خاصة تُنفَّذ تلقائياً عند الإنشاء بـ <code dir=\"ltr\">new</code>، ومهمتها تجهيز الخصائص.</li><li><code dir=\"ltr\">this</code> تشير إلى <strong>الكائن الحالي</strong> نفسه، فـ <code dir=\"ltr\">this.name</code> هي خاصية هذا اللاعب تحديداً.</li><li><code dir=\"ltr\">new Player(&quot;صقر&quot;)</code> تنشئ كائناً جديداً من القالب، ويسمى <strong>نسخة (instance)</strong>.</li></ul>\n<h2>الوراثة: extends</h2>\n<p>يمكن لصنف أن <strong>يرث</strong> كل ما في صنف آخر ويضيف عليه:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>class Animal {\n  constructor(name) {\n    this.name = name;\n  }\n  speak() {\n    return `${this.name} يصدر صوتاً`;\n  }\n}\n\nclass Cat extends Animal {\n  constructor(name, color) {\n    super(name);\n    this.color = color;\n  }\n  speak() {\n    return `${this.name} يقول مياو`;\n  }\n}\n\nconst generic = new Animal(&quot;حيوان&quot;);\nconst cat = new Cat(&quot;مشمش&quot;, &quot;برتقالي&quot;);\nconsole.log(generic.speak());\nconsole.log(cat.speak());\nconsole.log(cat.color, cat instanceof Animal);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>حيوان يصدر صوتاً\nمشمش يقول مياو\nبرتقالي true</code></pre></div>\n<ul><li><code dir=\"ltr\">extends Animal</code> تعني أن <code dir=\"ltr\">Cat</code> يرث من <code dir=\"ltr\">Animal</code>.</li><li><code dir=\"ltr\">super(name)</code> تستدعي constructor الأب، ويجب استدعاؤها قبل استخدام <code dir=\"ltr\">this</code>.</li><li>تعريف <code dir=\"ltr\">speak</code> في الابن <strong>يتجاوز (override)</strong> نسخة الأب.</li></ul>\n<h2>الخصائص الخاصة (#)</h2>\n<p>بإضافة <code dir=\"ltr\">#</code> قبل اسم الخاصية تصبح <strong>خاصة</strong>، فلا يمكن الوصول إليها من خارج الصنف:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>class BankAccount {\n  #balance = 0;\n\n  deposit(amount) {\n    if (amount &lt;= 0) return &quot;مبلغ غير صالح&quot;;\n    this.#balance += amount;\n    return `تم الإيداع، الرصيد: ${this.#balance}`;\n  }\n\n  get balance() {\n    return this.#balance;\n  }\n}\n\nconst acc = new BankAccount();\nconsole.log(acc.deposit(200));\nconsole.log(acc.deposit(-50));\nconsole.log(acc.balance);\nconsole.log(acc[&quot;#balance&quot;]);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>تم الإيداع، الرصيد: 200\nمبلغ غير صالح\n200\nundefined</code></pre></div>\n<p><code dir=\"ltr\">get balance()</code> تسمى <strong>getter</strong>: تُقرأ كخاصية <code dir=\"ltr\">acc.balance</code> دون أقواس، لكنها دالة لا تسمح إلا بالقراءة. هكذا لا يمكن تعديل الرصيد إلا عبر <code dir=\"ltr\">deposit</code> التي تتحقق من المبلغ.</p>\n<h2>الدوال الثابتة (static)</h2>\n<p>تنتمي للصنف نفسه وليس للنسخ:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>class Temperature {\n  static toFahrenheit(c) {\n    return c * 9 / 5 + 32;\n  }\n}\nconsole.log(Temperature.toFahrenheit(30));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>86</code></pre></div>\n<h2>ملخص الدرس</h2>\n<ul><li>الصنف قالب، و <code dir=\"ltr\">new</code> تنشئ نسخاً منه.</li><li><code dir=\"ltr\">constructor</code> يجهّز الخصائص، و <code dir=\"ltr\">this</code> تشير للكائن الحالي.</li><li><code dir=\"ltr\">extends</code> للوراثة، و <code dir=\"ltr\">super()</code> لاستدعاء الأب.</li><li><code dir=\"ltr\">#prop</code> للخصائص الخاصة، و <code dir=\"ltr\">get</code> للقراءة المحمية، و <code dir=\"ltr\">static</code> لدوال الصنف نفسه.</li></ul>",
+   "exercise": {
+    "prompt": "<ol><li>أنشئ صنف <code dir=\"ltr\">Shape</code> له constructor يستقبل <code dir=\"ltr\">name</code>، ودالة <code dir=\"ltr\">describe()</code> تُرجع <code dir=\"ltr\">X مساحته N</code> حيث N ناتج <code dir=\"ltr\">this.area()</code>.</li><li>أنشئ صنف <code dir=\"ltr\">Rectangle</code> يرث من <code dir=\"ltr\">Shape</code>، يستقبل <code dir=\"ltr\">width</code> و <code dir=\"ltr\">height</code>، ويعرّف <code dir=\"ltr\">area()</code>.</li><li>أنشئ صنف <code dir=\"ltr\">Circle</code> يرث من <code dir=\"ltr\">Shape</code>، يستقبل <code dir=\"ltr\">radius</code>، ويعرّف <code dir=\"ltr\">area()</code> = <code dir=\"ltr\">3 * r * r</code> (نستخدم 3 للتبسيط).</li></ol>\n<p>الكود في الأسفل يستخدم الأصناف، لا تعدّله.</p>",
+    "starter": "// اكتب الأصناف الثلاثة هنا\n\n\nconst shapes = [new Rectangle(4, 5), new Circle(2)];\nfor (const s of shapes) {\n  console.log(s.describe());\n}\nconsole.log(shapes[1] instanceof Shape);",
+    "expected": "مستطيل مساحته 20\nدائرة مساحته 12\ntrue",
+    "solution": "class Shape {\n  constructor(name) {\n    this.name = name;\n  }\n  describe() {\n    return `${this.name} مساحته ${this.area()}`;\n  }\n}\n\nclass Rectangle extends Shape {\n  constructor(width, height) {\n    super(\"مستطيل\");\n    this.width = width;\n    this.height = height;\n  }\n  area() {\n    return this.width * this.height;\n  }\n}\n\nclass Circle extends Shape {\n  constructor(radius) {\n    super(\"دائرة\");\n    this.radius = radius;\n  }\n  area() {\n    return 3 * this.radius * this.radius;\n  }\n}\n\nconst shapes = [new Rectangle(4, 5), new Circle(2)];\nfor (const s of shapes) {\n  console.log(s.describe());\n}\nconsole.log(shapes[1] instanceof Shape);"
+   },
+   "quiz": [
+    {
+     "q": "متى تُنفَّذ دالة <code dir=\"ltr\">constructor</code>؟",
+     "o": [
+      "عند تعريف الصنف",
+      "تلقائياً عند إنشاء نسخة جديدة بـ <code dir=\"ltr\">new</code>",
+      "عند استدعائها يدوياً فقط"
+     ],
+     "a": 1,
+     "why": "constructor تجهّز كل نسخة جديدة لحظة إنشائها."
+    },
+    {
+     "q": "ما وظيفة <code dir=\"ltr\">super(name)</code> داخل constructor الصنف الابن؟",
+     "o": [
+      "تستدعي constructor الصنف الأب",
+      "تحذف خصائص الأب",
+      "تنشئ نسخة جديدة من الأب"
+     ],
+     "a": 0,
+     "why": "يجب استدعاؤها قبل استخدام this في الصنف الابن."
+    },
+    {
+     "q": "ماذا يعني <code dir=\"ltr\">#</code> قبل اسم خاصية في الصنف؟",
+     "o": [
+      "أنها ثابتة لا تتغير",
+      "أنها خاصة لا يمكن الوصول إليها من خارج الصنف",
+      "أنها رقمية"
+     ],
+     "a": 1,
+     "why": "الخصائص الخاصة تحمي البيانات من التعديل الخارجي."
+    }
+   ]
+  },
+  {
+   "body": "<h2>أكثر من مجرد دمج نصوص</h2>\n<p>تعرّفت على <strong>القوالب النصية (Template Literals)</strong> في الوحدة الأولى. في هذا الدرس سنرى إمكانياتها الكاملة، فهي من أكثر ميزات JavaScript الحديثة استخداماً.</p>\n<h2>نصوص متعددة الأسطر</h2>\n<p>مع علامات التنصيص العادية تحتاج <code dir=\"ltr\">\\n</code> لكل سطر جديد. أما مع `<code dir=\"ltr\"> </code> `` فالأسطر تُكتب كما هي:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const oldWay = &quot;السطر الأول\\nالسطر الثاني&quot;;\nconst newWay = `السطر الأول\nالسطر الثاني`;\nconsole.log(oldWay === newWay);\nconsole.log(newWay);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>true\nالسطر الأول\nالسطر الثاني</code></pre></div>\n<h2>أي تعبير داخل ${ }</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const items = [{ name: &quot;قهوة&quot;, price: 12 }, { name: &quot;كعك&quot;, price: 8 }];\nconst vip = true;\n\nconsole.log(`عدد الأصناف: ${items.length}`);\nconsole.log(`الإجمالي: ${items.reduce((s, i) =&gt; s + i.price, 0)} ريال`);\nconsole.log(`العميل: ${vip ? &quot;مميز ⭐&quot; : &quot;عادي&quot;}`);\nconsole.log(`بأحرف كبيرة: ${&quot;codeway&quot;.toUpperCase()}`);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>عدد الأصناف: 2\nالإجمالي: 20 ريال\nالعميل: مميز ⭐\nبأحرف كبيرة: CODEWAY</code></pre></div>\n<h2>بناء HTML بالقوالب</h2>\n<p>هذا من أشهر الاستخدامات: توليد عناصر الصفحة من البيانات بـ <code dir=\"ltr\">map</code> ثم <code dir=\"ltr\">join</code>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const products = [\n  { name: &quot;ساعة&quot;, price: 300 },\n  { name: &quot;حقيبة&quot;, price: 150 }\n];\n\nconst html = `\n&lt;ul class=&quot;products&quot;&gt;\n  ${products.map(p =&gt; `&lt;li&gt;${p.name}: ${p.price} ريال&lt;/li&gt;`).join(&quot;\\n  &quot;)}\n&lt;/ul&gt;`;\nconsole.log(html.trim());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>&lt;ul class=&quot;products&quot;&gt;\n  &lt;li&gt;ساعة: 300 ريال&lt;/li&gt;\n  &lt;li&gt;حقيبة: 150 ريال&lt;/li&gt;\n&lt;/ul&gt;</code></pre></div>\n<p>لاحظ القالب <strong>داخل</strong> قالب، وهذا مسموح تماماً.</p>\n<div class=\"callout warn\">⚠️ تذكّر درس DOM: إذا كانت البيانات من المستخدم، لا تضعها في <code dir=\"ltr\">innerHTML</code> مباشرة دون تنظيفها، حتى لو بنيتها بقالب نصي.</div>\n<h2>القوالب الموسومة (Tagged Templates)</h2>\n<p>ميزة متقدمة: يمكن وضع <strong>دالة</strong> قبل القالب لتعالجه بطريقتها. الدالة تستقبل الأجزاء النصية الثابتة، ثم القيم:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function highlight(strings, ...values) {\n  return strings.reduce((result, str, i) =&gt; {\n    const value = i &lt; values.length ? `[${values[i]}]` : &quot;&quot;;\n    return result + str + value;\n  }, &quot;&quot;);\n}\n\nconst user = &quot;ماهر&quot;;\nconst points = 350;\nconsole.log(highlight`المستخدم ${user} جمع ${points} نقطة`);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>المستخدم [ماهر] جمع [350] نقطة</code></pre></div>\n<ul><li><code dir=\"ltr\">strings</code> = <code dir=\"ltr\">[&quot;المستخدم &quot;, &quot; جمع &quot;, &quot; نقطة&quot;]</code> الأجزاء الثابتة.</li><li><code dir=\"ltr\">values</code> = <code dir=\"ltr\">[&quot;ماهر&quot;, 350]</code> القيم.</li></ul>\n<p>قد لا تكتبها كثيراً بنفسك، لكنك ستراها في مكتبات مشهورة مثل styled-components و GraphQL.</p>\n<h2>String.raw: النص كما هو</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>console.log(String.raw`C:\\new\\table`);\nconsole.log(`C:\\\\new\\\\table`);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>C:\\new\\table\nC:\\new\\table</code></pre></div>\n<p><code dir=\"ltr\">String.raw</code> يتجاهل معنى <code dir=\"ltr\">\\</code> الخاص، وهو مفيد لمسارات الملفات والتعابير النمطية.</p>\n<h2>ملخص الدرس</h2>\n<ul><li>القوالب تدعم الأسطر المتعددة مباشرة.</li><li>أي تعبير JavaScript يمكن وضعه داخل <code dir=\"ltr\">${ }</code>: عمليات، ودوال، وعامل ثلاثي.</li><li><code dir=\"ltr\">map</code> مع <code dir=\"ltr\">join</code> داخل قالب لتوليد HTML من البيانات.</li><li>القوالب الموسومة تمرر القالب لدالة تعالجه.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب دالة <code dir=\"ltr\">receipt(customer, items)</code> تُرجع إيصالاً نصياً <strong>متعدد الأسطر</strong> بقالب واحد، بهذا الشكل بالضبط:</p>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>العميل: نورة\n- شاي × 2 = 10\n- كيك × 1 = 15\nالإجمالي: 25</code></pre></div>\n<p>استخدم <code dir=\"ltr\">map</code> و <code dir=\"ltr\">join(&quot;\\n&quot;)</code> لأسطر العناصر، و <code dir=\"ltr\">reduce</code> للإجمالي.</p>",
+    "starter": "function receipt(customer, items) {\n  // أكمل هنا\n}\n\nconsole.log(receipt(\"نورة\", [\n  { name: \"شاي\", price: 5, qty: 2 },\n  { name: \"كيك\", price: 15, qty: 1 }\n]));",
+    "expected": "العميل: نورة\n- شاي × 2 = 10\n- كيك × 1 = 15\nالإجمالي: 25",
+    "solution": "function receipt(customer, items) {\n  const lines = items.map(i => `- ${i.name} × ${i.qty} = ${i.price * i.qty}`).join(\"\\n\");\n  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);\n  return `العميل: ${customer}\n${lines}\nالإجمالي: ${total}`;\n}\n\nconsole.log(receipt(\"نورة\", [\n  { name: \"شاي\", price: 5, qty: 2 },\n  { name: \"كيك\", price: 15, qty: 1 }\n]));"
+   },
+   "quiz": [
+    {
+     "q": "ما ناتج `<code dir=\"ltr\"> </code>${2 &gt; 1 ? &quot;نعم&quot; : &quot;لا&quot;}<code dir=\"ltr\"> </code>`؟",
+     "o": [
+      "<code dir=\"ltr\">نعم</code>",
+      "<code dir=\"ltr\">لا</code>",
+      "<code dir=\"ltr\">true</code>"
+     ],
+     "a": 0,
+     "why": "يُحسب العامل الثلاثي داخل <code dir=\"ltr\">${ }</code> وتوضع نتيجته في النص."
+    },
+    {
+     "q": "ما ميزة القوالب على علامات التنصيص العادية في النصوص الطويلة؟",
+     "o": [
+      "أنها أسرع",
+      "تسمح بالأسطر المتعددة مباشرة دون <code dir=\"ltr\">\\n</code>",
+      "تشفّر النص"
+     ],
+     "a": 1,
+     "why": "يمكنك الضغط على Enter داخل القالب."
+    },
+    {
+     "q": "في القالب الموسوم `<code dir=\"ltr\"> tag</code>أ ${x} ب<code dir=\"ltr\"> </code><code dir=\"ltr\">، ماذا تستقبل الدالة </code>tag` أولاً؟",
+     "o": [
+      "مصفوفة الأجزاء النصية الثابتة",
+      "قيمة x",
+      "النص كاملاً"
+     ],
+     "a": 0,
+     "why": "المعامل الأول مصفوفة الأجزاء الثابتة، والقيم تأتي بعدها."
+    }
+   ]
+  }
  ]
 ]);
