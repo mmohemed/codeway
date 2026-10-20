@@ -35,7 +35,7 @@
           <div class="crumbs"><a href="index.html">الرئيسية</a> / <a href="catalog.html?tab=${c.type === "lang" ? "languages" : "tools"}">${c.type === "lang" ? "اللغات" : "الأدوات والمكتبات"}</a> / <span>${CW.esc(c.name)}</span></div>
           <div class="card-top" style="margin-top:14px">
             <span class="lang-badge">${CW.esc(c.short)}</span>
-            <div><h1>${CW.esc(c.name)}</h1><span class="tag">${c.kind || "لغة برمجة"} · ${c.level}</span></div>
+            <div><h1>${CW.esc(c.name)}</h1><span class="tag">${c.kind || "لغة برمجة"} · ${c.level}</span>${CW.contentReady.includes(c.id) ? ` <span class="tag">📘 الدروس مكتملة: شرح وتمارين واختبارات</span>` : ` <span class="tag">⏳ المحتوى قيد الإعداد</span>`}</div>
           </div>
           <p style="margin-top:14px">${CW.esc(c.desc)}</p>
           <div class="hero-meta">
@@ -97,7 +97,7 @@
               return `<li>
                 <button class="chk${on ? " on" : ""}" data-m="${m}" data-l="${l}" aria-label="تعليم كمنجز">${on ? "✓" : ""}</button>
                 <a href="lesson.html?c=${c.id}&m=${m}&l=${l}">${m + 1}.${l + 1} ${CW.esc(lesson)}</a>
-                <span class="lesson-type">درس + تمرين</span>
+                <span class="lesson-type">${CW.contentReady.includes(c.id) ? "شرح + تمرين + اختبار" : "قريباً"}</span>
               </li>`;
             }).join("")}
             <li><span class="chk" style="border-style:dashed"></span><span style="flex:1;font-weight:600">📝 اختبار الوحدة</span></li>

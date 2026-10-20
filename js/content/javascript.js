@@ -1453,5 +1453,213 @@ CW.registerContent("javascript", [
     }
    ]
   }
+ ],
+ [
+  {
+   "body": "<h2>من يستدعيني؟</h2>\n<p>الكلمة <code dir=\"ltr\">this</code> من أكثر ما يربك مبرمجي JavaScript، لأن قيمتها <strong>لا تُحدد عند كتابة الدالة، بل عند استدعائها</strong>. القاعدة الذهبية: انظر إلى ما <strong>قبل النقطة</strong> لحظة الاستدعاء.</p>\n<h2>this داخل طرق الكائن</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const user = {\n  name: &quot;عبير&quot;,\n  greet() {\n    return `مرحباً، أنا ${this.name}`;\n  }\n};\n\nconsole.log(user.greet());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>مرحباً، أنا عبير</code></pre></div>\n<p>استدعينا <code dir=\"ltr\">user.greet()</code>، وما قبل النقطة هو <code dir=\"ltr\">user</code>، إذن <code dir=\"ltr\">this</code> هي <code dir=\"ltr\">user</code>.</p>\n<h2>نفس الدالة، this مختلفة</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function introduce() {\n  return `أنا ${this.name}`;\n}\n\nconst a = { name: &quot;أحمد&quot;, introduce };\nconst b = { name: &quot;بشرى&quot;, introduce };\n\nconsole.log(a.introduce());\nconsole.log(b.introduce());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>أنا أحمد\nأنا بشرى</code></pre></div>\n<p>دالة واحدة، لكن <code dir=\"ltr\">this</code> تتغير حسب الكائن الذي استُدعيت منه.</p>\n<h2>المشكلة: فقدان this</h2>\n<p>عندما تأخذ الطريقة <strong>بعيداً</strong> عن كائنها، تفقد <code dir=\"ltr\">this</code>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const timer = {\n  seconds: 10,\n  show() {\n    console.log(this.seconds);\n  }\n};\n\ntimer.show();            // 10\nconst detached = timer.show;\ndetached();              // undefined، لا يوجد شيء قبل النقطة!</code></pre></div>\n<p>هذا يحدث كثيراً عند تمرير الطريقة كـ callback، مثلاً <code dir=\"ltr\">setTimeout(timer.show, 1000)</code> أو <code dir=\"ltr\">button.addEventListener(&quot;click&quot;, obj.handle)</code>.</p>\n<h2>الحل 1: bind</h2>\n<p><code dir=\"ltr\">bind</code> تنشئ نسخة من الدالة مربوطة بـ <code dir=\"ltr\">this</code> محددة <strong>للأبد</strong>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const timer = {\n  seconds: 10,\n  show() {\n    return this.seconds;\n  }\n};\n\nconst bound = timer.show.bind(timer);\nconsole.log(bound());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>10</code></pre></div>\n<h2>الحل 2: الدوال السهمية</h2>\n<p>الدوال السهمية **ليس لها <code dir=\"ltr\">this</code> خاص بها**، بل تأخذه من المكان الذي كُتبت فيه. وهذا يجعلها مثالية داخل الطرق:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const team = {\n  name: &quot;الصقور&quot;,\n  members: [&quot;علي&quot;, &quot;سعد&quot;],\n  list() {\n    return this.members.map(m =&gt; `${m} من فريق ${this.name}`);\n  }\n};\n\nconsole.log(team.list());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>[&quot;علي من فريق الصقور&quot;,&quot;سعد من فريق الصقور&quot;]</code></pre></div>\n<p>الدالة السهمية داخل <code dir=\"ltr\">map</code> أخذت <code dir=\"ltr\">this</code> من <code dir=\"ltr\">list</code>، أي <code dir=\"ltr\">team</code>.</p>\n<div class=\"callout warn\">⚠️ لهذا السبب <strong>لا تستخدم دالة سهمية كطريقة في كائن</strong>: <code dir=\"ltr\">{ greet: () =&gt; this.name }</code> لن تعمل، لأن السهمية ستأخذ <code dir=\"ltr\">this</code> من خارج الكائن.</div>\n<h2>call و apply: تحديد this لاستدعاء واحد</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function describe(city, country) {\n  return `${this.name} من ${city}، ${country}`;\n}\n\nconst person = { name: &quot;هالة&quot; };\nconsole.log(describe.call(person, &quot;أبها&quot;, &quot;السعودية&quot;));\nconsole.log(describe.apply(person, [&quot;الدوحة&quot;, &quot;قطر&quot;]));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>هالة من أبها، السعودية\nهالة من الدوحة، قطر</code></pre></div>\n<p>الفرق الوحيد: <code dir=\"ltr\">call</code> تأخذ الوسائط منفصلة، و <code dir=\"ltr\">apply</code> تأخذها في مصفوفة.</p>\n<h2>ملخص قواعد this</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>طريقة الاستدعاء</th><th>قيمة this</th></tr></thead><tbody><tr><td><code dir=\"ltr\">obj.method()</code></td><td><code dir=\"ltr\">obj</code></td></tr><tr><td><code dir=\"ltr\">new Class()</code></td><td>الكائن الجديد</td></tr><tr><td><code dir=\"ltr\">fn.call(x)</code> أو <code dir=\"ltr\">fn.bind(x)()</code></td><td><code dir=\"ltr\">x</code></td></tr><tr><td>دالة سهمية</td><td><code dir=\"ltr\">this</code> من المكان المحيط بها</td></tr><tr><td><code dir=\"ltr\">fn()</code> منفردة</td><td><code dir=\"ltr\">undefined</code> في الوضع الصارم</td></tr><tr><td>معالج حدث بدالة عادية</td><td>العنصر الذي وقع عليه الحدث</td></tr></tbody></table></div>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">this</code> تُحدد لحظة الاستدعاء: انظر لما قبل النقطة.</li><li>فصل الطريقة عن كائنها يُفقدها <code dir=\"ltr\">this</code>.</li><li><code dir=\"ltr\">bind</code> تربط <code dir=\"ltr\">this</code> بشكل دائم، و <code dir=\"ltr\">call</code> و <code dir=\"ltr\">apply</code> لاستدعاء واحد.</li><li>الدوال السهمية ترث <code dir=\"ltr\">this</code> من محيطها، فهي ممتازة داخل الطرق وسيئة كطرق.</li></ul>",
+   "exercise": {
+    "prompt": "<p>الكائن <code dir=\"ltr\">shop</code> به مشكلتان مع <code dir=\"ltr\">this</code>. أصلحهما دون تغيير أسطر الاختبار في الأسفل:</p>\n<ol><li>الطريقة <code dir=\"ltr\">printAll</code> تستخدم دالة عادية داخل <code dir=\"ltr\">map</code>، فتفقد <code dir=\"ltr\">this</code>. حوّلها لدالة سهمية.</li><li>السطر <code dir=\"ltr\">const later = shop.getName;</code> يفصل الطريقة عن كائنها. استخدم <code dir=\"ltr\">bind</code> في نفس السطر ليعمل.</li></ol>",
+    "starter": "const shop = {\n  name: \"متجر الورد\",\n  products: [\"جوري\", \"توليب\"],\n  getName() {\n    return this.name;\n  },\n  printAll() {\n    return this.products.map(function (p) {\n      return `${p} - ${this.name}`;\n    });\n  }\n};\n\nconsole.log(shop.printAll());\nconst later = shop.getName;\nconsole.log(later());",
+    "expected": "[\"جوري - متجر الورد\",\"توليب - متجر الورد\"]\nمتجر الورد",
+    "solution": "const shop = {\n  name: \"متجر الورد\",\n  products: [\"جوري\", \"توليب\"],\n  getName() {\n    return this.name;\n  },\n  printAll() {\n    return this.products.map(p => `${p} - ${this.name}`);\n  }\n};\n\nconsole.log(shop.printAll());\nconst later = shop.getName.bind(shop);\nconsole.log(later());"
+   },
+   "quiz": [
+    {
+     "q": "في <code dir=\"ltr\">car.start()</code>، ما قيمة <code dir=\"ltr\">this</code> داخل start؟",
+     "o": [
+      "<code dir=\"ltr\">car</code>",
+      "<code dir=\"ltr\">start</code>",
+      "الكائن العام دائماً"
+     ],
+     "a": 0,
+     "why": "ما قبل النقطة لحظة الاستدعاء هو this."
+    },
+    {
+     "q": "لماذا تعمل الدالة السهمية داخل <code dir=\"ltr\">map</code> في طريقة كائن؟",
+     "o": [
+      "لأنها أسرع",
+      "لأنها تأخذ <code dir=\"ltr\">this</code> من الطريقة المحيطة بها",
+      "لأن map تحدد this تلقائياً"
+     ],
+     "a": 1,
+     "why": "الدوال السهمية لا تملك this خاصاً بها."
+    },
+    {
+     "q": "ما الفرق بين <code dir=\"ltr\">bind</code> و <code dir=\"ltr\">call</code>؟",
+     "o": [
+      "<code dir=\"ltr\">bind</code> تُرجع دالة جديدة مربوطة، و <code dir=\"ltr\">call</code> تستدعي الدالة فوراً",
+      "لا فرق",
+      "<code dir=\"ltr\">call</code> للكائنات و <code dir=\"ltr\">bind</code> للمصفوفات"
+     ],
+     "a": 0,
+     "why": "bind للاستخدام لاحقاً، و call للاستدعاء الآن."
+    }
+   ]
+  },
+  {
+   "body": "<h2>من أين جاءت هذه الدوال؟</h2>\n<p>أنشأت مصفوفة فارغة <code dir=\"ltr\">[]</code>، ومع ذلك تستطيع استدعاء <code dir=\"ltr\">push</code> و <code dir=\"ltr\">map</code> و <code dir=\"ltr\">filter</code> عليها. أين عُرّفت هذه الدوال؟ الإجابة: في <strong>النموذج الأولي (Prototype)</strong>.</p>\n<h2>سلسلة النماذج الأولية</h2>\n<p>كل كائن في JavaScript له رابط خفي إلى كائن آخر اسمه <strong>prototype</strong>. عندما تطلب خاصية غير موجودة في الكائن، تبحث JavaScript في الـ prototype، ثم في prototype الـ prototype، وهكذا. هذا يسمى <strong>سلسلة النماذج (Prototype Chain)</strong>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const arr = [1, 2, 3];\n\nconsole.log(Object.getPrototypeOf(arr) === Array.prototype);\nconsole.log(arr.hasOwnProperty(&quot;map&quot;));\nconsole.log(&quot;map&quot; in arr);\nconsole.log(Object.getPrototypeOf(Array.prototype) === Object.prototype);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>true\nfalse\ntrue\ntrue</code></pre></div>\n<p>السلسلة هنا: <code dir=\"ltr\">arr</code> ← <code dir=\"ltr\">Array.prototype</code> (فيه map و push) ← <code dir=\"ltr\">Object.prototype</code> (فيه hasOwnProperty) ← <code dir=\"ltr\">null</code>.</p>\n<h2>إنشاء كائن يرث من آخر</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const animal = {\n  eat() {\n    return `${this.name} يأكل`;\n  }\n};\n\nconst dog = Object.create(animal);\ndog.name = &quot;ريكس&quot;;\ndog.bark = function () {\n  return &quot;هاو!&quot;;\n};\n\nconsole.log(dog.bark());\nconsole.log(dog.eat());\nconsole.log(Object.keys(dog));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>هاو!\nريكس يأكل\n[&quot;name&quot;,&quot;bark&quot;]</code></pre></div>\n<p><code dir=\"ltr\">dog</code> لا يملك <code dir=\"ltr\">eat</code>، لكنه وجدها في نموذجه الأولي <code dir=\"ltr\">animal</code>. و <code dir=\"ltr\">Object.keys</code> تعرض فقط الخصائص <strong>الخاصة</strong> بالكائن.</p>\n<h2>الأصناف مبنية على النماذج الأولية</h2>\n<p>الأصناف التي تعلمناها في الوحدة السابقة هي <strong>صيغة أجمل</strong> فوق نفس النظام:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>class User {\n  constructor(name) {\n    this.name = name;\n  }\n  hello() {\n    return `أهلاً ${this.name}`;\n  }\n}\n\nconst u1 = new User(&quot;وعد&quot;);\nconst u2 = new User(&quot;جاسم&quot;);\n\nconsole.log(typeof User);\nconsole.log(u1.hello === u2.hello);\nconsole.log(Object.getPrototypeOf(u1) === User.prototype);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>function\ntrue\ntrue</code></pre></div>\n<p>الصنف في الحقيقة دالة، والطريقة <code dir=\"ltr\">hello</code> محفوظة <strong>مرة واحدة</strong> في <code dir=\"ltr\">User.prototype</code> وتتشاركها كل النسخ، بدلاً من نسخة لكل كائن. وهذا يوفر الذاكرة.</p>\n<h2>الطريقة القديمة: دوال البناء</h2>\n<p>قبل الأصناف (2015) كان يُكتب الكود هكذا، وستراه في المشاريع القديمة:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function Car(brand) {\n  this.brand = brand;\n}\nCar.prototype.drive = function () {\n  return `${this.brand} تسير`;\n};\n\nconst car = new Car(&quot;نيسان&quot;);\nconsole.log(car.drive());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>نيسان تسير</code></pre></div>\n<h2>تظليل خصائص النموذج</h2>\n<p>إذا أضفت خاصية للكائن بنفس اسم خاصية في نموذجه، فالكائن يفوز:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const base = { greet() { return &quot;مرحباً من النموذج&quot;; } };\nconst obj = Object.create(base);\nobj.greet = () =&gt; &quot;مرحباً من الكائن نفسه&quot;;\nconsole.log(obj.greet());\nconsole.log(base.greet());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>مرحباً من الكائن نفسه\nمرحباً من النموذج</code></pre></div>\n<div class=\"callout warn\">⚠️ لا تعدّل أبداً النماذج المدمجة مثل <code dir=\"ltr\">Array.prototype.myFunc = ...</code> في مشاريعك، لأن ذلك قد يتعارض مع مكتبات أخرى أو إصدارات مستقبلية من اللغة.</div>\n<h2>ملخص الدرس</h2>\n<ul><li>كل كائن مرتبط بنموذج أولي، والبحث عن الخصائص يمر عبر السلسلة.</li><li><code dir=\"ltr\">Object.create(proto)</code> تنشئ كائناً يرث من proto.</li><li>الأصناف صيغة فوق النماذج الأولية، والطرق تُخزن مرة واحدة في <code dir=\"ltr\">Class.prototype</code>.</li><li><code dir=\"ltr\">hasOwnProperty</code> و <code dir=\"ltr\">Object.keys</code> تعرضان الخصائص الخاصة فقط.</li></ul>",
+   "exercise": {
+    "prompt": "<ol><li>أنشئ كائناً <code dir=\"ltr\">vehicle</code> فيه طريقة <code dir=\"ltr\">info()</code> تُرجع <code dir=\"ltr\">X بسرعة N كم/س</code> مستخدمة <code dir=\"ltr\">this.name</code> و <code dir=\"ltr\">this.speed</code>.</li><li>أنشئ <code dir=\"ltr\">bike</code> بـ <code dir=\"ltr\">Object.create(vehicle)</code>، وأعطه <code dir=\"ltr\">name</code> = <code dir=\"ltr\">دراجة</code> و <code dir=\"ltr\">speed</code> = <code dir=\"ltr\">25</code>.</li><li>اطبع <code dir=\"ltr\">bike.info()</code>.</li><li>اطبع هل <code dir=\"ltr\">info</code> خاصية خاصة بـ <code dir=\"ltr\">bike</code> (<code dir=\"ltr\">hasOwnProperty</code>).</li><li>اطبع هل <code dir=\"ltr\">vehicle</code> هو النموذج الأولي لـ <code dir=\"ltr\">bike</code>.</li></ol>",
+    "starter": "// أكمل هنا",
+    "expected": "دراجة بسرعة 25 كم/س\nfalse\ntrue",
+    "solution": "const vehicle = {\n  info() {\n    return `${this.name} بسرعة ${this.speed} كم/س`;\n  }\n};\n\nconst bike = Object.create(vehicle);\nbike.name = \"دراجة\";\nbike.speed = 25;\n\nconsole.log(bike.info());\nconsole.log(bike.hasOwnProperty(\"info\"));\nconsole.log(Object.getPrototypeOf(bike) === vehicle);"
+   },
+   "quiz": [
+    {
+     "q": "أين توجد الدالة <code dir=\"ltr\">map</code> التي تستدعيها على أي مصفوفة؟",
+     "o": [
+      "داخل كل مصفوفة على حدة",
+      "في <code dir=\"ltr\">Array.prototype</code>، وتصل إليها المصفوفات عبر سلسلة النماذج",
+      "في <code dir=\"ltr\">console</code>"
+     ],
+     "a": 1,
+     "why": "كل المصفوفات تتشارك نفس الطرق من نموذجها الأولي."
+    },
+    {
+     "q": "ماذا يحدث عند طلب خاصية غير موجودة في الكائن ولا في أي نموذج في سلسلته؟",
+     "o": [
+      "خطأ",
+      "يُرجع <code dir=\"ltr\">undefined</code>",
+      "يُرجع <code dir=\"ltr\">null</code>"
+     ],
+     "a": 1,
+     "why": "تنتهي السلسلة عند null، وإذا لم تُوجد الخاصية تكون النتيجة undefined."
+    },
+    {
+     "q": "ما نتيجة <code dir=\"ltr\">typeof</code> لصنف معرّف بـ <code dir=\"ltr\">class</code>؟",
+     "o": [
+      "<code dir=\"ltr\">&quot;class&quot;</code>",
+      "<code dir=\"ltr\">&quot;object&quot;</code>",
+      "<code dir=\"ltr\">&quot;function&quot;</code>"
+     ],
+     "a": 2,
+     "why": "الأصناف في JavaScript دوال بناء بصيغة أجمل."
+    }
+   ]
+  },
+  {
+   "body": "<h2>خيط واحد، مهام كثيرة</h2>\n<p>JavaScript تعمل على <strong>خيط واحد (Single Thread)</strong>: تنفّذ شيئاً واحداً فقط في كل لحظة. فكيف تتعامل مع المؤقتات والطلبات والضغطات في نفس الوقت؟ الإجابة هي <strong>حلقة الأحداث (Event Loop)</strong>، وهي من أشهر أسئلة المقابلات المتقدمة.</p>\n<h2>المكونات الأربعة</h2>\n<ol><li><strong>مكدس الاستدعاءات (Call Stack):</strong> الكود الذي يُنفَّذ الآن. الدالة تدخل المكدس عند استدعائها، وتخرج عند انتهائها.</li><li><strong>واجهات المتصفح (Web APIs):</strong> المؤقتات و fetch والأحداث تعمل هنا <strong>خارج</strong> JavaScript، في المتصفح نفسه.</li><li><strong>طابور المهام (Task Queue):</strong> عندما ينتهي مؤقت أو يقع حدث، توضع دالته هنا تنتظر دورها.</li><li><strong>طابور المهام الدقيقة (Microtask Queue):</strong> خاص بالوعود (<code dir=\"ltr\">then</code> و <code dir=\"ltr\">await</code>)، وله <strong>أولوية أعلى</strong>.</li></ol>\n<p><strong>حلقة الأحداث</strong> وظيفتها بسيطة: عندما يفرغ المكدس، تنفّذ <strong>كل</strong> المهام الدقيقة أولاً، ثم تأخذ مهمة <strong>واحدة</strong> من طابور المهام، وتكرر.</p>\n<h2>اختبر نفسك: ما الترتيب؟</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>console.log(&quot;1&quot;);\n\nsetTimeout(() =&gt; console.log(&quot;2&quot;), 0);\n\nPromise.resolve().then(() =&gt; console.log(&quot;3&quot;));\n\nconsole.log(&quot;4&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1\n4\n3\n2</code></pre></div>\n<p>لماذا؟</p>\n<ol><li><code dir=\"ltr\">1</code> و <code dir=\"ltr\">4</code> كود متزامن يُنفَّذ فوراً في المكدس.</li><li><code dir=\"ltr\">setTimeout</code> وضعت دالتها في <strong>طابور المهام</strong>.</li><li><code dir=\"ltr\">then</code> وضعت دالتها في <strong>طابور المهام الدقيقة</strong>.</li><li>فرغ المكدس، فنُفّذت المهام الدقيقة أولاً: <code dir=\"ltr\">3</code>.</li><li>ثم مهمة من طابور المهام: <code dir=\"ltr\">2</code>.</li></ol>\n<div class=\"callout tip\">💡 حتى <code dir=\"ltr\">setTimeout(fn, 0)</code> لا تُنفَّذ فوراً. الصفر يعني &quot;في أقرب فرصة بعد انتهاء كل شيء آخر&quot;، والوعود تسبقها دائماً.</div>\n<h2>مثال أعمق</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>console.log(&quot;بداية&quot;);\n\nsetTimeout(() =&gt; console.log(&quot;مؤقت 1&quot;), 0);\n\nPromise.resolve()\n  .then(() =&gt; console.log(&quot;وعد 1&quot;))\n  .then(() =&gt; console.log(&quot;وعد 2&quot;));\n\nqueueMicrotask(() =&gt; console.log(&quot;مهمة دقيقة&quot;));\n\nsetTimeout(() =&gt; console.log(&quot;مؤقت 2&quot;), 0);\n\nconsole.log(&quot;نهاية&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>بداية\nنهاية\nوعد 1\nمهمة دقيقة\nوعد 2\nمؤقت 1\nمؤقت 2</code></pre></div>\n<p><code dir=\"ltr\">وعد 2</code> لم تُضف إلى الطابور إلا بعد انتهاء <code dir=\"ltr\">وعد 1</code>، فجاءت بعد <code dir=\"ltr\">مهمة دقيقة</code>. لكنها ما زالت قبل كل المؤقتات، لأن حلقة الأحداث تفرغ طابور المهام الدقيقة <strong>بالكامل</strong> قبل أي مؤقت.</p>\n<h2>async و await في حلقة الأحداث</h2>\n<p>ما بعد <code dir=\"ltr\">await</code> يُعامل كمهمة دقيقة:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>async function run() {\n  console.log(&quot;أ&quot;);\n  await null;\n  console.log(&quot;ج&quot;);\n}\n\nrun();\nconsole.log(&quot;ب&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>أ\nب\nج</code></pre></div>\n<h2>لماذا يهمك هذا عملياً؟</h2>\n<p><strong>لا تحجب المكدس:</strong> أي كود متزامن طويل (حلقة على مليون عنصر مثلاً) يجمّد الصفحة كاملة، فلا ضغطات ولا رسوم ولا مؤقتات، لأن حلقة الأحداث لا تستطيع العمل حتى يفرغ المكدس.</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>button.addEventListener(&quot;click&quot;, () =&gt; {\n  // ❌ يجمّد الصفحة عدة ثوانٍ\n  for (let i = 0; i &lt; 5_000_000_000; i++) {}\n});</code></pre></div>\n<p>الحلول: تقسيم العمل إلى أجزاء صغيرة بـ <code dir=\"ltr\">setTimeout</code>، أو نقله إلى <strong>Web Worker</strong> يعمل في خيط منفصل. (محرر CodeWay نفسه يشغّل كودك في Web Worker حتى لا تتجمد الصفحة!)</p>\n<h2>ملخص الدرس</h2>\n<ul><li>JavaScript تنفّذ شيئاً واحداً في كل لحظة على مكدس الاستدعاءات.</li><li>المؤقتات والأحداث تذهب لطابور المهام، والوعود لطابور المهام الدقيقة.</li><li>الترتيب: الكود المتزامن ← كل المهام الدقيقة (الوعود) ← مهمة واحدة (مؤقت) ← وتكرار.</li><li>الكود المتزامن الطويل يجمّد الصفحة.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب <strong>نفس</strong> الأسطر الخمسة الموجودة، لكن رتبها وغيّر أنواعها (متزامن أو <code dir=\"ltr\">Promise.resolve().then</code> أو <code dir=\"ltr\">setTimeout</code>) بحيث تُطبع الأرقام بالترتيب 1 ثم 2 ثم 3 ثم 4 ثم 5، مع الالتزام بالشروط:</p>\n<ul><li><code dir=\"ltr\">1</code> و <code dir=\"ltr\">2</code> تُطبعان بـ <code dir=\"ltr\">console.log</code> مباشرة.</li><li><code dir=\"ltr\">3</code> تُطبع داخل <code dir=\"ltr\">Promise.resolve().then(...)</code>.</li><li><code dir=\"ltr\">4</code> و <code dir=\"ltr\">5</code> تُطبعان داخل <code dir=\"ltr\">setTimeout(..., 0)</code>.</li><li>السطر الأول في الكود يجب أن يكون الـ setTimeout الخاص بالرقم 4.</li></ul>",
+    "starter": "setTimeout(() => console.log(5), 0);\nconsole.log(2);\nPromise.resolve().then(() => console.log(4));\nsetTimeout(() => console.log(3), 0);\nconsole.log(1);",
+    "expected": "1\n2\n3\n4\n5",
+    "solution": "setTimeout(() => console.log(4), 0);\nconsole.log(1);\nPromise.resolve().then(() => console.log(3));\nsetTimeout(() => console.log(5), 0);\nconsole.log(2);"
+   },
+   "quiz": [
+    {
+     "q": "أيهما يُنفَّذ أولاً: <code dir=\"ltr\">setTimeout(fn, 0)</code> أم <code dir=\"ltr\">Promise.resolve().then(fn)</code>؟",
+     "o": [
+      "setTimeout لأنها كُتبت أولاً",
+      "then، لأن طابور المهام الدقيقة له أولوية",
+      "عشوائياً"
+     ],
+     "a": 1,
+     "why": "حلقة الأحداث تفرغ كل المهام الدقيقة قبل أي مؤقت."
+    },
+    {
+     "q": "لماذا تتجمد الصفحة عند تنفيذ حلقة متزامنة طويلة جداً؟",
+     "o": [
+      "لأن المكدس مشغول، فلا تستطيع حلقة الأحداث معالجة الضغطات أو الرسم",
+      "لأن الذاكرة تمتلئ",
+      "لأن المتصفح يوقف JavaScript"
+     ],
+     "a": 0,
+     "why": "JavaScript تعمل على خيط واحد، وحلقة الأحداث تنتظر فراغ المكدس."
+    },
+    {
+     "q": "ما الذي يحدث للكود بعد <code dir=\"ltr\">await</code> داخل دالة async؟",
+     "o": [
+      "يُنفَّذ فوراً",
+      "يُجدول كمهمة دقيقة بعد انتهاء الكود المتزامن الحالي",
+      "يُجدول كمؤقت"
+     ],
+     "a": 1,
+     "why": "ما بعد await يُستأنف عبر طابور المهام الدقيقة."
+    }
+   ]
+  },
+  {
+   "body": "<h2>الأخطاء جزء من البرمجة</h2>\n<p>لا يوجد برنامج بلا أخطاء. المهم ألا <strong>ينهار</strong> البرنامج كله بسبب خطأ واحد، وأن يُعرض للمستخدم ما يفهمه. لهذا نستخدم <code dir=\"ltr\">try...catch</code>.</p>\n<h2>بدون معالجة: البرنامج يتوقف</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>console.log(&quot;قبل&quot;);\nconst data = JSON.parse(&quot;{خطأ}&quot;); // SyntaxError يوقف كل شيء\nconsole.log(&quot;بعد&quot;);               // لن يُطبع أبداً</code></pre></div>\n<h2>مع try...catch</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>console.log(&quot;قبل&quot;);\ntry {\n  const data = JSON.parse(&quot;{خطأ}&quot;);\n  console.log(&quot;لن يُنفّذ هذا السطر&quot;);\n} catch (error) {\n  console.log(`حدث خطأ: ${error.name}`);\n}\nconsole.log(&quot;بعد، والبرنامج مستمر&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>قبل\nحدث خطأ: SyntaxError\nبعد، والبرنامج مستمر</code></pre></div>\n<ul><li><code dir=\"ltr\">try</code>: الكود الذي قد يفشل. عند أول خطأ يتوقف ويقفز إلى <code dir=\"ltr\">catch</code>.</li><li><code dir=\"ltr\">catch (error)</code>: يُنفَّذ فقط عند حدوث خطأ، ويستقبل كائن الخطأ.</li><li><code dir=\"ltr\">finally</code> (اختياري): يُنفَّذ دائماً في الحالتين.</li></ul>\n<h2>كائن الخطأ</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>try {\n  const user = null;\n  user.name;\n} catch (error) {\n  console.log(error.name);\n  console.log(error.message);\n  console.log(error instanceof TypeError);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>TypeError\nCannot read properties of null (reading &#x27;name&#x27;)\ntrue</code></pre></div>\n<p>أشهر أنواع الأخطاء:</p>\n<div class=\"table-wrap\"><table><thead><tr><th>النوع</th><th>السبب الشائع</th></tr></thead><tbody><tr><td><code dir=\"ltr\">ReferenceError</code></td><td>استخدام متغير غير معرّف</td></tr><tr><td><code dir=\"ltr\">TypeError</code></td><td>استخدام قيمة بطريقة خاطئة، مثل استدعاء خاصية على <code dir=\"ltr\">null</code></td></tr><tr><td><code dir=\"ltr\">SyntaxError</code></td><td>كود أو JSON مكتوب بشكل خاطئ</td></tr><tr><td><code dir=\"ltr\">RangeError</code></td><td>قيمة خارج النطاق المسموح</td></tr></tbody></table></div>\n<h2>رمي الأخطاء بنفسك: throw</h2>\n<p>عندما تكتشف دالتك وضعاً غير صالح، ترمي خطأ بنفسها:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function withdraw(balance, amount) {\n  if (typeof amount !== &quot;number&quot; || amount &lt;= 0) {\n    throw new Error(&quot;المبلغ يجب أن يكون رقماً موجباً&quot;);\n  }\n  if (amount &gt; balance) {\n    throw new RangeError(`الرصيد غير كافٍ (المتاح ${balance})`);\n  }\n  return balance - amount;\n}\n\nfor (const amount of [50, -5, 900]) {\n  try {\n    console.log(`الرصيد الجديد: ${withdraw(200, amount)}`);\n  } catch (error) {\n    console.log(`${error.name}: ${error.message}`);\n  }\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>الرصيد الجديد: 150\nError: المبلغ يجب أن يكون رقماً موجباً\nRangeError: الرصيد غير كافٍ (المتاح 200)</code></pre></div>\n<h2>أخطاء مخصصة</h2>\n<p>بالوراثة من <code dir=\"ltr\">Error</code> يمكنك إنشاء أنواع أخطاء خاصة بتطبيقك، وتمييزها بـ <code dir=\"ltr\">instanceof</code>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>class ValidationError extends Error {\n  constructor(field, message) {\n    super(message);\n    this.name = &quot;ValidationError&quot;;\n    this.field = field;\n  }\n}\n\nfunction register(email) {\n  if (!email.includes(&quot;@&quot;)) {\n    throw new ValidationError(&quot;email&quot;, &quot;البريد الإلكتروني غير صالح&quot;);\n  }\n  return &quot;تم التسجيل&quot;;\n}\n\ntry {\n  register(&quot;ali.mail.com&quot;);\n} catch (error) {\n  if (error instanceof ValidationError) {\n    console.log(`خطأ في الحقل ${error.field}: ${error.message}`);\n  } else {\n    throw error;\n  }\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>خطأ في الحقل email: البريد الإلكتروني غير صالح</code></pre></div>\n<p>لاحظ <code dir=\"ltr\">else { throw error; }</code>: نعالج الأخطاء التي <strong>نتوقعها</strong> فقط، ونعيد رمي غيرها، حتى لا نخفي أخطاء برمجية حقيقية.</p>\n<h2>نصائح احترافية</h2>\n<ul><li>لا تكتب <code dir=\"ltr\">catch</code> فارغة تبتلع الخطأ بصمت. على الأقل سجّله بـ <code dir=\"ltr\">console.error</code>.</li><li>لا تغلّف كل الكود بـ <code dir=\"ltr\">try</code>. استخدمها حول العمليات التي <strong>قد تفشل فعلاً</strong>: تحليل JSON، والطلبات، ومدخلات المستخدم.</li><li>رسالة الخطأ للمطور يجب أن تكون دقيقة، ورسالة المستخدم يجب أن تكون بسيطة ومفيدة.</li></ul>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">try...catch</code> يمنع انهيار البرنامج ويعالج الخطأ.</li><li>كائن الخطأ فيه <code dir=\"ltr\">name</code> و <code dir=\"ltr\">message</code>.</li><li><code dir=\"ltr\">throw new Error(&quot;...&quot;)</code> لرمي خطأ عند وضع غير صالح.</li><li>الأخطاء المخصصة بـ <code dir=\"ltr\">extends Error</code> و <code dir=\"ltr\">instanceof</code> لتمييزها.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب دالة <code dir=\"ltr\">parseAge(input)</code>:</p>\n<ul><li>إذا لم يكن <code dir=\"ltr\">input</code> رقماً صالحاً (<code dir=\"ltr\">Number(input)</code> تعطي <code dir=\"ltr\">NaN</code>)، ترمي <code dir=\"ltr\">TypeError</code> برسالة <code dir=\"ltr\">القيمة ليست رقماً</code>.</li><li>إذا كان الرقم أقل من 0 أو أكبر من 120، ترمي <code dir=\"ltr\">RangeError</code> برسالة <code dir=\"ltr\">العمر خارج النطاق</code>.</li><li>غير ذلك تُرجع الرقم.</li></ul>\n<p>الحلقة في الأسفل تستدعي الدالة داخل <code dir=\"ltr\">try...catch</code> وتطبع النتيجة، لا تعدّلها.</p>",
+    "starter": "function parseAge(input) {\n  // أكمل هنا\n}\n\nfor (const value of [\"30\", \"abc\", \"150\"]) {\n  try {\n    console.log(`العمر: ${parseAge(value)}`);\n  } catch (error) {\n    console.log(`${error.name}: ${error.message}`);\n  }\n}",
+    "expected": "العمر: 30\nTypeError: القيمة ليست رقماً\nRangeError: العمر خارج النطاق",
+    "solution": "function parseAge(input) {\n  const age = Number(input);\n  if (Number.isNaN(age)) {\n    throw new TypeError(\"القيمة ليست رقماً\");\n  }\n  if (age < 0 || age > 120) {\n    throw new RangeError(\"العمر خارج النطاق\");\n  }\n  return age;\n}\n\nfor (const value of [\"30\", \"abc\", \"150\"]) {\n  try {\n    console.log(`العمر: ${parseAge(value)}`);\n  } catch (error) {\n    console.log(`${error.name}: ${error.message}`);\n  }\n}"
+   },
+   "quiz": [
+    {
+     "q": "متى يُنفَّذ كود <code dir=\"ltr\">finally</code>؟",
+     "o": [
+      "عند النجاح فقط",
+      "عند الخطأ فقط",
+      "دائماً، سواء حدث خطأ أم لا"
+     ],
+     "a": 2,
+     "why": "finally مناسبة لأعمال التنظيف مثل إخفاء مؤشر التحميل."
+    },
+    {
+     "q": "ما نوع الخطأ عند كتابة <code dir=\"ltr\">null.length</code>؟",
+     "o": [
+      "ReferenceError",
+      "TypeError",
+      "SyntaxError"
+     ],
+     "a": 1,
+     "why": "استخدام قيمة null أو undefined كأنها كائن يسبب TypeError."
+    },
+    {
+     "q": "لماذا نعيد رمي الخطأ <code dir=\"ltr\">throw error</code> في catch إذا لم يكن من النوع المتوقع؟",
+     "o": [
+      "حتى لا نخفي أخطاء برمجية حقيقية لم نخطط لمعالجتها",
+      "لتسريع البرنامج",
+      "لأن catch لا تقبل إلا نوعاً واحداً"
+     ],
+     "a": 0,
+     "why": "معالجة كل الأخطاء بنفس الطريقة قد تخفي مشاكل خطيرة."
+    }
+   ]
+  },
+  {
+   "body": "<h2>تذكّر بيانات المستخدم</h2>\n<p>عندما يحدّث المستخدم الصفحة، تختفي كل المتغيرات. فكيف يتذكر الموقع أن المستخدم اختار الوضع الليلي، أو ما في سلة مشترياته؟ أحد الحلول: <strong>التخزين المحلي (localStorage)</strong>، وهو مساحة تخزين صغيرة في متصفح المستخدم تبقى حتى بعد إغلاق المتصفح.</p>\n<h2>الأساسيات</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;p id=&quot;out&quot;&gt;&lt;/p&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>localStorage.setItem(&quot;theme&quot;, &quot;dark&quot;);\nlocalStorage.setItem(&quot;lang&quot;, &quot;ar&quot;);\n\nconsole.log(localStorage.getItem(&quot;theme&quot;));\nconsole.log(localStorage.getItem(&quot;missing&quot;));\nconsole.log(localStorage.length);\n\nlocalStorage.removeItem(&quot;lang&quot;);\nconsole.log(localStorage.length);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>dark\nnull\n2\n1</code></pre></div>\n<div class=\"table-wrap\"><table><thead><tr><th>الدالة</th><th>وظيفتها</th></tr></thead><tbody><tr><td><code dir=\"ltr\">setItem(key, value)</code></td><td>حفظ قيمة</td></tr><tr><td><code dir=\"ltr\">getItem(key)</code></td><td>قراءة قيمة، أو <code dir=\"ltr\">null</code> إن لم توجد</td></tr><tr><td><code dir=\"ltr\">removeItem(key)</code></td><td>حذف قيمة</td></tr><tr><td><code dir=\"ltr\">clear()</code></td><td>حذف كل شيء</td></tr></tbody></table></div>\n<h2>localStorage يخزّن نصوصاً فقط</h2>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;p&gt;&lt;/p&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>localStorage.setItem(&quot;count&quot;, 5);\nconsole.log(typeof localStorage.getItem(&quot;count&quot;));\n\nlocalStorage.setItem(&quot;user&quot;, { name: &quot;علي&quot; });\nconsole.log(localStorage.getItem(&quot;user&quot;));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>string\n[object Object]</code></pre></div>\n<p>الرقم أصبح نصاً، والكائن ضاع تماماً! الحل هو JSON الذي تعلمناه:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;p&gt;&lt;/p&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const cart = [{ id: 1, name: &quot;قلم&quot;, qty: 2 }];\nlocalStorage.setItem(&quot;cart&quot;, JSON.stringify(cart));\n\nconst saved = JSON.parse(localStorage.getItem(&quot;cart&quot;));\nconsole.log(saved[0].name, saved[0].qty);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>قلم 2</code></pre></div>\n<h2>النمط الآمن للقراءة</h2>\n<p>قد تكون القيمة غير موجودة، أو تالفة، أو قد يكون التخزين معطلاً في التصفح الخاص. لذلك نكتب دالة قراءة آمنة:</p>\n<div class=\"code-block src\"><span class=\"code-label\">HTML</span><pre dir=\"ltr\"><code>&lt;p&gt;&lt;/p&gt;</code></pre></div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function load(key, fallback) {\n  try {\n    const raw = localStorage.getItem(key);\n    return raw === null ? fallback : JSON.parse(raw);\n  } catch {\n    return fallback;\n  }\n}\n\nfunction save(key, value) {\n  try {\n    localStorage.setItem(key, JSON.stringify(value));\n  } catch {\n    // التخزين ممتلئ أو معطّل، نتجاهل بهدوء\n  }\n}\n\nlocalStorage.setItem(&quot;broken&quot;, &quot;{not json&quot;);\nconsole.log(load(&quot;settings&quot;, { theme: &quot;light&quot; }).theme);\nconsole.log(load(&quot;broken&quot;, &quot;قيمة احتياطية&quot;));\nsave(&quot;score&quot;, 42);\nconsole.log(load(&quot;score&quot;, 0) + 8);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>light\nقيمة احتياطية\n50</code></pre></div>\n<div class=\"callout tip\">💡 منصة CodeWay نفسها تستخدم هذا النمط بالضبط لحفظ تقدّمك في الدروس وكودك في التمارين!</div>\n<h2>sessionStorage</h2>\n<p>نفس الدوال تماماً، لكن البيانات تُحذف عند <strong>إغلاق التبويب</strong>. مناسبة لبيانات مؤقتة مثل خطوات نموذج طويل.</p>\n<h2>ما لا يجب تخزينه</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>مناسب</th><th>غير مناسب</th></tr></thead><tbody><tr><td>تفضيلات الواجهة (الوضع، اللغة)</td><td>كلمات المرور</td></tr><tr><td>مسودة نص لم يُرسل</td><td>بيانات بطاقات الدفع</td></tr><tr><td>سلة مشتريات زائر</td><td>رموز الدخول الحساسة إن أمكن تجنبها</td></tr><tr><td>تقدّم في درس</td><td>البيانات التي يجب أن تُشارك بين الأجهزة</td></tr></tbody></table></div>\n<div class=\"callout warn\">⚠️ أي كود JavaScript في الصفحة يستطيع قراءة localStorage، والمساحة محدودة بحوالي 5 ميجابايت، والبيانات موجودة على جهاز واحد فقط. البيانات المهمة مكانها الخادم.</div>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">localStorage</code> تخزين دائم في المتصفح، و <code dir=\"ltr\">sessionStorage</code> حتى إغلاق التبويب.</li><li>يخزّن نصوصاً فقط، فاستخدم <code dir=\"ltr\">JSON.stringify</code> و <code dir=\"ltr\">JSON.parse</code> للكائنات.</li><li>احمِ القراءة بـ <code dir=\"ltr\">try...catch</code> وقيمة احتياطية.</li><li>لا تخزّن بيانات حساسة.</li></ul>",
+   "exercise": {
+    "prompt": "<p>ابنِ قائمة مفضلات تُحفظ في <code dir=\"ltr\">localStorage</code> تحت المفتاح <code dir=\"ltr\">favorites</code>:</p>\n<ol><li>اكتب دالة <code dir=\"ltr\">getFavorites()</code> تُرجع المصفوفة المحفوظة، أو مصفوفة فارغة إذا لم يوجد شيء.</li><li>اكتب دالة <code dir=\"ltr\">addFavorite(item)</code> تقرأ القائمة، وتضيف العنصر <strong>إذا لم يكن موجوداً</strong>، ثم تحفظها.</li><li>أسطر الاختبار في الأسفل تضيف عناصر (أحدها مكرر) وتطبع النتيجة، لا تعدّلها.</li></ol>",
+    "html": "<p>⭐ مفضلاتي محفوظة في التخزين المحلي</p>",
+    "starter": "function getFavorites() {\n  // أكمل هنا\n}\n\nfunction addFavorite(item) {\n  // أكمل هنا\n}\n\n// --- اختبار (لا تعدّل) ---\nlocalStorage.clear();\nconsole.log(getFavorites().length);\naddFavorite(\"JavaScript\");\naddFavorite(\"CSS\");\naddFavorite(\"JavaScript\");\nconsole.log(getFavorites());\nconsole.log(localStorage.getItem(\"favorites\"));",
+    "expected": "0\n[\"JavaScript\",\"CSS\"]\n[\"JavaScript\",\"CSS\"]",
+    "solution": "function getFavorites() {\n  try {\n    return JSON.parse(localStorage.getItem(\"favorites\")) || [];\n  } catch {\n    return [];\n  }\n}\n\nfunction addFavorite(item) {\n  const list = getFavorites();\n  if (!list.includes(item)) {\n    list.push(item);\n    localStorage.setItem(\"favorites\", JSON.stringify(list));\n  }\n}\n\n// --- اختبار (لا تعدّل) ---\nlocalStorage.clear();\nconsole.log(getFavorites().length);\naddFavorite(\"JavaScript\");\naddFavorite(\"CSS\");\naddFavorite(\"JavaScript\");\nconsole.log(getFavorites());\nconsole.log(localStorage.getItem(\"favorites\"));"
+   },
+   "quiz": [
+    {
+     "q": "ماذا يُرجع <code dir=\"ltr\">localStorage.getItem(&quot;x&quot;)</code> إذا لم يكن المفتاح موجوداً؟",
+     "o": [
+      "<code dir=\"ltr\">undefined</code>",
+      "<code dir=\"ltr\">null</code>",
+      "<code dir=\"ltr\">&quot;&quot;</code>"
+     ],
+     "a": 1,
+     "why": "getItem تُرجع null للمفاتيح غير الموجودة."
+    },
+    {
+     "q": "كيف تحفظ مصفوفة في localStorage بشكل صحيح؟",
+     "o": [
+      "<code dir=\"ltr\">setItem(&quot;list&quot;, arr)</code>",
+      "<code dir=\"ltr\">setItem(&quot;list&quot;, JSON.stringify(arr))</code>",
+      "<code dir=\"ltr\">setItem(arr)</code>"
+     ],
+     "a": 1,
+     "why": "localStorage يخزّن نصوصاً فقط، فنحوّل المصفوفة لنص JSON."
+    },
+    {
+     "q": "ما الفرق بين localStorage و sessionStorage؟",
+     "o": [
+      "بيانات sessionStorage تُحذف عند إغلاق التبويب، و localStorage تبقى",
+      "sessionStorage أكبر حجماً",
+      "localStorage للأرقام فقط"
+     ],
+     "a": 0,
+     "why": "كلاهما بنفس الدوال، والفرق في مدة بقاء البيانات."
+    }
+   ]
+  }
  ]
 ]);

@@ -34,7 +34,7 @@ require(path.resolve(__dirname, "..", "js", "content", course + ".js"));
         blocks.forEach((b, i) => {
           if (b.label === "HTML") html = b.code;
           const next = blocks[i + 1];
-          if (b.label === "JavaScript" && /document/.test(b.code) && next && next.label === "المخرجات")
+          if (b.label === "JavaScript" && /document|localStorage/.test(b.code) && next && next.label === "المخرجات")
             jobs.push({ code: b.code, html, want: next.code });
         });
         const norm = s => s.split("\n").map(x => x.trim()).join("\n").trim();

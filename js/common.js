@@ -57,6 +57,8 @@
   // ---------- محتوى الدروس ----------
   // كل دورة لها ملف js/content/<id>.js يُحمَّل عند الحاجة فقط حتى يبقى الموقع سريعاً
   CW.content = {};
+  // الدورات التي اكتمل محتوى دروسها (لها ملف في js/content)
+  CW.contentReady = ["javascript"];
   CW.registerContent = (id, modules) => { CW.content[id] = modules; };
   CW.loadContent = (id, done) => {
     if (CW.content[id]) return done(CW.content[id]);
@@ -101,6 +103,7 @@
         ${pct ? `<div class="progress"><i style="width:${pct}%"></i></div><span class="mini-progress">أنجزت ${pct}%</span>` : ""}
         <div class="meta">
           <span class="tag tag-primary">${c.level}</span>
+          ${CW.contentReady.includes(c.id) ? `<span class="tag tag-green">📘 الدروس مكتملة</span>` : ""}
           <span class="tag">${c.modules.length} وحدات</span>
           <span class="tag">${CW.lessonCount(c)} درساً</span>
           <span class="tag">${c.hours} ساعة</span>
