@@ -413,5 +413,212 @@ CW.registerContent("javascript", [
     }
    ]
   }
+ ],
+ [
+  {
+   "body": "<h2>ما هي الدالة؟</h2>\n<p>الدالة (Function) هي <strong>مجموعة أوامر لها اسم</strong>، نكتبها مرة واحدة ونستدعيها متى شئنا. فكّر فيها كوصفة طبخ: تكتب الوصفة مرة، ثم تطبخها كلما أردت دون إعادة كتابتها.</p>\n<p>الدوال تحل ثلاث مشاكل:</p>\n<ul><li><strong>التكرار:</strong> بدلاً من نسخ نفس الكود في عشرة أماكن، تستدعي الدالة.</li><li><strong>التنظيم:</strong> تقسّم البرنامج الكبير إلى أجزاء صغيرة لكل منها اسم واضح.</li><li><strong>سهولة التعديل:</strong> إذا أردت تغيير السلوك، تعدّل الدالة في مكان واحد فقط.</li></ul>\n<p>لقد استخدمت دوالاً جاهزة بالفعل: <code dir=\"ltr\">console.log()</code> و <code dir=\"ltr\">Number()</code> و <code dir=\"ltr\">toUpperCase()</code>. الآن ستكتب دوالك الخاصة.</p>\n<h2>تعريف دالة</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function greet() {\n  console.log(&quot;مرحباً!&quot;);\n  console.log(&quot;أهلاً بك في CodeWay&quot;);\n}</code></pre></div>\n<ul><li><code dir=\"ltr\">function</code> الكلمة التي تعني &quot;سأعرّف دالة&quot;.</li><li><code dir=\"ltr\">greet</code> اسم الدالة، ويُفضل أن يكون <strong>فعلاً</strong> يصف ما تفعله.</li><li><code dir=\"ltr\">()</code> الأقواس، وسنضع فيها المدخلات في الدرس القادم.</li><li><code dir=\"ltr\">{ }</code> جسم الدالة: الأوامر التي تُنفَّذ.</li></ul>\n<div class=\"callout warn\">⚠️ تعريف الدالة <strong>لا ينفّذها</strong>. الكود السابق وحده لا يطبع شيئاً.</div>\n<h2>استدعاء الدالة</h2>\n<p>لتنفيذ الدالة نكتب اسمها متبوعاً بالأقواس:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function greet() {\n  console.log(&quot;مرحباً!&quot;);\n}\n\ngreet();\ngreet();\ngreet();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>مرحباً!\nمرحباً!\nمرحباً!</code></pre></div>\n<p>كل استدعاء ينفّذ جسم الدالة كاملاً من جديد.</p>\n<h2>الدوال تجعل الكود أوضح</h2>\n<p>قارن بين برنامج طويل بلا دوال، وبرنامج مقسّم:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function printHeader() {\n  console.log(&quot;==========&quot;);\n  console.log(&quot;  فاتورة  &quot;);\n  console.log(&quot;==========&quot;);\n}\n\nfunction printFooter() {\n  console.log(&quot;----------&quot;);\n  console.log(&quot;شكراً لزيارتكم&quot;);\n}\n\nprintHeader();\nconsole.log(&quot;قهوة: 12 ريال&quot;);\nprintFooter();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>==========\n  فاتورة  \n==========\nقهوة: 12 ريال\n----------\nشكراً لزيارتكم</code></pre></div>\n<p>من يقرأ آخر ثلاثة أسطر يفهم البرنامج فوراً دون الدخول في التفاصيل.</p>\n<h2>الاستدعاء قبل التعريف (Hoisting)</h2>\n<p>الدوال المعرّفة بالكلمة <code dir=\"ltr\">function</code> يمكن استدعاؤها <strong>قبل</strong> سطر تعريفها، لأن JavaScript ترفعها إلى الأعلى قبل التنفيذ:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>sayHi();\n\nfunction sayHi() {\n  console.log(&quot;هاي!&quot;);\n}</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>هاي!</code></pre></div>\n<p>ومع ذلك، الأوضح عادة أن تعرّف الدوال أولاً ثم تستدعيها.</p>\n<h2>تسمية الدوال</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>جيد</th><th>سيئ</th><th>السبب</th></tr></thead><tbody><tr><td><code dir=\"ltr\">calculateTotal</code></td><td><code dir=\"ltr\">total</code></td><td>الدالة تفعل شيئاً، فاسمها فعل</td></tr><tr><td><code dir=\"ltr\">sendEmail</code></td><td><code dir=\"ltr\">doStuff</code></td><td>الاسم يصف المهمة بدقة</td></tr><tr><td><code dir=\"ltr\">isValidEmail</code></td><td><code dir=\"ltr\">check</code></td><td>الدوال التي تجيب بنعم أو لا تبدأ غالباً بـ <code dir=\"ltr\">is</code> أو <code dir=\"ltr\">has</code></td></tr></tbody></table></div>\n<h2>ملخص الدرس</h2>\n<ul><li>الدالة مجموعة أوامر لها اسم، تُكتب مرة وتُستدعى مرات.</li><li>نعرّفها بـ <code dir=\"ltr\">function name() { ... }</code> ونستدعيها بـ <code dir=\"ltr\">name()</code>.</li><li>التعريف وحده لا ينفّذ شيئاً.</li><li>اسم الدالة فعل يصف ما تفعله.</li></ul>",
+   "exercise": {
+    "prompt": "<p>عرّف دالة اسمها <code dir=\"ltr\">printLine</code> تطبع السطر <code dir=\"ltr\">--------</code>، ودالة اسمها <code dir=\"ltr\">printTitle</code> تطبع <code dir=\"ltr\">قائمة الطعام</code>.</p>\n<p>ثم استدعِ الدوال بحيث تكون المخرجات:</p>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>--------\nقائمة الطعام\n--------</code></pre></div>",
+    "starter": "// عرّف الدالتين هنا\n\n\n// استدعِ الدوال هنا",
+    "expected": "--------\nقائمة الطعام\n--------",
+    "solution": "function printLine() {\n  console.log(\"--------\");\n}\n\nfunction printTitle() {\n  console.log(\"قائمة الطعام\");\n}\n\nprintLine();\nprintTitle();\nprintLine();"
+   },
+   "quiz": [
+    {
+     "q": "ماذا يحدث عند تنفيذ هذا الكود وحده؟ <code dir=\"ltr\">function hello() { console.log(&quot;Hi&quot;); }</code>",
+     "o": [
+      "يُطبع Hi مرة واحدة",
+      "لا يُطبع شيء",
+      "يحدث خطأ"
+     ],
+     "a": 1,
+     "why": "التعريف يجهّز الدالة فقط، ولا تُنفَّذ إلا عند استدعائها بـ <code dir=\"ltr\">hello()</code>."
+    },
+    {
+     "q": "كيف نستدعي دالة اسمها <code dir=\"ltr\">start</code>؟",
+     "o": [
+      "<code dir=\"ltr\">call start</code>",
+      "<code dir=\"ltr\">start;</code>",
+      "<code dir=\"ltr\">start();</code>"
+     ],
+     "a": 2,
+     "why": "الأقواس <code dir=\"ltr\">()</code> هي التي تنفّذ الدالة."
+    },
+    {
+     "q": "أي اسم أفضل لدالة تحسب متوسط الدرجات؟",
+     "o": [
+      "<code dir=\"ltr\">calculateAverage</code>",
+      "<code dir=\"ltr\">average2</code>",
+      "<code dir=\"ltr\">x</code>"
+     ],
+     "a": 0,
+     "why": "اسم الدالة يجب أن يكون فعلاً واضحاً يصف ما تفعله."
+    }
+   ]
+  },
+  {
+   "body": "<h2>الدوال تستقبل مدخلات</h2>\n<p>دالة <code dir=\"ltr\">greet</code> في الدرس السابق تطبع نفس الرسالة دائماً. ماذا لو أردنا ترحيباً باسم مختلف كل مرة؟ نعطي الدالة <strong>معاملات (Parameters)</strong>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function greet(name) {\n  console.log(`مرحباً يا ${name}!`);\n}\n\ngreet(&quot;سارة&quot;);\ngreet(&quot;خالد&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>مرحباً يا سارة!\nمرحباً يا خالد!</code></pre></div>\n<ul><li><code dir=\"ltr\">name</code> في التعريف يسمى <strong>معاملاً (parameter)</strong>، وهو متغير يعيش داخل الدالة.</li><li><code dir=\"ltr\">&quot;سارة&quot;</code> عند الاستدعاء تسمى <strong>وسيطاً (argument)</strong>، وهي القيمة الفعلية التي تُعطى للمعامل.</li></ul>\n<h2>عدة معاملات</h2>\n<p>نفصل بينها بفاصلة، وترتيب الوسائط مهم:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function introduce(name, city, age) {\n  console.log(`أنا ${name} من ${city}، عمري ${age}`);\n}\n\nintroduce(&quot;ليلى&quot;, &quot;جدة&quot;, 24);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>أنا ليلى من جدة، عمري 24</code></pre></div>\n<h2>القيم الافتراضية</h2>\n<p>إذا لم يُعطَ وسيط لمعامل، تكون قيمته <code dir=\"ltr\">undefined</code>. يمكننا تحديد <strong>قيمة افتراضية</strong>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function orderCoffee(size = &quot;وسط&quot;) {\n  console.log(`قهوة حجم ${size}`);\n}\n\norderCoffee(&quot;كبير&quot;);\norderCoffee();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>قهوة حجم كبير\nقهوة حجم وسط</code></pre></div>\n<h2>إرجاع قيمة باستخدام return</h2>\n<p>حتى الآن كانت دوالنا <strong>تطبع</strong> النتيجة. لكن الأهم أن تُرجع الدالة نتيجة يمكن استخدامها في بقية البرنامج. هنا تأتي <code dir=\"ltr\">return</code>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function add(a, b) {\n  return a + b;\n}\n\nconst result = add(4, 6);\nconsole.log(result);\nconsole.log(add(10, 20) * 2);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>10\n60</code></pre></div>\n<p><code dir=\"ltr\">return</code> تفعل أمرين: <strong>تعيد القيمة</strong> إلى مكان الاستدعاء، و<strong>تنهي الدالة فوراً</strong>.</p>\n<h2>الفرق بين console.log و return</h2>\n<p>هذا من أهم المفاهيم للمبتدئ:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function printDouble(n) {\n  console.log(n * 2);\n}\n\nfunction getDouble(n) {\n  return n * 2;\n}\n\nconst a = printDouble(5);\nconst b = getDouble(5);\nconsole.log(a, b);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>10\nundefined 10</code></pre></div>\n<ul><li><code dir=\"ltr\">printDouble</code> <strong>تعرض</strong> النتيجة على الشاشة فقط ثم تختفي، ولذلك <code dir=\"ltr\">a</code> قيمتها <code dir=\"ltr\">undefined</code>.</li><li><code dir=\"ltr\">getDouble</code> <strong>تسلّم</strong> النتيجة لك، فتخزنها في <code dir=\"ltr\">b</code> وتستخدمها كما تشاء.</li></ul>\n<div class=\"callout tip\">💡 القاعدة: الدالة التي تحسب شيئاً يجب أن <strong>تُرجعه</strong> بـ <code dir=\"ltr\">return</code>، واترك قرار طباعته لمن يستدعيها.</div>\n<h2>return تنهي الدالة مبكراً</h2>\n<p>أي كود بعد <code dir=\"ltr\">return</code> لا يُنفَّذ، وهذا مفيد للتعامل مع الحالات الخاصة أولاً:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function divide(a, b) {\n  if (b === 0) {\n    return &quot;لا يمكن القسمة على صفر&quot;;\n  }\n  return a / b;\n}\n\nconsole.log(divide(10, 2));\nconsole.log(divide(10, 0));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>5\nلا يمكن القسمة على صفر</code></pre></div>\n<h2>الدوال تستدعي دوالاً</h2>\n<p>يمكن بناء دوال من دوال أصغر:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function square(n) {\n  return n * n;\n}\n\nfunction sumOfSquares(a, b) {\n  return square(a) + square(b);\n}\n\nconsole.log(sumOfSquares(3, 4));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>25</code></pre></div>\n<h2>ملخص الدرس</h2>\n<ul><li>المعاملات تجعل الدالة مرنة، ونعطيها القيم عند الاستدعاء.</li><li><code dir=\"ltr\">param = قيمة</code> تحدد قيمة افتراضية.</li><li><code dir=\"ltr\">return</code> تعيد نتيجة وتنهي الدالة فوراً.</li><li>الدالة التي لا تحتوي <code dir=\"ltr\">return</code> تعيد <code dir=\"ltr\">undefined</code>.</li><li>فضّل إرجاع النتائج على طباعتها داخل الدالة.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب دالة اسمها <code dir=\"ltr\">calculatePrice</code> تستقبل:</p>\n<ul><li><code dir=\"ltr\">price</code> سعر المنتج</li><li><code dir=\"ltr\">discount</code> نسبة الخصم بالمئة، وقيمتها الافتراضية <code dir=\"ltr\">0</code></li></ul>\n<p>وتُرجع السعر بعد الخصم. مثلاً <code dir=\"ltr\">calculatePrice(200, 25)</code> تُرجع <code dir=\"ltr\">150</code>.</p>\n<p>الكود الموجود يستدعي الدالة ويطبع النتائج، لا تعدّله.</p>",
+    "starter": "// اكتب الدالة هنا\n\n\nconsole.log(calculatePrice(200, 25));\nconsole.log(calculatePrice(80));\nconsole.log(calculatePrice(50, 10) + calculatePrice(50, 10));",
+    "expected": "150\n80\n90",
+    "solution": "function calculatePrice(price, discount = 0) {\n  return price - (price * discount) / 100;\n}\n\nconsole.log(calculatePrice(200, 25));\nconsole.log(calculatePrice(80));\nconsole.log(calculatePrice(50, 10) + calculatePrice(50, 10));"
+   },
+   "quiz": [
+    {
+     "q": "ما الذي تُرجعه دالة لا تحتوي على <code dir=\"ltr\">return</code>؟",
+     "o": [
+      "<code dir=\"ltr\">0</code>",
+      "<code dir=\"ltr\">null</code>",
+      "<code dir=\"ltr\">undefined</code>"
+     ],
+     "a": 2,
+     "why": "أي دالة لا تُرجع شيئاً صراحة تُرجع <code dir=\"ltr\">undefined</code>."
+    },
+    {
+     "q": "ماذا يُطبع؟ <code dir=\"ltr\">function f() { return 1; console.log(&quot;A&quot;); } console.log(f());</code>",
+     "o": [
+      "<code dir=\"ltr\">1</code> فقط",
+      "<code dir=\"ltr\">A</code> ثم <code dir=\"ltr\">1</code>",
+      "<code dir=\"ltr\">1</code> ثم <code dir=\"ltr\">A</code>"
+     ],
+     "a": 0,
+     "why": "<code dir=\"ltr\">return</code> تنهي الدالة فوراً، فالسطر الذي بعدها لا يُنفَّذ."
+    },
+    {
+     "q": "في <code dir=\"ltr\">function greet(name = &quot;ضيف&quot;)</code>، ماذا يُطبع عند استدعاء <code dir=\"ltr\">greet()</code> دون وسيط إذا كانت الدالة تطبع name؟",
+     "o": [
+      "<code dir=\"ltr\">undefined</code>",
+      "<code dir=\"ltr\">ضيف</code>",
+      "خطأ"
+     ],
+     "a": 1,
+     "why": "عند غياب الوسيط تُستخدم القيمة الافتراضية."
+    }
+   ]
+  },
+  {
+   "body": "<h2>طريقة أقصر لكتابة الدوال</h2>\n<p>في JavaScript الحديثة توجد صيغة مختصرة تسمى <strong>الدوال السهمية (Arrow Functions)</strong>، وستراها في كل مكان تقريباً في الأكواد الحديثة ومكتبات مثل React.</p>\n<h2>من دالة عادية إلى سهمية</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>// دالة عادية\nfunction multiply(a, b) {\n  return a * b;\n}\n\n// نفس الدالة كدالة سهمية\nconst multiplyArrow = (a, b) =&gt; {\n  return a * b;\n};\n\nconsole.log(multiply(3, 4), multiplyArrow(3, 4));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>12 12</code></pre></div>\n<p>الخطوات: نحذف كلمة <code dir=\"ltr\">function</code>، ونخزّن الدالة في ثابت، ونضع السهم <code dir=\"ltr\">=&gt;</code> بين المعاملات والجسم.</p>\n<h2>الاختصار الأقوى: الإرجاع الضمني</h2>\n<p>إذا كان جسم الدالة <strong>تعبيراً واحداً فقط</strong> نُرجعه، نحذف الأقواس المعقوفة وكلمة <code dir=\"ltr\">return</code>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const multiply = (a, b) =&gt; a * b;\nconst square = n =&gt; n * n;\nconst sayHello = () =&gt; &quot;مرحباً&quot;;\n\nconsole.log(multiply(5, 6));\nconsole.log(square(9));\nconsole.log(sayHello());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>30\n81\nمرحباً</code></pre></div>\n<div class=\"table-wrap\"><table><thead><tr><th>الحالة</th><th>الصيغة</th></tr></thead><tbody><tr><td>بدون معاملات</td><td><code dir=\"ltr\">() =&gt; ...</code></td></tr><tr><td>معامل واحد</td><td><code dir=\"ltr\">n =&gt; ...</code> (الأقواس اختيارية)</td></tr><tr><td>عدة معاملات</td><td><code dir=\"ltr\">(a, b) =&gt; ...</code></td></tr><tr><td>جسم من سطر واحد</td><td><code dir=\"ltr\">x =&gt; x * 2</code> (إرجاع تلقائي)</td></tr><tr><td>جسم من عدة أسطر</td><td><code dir=\"ltr\">x =&gt; { ...; return y; }</code></td></tr></tbody></table></div>\n<div class=\"callout warn\">⚠️ إذا استخدمت الأقواس المعقوفة <code dir=\"ltr\">{ }</code> يجب أن تكتب <code dir=\"ltr\">return</code> بنفسك، وإلا ستُرجع الدالة <code dir=\"ltr\">undefined</code>.</div>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const bad = n =&gt; { n * 2 };\nconst good = n =&gt; { return n * 2; };\nconsole.log(bad(5), good(5));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>undefined 10</code></pre></div>\n<h2>الدوال قيم مثل غيرها</h2>\n<p>في JavaScript الدالة <strong>قيمة</strong> يمكن تخزينها في متغير، وتمريرها لدالة أخرى. وهذا أهم استخدام للدوال السهمية:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function applyTwice(fn, value) {\n  return fn(fn(value));\n}\n\nconsole.log(applyTwice(n =&gt; n + 3, 10));\nconsole.log(applyTwice(n =&gt; n * 2, 5));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>16\n20</code></pre></div>\n<p>مررنا دالة كاملة كوسيط! الدالة الممررة بهذا الشكل تسمى <strong>دالة رد النداء (Callback)</strong>، وستراها كثيراً مع المصفوفات والأحداث في الوحدات القادمة.</p>\n<h2>تعبير الدالة (Function Expression)</h2>\n<p>يمكن أيضاً تخزين دالة عادية في متغير:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const greet = function (name) {\n  return `أهلاً ${name}`;\n};\nconsole.log(greet(&quot;نور&quot;));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>أهلاً نور</code></pre></div>\n<p>الفرق المهم عن تعريف <code dir=\"ltr\">function</code> العادي: الدوال المخزنة في متغيرات (عادية أو سهمية) <strong>لا يمكن استدعاؤها قبل سطر تعريفها</strong>.</p>\n<h2>متى أستخدم أيهما؟</h2>\n<ul><li><strong>الدوال السهمية:</strong> للدوال القصيرة، وخاصة كـ callback.</li><li>**<code dir=\"ltr\">function</code> العادية:** للدوال الرئيسية الكبيرة في البرنامج، وعندما تحتاج <code dir=\"ltr\">this</code> (سنتعلمه في الوحدة 8).</li></ul>\n<h2>ملخص الدرس</h2>\n<ul><li>الصيغة السهمية: <code dir=\"ltr\">(a, b) =&gt; a + b</code>.</li><li>بدون <code dir=\"ltr\">{ }</code> يكون الإرجاع تلقائياً، ومع <code dir=\"ltr\">{ }</code> يجب كتابة <code dir=\"ltr\">return</code>.</li><li>الدوال قيم يمكن تخزينها وتمريرها لدوال أخرى (callbacks).</li></ul>",
+   "exercise": {
+    "prompt": "<p>حوّل الدوال الثلاث التالية إلى <strong>دوال سهمية مختصرة</strong> (سطر واحد بإرجاع ضمني لكل منها)، مع الحفاظ على أسمائها:</p>\n<ul><li><code dir=\"ltr\">isEven(n)</code> تُرجع <code dir=\"ltr\">true</code> إذا كان الرقم زوجياً</li><li><code dir=\"ltr\">fullName(first, last)</code> تُرجع الاسم الكامل بينهما مسافة</li><li><code dir=\"ltr\">getPi()</code> تُرجع <code dir=\"ltr\">3.14</code></li></ul>\n<p>ثم أكمل الدالة <code dir=\"ltr\">applyToFive(fn)</code> التي تُرجع ناتج استدعاء <code dir=\"ltr\">fn</code> على الرقم 5.</p>",
+    "starter": "function isEven(n) {\n  return n % 2 === 0;\n}\nfunction fullName(first, last) {\n  return first + \" \" + last;\n}\nfunction getPi() {\n  return 3.14;\n}\nfunction applyToFive(fn) {\n  // أكمل هنا\n}\n\nconsole.log(isEven(4), isEven(7));\nconsole.log(fullName(\"محمد\", \"سالم\"));\nconsole.log(getPi());\nconsole.log(applyToFive(n => n * 10));",
+    "expected": "true false\nمحمد سالم\n3.14\n50",
+    "solution": "const isEven = n => n % 2 === 0;\nconst fullName = (first, last) => `${first} ${last}`;\nconst getPi = () => 3.14;\nconst applyToFive = fn => fn(5);\n\nconsole.log(isEven(4), isEven(7));\nconsole.log(fullName(\"محمد\", \"سالم\"));\nconsole.log(getPi());\nconsole.log(applyToFive(n => n * 10));"
+   },
+   "quiz": [
+    {
+     "q": "ما ناتج <code dir=\"ltr\">const f = x =&gt; x + 1; console.log(f(9));</code>؟",
+     "o": [
+      "<code dir=\"ltr\">10</code>",
+      "<code dir=\"ltr\">9</code>",
+      "<code dir=\"ltr\">undefined</code>"
+     ],
+     "a": 0,
+     "why": "الدالة بلا أقواس معقوفة تُرجع ناتج التعبير تلقائياً."
+    },
+    {
+     "q": "ما المشكلة في: <code dir=\"ltr\">const half = n =&gt; { n / 2 };</code>؟",
+     "o": [
+      "الصيغة خاطئة وتسبب خطأ",
+      "تُرجع <code dir=\"ltr\">undefined</code> لأن الأقواس المعقوفة تتطلب <code dir=\"ltr\">return</code>",
+      "لا مشكلة"
+     ],
+     "a": 1,
+     "why": "مع <code dir=\"ltr\">{ }</code> يصبح الجسم كتلة أوامر، ولا يحدث إرجاع إلا بـ <code dir=\"ltr\">return</code>."
+    },
+    {
+     "q": "ما الاسم الذي نطلقه على دالة تُمرَّر كوسيط لدالة أخرى؟",
+     "o": [
+      "دالة سهمية",
+      "دالة رد نداء (Callback)",
+      "دالة افتراضية"
+     ],
+     "a": 1,
+     "why": "الـ callback دالة نعطيها لدالة أخرى لتستدعيها في الوقت المناسب."
+    }
+   ]
+  },
+  {
+   "body": "<h2>أين يعيش المتغير؟</h2>\n<p><strong>النطاق (Scope)</strong> يحدد أين يمكن رؤية المتغير واستخدامه. ليست كل المتغيرات متاحة في كل مكان، وهذا أمر جيد لأنه يمنع أجزاء البرنامج من العبث ببعضها.</p>\n<h2>النطاق العام (Global Scope)</h2>\n<p>المتغير المعرّف خارج أي دالة أو كتلة يُرى في كل مكان:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const siteName = &quot;CodeWay&quot;;\n\nfunction showName() {\n  console.log(siteName);\n}\nshowName();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>CodeWay</code></pre></div>\n<h2>نطاق الدالة (Function Scope)</h2>\n<p>المتغير المعرّف <strong>داخل</strong> دالة لا يُرى خارجها:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function calculate() {\n  const secret = 42;\n  console.log(secret); // يعمل\n}\ncalculate();\nconsole.log(secret); // ReferenceError: secret is not defined</code></pre></div>\n<p>هذا يعني أن كل دالة لها &quot;غرفتها الخاصة&quot; من المتغيرات. ولهذا يمكن لدالتين مختلفتين استخدام نفس اسم المتغير دون تعارض:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function a() {\n  const x = 1;\n  return x;\n}\nfunction b() {\n  const x = 2;\n  return x;\n}\nconsole.log(a(), b());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1 2</code></pre></div>\n<h2>نطاق الكتلة (Block Scope)</h2>\n<p>المتغيرات المعرّفة بـ <code dir=\"ltr\">let</code> و <code dir=\"ltr\">const</code> تعيش داخل أقرب أقواس معقوفة <code dir=\"ltr\">{ }</code>، سواء كانت <code dir=\"ltr\">if</code> أو حلقة أو غيرها:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const age = 20;\n\nif (age &gt;= 18) {\n  const message = &quot;بالغ&quot;;\n  console.log(message);\n}\n// message غير موجود هنا\nconsole.log(typeof message);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>بالغ\nundefined</code></pre></div>\n<div class=\"callout tip\">💡 لهذا السبب عدّاد الحلقة <code dir=\"ltr\">let i</code> لا يُرى بعد انتهائها. وهذا من أسباب تفضيل <code dir=\"ltr\">let</code> و <code dir=\"ltr\">const</code> على <code dir=\"ltr\">var</code>، فـ <code dir=\"ltr\">var</code> لا تحترم نطاق الكتلة.</div>\n<h2>سلسلة النطاقات</h2>\n<p>الدالة الداخلية ترى متغيرات الدالة الخارجية، والعكس غير صحيح. تبحث JavaScript عن المتغير في النطاق الحالي، ثم في الذي يحيط به، وهكذا حتى النطاق العام:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const level1 = &quot;عام&quot;;\n\nfunction outer() {\n  const level2 = &quot;خارجي&quot;;\n\n  function inner() {\n    const level3 = &quot;داخلي&quot;;\n    console.log(level1, level2, level3);\n  }\n  inner();\n}\nouter();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>عام خارجي داخلي</code></pre></div>\n<h2>التظليل (Shadowing)</h2>\n<p>إذا عرّفت متغيراً داخلياً بنفس اسم متغير خارجي، فالداخلي &quot;يظلل&quot; الخارجي داخل نطاقه فقط:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const color = &quot;أزرق&quot;;\n\nfunction paint() {\n  const color = &quot;أحمر&quot;;\n  console.log(`داخل الدالة: ${color}`);\n}\npaint();\nconsole.log(`خارج الدالة: ${color}`);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>داخل الدالة: أحمر\nخارج الدالة: أزرق</code></pre></div>\n<h2>لماذا نتجنب المتغيرات العامة؟</h2>\n<p>المتغيرات العامة يمكن لأي جزء من البرنامج تعديلها، فيصعب تتبع من غيّرها ومتى. القاعدة: <strong>عرّف المتغير في أضيق نطاق يحتاجه</strong>، ومرّر القيم للدوال كمعاملات بدلاً من الاعتماد على متغيرات عامة.</p>\n<h2>ملخص الدرس</h2>\n<ul><li>النطاق العام: يُرى في كل مكان، ويجب التقليل منه.</li><li>نطاق الدالة: متغيرات الدالة لا تُرى خارجها.</li><li>نطاق الكتلة: <code dir=\"ltr\">let</code> و <code dir=\"ltr\">const</code> تعيشان داخل أقرب <code dir=\"ltr\">{ }</code>.</li><li>الداخل يرى الخارج، والخارج لا يرى الداخل.</li><li>عرّف المتغيرات في أضيق نطاق ممكن.</li></ul>",
+   "exercise": {
+    "prompt": "<p>الكود التالي فيه مشكلة: الدالة <code dir=\"ltr\">addPoints</code> تعدّل متغيراً عاماً، وهذا أسلوب سيئ. أعد كتابتها لتكون <strong>دالة نقية</strong>: تستقبل النقاط الحالية والنقاط المضافة كمعاملات، وتُرجع المجموع الجديد دون تعديل أي متغير خارجي.</p>\n<p>ثم استخدمها بحيث يطبع البرنامج المخرجات المطلوبة.</p>",
+    "starter": "let points = 0;\n\nfunction addPoints() {\n  points = points + 10;\n}\n\naddPoints();\naddPoints();\nconsole.log(points);",
+    "expected": "10\n25",
+    "solution": "function addPoints(current, amount) {\n  return current + amount;\n}\n\nlet points = 0;\npoints = addPoints(points, 10);\nconsole.log(points);\npoints = addPoints(points, 15);\nconsole.log(points);"
+   },
+   "quiz": [
+    {
+     "q": "ماذا يحدث عند محاولة الوصول لمتغير معرّف داخل دالة من خارجها؟",
+     "o": [
+      "يُرجع آخر قيمة له",
+      "يحدث خطأ ReferenceError لأنه غير معرّف في هذا النطاق",
+      "يُرجع 0"
+     ],
+     "a": 1,
+     "why": "متغيرات الدالة تعيش داخلها فقط."
+    },
+    {
+     "q": "هل ترى الدالة الداخلية متغيرات الدالة الخارجية التي تحيط بها؟",
+     "o": [
+      "نعم",
+      "لا",
+      "فقط إذا كانت معرّفة بـ var"
+     ],
+     "a": 0,
+     "why": "تبحث JavaScript في النطاقات المحيطة من الداخل إلى الخارج."
+    },
+    {
+     "q": "متغير معرّف بـ <code dir=\"ltr\">let</code> داخل كتلة <code dir=\"ltr\">if</code>، أين يمكن استخدامه؟",
+     "o": [
+      "في كل البرنامج",
+      "في كل الدالة التي تحتوي الـ if",
+      "داخل أقواس الـ if فقط"
+     ],
+     "a": 2,
+     "why": "<code dir=\"ltr\">let</code> و <code dir=\"ltr\">const</code> لهما نطاق الكتلة."
+    }
+   ]
+  },
+  {
+   "body": "<h2>الدالة تتذكر</h2>\n<p><strong>الإغلاق (Closure)</strong> من المفاهيم التي تبدو صعبة في البداية، لكنه بسيط إذا فهمت النطاق جيداً. وهو من الأسئلة المفضلة في مقابلات التوظيف.</p>\n<p>الفكرة: <strong>الدالة تتذكر المتغيرات التي كانت حولها لحظة إنشائها، حتى بعد انتهاء الدالة الخارجية.</strong></p>\n<h2>مثال أول</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function createGreeter(greeting) {\n  return name =&gt; `${greeting} يا ${name}`;\n}\n\nconst sayHello = createGreeter(&quot;مرحباً&quot;);\nconst sayMorning = createGreeter(&quot;صباح الخير&quot;);\n\nconsole.log(sayHello(&quot;علي&quot;));\nconsole.log(sayMorning(&quot;هدى&quot;));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>مرحباً يا علي\nصباح الخير يا هدى</code></pre></div>\n<p>ماذا حدث؟</p>\n<ol><li>استدعينا <code dir=\"ltr\">createGreeter(&quot;مرحباً&quot;)</code> فأرجعت دالة جديدة.</li><li>انتهت <code dir=\"ltr\">createGreeter</code> تماماً.</li><li>ومع ذلك، عندما استدعينا <code dir=\"ltr\">sayHello</code> بعدها، كانت <strong>ما زالت تتذكر</strong> أن <code dir=\"ltr\">greeting</code> قيمتها &quot;مرحباً&quot;.</li></ol>\n<p>الدالة الداخلية مع المتغيرات التي تتذكرها تسمى <strong>Closure</strong>.</p>\n<h2>العدّاد: المثال الكلاسيكي</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function createCounter() {\n  let count = 0;\n  return () =&gt; {\n    count++;\n    return count;\n  };\n}\n\nconst counter = createCounter();\nconsole.log(counter());\nconsole.log(counter());\nconsole.log(counter());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1\n2\n3</code></pre></div>\n<p>المتغير <code dir=\"ltr\">count</code> لا يُعاد إلى الصفر، لأن الدالة المُرجعة تحتفظ بنفس <code dir=\"ltr\">count</code> بين الاستدعاءات.</p>\n<h2>كل closure له ذاكرته الخاصة</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function createCounter() {\n  let count = 0;\n  return () =&gt; ++count;\n}\n\nconst a = createCounter();\nconst b = createCounter();\n\na();\na();\nconsole.log(a());\nconsole.log(b());</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>3\n1</code></pre></div>\n<p>كل استدعاء لـ <code dir=\"ltr\">createCounter</code> ينشئ <code dir=\"ltr\">count</code> جديداً مستقلاً، فـ <code dir=\"ltr\">a</code> و <code dir=\"ltr\">b</code> لا يتشاركان العدّ.</p>\n<h2>لماذا الإغلاق مفيد؟ إخفاء البيانات</h2>\n<p>لا يستطيع أي كود خارجي الوصول إلى <code dir=\"ltr\">count</code> مباشرة وتغييره عشوائياً. الطريقة الوحيدة هي الدوال التي نوفرها. هذا يسمى <strong>التغليف (Encapsulation)</strong>:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function createWallet(initial) {\n  let balance = initial;\n  return {\n    deposit: amount =&gt; { balance += amount; },\n    withdraw: amount =&gt; {\n      if (amount &gt; balance) return &quot;الرصيد غير كافٍ&quot;;\n      balance -= amount;\n      return &quot;تم السحب&quot;;\n    },\n    getBalance: () =&gt; balance\n  };\n}\n\nconst wallet = createWallet(100);\nwallet.deposit(50);\nconsole.log(wallet.withdraw(500));\nconsole.log(wallet.withdraw(30));\nconsole.log(wallet.getBalance());\nconsole.log(wallet.balance);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>الرصيد غير كافٍ\nتم السحب\n120\nundefined</code></pre></div>\n<p>لاحظ السطر الأخير: لا يمكن الوصول إلى <code dir=\"ltr\">balance</code> مباشرة، فهي محمية داخل الإغلاق. (استخدمنا هنا <strong>كائناً</strong> <code dir=\"ltr\">{ }</code> لإرجاع عدة دوال معاً، وسنتعلم الكائنات بالتفصيل في الوحدة القادمة.)</p>\n<h2>أين ستقابل الإغلاق؟</h2>\n<ul><li>في معالجات الأحداث (<code dir=\"ltr\">addEventListener</code>) التي تتذكر بيانات الصفحة.</li><li>في <code dir=\"ltr\">setTimeout</code> التي تُنفَّذ لاحقاً وتتذكر المتغيرات.</li><li>في React Hooks مثل <code dir=\"ltr\">useState</code>.</li></ul>\n<p>في الحقيقة، أنت تستخدم الإغلاق في كل مرة تكتب دالة تستخدم متغيراً من خارجها.</p>\n<h2>ملخص الدرس</h2>\n<ul><li>الإغلاق: الدالة تتذكر متغيرات النطاق الذي أُنشئت فيه، حتى بعد انتهائه.</li><li>كل استدعاء للدالة الخارجية ينشئ ذاكرة مستقلة.</li><li>يُستخدم لإخفاء البيانات وحمايتها، ولإنشاء دوال مخصصة.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب دالة <code dir=\"ltr\">createMultiplier(factor)</code> تُرجع <strong>دالة</strong> تستقبل رقماً وتضربه في <code dir=\"ltr\">factor</code>.</p>\n<p>ثم اكتب دالة <code dir=\"ltr\">createIdGenerator(prefix)</code> تُرجع دالة، كل استدعاء لها يُرجع معرّفاً جديداً بالشكل <code dir=\"ltr\">prefix-1</code> ثم <code dir=\"ltr\">prefix-2</code> وهكذا.</p>",
+    "starter": "function createMultiplier(factor) {\n  // أكمل هنا\n}\n\nfunction createIdGenerator(prefix) {\n  // أكمل هنا\n}\n\nconst double = createMultiplier(2);\nconst triple = createMultiplier(3);\nconsole.log(double(7), triple(7));\n\nconst nextUserId = createIdGenerator(\"user\");\nconst nextOrderId = createIdGenerator(\"order\");\nconsole.log(nextUserId());\nconsole.log(nextUserId());\nconsole.log(nextOrderId());",
+    "expected": "14 21\nuser-1\nuser-2\norder-1",
+    "solution": "function createMultiplier(factor) {\n  return n => n * factor;\n}\n\nfunction createIdGenerator(prefix) {\n  let id = 0;\n  return () => {\n    id++;\n    return `${prefix}-${id}`;\n  };\n}\n\nconst double = createMultiplier(2);\nconst triple = createMultiplier(3);\nconsole.log(double(7), triple(7));\n\nconst nextUserId = createIdGenerator(\"user\");\nconst nextOrderId = createIdGenerator(\"order\");\nconsole.log(nextUserId());\nconsole.log(nextUserId());\nconsole.log(nextOrderId());"
+   },
+   "quiz": [
+    {
+     "q": "ما هو الإغلاق (Closure)؟",
+     "o": [
+      "دالة تُغلق البرنامج",
+      "دالة تتذكر متغيرات النطاق الذي أُنشئت فيه حتى بعد انتهائه",
+      "طريقة لحذف المتغيرات من الذاكرة"
+     ],
+     "a": 1,
+     "why": "الدالة الداخلية تحتفظ بالوصول لمتغيرات الدالة الخارجية."
+    },
+    {
+     "q": "ماذا يُطبع؟ <code dir=\"ltr\">const c1 = createCounter(); const c2 = createCounter(); c1(); c1(); console.log(c2());</code> (حيث createCounter من الدرس)",
+     "o": [
+      "<code dir=\"ltr\">3</code>",
+      "<code dir=\"ltr\">1</code>",
+      "<code dir=\"ltr\">2</code>"
+     ],
+     "a": 1,
+     "why": "كل استدعاء لـ <code dir=\"ltr\">createCounter</code> ينشئ عدّاداً مستقلاً يبدأ من الصفر."
+    },
+    {
+     "q": "ما الفائدة الأساسية من استخدام الإغلاق مع رصيد المحفظة في الدرس؟",
+     "o": [
+      "تسريع البرنامج",
+      "حماية المتغير من التعديل المباشر من خارج الدوال المسموح بها",
+      "توفير الذاكرة"
+     ],
+     "a": 1,
+     "why": "لا يمكن تعديل <code dir=\"ltr\">balance</code> إلا عبر الدوال التي أرجعناها."
+    }
+   ]
+  }
  ]
 ]);
