@@ -53,7 +53,9 @@ for (const file of fs.readdirSync(dir).filter(f => /^m\d+\.md$/.test(f)).sort((a
     const blocks = [...bodyPart.matchAll(/^```([\w-]*)\n([\s\S]*?)^```\s*$/gm)].map(m => ({ lang: m[1], code: m[2] }));
     blocks.forEach((b, bi) => {
       if (b.lang !== "js") return;
-      if (/document\.|window\.|localStorage|fetch\(/.test(b.code)) return; // أمثلة تحتاج متصفحاً
+      // أمثلة تحتاج متصفحاً أو إنترنت (إلا إذا عرّفت fetch محاكياً بنفسها)
+      if (/document\.|window\.|localStorage/.test(b.code)) return;
+      if (/fetch\(/.test(b.code) && !/(const|let|globalThis\.)\s*fetch\s*=/.test(b.code)) return;
       checks++;
       const got = run(b.code);
       const next = blocks[bi + 1];

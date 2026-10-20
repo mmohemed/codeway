@@ -1039,5 +1039,212 @@ CW.registerContent("javascript", [
     }
    ]
   }
+ ],
+ [
+  {
+   "body": "<h2>البرنامج لا ينتظر</h2>\n<p>بعض العمليات تأخذ وقتاً: جلب بيانات من خادم، قراءة ملف، أو انتظار مؤقت. لو انتظرت JavaScript انتهاء كل عملية قبل الانتقال للتالية، <strong>لتجمدت الصفحة</strong> كلها ولم يستطع المستخدم الضغط على أي شيء.</p>\n<p>لذلك تعمل JavaScript بأسلوب <strong>غير متزامن (Asynchronous)</strong>: تبدأ العملية الطويلة، وتكمل باقي الكود، ثم تعود لنتيجة العملية عندما تجهز.</p>\n<h2>setTimeout: أول تجربة</h2>\n<p><code dir=\"ltr\">setTimeout</code> تنفّذ دالة بعد مدة محددة بالملي ثانية (1000 = ثانية واحدة):</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>console.log(&quot;1. طلبت قهوة&quot;);\n\nsetTimeout(() =&gt; {\n  console.log(&quot;3. القهوة جاهزة ☕&quot;);\n}, 1000);\n\nconsole.log(&quot;2. أتصفح هاتفي أثناء الانتظار&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>1. طلبت قهوة\n2. أتصفح هاتفي أثناء الانتظار\n3. القهوة جاهزة ☕</code></pre></div>\n<p>لاحظ الترتيب! السطر الثالث في الكود طُبع <strong>قبل</strong> الثاني، لأن JavaScript لم تنتظر انتهاء المؤقت. حتى <code dir=\"ltr\">setTimeout(fn, 0)</code> تُنفَّذ بعد انتهاء الكود الحالي كله.</p>\n<h2>Callbacks: &quot;اتصل بي عندما تنتهي&quot;</h2>\n<p>الطريقة التقليدية للتعامل مع العمليات غير المتزامنة هي تمرير <strong>دالة callback</strong> تُستدعى عند انتهاء العملية:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function downloadFile(name, callback) {\n  console.log(`بدأ تحميل ${name}...`);\n  setTimeout(() =&gt; {\n    callback(`محتوى ${name}`);\n  }, 500);\n}\n\ndownloadFile(&quot;report.pdf&quot;, content =&gt; {\n  console.log(`انتهى التحميل: ${content}`);\n});\nconsole.log(&quot;يمكنك متابعة العمل&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>بدأ تحميل report.pdf...\nيمكنك متابعة العمل\nانتهى التحميل: محتوى report.pdf</code></pre></div>\n<h2>التعامل مع الأخطاء في Callbacks</h2>\n<p>العرف المتبع (خاصة في Node.js) أن يكون أول معامل للـ callback هو الخطأ:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function getUser(id, callback) {\n  setTimeout(() =&gt; {\n    if (id &lt;= 0) {\n      callback(&quot;معرّف غير صالح&quot;, null);\n    } else {\n      callback(null, { id, name: &quot;مستخدم &quot; + id });\n    }\n  }, 300);\n}\n\ngetUser(5, (error, user) =&gt; {\n  if (error) return console.log(`خطأ: ${error}`);\n  console.log(user.name);\n});\ngetUser(-1, (error, user) =&gt; {\n  if (error) return console.log(`خطأ: ${error}`);\n  console.log(user.name);\n});</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>مستخدم 5\nخطأ: معرّف غير صالح</code></pre></div>\n<h2>جحيم الـ Callbacks</h2>\n<p>المشكلة تظهر عندما تعتمد العمليات على بعضها: اجلب المستخدم، ثم طلباته، ثم تفاصيل أول طلب...</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>getUser(1, (err, user) =&gt; {\n  getOrders(user.id, (err, orders) =&gt; {\n    getOrderDetails(orders[0], (err, details) =&gt; {\n      getShipping(details.id, (err, shipping) =&gt; {\n        // ... وهكذا إلى ما لا نهاية\n      });\n    });\n  });\n});</code></pre></div>\n<p>هذا الشكل الهرمي يسمى <strong>Callback Hell</strong> أو &quot;هرم الهلاك&quot;. صعب القراءة، وصعب التعامل مع أخطائه. ولحله جاءت <strong>Promises</strong> التي سنتعلمها في الدرس القادم.</p>\n<h2>ملخص الدرس</h2>\n<ul><li>العمليات الطويلة في JavaScript غير متزامنة حتى لا تتجمد الصفحة.</li><li><code dir=\"ltr\">setTimeout(fn, ms)</code> تنفّذ الدالة بعد مدة، والكود الذي بعدها لا ينتظر.</li><li>الـ callback دالة نمررها لتُستدعى عند انتهاء العملية.</li><li>تداخل الـ callbacks يصنع &quot;Callback Hell&quot;، والحل هو Promises.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب دالة <code dir=\"ltr\">cook(dish, minutes, callback)</code> تطبع <code dir=\"ltr\">بدأ تحضير X</code>، ثم بعد <code dir=\"ltr\">minutes * 100</code> ملي ثانية تستدعي <code dir=\"ltr\">callback</code> وتمرر لها النص <code dir=\"ltr\">X جاهز</code>.</p>\n<p>استخدمها لتحضير الطبقين في الكود. لاحظ أن ترتيب الجاهزية يعتمد على المدة وليس على ترتيب البدء.</p>",
+    "starter": "function cook(dish, minutes, callback) {\n  // أكمل هنا\n}\n\ncook(\"أرز\", 5, message => console.log(message));\ncook(\"سلطة\", 2, message => console.log(message));\nconsole.log(\"المطبخ يعمل...\");",
+    "expected": "بدأ تحضير أرز\nبدأ تحضير سلطة\nالمطبخ يعمل...\nسلطة جاهز\nأرز جاهز",
+    "solution": "function cook(dish, minutes, callback) {\n  console.log(`بدأ تحضير ${dish}`);\n  setTimeout(() => {\n    callback(`${dish} جاهز`);\n  }, minutes * 100);\n}\n\ncook(\"أرز\", 5, message => console.log(message));\ncook(\"سلطة\", 2, message => console.log(message));\nconsole.log(\"المطبخ يعمل...\");"
+   },
+   "quiz": [
+    {
+     "q": "ما ترتيب المخرجات؟ <code dir=\"ltr\">console.log(&quot;A&quot;); setTimeout(() =&gt; console.log(&quot;B&quot;), 0); console.log(&quot;C&quot;);</code>",
+     "o": [
+      "A ثم B ثم C",
+      "A ثم C ثم B",
+      "B ثم A ثم C"
+     ],
+     "a": 1,
+     "why": "حتى مع مهلة 0، تُنفَّذ دالة setTimeout بعد انتهاء الكود الحالي."
+    },
+    {
+     "q": "لماذا تعمل JavaScript بشكل غير متزامن مع العمليات الطويلة؟",
+     "o": [
+      "حتى لا تتجمد الصفحة أثناء الانتظار",
+      "لأنها أبطأ من اللغات الأخرى",
+      "لتوفير الذاكرة فقط"
+     ],
+     "a": 0,
+     "why": "الانتظار المتزامن يوقف كل شيء، بما فيه تفاعل المستخدم."
+    },
+    {
+     "q": "ما المقصود بـ Callback Hell؟",
+     "o": [
+      "خطأ في دالة callback",
+      "تداخل callbacks كثيرة داخل بعضها بشكل يصعب قراءته",
+      "دالة callback لا تُستدعى أبداً"
+     ],
+     "a": 1,
+     "why": "كل عملية معتمدة على السابقة تضيف مستوى تداخل جديداً."
+    }
+   ]
+  },
+  {
+   "body": "<h2>وعد بنتيجة مستقبلية</h2>\n<p><strong>الوعد (Promise)</strong> كائن يمثل نتيجة ستأتي في المستقبل. تخيّل أنك طلبت وجبة فأعطوك <strong>إيصالاً</strong>: الإيصال ليس الوجبة، لكنه وعد بأنك ستحصل عليها، أو ستُخبر بأنها نفدت.</p>\n<p>للوعد ثلاث حالات:</p>\n<div class=\"table-wrap\"><table><thead><tr><th>الحالة</th><th>المعنى</th></tr></thead><tbody><tr><td><code dir=\"ltr\">pending</code> (معلّق)</td><td>العملية ما زالت تعمل</td></tr><tr><td><code dir=\"ltr\">fulfilled</code> (تحقق)</td><td>انتهت بنجاح ومعها النتيجة</td></tr><tr><td><code dir=\"ltr\">rejected</code> (رُفض)</td><td>فشلت ومعها سبب الخطأ</td></tr></tbody></table></div>\n<h2>استخدام وعد: then و catch</h2>\n<p>معظم الوقت ستستخدم وعوداً جاهزة (مثل <code dir=\"ltr\">fetch</code>). نتعامل معها بـ <code dir=\"ltr\">then</code> للنجاح و <code dir=\"ltr\">catch</code> للفشل:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function getPrice(product) {\n  return new Promise((resolve, reject) =&gt; {\n    setTimeout(() =&gt; {\n      if (product === &quot;ذهب&quot;) resolve(250);\n      else reject(&quot;المنتج غير موجود&quot;);\n    }, 300);\n  });\n}\n\ngetPrice(&quot;ذهب&quot;)\n  .then(price =&gt; console.log(`السعر: ${price}`))\n  .catch(error =&gt; console.log(`خطأ: ${error}`));\n\ngetPrice(&quot;فضة&quot;)\n  .then(price =&gt; console.log(`السعر: ${price}`))\n  .catch(error =&gt; console.log(`خطأ: ${error}`));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>السعر: 250\nخطأ: المنتج غير موجود</code></pre></div>\n<h2>إنشاء وعد</h2>\n<p>داخل <code dir=\"ltr\">new Promise</code> نكتب دالة تستقبل دالتين:</p>\n<ul><li><code dir=\"ltr\">resolve(value)</code>: نستدعيها عند النجاح ونمرر النتيجة.</li><li><code dir=\"ltr\">reject(error)</code>: نستدعيها عند الفشل ونمرر السبب.</li></ul>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const wait = ms =&gt; new Promise(resolve =&gt; setTimeout(resolve, ms));\n\nwait(500).then(() =&gt; console.log(&quot;مرت نصف ثانية&quot;));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>مرت نصف ثانية</code></pre></div>\n<p>دالة <code dir=\"ltr\">wait</code> هذه مفيدة جداً، وسنستخدمها كثيراً.</p>\n<h2>السلسلة: نهاية هرم الهلاك</h2>\n<p>قيمة <code dir=\"ltr\">then</code> الكبرى أنها تُرجع <strong>وعداً جديداً</strong>، فنستطيع ربط العمليات بشكل مسطح بدلاً من التداخل:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const wait = (ms, value) =&gt; new Promise(resolve =&gt; setTimeout(() =&gt; resolve(value), ms));\n\nwait(100, 5)\n  .then(n =&gt; {\n    console.log(`البداية: ${n}`);\n    return n * 2;\n  })\n  .then(n =&gt; {\n    console.log(`بعد المضاعفة: ${n}`);\n    return wait(100, n + 1);\n  })\n  .then(n =&gt; console.log(`النتيجة النهائية: ${n}`))\n  .catch(err =&gt; console.log(err))\n  .finally(() =&gt; console.log(&quot;انتهت العملية&quot;));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>البداية: 5\nبعد المضاعفة: 10\nالنتيجة النهائية: 11\nانتهت العملية</code></pre></div>\n<ul><li>ما تُرجعه <code dir=\"ltr\">then</code> يصل للـ <code dir=\"ltr\">then</code> التالية.</li><li>إذا أرجعت وعداً، تنتظره السلسلة قبل المتابعة.</li><li><code dir=\"ltr\">catch</code> واحدة في النهاية تلتقط خطأ <strong>أي</strong> خطوة.</li><li><code dir=\"ltr\">finally</code> تُنفَّذ دائماً، نجاحاً أو فشلاً، وهي مناسبة لإخفاء مؤشر التحميل مثلاً.</li></ul>\n<h2>تشغيل عدة وعود معاً</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const task = (name, ms) =&gt; new Promise(r =&gt; setTimeout(() =&gt; r(name), ms));\n\nPromise.all([task(&quot;المستخدم&quot;, 300), task(&quot;الطلبات&quot;, 100), task(&quot;الإشعارات&quot;, 200)])\n  .then(results =&gt; console.log(results));\n\nPromise.race([task(&quot;خادم 1&quot;, 250), task(&quot;خادم 2&quot;, 150)])\n  .then(winner =&gt; console.log(`الأسرع: ${winner}`));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>الأسرع: خادم 2\n[&quot;المستخدم&quot;,&quot;الطلبات&quot;,&quot;الإشعارات&quot;]</code></pre></div>\n<div class=\"table-wrap\"><table><thead><tr><th>الدالة</th><th>تتحقق عندما</th></tr></thead><tbody><tr><td><code dir=\"ltr\">Promise.all</code></td><td><strong>تنجح كل</strong> الوعود، وتُرجع النتائج بنفس الترتيب. تفشل إذا فشل أي وعد</td></tr><tr><td><code dir=\"ltr\">Promise.allSettled</code></td><td>تنتهي كل الوعود، نجاحاً أو فشلاً، وتعطيك حالة كل واحد</td></tr><tr><td><code dir=\"ltr\">Promise.race</code></td><td>ينتهي <strong>أول</strong> وعد</td></tr><tr><td><code dir=\"ltr\">Promise.any</code></td><td>ينجح أول وعد</td></tr></tbody></table></div>\n<div class=\"callout tip\">💡 <code dir=\"ltr\">Promise.all</code> أسرع بكثير من تنفيذ العمليات واحدة بعد الأخرى، لأنها تعمل بالتوازي. في المثال انتهت الثلاثة خلال 300 ملي ثانية بدلاً من 600.</div>\n<h2>ملخص الدرس</h2>\n<ul><li>الوعد يمثل نتيجة مستقبلية بحالة pending أو fulfilled أو rejected.</li><li><code dir=\"ltr\">then</code> للنتيجة، و <code dir=\"ltr\">catch</code> للخطأ، و <code dir=\"ltr\">finally</code> تُنفَّذ دائماً.</li><li>السلسلة تجعل العمليات المتتابعة مسطحة وواضحة.</li><li><code dir=\"ltr\">Promise.all</code> لتشغيل عدة عمليات بالتوازي.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب دالة <code dir=\"ltr\">checkStock(item)</code> تُرجع <strong>وعداً</strong> يتحقق بعد 200 ملي ثانية:</p>\n<ul><li>إذا كان <code dir=\"ltr\">item</code> موجوداً في الكائن <code dir=\"ltr\">stock</code> وكميته أكبر من 0، يتحقق بالنص <code dir=\"ltr\">X متوفر (الكمية: N)</code>.</li><li>غير ذلك يُرفض بالنص <code dir=\"ltr\">X غير متوفر</code>.</li></ul>\n<p>الكود في الأسفل يستخدم الدالة، لا تعدّله.</p>",
+    "starter": "const stock = { \"قلم\": 12, \"دفتر\": 0, \"مسطرة\": 5 };\n\nfunction checkStock(item) {\n  // أعد وعداً هنا\n}\n\ncheckStock(\"قلم\")\n  .then(msg => console.log(msg))\n  .then(() => checkStock(\"دفتر\"))\n  .then(msg => console.log(msg))\n  .catch(err => console.log(err))\n  .finally(() => console.log(\"انتهى الفحص\"));",
+    "expected": "قلم متوفر (الكمية: 12)\nدفتر غير متوفر\nانتهى الفحص",
+    "solution": "const stock = { \"قلم\": 12, \"دفتر\": 0, \"مسطرة\": 5 };\n\nfunction checkStock(item) {\n  return new Promise((resolve, reject) => {\n    setTimeout(() => {\n      if (stock[item] > 0) {\n        resolve(`${item} متوفر (الكمية: ${stock[item]})`);\n      } else {\n        reject(`${item} غير متوفر`);\n      }\n    }, 200);\n  });\n}\n\ncheckStock(\"قلم\")\n  .then(msg => console.log(msg))\n  .then(() => checkStock(\"دفتر\"))\n  .then(msg => console.log(msg))\n  .catch(err => console.log(err))\n  .finally(() => console.log(\"انتهى الفحص\"));"
+   },
+   "quiz": [
+    {
+     "q": "ما الحالات الثلاث للوعد؟",
+     "o": [
+      "pending و fulfilled و rejected",
+      "start و running و end",
+      "true و false و null"
+     ],
+     "a": 0,
+     "why": "الوعد يبدأ معلقاً، ثم إما يتحقق أو يُرفض."
+    },
+    {
+     "q": "ماذا يحدث إذا فشلت الخطوة الثانية في سلسلة then ثلاثية، وفي نهايتها catch واحدة؟",
+     "o": [
+      "تستمر الخطوة الثالثة",
+      "تُتخطى بقية الـ then وينتقل التنفيذ إلى catch",
+      "يتوقف البرنامج بخطأ"
+     ],
+     "a": 1,
+     "why": "catch في نهاية السلسلة تلتقط خطأ أي خطوة قبلها."
+    },
+    {
+     "q": "متى يفشل <code dir=\"ltr\">Promise.all</code>؟",
+     "o": [
+      "عندما تفشل كل الوعود",
+      "عندما يفشل أي وعد واحد",
+      "لا يفشل أبداً"
+     ],
+     "a": 1,
+     "why": "Promise.all تتطلب نجاح الجميع. استخدم allSettled إذا أردت كل النتائج مهما حدث."
+    }
+   ]
+  },
+  {
+   "body": "<h2>كتابة الكود غير المتزامن كأنه متزامن</h2>\n<p><code dir=\"ltr\">async</code> و <code dir=\"ltr\">await</code> صيغة أحدث مبنية على الوعود، تجعل الكود غير المتزامن <strong>يُقرأ من الأعلى للأسفل</strong> كالكود العادي تماماً. وهي الطريقة الأكثر استخداماً اليوم.</p>\n<h2>المقارنة</h2>\n<p>نفس العملية بالطريقتين:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const wait = (ms, v) =&gt; new Promise(r =&gt; setTimeout(() =&gt; r(v), ms));\n\n// باستخدام then\nfunction withThen() {\n  return wait(100, &quot;علي&quot;).then(name =&gt; {\n    return wait(100, `${name} - 3 طلبات`);\n  });\n}\n\n// باستخدام async/await\nasync function withAwait() {\n  const name = await wait(100, &quot;علي&quot;);\n  const summary = await wait(100, `${name} - 3 طلبات`);\n  return summary;\n}\n\nwithThen().then(r =&gt; console.log(r));\nwithAwait().then(r =&gt; console.log(r));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>علي - 3 طلبات\nعلي - 3 طلبات</code></pre></div>\n<p>النسخة الثانية أوضح بكثير، خاصة عندما تكثر الخطوات.</p>\n<h2>القواعد</h2>\n<ol><li><code dir=\"ltr\">async</code> قبل الدالة تجعلها <strong>تُرجع وعداً دائماً</strong>.</li><li><code dir=\"ltr\">await</code> توقف تنفيذ <strong>هذه الدالة فقط</strong> حتى يتحقق الوعد، ثم تعطيك قيمته مباشرة.</li><li><code dir=\"ltr\">await</code> لا تُستخدم إلا داخل دالة <code dir=\"ltr\">async</code>.</li></ol>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>async function getNumber() {\n  return 42;\n}\n\nconst result = getNumber();\nconsole.log(result instanceof Promise);\nresult.then(n =&gt; console.log(n));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>true\n42</code></pre></div>\n<p>حتى لو أرجعت رقماً عادياً، الدالة <code dir=\"ltr\">async</code> تغلّفه في وعد.</p>\n<h2>await لا تجمّد البرنامج</h2>\n<p><code dir=\"ltr\">await</code> توقف الدالة الحالية فقط، أما باقي البرنامج فيستمر:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const wait = ms =&gt; new Promise(r =&gt; setTimeout(r, ms));\n\nasync function task() {\n  console.log(&quot;بدأت المهمة&quot;);\n  await wait(200);\n  console.log(&quot;انتهت المهمة&quot;);\n}\n\ntask();\nconsole.log(&quot;البرنامج مستمر&quot;);</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>بدأت المهمة\nالبرنامج مستمر\nانتهت المهمة</code></pre></div>\n<h2>الأخطاء مع try...catch</h2>\n<p>بدلاً من <code dir=\"ltr\">.catch()</code>، نستخدم <code dir=\"ltr\">try...catch</code> المألوفة:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>function login(password) {\n  return new Promise((resolve, reject) =&gt; {\n    setTimeout(() =&gt; {\n      password === &quot;1234&quot; ? resolve(&quot;تم الدخول&quot;) : reject(new Error(&quot;كلمة المرور خاطئة&quot;));\n    }, 100);\n  });\n}\n\nasync function attempt(pass) {\n  try {\n    const msg = await login(pass);\n    console.log(msg);\n  } catch (error) {\n    console.log(`فشل: ${error.message}`);\n  } finally {\n    console.log(&quot;--&quot;);\n  }\n}\n\nattempt(&quot;0000&quot;).then(() =&gt; attempt(&quot;1234&quot;));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>فشل: كلمة المرور خاطئة\n--\nتم الدخول\n--</code></pre></div>\n<h2>خطأ شائع: الانتظار المتتابع دون داعٍ</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const wait = (ms, v) =&gt; new Promise(r =&gt; setTimeout(() =&gt; r(v), ms));\n\nasync function slow() {\n  const a = await wait(300, &quot;أ&quot;);\n  const b = await wait(300, &quot;ب&quot;);\n  return a + b;\n}\n\nasync function fast() {\n  const [a, b] = await Promise.all([wait(300, &quot;أ&quot;), wait(300, &quot;ب&quot;)]);\n  return a + b;\n}\n\nconst t = Date.now();\nfast().then(r =&gt; console.log(r, Date.now() - t &lt; 450 ? &quot;سريع&quot; : &quot;بطيء&quot;));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>أب سريع</code></pre></div>\n<p>إذا كانت العمليتان <strong>مستقلتين</strong> عن بعضهما، لا تنتظر الأولى قبل بدء الثانية. <code dir=\"ltr\">slow</code> تأخذ 600 ملي ثانية، و <code dir=\"ltr\">fast</code> تأخذ 300 فقط.</p>\n<div class=\"callout tip\">💡 القاعدة: <code dir=\"ltr\">await</code> متتابعة عندما تحتاج نتيجة الخطوة السابقة، و <code dir=\"ltr\">Promise.all</code> عندما تكون العمليات مستقلة.</div>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">async</code> تجعل الدالة تُرجع وعداً، و <code dir=\"ltr\">await</code> تنتظر الوعد وتعطيك قيمته.</li><li><code dir=\"ltr\">await</code> توقف الدالة الحالية فقط وليس البرنامج كله.</li><li>استخدم <code dir=\"ltr\">try...catch</code> لالتقاط الأخطاء.</li><li>استخدم <code dir=\"ltr\">Promise.all</code> مع <code dir=\"ltr\">await</code> للعمليات المستقلة.</li></ul>",
+   "exercise": {
+    "prompt": "<p>لديك دوال جاهزة تحاكي قاعدة بيانات. اكتب دالة <code dir=\"ltr\">async</code> اسمها <code dir=\"ltr\">showProfile(id)</code> تنفّذ بالترتيب:</p>\n<ol><li>تجلب المستخدم بـ <code dir=\"ltr\">getUser(id)</code> وتطبع اسمه.</li><li>تجلب طلباته بـ <code dir=\"ltr\">getOrders(user.name)</code> وتطبع <code dir=\"ltr\">عدد الطلبات: N</code>.</li><li>إذا فشلت أي خطوة، تطبع <code dir=\"ltr\">خطأ: </code> متبوعة برسالة الخطأ.</li></ol>",
+    "starter": "const wait = ms => new Promise(r => setTimeout(r, ms));\nconst getUser = async id => {\n  await wait(100);\n  if (id !== 7) throw new Error(\"المستخدم غير موجود\");\n  return { id, name: \"جود\" };\n};\nconst getOrders = async name => {\n  await wait(100);\n  return [\"طلب 1\", \"طلب 2\", \"طلب 3\"];\n};\n\nasync function showProfile(id) {\n  // أكمل هنا\n}\n\nshowProfile(7).then(() => showProfile(99));",
+    "expected": "جود\nعدد الطلبات: 3\nخطأ: المستخدم غير موجود",
+    "solution": "const wait = ms => new Promise(r => setTimeout(r, ms));\nconst getUser = async id => {\n  await wait(100);\n  if (id !== 7) throw new Error(\"المستخدم غير موجود\");\n  return { id, name: \"جود\" };\n};\nconst getOrders = async name => {\n  await wait(100);\n  return [\"طلب 1\", \"طلب 2\", \"طلب 3\"];\n};\n\nasync function showProfile(id) {\n  try {\n    const user = await getUser(id);\n    console.log(user.name);\n    const orders = await getOrders(user.name);\n    console.log(`عدد الطلبات: ${orders.length}`);\n  } catch (error) {\n    console.log(`خطأ: ${error.message}`);\n  }\n}\n\nshowProfile(7).then(() => showProfile(99));"
+   },
+   "quiz": [
+    {
+     "q": "ماذا تُرجع أي دالة معرّفة بـ <code dir=\"ltr\">async</code>؟",
+     "o": [
+      "القيمة كما هي",
+      "وعداً (Promise) دائماً",
+      "undefined"
+     ],
+     "a": 1,
+     "why": "async تغلّف قيمة الإرجاع في وعد تلقائياً."
+    },
+    {
+     "q": "أين يمكن استخدام <code dir=\"ltr\">await</code>؟",
+     "o": [
+      "في أي مكان في الكود",
+      "داخل دالة <code dir=\"ltr\">async</code> (أو في المستوى الأعلى للوحدات modules)",
+      "داخل الحلقات فقط"
+     ],
+     "a": 1,
+     "why": "await تحتاج سياقاً غير متزامن."
+    },
+    {
+     "q": "لديك ثلاث عمليات مستقلة كل منها تأخذ ثانية. ما أسرع طريقة لانتظارها؟",
+     "o": [
+      "ثلاث <code dir=\"ltr\">await</code> متتالية",
+      "<code dir=\"ltr\">await Promise.all([...])</code>",
+      "setTimeout لكل واحدة"
+     ],
+     "a": 1,
+     "why": "Promise.all تشغلها بالتوازي، فتنتهي خلال ثانية واحدة بدلاً من ثلاث."
+    }
+   ]
+  },
+  {
+   "body": "<h2>التحدث مع الخوادم</h2>\n<p>معظم التطبيقات الحديثة تجلب بياناتها من <strong>خادم</strong> عبر الإنترنت: المنتجات، والأخبار، والطقس، والتعليقات. الواجهة البرمجية التي يوفرها الخادم تسمى <strong>API</strong>، والدالة المدمجة في المتصفح للتواصل معها هي <code dir=\"ltr\">fetch</code>.</p>\n<h2>طلب GET: جلب البيانات</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>async function loadUsers() {\n  const response = await fetch(&quot;https://jsonplaceholder.typicode.com/users&quot;);\n  const users = await response.json();\n  console.log(users.length);\n  console.log(users[0].name);\n}\nloadUsers();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>10\nLeanne Graham</code></pre></div>\n<p>خطوتان دائماً، وكل منهما تحتاج <code dir=\"ltr\">await</code>:</p>\n<ol><li><code dir=\"ltr\">fetch(url)</code> ترسل الطلب وتُرجع وعداً بكائن <strong>Response</strong> (الاستجابة).</li><li><code dir=\"ltr\">response.json()</code> تقرأ جسم الاستجابة وتحوّله من JSON إلى كائن، وهي أيضاً غير متزامنة.</li></ol>\n<div class=\"callout tip\">💡 <code dir=\"ltr\">jsonplaceholder.typicode.com</code> خادم تجريبي مجاني ممتاز للتدرب. جرّب المثال في وحدة التحكم في متصفحك (F12). أما تمارين هذا الدرس فتستخدم <strong>خادماً محاكياً</strong> حتى تعمل دون إنترنت.</div>\n<h2>كائن Response</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>الخاصية</th><th>معناها</th></tr></thead><tbody><tr><td><code dir=\"ltr\">response.ok</code></td><td><code dir=\"ltr\">true</code> إذا كان رمز الحالة بين 200 و 299</td></tr><tr><td><code dir=\"ltr\">response.status</code></td><td>رمز الحالة: 200 نجاح، 404 غير موجود، 500 خطأ في الخادم</td></tr><tr><td><code dir=\"ltr\">response.json()</code></td><td>قراءة الجسم كـ JSON</td></tr><tr><td><code dir=\"ltr\">response.text()</code></td><td>قراءة الجسم كنص</td></tr></tbody></table></div>\n<h2>طلب POST: إرسال البيانات</h2>\n<p>لإنشاء شيء جديد على الخادم (تسجيل مستخدم، إضافة تعليق)، نمرر خيارات إضافية:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>async function createPost() {\n  const response = await fetch(&quot;https://jsonplaceholder.typicode.com/posts&quot;, {\n    method: &quot;POST&quot;,\n    headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },\n    body: JSON.stringify({ title: &quot;أول منشور&quot;, body: &quot;مرحباً&quot;, userId: 1 })\n  });\n  const created = await response.json();\n  console.log(created.id);\n}\ncreatePost();</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>101</code></pre></div>\n<ul><li><code dir=\"ltr\">method</code>: نوع الطلب.</li><li><code dir=\"ltr\">headers</code>: معلومات إضافية، وهنا نخبر الخادم أن الجسم بصيغة JSON.</li><li><code dir=\"ltr\">body</code>: البيانات المرسلة، ويجب تحويلها لنص بـ <code dir=\"ltr\">JSON.stringify</code>.</li></ul>\n<h2>أنواع الطلبات (HTTP Methods)</h2>\n<div class=\"table-wrap\"><table><thead><tr><th>النوع</th><th>الاستخدام</th><th>مثال</th></tr></thead><tbody><tr><td><code dir=\"ltr\">GET</code></td><td>قراءة بيانات</td><td>عرض المنتجات</td></tr><tr><td><code dir=\"ltr\">POST</code></td><td>إنشاء جديد</td><td>تسجيل حساب</td></tr><tr><td><code dir=\"ltr\">PUT</code> و <code dir=\"ltr\">PATCH</code></td><td>تعديل موجود</td><td>تعديل الملف الشخصي</td></tr><tr><td><code dir=\"ltr\">DELETE</code></td><td>حذف</td><td>حذف تعليق</td></tr></tbody></table></div>\n<h2>عرض البيانات في الصفحة</h2>\n<p>هكذا يبدو النمط الكامل في مشروع حقيقي: نجلب البيانات، ثم نبني عناصر DOM منها:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>async function showProducts() {\n  const list = document.querySelector(&quot;#products&quot;);\n  list.textContent = &quot;جاري التحميل...&quot;;\n\n  const response = await fetch(&quot;https://fakestoreapi.com/products?limit=5&quot;);\n  const products = await response.json();\n\n  list.textContent = &quot;&quot;;\n  for (const p of products) {\n    const li = document.createElement(&quot;li&quot;);\n    li.textContent = `${p.title} - $${p.price}`;\n    list.append(li);\n  }\n}</code></pre></div>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">fetch(url)</code> ترسل طلباً وتُرجع وعداً بالاستجابة.</li><li><code dir=\"ltr\">await response.json()</code> لتحويل الجسم إلى كائن.</li><li><code dir=\"ltr\">response.ok</code> و <code dir=\"ltr\">response.status</code> لمعرفة نجاح الطلب.</li><li>لطلب POST نمرر <code dir=\"ltr\">method</code> و <code dir=\"ltr\">headers</code> و <code dir=\"ltr\">body</code> بصيغة JSON.</li></ul>",
+   "exercise": {
+    "prompt": "<p>في هذا التمرين <code dir=\"ltr\">fetch</code> <strong>محاكاة</strong> لخادم متجر (معرّفة في أعلى الكود، لا تعدّلها). اكتب دالة <code dir=\"ltr\">async</code> اسمها <code dir=\"ltr\">loadCatalog</code> تنفّذ:</p>\n<ol><li>تجلب <code dir=\"ltr\">/api/products</code> وتحوّل الاستجابة بـ <code dir=\"ltr\">json()</code>.</li><li>تطبع عدد المنتجات.</li><li>تطبع أسماء المنتجات المتوفرة (<code dir=\"ltr\">inStock</code> قيمتها true) مفصولة بـ <code dir=\"ltr\">، </code> باستخدام <code dir=\"ltr\">join</code>.</li><li>ترسل طلب <code dir=\"ltr\">POST</code> إلى <code dir=\"ltr\">/api/cart</code> بجسم JSON فيه <code dir=\"ltr\">{ productId: 2 }</code>، ثم تطبع الخاصية <code dir=\"ltr\">message</code> من الاستجابة.</li></ol>",
+    "starter": "// --- خادم محاكي (لا تعدّل) ---\nglobalThis.fetch = (url, options = {}) => new Promise(resolve => setTimeout(() => {\n  const reply = data => ({ ok: true, status: 200, json: async () => data });\n  if (url === \"/api/products\") resolve(reply([\n    { id: 1, name: \"ساعة\", inStock: true },\n    { id: 2, name: \"نظارة\", inStock: true },\n    { id: 3, name: \"محفظة\", inStock: false }\n  ]));\n  else if (url === \"/api/cart\" && options.method === \"POST\")\n    resolve(reply({ message: `أضيف المنتج ${JSON.parse(options.body).productId} إلى السلة` }));\n  else resolve({ ok: false, status: 404, json: async () => ({}) });\n}, 100));\n// --------------------------------\n\nasync function loadCatalog() {\n  // أكمل هنا\n}\n\nloadCatalog();",
+    "expected": "3\nساعة، نظارة\nأضيف المنتج 2 إلى السلة",
+    "solution": "// --- خادم محاكي (لا تعدّل) ---\nglobalThis.fetch = (url, options = {}) => new Promise(resolve => setTimeout(() => {\n  const reply = data => ({ ok: true, status: 200, json: async () => data });\n  if (url === \"/api/products\") resolve(reply([\n    { id: 1, name: \"ساعة\", inStock: true },\n    { id: 2, name: \"نظارة\", inStock: true },\n    { id: 3, name: \"محفظة\", inStock: false }\n  ]));\n  else if (url === \"/api/cart\" && options.method === \"POST\")\n    resolve(reply({ message: `أضيف المنتج ${JSON.parse(options.body).productId} إلى السلة` }));\n  else resolve({ ok: false, status: 404, json: async () => ({}) });\n}, 100));\n// --------------------------------\n\nasync function loadCatalog() {\n  const response = await fetch(\"/api/products\");\n  const products = await response.json();\n  console.log(products.length);\n\n  const available = products.filter(p => p.inStock).map(p => p.name);\n  console.log(available.join(\"، \"));\n\n  const cartResponse = await fetch(\"/api/cart\", {\n    method: \"POST\",\n    headers: { \"Content-Type\": \"application/json\" },\n    body: JSON.stringify({ productId: 2 })\n  });\n  const result = await cartResponse.json();\n  console.log(result.message);\n}\n\nloadCatalog();"
+   },
+   "quiz": [
+    {
+     "q": "لماذا نكتب <code dir=\"ltr\">await</code> مرتين: مع <code dir=\"ltr\">fetch</code> ومع <code dir=\"ltr\">response.json()</code>؟",
+     "o": [
+      "لأن كلتيهما عمليتان غير متزامنتين تُرجعان وعداً",
+      "لأن الأولى لا تعمل دون الثانية",
+      "خطأ، await واحدة تكفي"
+     ],
+     "a": 0,
+     "why": "fetch تنتظر وصول الاستجابة، و json() تنتظر قراءة الجسم وتحويله."
+    },
+    {
+     "q": "أي نوع طلب نستخدم لإنشاء حساب جديد على الخادم؟",
+     "o": [
+      "GET",
+      "POST",
+      "DELETE"
+     ],
+     "a": 1,
+     "why": "POST لإنشاء موارد جديدة، و GET للقراءة فقط."
+    },
+    {
+     "q": "لماذا نستخدم <code dir=\"ltr\">JSON.stringify</code> مع <code dir=\"ltr\">body</code> في طلب POST؟",
+     "o": [
+      "لتشفير البيانات",
+      "لأن جسم الطلب يجب أن يكون نصاً",
+      "لتسريع الإرسال"
+     ],
+     "a": 1,
+     "why": "fetch ترسل الجسم كنص، فنحوّل الكائن إلى JSON."
+    }
+   ]
+  },
+  {
+   "body": "<h2>الشبكة لا تُعتمد عليها دائماً</h2>\n<p>الإنترنت ينقطع، والخوادم تتعطل، والروابط تتغير. التطبيق الاحترافي <strong>يتوقع الفشل</strong> ويتعامل معه بلطف، بدلاً من أن يتجمد أو يعرض شاشة فارغة.</p>\n<h2>نوعان من الفشل</h2>\n<p>هذه نقطة يخطئ فيها كثير من المطورين:</p>\n<div class=\"table-wrap\"><table><thead><tr><th>الحالة</th><th>ماذا تفعل <code dir=\"ltr\">fetch</code></th></tr></thead><tbody><tr><td>انقطاع الإنترنت أو الخادم لا يرد</td><td><strong>ترفض</strong> الوعد، فينتقل التنفيذ إلى <code dir=\"ltr\">catch</code></td></tr><tr><td>الخادم رد بخطأ (404 أو 500)</td><td><strong>لا ترفض!</strong> يتحقق الوعد عادياً لكن <code dir=\"ltr\">response.ok</code> تكون <code dir=\"ltr\">false</code></td></tr></tbody></table></div>\n<div class=\"callout warn\">⚠️ <code dir=\"ltr\">fetch</code> لا تعتبر رمز 404 أو 500 خطأ، لأن الخادم ردّ فعلاً. يجب أن تفحص <code dir=\"ltr\">response.ok</code> بنفسك.</div>\n<h2>النمط الصحيح</h2>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>// خادم محاكي للتجربة\nconst fetch = url =&gt; new Promise((resolve, reject) =&gt; setTimeout(() =&gt; {\n  if (url === &quot;/offline&quot;) reject(new TypeError(&quot;Failed to fetch&quot;));\n  else if (url === &quot;/missing&quot;) resolve({ ok: false, status: 404 });\n  else resolve({ ok: true, status: 200, json: async () =&gt; ({ name: &quot;بيانات&quot; }) });\n}, 50));\n\nasync function getData(url) {\n  try {\n    const response = await fetch(url);\n    if (!response.ok) {\n      throw new Error(`خطأ من الخادم: ${response.status}`);\n    }\n    const data = await response.json();\n    console.log(`نجاح: ${data.name}`);\n  } catch (error) {\n    console.log(`تعذر التحميل (${error.message})`);\n  }\n}\n\ngetData(&quot;/ok&quot;)\n  .then(() =&gt; getData(&quot;/missing&quot;))\n  .then(() =&gt; getData(&quot;/offline&quot;));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>نجاح: بيانات\nتعذر التحميل (خطأ من الخادم: 404)\nتعذر التحميل (Failed to fetch)</code></pre></div>\n<p>نرمي خطأ بأنفسنا بـ <code dir=\"ltr\">throw</code> عندما يكون <code dir=\"ltr\">response.ok</code> خاطئاً، فيصل إلى نفس <code dir=\"ltr\">catch</code> التي تعالج انقطاع الشبكة. هكذا نتعامل مع كل أنواع الفشل في مكان واحد.</p>\n<h2>إعادة المحاولة</h2>\n<p>بعض الأخطاء مؤقتة. يمكننا إعادة المحاولة عدة مرات قبل الاستسلام:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>let calls = 0;\nconst unstableServer = () =&gt; new Promise((resolve, reject) =&gt; {\n  calls++;\n  setTimeout(() =&gt; (calls &lt; 3 ? reject(new Error(&quot;timeout&quot;)) : resolve(&quot;البيانات&quot;)), 50);\n});\n\nasync function withRetry(fn, attempts = 3) {\n  for (let i = 1; i &lt;= attempts; i++) {\n    try {\n      return await fn();\n    } catch (error) {\n      console.log(`المحاولة ${i} فشلت`);\n      if (i === attempts) throw error;\n    }\n  }\n}\n\nwithRetry(unstableServer).then(data =&gt; console.log(`نجحت: ${data}`));</code></pre></div>\n<div class=\"code-block out\"><span class=\"code-label\">المخرجات</span><pre dir=\"ltr\"><code>المحاولة 1 فشلت\nالمحاولة 2 فشلت\nنجحت: البيانات</code></pre></div>\n<h2>تجربة المستخدم أثناء التحميل والخطأ</h2>\n<p>التعامل مع الأخطاء ليس تقنياً فقط، بل هو تجربة مستخدم:</p>\n<ul><li><strong>أثناء التحميل:</strong> اعرض مؤشراً مثل &quot;جاري التحميل...&quot; وعطّل زر الإرسال حتى لا يُضغط مرتين.</li><li><strong>عند الخطأ:</strong> رسالة واضحة بلغة المستخدم، وليس <code dir=\"ltr\">TypeError: Failed to fetch</code>، مع زر &quot;إعادة المحاولة&quot;.</li><li><strong>عند النجاح بلا بيانات:</strong> رسالة مثل &quot;لا توجد منتجات بعد&quot; بدلاً من صفحة فارغة.</li></ul>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>async function loadComments() {\n  const status = document.querySelector(&quot;#status&quot;);\n  const button = document.querySelector(&quot;#reload&quot;);\n  status.textContent = &quot;جاري التحميل...&quot;;\n  button.disabled = true;\n  try {\n    const response = await fetch(&quot;/api/comments&quot;);\n    if (!response.ok) throw new Error(response.status);\n    const comments = await response.json();\n    status.textContent = comments.length ? &quot;&quot; : &quot;لا توجد تعليقات بعد&quot;;\n    // ... عرض التعليقات\n  } catch {\n    status.textContent = &quot;تعذر تحميل التعليقات. تحقق من اتصالك وحاول مجدداً.&quot;;\n  } finally {\n    button.disabled = false;\n  }\n}</code></pre></div>\n<h2>إلغاء الطلبات البطيئة</h2>\n<p>بـ <code dir=\"ltr\">AbortController</code> يمكنك إلغاء طلب أخذ وقتاً أطول من اللازم:</p>\n<div class=\"code-block src\"><span class=\"code-label\">JavaScript</span><pre dir=\"ltr\"><code>const controller = new AbortController();\nsetTimeout(() =&gt; controller.abort(), 5000);\nconst response = await fetch(url, { signal: controller.signal });</code></pre></div>\n<h2>ملخص الدرس</h2>\n<ul><li><code dir=\"ltr\">fetch</code> ترفض عند فشل الشبكة فقط، أما 404 و 500 فيجب فحصها بـ <code dir=\"ltr\">response.ok</code>.</li><li>ارمِ خطأ بـ <code dir=\"ltr\">throw</code> عند <code dir=\"ltr\">!response.ok</code> لتعالج كل الأخطاء في <code dir=\"ltr\">catch</code> واحدة.</li><li>أعد المحاولة للأخطاء المؤقتة.</li><li>اهتم بتجربة المستخدم: مؤشر تحميل، ورسائل واضحة، و <code dir=\"ltr\">finally</code> لإعادة الواجهة لحالتها.</li></ul>",
+   "exercise": {
+    "prompt": "<p>اكتب دالة <code dir=\"ltr\">async</code> اسمها <code dir=\"ltr\">getWeather(city)</code> تستخدم الخادم المحاكي:</p>\n<ul><li>إذا نجح الطلب، تطبع <code dir=\"ltr\">الطقس في X: N°</code>.</li><li>إذا رد الخادم بـ <code dir=\"ltr\">ok: false</code>، تطبع <code dir=\"ltr\">المدينة غير موجودة (404)</code> مستخدمة <code dir=\"ltr\">status</code> من الاستجابة.</li><li>إذا فشل الاتصال كلياً، تطبع <code dir=\"ltr\">لا يوجد اتصال بالإنترنت</code>.</li></ul>\n<p>تلميح: فرّق بين الحالتين الأخيرتين برمي خطأ بنفسك وفحص <code dir=\"ltr\">error.message</code>، أو بمعالجة <code dir=\"ltr\">!response.ok</code> قبل <code dir=\"ltr\">catch</code>.</p>",
+    "starter": "// --- خادم محاكي (لا تعدّل) ---\nconst weatherApi = city => new Promise((resolve, reject) => setTimeout(() => {\n  const data = { \"الرياض\": 38, \"أبها\": 22 };\n  if (city === \"offline\") return reject(new TypeError(\"Failed to fetch\"));\n  if (city in data) resolve({ ok: true, status: 200, json: async () => ({ temp: data[city] }) });\n  else resolve({ ok: false, status: 404, json: async () => ({}) });\n}, 50));\n// --------------------------------\n\nasync function getWeather(city) {\n  // استخدم: const response = await weatherApi(city);\n}\n\ngetWeather(\"الرياض\")\n  .then(() => getWeather(\"لندن\"))\n  .then(() => getWeather(\"offline\"));",
+    "expected": "الطقس في الرياض: 38°\nالمدينة غير موجودة (404)\nلا يوجد اتصال بالإنترنت",
+    "solution": "// --- خادم محاكي (لا تعدّل) ---\nconst weatherApi = city => new Promise((resolve, reject) => setTimeout(() => {\n  const data = { \"الرياض\": 38, \"أبها\": 22 };\n  if (city === \"offline\") return reject(new TypeError(\"Failed to fetch\"));\n  if (city in data) resolve({ ok: true, status: 200, json: async () => ({ temp: data[city] }) });\n  else resolve({ ok: false, status: 404, json: async () => ({}) });\n}, 50));\n// --------------------------------\n\nasync function getWeather(city) {\n  try {\n    const response = await weatherApi(city);\n    if (!response.ok) {\n      console.log(`المدينة غير موجودة (${response.status})`);\n      return;\n    }\n    const data = await response.json();\n    console.log(`الطقس في ${city}: ${data.temp}°`);\n  } catch (error) {\n    console.log(\"لا يوجد اتصال بالإنترنت\");\n  }\n}\n\ngetWeather(\"الرياض\")\n  .then(() => getWeather(\"لندن\"))\n  .then(() => getWeather(\"offline\"));"
+   },
+   "quiz": [
+    {
+     "q": "ماذا تفعل <code dir=\"ltr\">fetch</code> عندما يرد الخادم برمز 404؟",
+     "o": [
+      "ترفض الوعد وتنتقل إلى catch",
+      "يتحقق الوعد عادياً لكن <code dir=\"ltr\">response.ok</code> تكون false",
+      "تعيد المحاولة تلقائياً"
+     ],
+     "a": 1,
+     "why": "fetch لا ترفض إلا عند فشل الاتصال نفسه."
+    },
+    {
+     "q": "أين نضع الكود الذي يعيد تفعيل زر الإرسال سواء نجح الطلب أو فشل؟",
+     "o": [
+      "في try",
+      "في catch",
+      "في finally"
+     ],
+     "a": 2,
+     "why": "finally تُنفَّذ في كل الحالات."
+    },
+    {
+     "q": "أي رسالة خطأ أفضل للمستخدم العادي؟",
+     "o": [
+      "<code dir=\"ltr\">TypeError: Failed to fetch</code>",
+      "<code dir=\"ltr\">تعذر تحميل البيانات. تحقق من اتصالك وحاول مجدداً.</code>",
+      "<code dir=\"ltr\">Error 500</code>"
+     ],
+     "a": 1,
+     "why": "الرسالة الجيدة واضحة بلغة المستخدم وتخبره بما يمكنه فعله."
+    }
+   ]
+  }
  ]
 ]);
