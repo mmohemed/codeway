@@ -16,7 +16,8 @@
         const data = await response.json().catch(() => ({}));
         if (!response.ok || !data.result) {
           // أخطاء الترجمة تصل في error بصيغة: path:line:col: Error: message
-          const msg = (data.error || data.message || `HTTP ${response.status}`)
+          const err = data.error;
+          const msg = String((err && (err.message || err)) || data.message || `HTTP ${response.status}`)
             .split("\n").filter(Boolean).slice(0, 6).join("\n");
           return done([{ kind: "err", text: "خطأ في كود Dart:\n" + msg }]);
         }

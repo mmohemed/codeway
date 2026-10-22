@@ -30,11 +30,16 @@ process.on("uncaughtException", e => { process.stdout.write("ERR: " + e.name + "
 process.on("unhandledRejection", e => { process.stdout.write("ERR: Uncaught (in promise) " + __fmt(e) + "\\n"); });
 `;
 
+// الكود يُكتب في ملف مؤقت (وليس وسيطاً في سطر الأوامر) لأن كود Dart المترجم قد يتجاوز حد 128KB للوسيط
 function runJs(code) {
+  const file = path.join(require("os").tmpdir(), `cw-run-${process.pid}.js`);
+  fs.writeFileSync(file, shim + "\n(0, eval)(" + JSON.stringify(code) + ");");
   try {
-    return execFileSync(process.execPath, ["-e", shim + "\n(0, eval)(" + JSON.stringify(code) + ");"], { timeout: 8000, encoding: "utf8" });
+    return execFileSync(process.execPath, [file], { timeout: 8000, encoding: "utf8" });
   } catch (e) {
-    return (e.stdout || "") + "ERR: " + (e.stderr || e.message).split("\n").find(l => /Error/.test(l));
+    return (e.stdout || "") + "ERR: " + String(e.stderr || e.message).split("\n").find(l => /Error/.test(l));
+  } finally {
+    fs.rmSync(file, { force: true });
   }
 }
 const norm = s => s.split("\n").map(x => x.trim()).join("\n").trim();
@@ -57,24 +62,33 @@ function runSql(code, setup) {
   return globalThis.CW.sqlFormat(tables) + (error ? "\nERR: " + error : "");
 }
 
+// Dart: نترجم إلى JavaScript بـ dart2js (نفس ما تفعله خدمة DartPad التي يستخدمها المتصفح)
+// ثم نشغّل الناتج، لأن مخرجات الويب قد تختلف عن Dart VM (مثلاً print(10.0) تطبع 10)
 const dartBin = process.env.DART || "dart";
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cw-dart-"));
-function runDart(code) {
-  const file = path.join(tmp, "main.dart");
+function compileDart(code) {
+  const file = path.join(tmp, "main.dart"), out = path.join(tmp, "main.js");
   fs.writeFileSync(file, code);
   try {
-    return execFileSync(dartBin, ["run", file], { timeout: 20000, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    execFileSync(dartBin, ["compile", "js", "-O1", "-o", out, file], { timeout: 60000, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    return { js: fs.readFileSync(out, "utf8") };
   } catch (e) {
-    return (e.stdout || "") + "ERR: " + String(e.stderr || e.message).split("\n").filter(Boolean).slice(0, 3).join(" ");
+    return { error: String(e.stdout || "") + String(e.stderr || e.message) };
   }
 }
+function runDart(code) {
+  const { js, error } = compileDart(code);
+  if (error) return "ERR: " + error.split("\n").filter(l => /Error/.test(l)).slice(0, 3).join(" ");
+  return runJs("globalThis.self = globalThis;\n" + js);
+}
+module.exports = { compileDart };
 
 const run = (code, setup) => runner === "sql" ? runSql(code, setup) : runner === "dart" ? runDart(code) : runJs(code);
 
 let fails = 0, checks = 0;
 const fail = (where, msg) => { fails++; console.log(`✗ ${where}\n  ${msg.replace(/\n/g, "\n  ")}`); };
 
-(async () => {
+if (require.main === module) (async () => {
   if (runner === "sql") SQL = await require("sql.js")();
 
   // --fill: يحسب المخرجات المكتوبة كـ "?" بتشغيل الكود فعلاً، ثم يكمل التحقق

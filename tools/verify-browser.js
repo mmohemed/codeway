@@ -17,6 +17,17 @@ require(path.resolve(__dirname, "..", "js", "content", course + ".js"));
 (async () => {
   const browser = await playwright.chromium.launch();
   const page = await browser.newPage();
+  // دورات Dart: نعترض طلبات خدمة الترجمة (DartPad) ونترجم محلياً بـ dart2js،
+  // فنختبر المسار الكامل في المتصفح (إرسال الكود ← JavaScript ← تشغيله في Worker) دون إنترنت
+  await page.route(/api\.dartpad\.dev/, async route => {
+    const { compileDart } = require("./verify.js");
+    const { js, error } = compileDart(JSON.parse(route.request().postData()).source);
+    await route.fulfill({
+      status: error ? 400 : 200, contentType: "application/json",
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify(error ? { error } : { result: js })
+    });
+  });
   const errors = [];
   page.on("pageerror", e => errors.push(e.message));
   let fails = 0, n = 0, domN = 0;

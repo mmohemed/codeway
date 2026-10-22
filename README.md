@@ -36,7 +36,10 @@ js/data/languages.js  اللغات ووحداتها ودروسها
 js/data/fields.js     الأدوات والمكتبات، ثم المجالات التي تجمعها
 js/data/paths.js      المسارات المهنية (خطوات بمعرّفات اللغات والأدوات)
 js/common.js          الترويسة والتذييل والبطاقات وتتبّع التقدّم
-js/runner.js          تشغيل JavaScript في Web Worker معزول مع مهلة 3 ثوانٍ
+js/runner.js          تشغيل JavaScript في Web Worker معزول مع مهلة
+js/sql-runner.js      تشغيل SQL بمحرك SQLite كامل في المتصفح (sql.js في js/vendor، يعمل دون إنترنت)
+js/dart-runner.js     تشغيل Dart عبر خدمة الترجمة الرسمية لـ DartPad (يحتاج إنترنت)
+js/content/           محتوى الدروس المولَّد لكل دورة
 js/*.js               سكربت لكل صفحة
 ```
 
@@ -53,6 +56,8 @@ js/*.js               سكربت لكل صفحة
 | الدورة | الحالة |
 |---|---|
 | JavaScript | ✅ مكتملة: 8 وحدات، 40 درساً، لكل درس شرح وأمثلة وتمرين مصحَّح تلقائياً واختبار |
+| SQL | ✅ مكتملة: 9 وحدات، 29 درساً، على قاعدة بيانات متجر مشتركة (`content/sql/setup.sql`) |
+| Dart | ✅ مكتملة: 5 وحدات، 15 درساً، تمهيداً لـ Flutter |
 | بقية الدورات | الهيكل جاهز والمحتوى قيد الإعداد |
 
 ### كتابة الدروس
@@ -60,7 +65,10 @@ js/*.js               سكربت لكل صفحة
 تُكتب الدروس في `content/<course>/m1.md` و `m2.md` ... (ملف لكل وحدة). الصيغة موثقة في أعلى `tools/build.py`. بعد الكتابة:
 
 ```bash
+npm install                              # مرة واحدة: sql.js لأداة التحقق
 node tools/verify.js javascript          # يشغّل كل مثال ويقارن مخرجاته، ويتحقق من حلول التمارين
+node tools/verify.js sql --fill          # --fill يحسب المخرجات المكتوبة كـ "?" بالتشغيل الفعلي (راجعها بعدها)
+DART=/path/to/dart node tools/verify.js dart   # Dart يتطلب Dart SDK، ويُترجم بـ dart2js كما في المتصفح
 python3 tools/build.py javascript        # يولّد js/content/javascript.js
 node tools/verify-browser.js javascript  # يختبر كل تمرين وأمثلة DOM في متصفح حقيقي (يتطلب Playwright)
 ```
@@ -69,7 +77,7 @@ node tools/verify-browser.js javascript  # يختبر كل تمرين وأمثل
 
 ## المرحلة القادمة
 
-- محتوى بقية الدورات، بدءاً بـ HTML/CSS و Python و SQL
+- محتوى بقية الدورات، بدءاً بـ HTML/CSS و Python
 - خادم خلفي للتسجيل وحفظ التقدّم (حالياً يُحفظ في المتصفح فقط)
 - تشغيل لغات غير JavaScript في المحرر، والمساعد الذكي، والشهادات، والدفع
 
