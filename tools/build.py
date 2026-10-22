@@ -53,14 +53,17 @@ def inline(text):
 def sql_result_html(text):
     """نتيجة استعلام SQL (أعمدة مفصولة بـ " | " ونتائج يفصلها سطر فارغ) كجداول HTML"""
     tables = []
-    for chunk in re.split(r"\n\s*\n", text.strip()):
+    # رسائل الخطأ المقصودة في الأمثلة تُعرض كتنبيه وليس كجدول
+    errors = [l[5:] for l in text.strip().split("\n") if l.startswith("ERR: ")]
+    text = "\n".join(l for l in text.strip().split("\n") if not l.startswith("ERR: "))
+    for chunk in re.split(r"\n\s*\n", text.strip()) if text.strip() else []:
         rows = [r.split(" | ") for r in chunk.split("\n")]
         head = "".join(f"<th>{html.escape(c)}</th>" for c in rows[0])
         body = "".join("<tr>" + "".join(f'<td class="{"null" if c == "NULL" else ""}">{html.escape(c)}</td>' for c in r) + "</tr>" for r in rows[1:])
         if not rows[1:]:
             body = f'<tr><td colspan="{len(rows[0])}" class="null">(لا توجد صفوف)</td></tr>'
         tables.append(f'<table class="res-table"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>')
-    return "".join(tables)
+    return "".join(tables) + "".join(f'<div class="sql-err" dir="ltr">⚠️ {html.escape(e)}</div>' for e in errors)
 
 
 def markdown(src):

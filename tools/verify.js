@@ -92,6 +92,9 @@ const fail = (where, msg) => { fails++; console.log(`✗ ${where}\n  ${msg.repla
         return chunk.replace(/^~~~expected\n\?\n~~~/m, () => "~~~expected\n" + out + "\n~~~");
       }).join("");
       if (text !== before) { fs.writeFileSync(p, text); console.log(`ملء المخرجات: ${file}`); }
+      // المخرجات التي فيها خطأ تحتاج مراجعة: هل الخطأ مقصود في الدرس أم المثال معطوب؟
+      const errs = (text.match(/^```output\n(?:(?!```)[\s\S])*?ERR:.*$/gm) || []);
+      errs.forEach(e => console.log(`⚠️ ${file}: مخرجات فيها خطأ، راجعها: ${e.split("\n").pop()}`));
     }
   }
 
