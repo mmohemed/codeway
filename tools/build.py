@@ -13,6 +13,10 @@
     ~~~expected       المخرجات المتوقعة من console.log (سطراً بسطر)
     ~~~solution       الحل النموذجي
     ~~~html           (اختياري) صفحة HTML يعمل عليها الكود في دروس DOM
+    ~~~setup          (اختياري، SQL) جداول خاصة بهذا التمرين بدل قاعدة الدورة المشتركة
+
+إعدادات الدورة في content/<course>/course.json، مثلاً:
+    {"runner": "sql", "setup": "setup.sql"}   أو   {"runner": "dart"}
 
     --- quiz
     ? السؤال
@@ -25,6 +29,7 @@
 import html
 import json
 import re
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -45,9 +50,23 @@ def inline(text):
     return "".join(out)
 
 
+def sql_result_html(text):
+    """نتيجة استعلام SQL (أعمدة مفصولة بـ " | " ونتائج يفصلها سطر فارغ) كجداول HTML"""
+    tables = []
+    for chunk in re.split(r"\n\s*\n", text.strip()):
+        rows = [r.split(" | ") for r in chunk.split("\n")]
+        head = "".join(f"<th>{html.escape(c)}</th>" for c in rows[0])
+        body = "".join("<tr>" + "".join(f'<td class="{"null" if c == "NULL" else ""}">{html.escape(c)}</td>' for c in r) + "</tr>" for r in rows[1:])
+        if not rows[1:]:
+            body = f'<tr><td colspan="{len(rows[0])}" class="null">(لا توجد صفوف)</td></tr>'
+        tables.append(f'<table class="res-table"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>')
+    return "".join(tables)
+
+
 def markdown(src):
     lines = src.strip("\n").split("\n")
     out, i = [], 0
+    prev_lang = None
     while i < len(lines):
         line = lines[i]
         if line.startswith("```"):
@@ -58,8 +77,14 @@ def markdown(src):
                 code.append(lines[i])
                 i += 1
             i += 1
-            label = {"js": "JavaScript", "html": "HTML", "css": "CSS", "text": "المخرجات", "output": "المخرجات", "js-error": "JavaScript"}.get(lang, lang)
+            label = {"js": "JavaScript", "html": "HTML", "css": "CSS", "text": "المخرجات", "output": "المخرجات", "js-error": "JavaScript",
+                     "sql": "SQL", "sql-error": "SQL", "dart": "Dart", "dart-error": "Dart"}.get(lang, lang)
             cls = "out" if lang in ("text", "output") else "src"
+            if lang == "output" and prev_lang == "sql":
+                out.append(f'<div class="code-block out sql-out"><span class="code-label">النتيجة</span><div class="table-wrap">{sql_result_html(chr(10).join(code))}</div></div>')
+                prev_lang = lang
+                continue
+            prev_lang = lang
             out.append(f'<div class="code-block {cls}"><span class="code-label">{label}</span><pre dir="ltr"><code>{html.escape(chr(10).join(code))}</code></pre></div>')
         elif line.startswith("### "):
             out.append(f"<h3>{inline(line[4:])}</h3>")
@@ -142,6 +167,21 @@ def parse_quiz(text):
     return qs
 
 
+def schema_html(setup):
+    """وصف جداول قاعدة البيانات (الأعمدة وعدد الصفوف) ليراه الطالب في تمارين SQL"""
+    db = sqlite3.connect(":memory:")
+    db.executescript(setup)
+    parts = []
+    tables = [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid")]
+    for t in tables:
+        cols = db.execute(f'PRAGMA table_info("{t}")').fetchall()
+        count = db.execute(f'SELECT COUNT(*) FROM "{t}"').fetchone()[0]
+        cols_txt = ", ".join(html.escape(c[1]) + (" 🔑" if c[5] else "") for c in cols)
+        parts.append(f'<div class="schema-table"><code dir="ltr"><b>{html.escape(t)}</b> ({cols_txt})</code> <span class="muted">· {count} صفوف</span></div>')
+    db.close()
+    return "".join(parts)
+
+
 def parse_lesson(src):
     parts = re.split(r"^--- (exercise|quiz)\s*$", src, flags=re.M)
     lesson = {"body": markdown(parts[0])}
@@ -151,6 +191,8 @@ def parse_lesson(src):
             for key in ("starter", "expected", "solution"):
                 assert key in blocks, f"التمرين ينقصه ~~~{key}"
             lesson["exercise"] = {"prompt": markdown(prompt), **blocks}
+            if "setup" in blocks:
+                lesson["exercise"]["schema"] = schema_html(blocks["setup"])
         else:
             lesson["quiz"] = parse_quiz(text)
     return lesson
@@ -167,7 +209,16 @@ def build(course):
     out = ROOT / "js" / "content" / f"{course}.js"
     out.parent.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(modules, ensure_ascii=False, indent=1)
-    out.write_text(f"// ملف مولَّد من content/{course} عبر tools/build.py، لا تعدّله يدوياً\nCW.registerContent({json.dumps(course)}, {payload});\n", encoding="utf-8")
+    # إعدادات الدورة: نوع المشغّل (js أو sql أو dart) وقاعدة البيانات المشتركة لتمارين SQL
+    meta = {"runner": "js"}
+    cfg = src_dir / "course.json"
+    if cfg.exists():
+        meta.update(json.loads(cfg.read_text(encoding="utf-8")))
+    if "setup" in meta:
+        meta["setup"] = (src_dir / meta["setup"]).read_text(encoding="utf-8")
+        meta["schema"] = schema_html(meta["setup"])
+    meta_json = json.dumps(meta, ensure_ascii=False)
+    out.write_text(f"// ملف مولَّد من content/{course} عبر tools/build.py، لا تعدّله يدوياً\nCW.registerContent({json.dumps(course)}, {payload}, {meta_json});\n", encoding="utf-8")
     total = sum(len(m) for m in modules)
     print(f"{course}: {len(modules)} وحدات، {total} درساً → {out.relative_to(ROOT)}")
 

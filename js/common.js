@@ -58,8 +58,9 @@
   // كل دورة لها ملف js/content/<id>.js يُحمَّل عند الحاجة فقط حتى يبقى الموقع سريعاً
   CW.content = {};
   // الدورات التي اكتمل محتوى دروسها (لها ملف في js/content)
-  CW.contentReady = ["javascript"];
-  CW.registerContent = (id, modules) => { CW.content[id] = modules; };
+  CW.contentReady = ["javascript", "sql", "dart"];
+  CW.contentMeta = {};
+  CW.registerContent = (id, modules, meta) => { CW.content[id] = modules; CW.contentMeta[id] = meta || {}; };
   CW.loadContent = (id, done) => {
     if (CW.content[id]) return done(CW.content[id]);
     const s = document.createElement("script");

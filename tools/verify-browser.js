@@ -28,7 +28,7 @@ require(path.resolve(__dirname, "..", "js", "content", course + ".js"));
       // أمثلة DOM في الشرح: كتلة HTML ثم JavaScript ثم المخرجات
       const domFails = await page.evaluate(() => new Promise(resolve => {
         const blocks = [...document.querySelectorAll(".prose .code-block")].map(b => ({
-          label: b.querySelector(".code-label").textContent, code: b.querySelector("code").textContent }));
+          label: b.querySelector(".code-label").textContent, code: (b.querySelector("code") || {}).textContent || "" }));
         const jobs = [];
         let html = "";
         blocks.forEach((b, i) => {

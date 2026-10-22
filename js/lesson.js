@@ -82,16 +82,22 @@
   // ---------- التمرين ----------
   function renderExercise(ex) {
     const box = document.getElementById("exercise");
-    const isDom = !!ex.html;
+    const meta = CW.contentMeta[c.id] || {};
+    const runner = meta.runner || "js";
+    const isDom = runner === "js" && !!ex.html;
+    const setup = ex.setup || meta.setup || "";
+    const fileName = { sql: "query.sql", dart: "main.dart" }[runner] || (isDom ? "script.js" : "exercise.js");
     const key = `cw-code-${c.id}-${m}-${l}`;
     const saved = CW.store.get(key, null);
     box.innerHTML = `
       <div class="exercise">
         <div class="prose">${ex.prompt}</div>
+        ${runner === "sql" && meta.schema ? `<details class="acc schema-box"><summary>📋 جداول قاعدة البيانات في هذا التمرين</summary><div class="acc-body">${ex.schema || meta.schema}</div></details>` : ""}
+        ${runner === "dart" ? `<p class="muted net-note">🌐 تشغيل Dart يتم عبر خدمة الترجمة الرسمية لـ DartPad، لذلك يحتاج اتصالاً بالإنترنت.</p>` : ""}
         <div class="editor">
           <div class="editor-bar">
             <span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>
-            <span class="file">${isDom ? "script.js" : "exercise.js"}</span>
+            <span class="file">${fileName}</span>
             <span class="editor-actions">
               <button class="btn btn-sm btn-dark" id="ex-reset" title="إرجاع الكود الأصلي">↺</button>
               <button class="btn btn-sm btn-dark" id="ex-run">▶ تشغيل</button>
@@ -118,12 +124,15 @@
     const execute = done => {
       out.innerHTML = '<span class="hint">جاري التشغيل...</span>';
       const finish = lines => { CW.renderOutput(out, lines); done && done(lines); };
-      isDom ? CW.runDOM(ta.value, ex.html, document.getElementById("ex-preview"), finish) : CW.runJS(ta.value, finish);
+      if (runner === "sql") CW.runSQL(ta.value, setup, finish);
+      else if (runner === "dart") CW.runDart(ta.value, finish);
+      else if (isDom) CW.runDOM(ta.value, ex.html, document.getElementById("ex-preview"), finish);
+      else CW.runJS(ta.value, finish);
     };
     const norm = s => s.split("\n").map(x => x.trim()).join("\n").trim();
     const check = () => execute(lines => {
       const errors = lines.filter(x => x.kind === "err");
-      const got = norm(lines.filter(x => x.kind !== "err").map(x => x.text).join("\n"));
+      const got = norm(lines.filter(x => x.kind !== "err" && x.kind !== "info").map(x => x.text).join(runner === "sql" ? "\n\n" : "\n"));
       const want = norm(ex.expected);
       if (!errors.length && got === want) {
         result.innerHTML = `<div class="result ok">🎉 أحسنت! حلّك صحيح، وتم تسجيل الدرس كمنجز.</div>`;

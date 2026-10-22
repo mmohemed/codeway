@@ -121,9 +121,15 @@ CW.runDOM = function (code, pageHtml, container, onDone) {
 };
 
 // ربط محرر بسيط (textarea + زر + منطقة مخرجات) كما في الصفحة الرئيسية
+// نتائج SQL تُعرض كجداول، وبقية المخرجات كأسطر نصية
+const renderTable = t => `<table class="out-table"><thead><tr>${t.columns.map(c => `<th>${CW.esc(c)}</th>`).join("")}</tr></thead><tbody>${
+  t.rows.length ? t.rows.map(r => `<tr>${r.map(v => `<td class="${v === null ? "null" : ""}">${CW.esc(v === null ? "NULL" : v)}</td>`).join("")}</tr>`).join("")
+  : `<tr><td colspan="${t.columns.length}" class="null">(لا توجد صفوف)</td></tr>`}</tbody></table>`;
+
 CW.renderOutput = (output, lines) => {
   output.innerHTML = lines.length
-    ? lines.map(l => `<div class="${l.kind === "err" ? "err" : ""}">${CW.esc(l.text)}</div>`).join("")
+    ? lines.map(l => l.kind === "table" ? renderTable(l.table)
+      : `<div class="${l.kind === "err" ? "err" : l.kind === "info" ? "hint" : ""}">${CW.esc(l.text)}</div>`).join("")
     : '<span class="hint">لا توجد مخرجات. استخدم console.log لطباعة النتائج.</span>';
 };
 

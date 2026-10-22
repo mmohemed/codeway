@@ -1662,4 +1662,4 @@ CW.registerContent("javascript", [
    ]
   }
  ]
-]);
+], {"runner": "js"});
