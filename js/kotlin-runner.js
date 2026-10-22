@@ -38,7 +38,7 @@
         const compileErrors = Object.values(data.errors || {}).flat().filter(e => e.severity === "ERROR");
         if (compileErrors.length) {
           return done([{ kind: "err", text: "خطأ في كود Kotlin:\n" + compileErrors.map(e =>
-            `سطر ${e.interval && e.interval.start ? e.interval.start.line + 1 : "?"}: ${e.message}`).join("\n") }]);
+            `line ${e.interval && e.interval.start ? e.interval.start.line + 1 : "?"}: ${e.message}`).join("\n") }]);
         }
         const lines = parseText(data.text);
         if (data.exception) {

@@ -39,6 +39,8 @@ js/common.js          الترويسة والتذييل والبطاقات وت�
 js/runner.js          تشغيل JavaScript في Web Worker معزول مع مهلة
 js/sql-runner.js      تشغيل SQL بمحرك SQLite كامل في المتصفح (sql.js في js/vendor، يعمل دون إنترنت)
 js/dart-runner.js     تشغيل Dart عبر خدمة الترجمة الرسمية لـ DartPad (يحتاج إنترنت)
+js/ts-runner.js       فحص أنواع TypeScript وتحويلها بالمترجم الرسمي في المتصفح (js/vendor، يعمل دون إنترنت)
+js/kotlin-runner.js   تشغيل Kotlin عبر خدمة Kotlin Playground الرسمية من JetBrains (يحتاج إنترنت)
 js/content/           محتوى الدروس المولَّد لكل دورة
 js/*.js               سكربت لكل صفحة
 ```
@@ -58,6 +60,8 @@ js/*.js               سكربت لكل صفحة
 | JavaScript | ✅ مكتملة: 8 وحدات، 40 درساً، لكل درس شرح وأمثلة وتمرين مصحَّح تلقائياً واختبار |
 | SQL | ✅ مكتملة: 9 وحدات، 29 درساً، على قاعدة بيانات متجر مشتركة (`content/sql/setup.sql`) |
 | Dart | ✅ مكتملة: 5 وحدات، 15 درساً، تمهيداً لـ Flutter |
+| TypeScript | ✅ مكتملة: 8 وحدات، 28 درساً، وأخطاء الأنواع تظهر في المحرر كما في VS Code |
+| Kotlin | ✅ مكتملة: 6 وحدات، 19 درساً، تمهيداً لتطوير Android |
 | بقية الدورات | الهيكل جاهز والمحتوى قيد الإعداد |
 
 ### كتابة الدروس
@@ -69,6 +73,9 @@ npm install                              # مرة واحدة: sql.js لأداة 
 node tools/verify.js javascript          # يشغّل كل مثال ويقارن مخرجاته، ويتحقق من حلول التمارين
 node tools/verify.js sql --fill          # --fill يحسب المخرجات المكتوبة كـ "?" بالتشغيل الفعلي (راجعها بعدها)
 DART=/path/to/dart node tools/verify.js dart   # Dart يتطلب Dart SDK، ويُترجم بـ dart2js كما في المتصفح
+node tools/verify.js typescript          # بنفس مترجم TypeScript الذي يعمل في المتصفح
+KOTLIN_LIB=/path/to/jars node tools/verify.js kotlin   # مجلد فيه kotlin-compiler-embeddable و kotlin-stdlib و kotlinx-coroutines
+node tools/vendor-ts.js                  # عند تحديث إصدار TypeScript: يعيد توليد js/vendor/typescript.min.js و ts-libs.js
 python3 tools/build.py javascript        # يولّد js/content/javascript.js
 node tools/verify-browser.js javascript  # يختبر كل تمرين وأمثلة DOM في متصفح حقيقي (يتطلب Playwright)
 ```

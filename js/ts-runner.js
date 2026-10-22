@@ -57,7 +57,7 @@ declare function structuredClone<T>(value: T): T;
     return { js, errors };
   };
 
-  CW.tsErrorText = errors => errors.map(e => `سطر ${e.line}: ${e.message}`).join("\n");
+  CW.tsErrorText = errors => errors.map(e => `line ${e.line}: ${e.message}`).join("\n");
 
   if (typeof document === "undefined") return;
 

@@ -140,7 +140,7 @@ function runKotlinRaw(code) {
 }
 function runKotlin(code) {
   const r = runKotlinRaw(code);
-  if (r.errors.length) return "ERR: " + r.errors.map(e => `سطر ${e.line}: ${e.message}`).join(" | ");
+  if (r.errors.length) return "ERR: " + r.errors.map(e => `line ${e.line}: ${e.message}`).join(" | ");
   return r.stdout + (r.exception ? `ERR: Exception: ${r.exception.fullName}${r.exception.message ? ": " + r.exception.message : ""}` : "");
 }
 
