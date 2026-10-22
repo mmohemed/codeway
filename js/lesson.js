@@ -86,7 +86,7 @@
     const runner = meta.runner || "js";
     const isDom = runner === "js" && !!ex.html;
     const setup = ex.setup || meta.setup || "";
-    const fileName = { sql: "query.sql", dart: "main.dart" }[runner] || (isDom ? "script.js" : "exercise.js");
+    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt" }[runner] || (isDom ? "script.js" : "exercise.js");
     const key = `cw-code-${c.id}-${m}-${l}`;
     const saved = CW.store.get(key, null);
     box.innerHTML = `
@@ -94,6 +94,7 @@
         <div class="prose">${ex.prompt}</div>
         ${runner === "sql" && meta.schema ? `<details class="acc schema-box"><summary>📋 جداول قاعدة البيانات في هذا التمرين</summary><div class="acc-body">${ex.schema || meta.schema}</div></details>` : ""}
         ${runner === "dart" ? `<p class="muted net-note">🌐 تشغيل Dart يتم عبر خدمة الترجمة الرسمية لـ DartPad، لذلك يحتاج اتصالاً بالإنترنت.</p>` : ""}
+        ${runner === "kotlin" ? `<p class="muted net-note">🌐 تشغيل Kotlin يتم عبر خدمة Kotlin Playground الرسمية من JetBrains، لذلك يحتاج اتصالاً بالإنترنت، وقد يستغرق ثوانيَ قليلة.</p>` : ""}
         <div class="editor">
           <div class="editor-bar">
             <span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>
@@ -126,6 +127,8 @@
       const finish = lines => { CW.renderOutput(out, lines); done && done(lines); };
       if (runner === "sql") CW.runSQL(ta.value, setup, finish);
       else if (runner === "dart") CW.runDart(ta.value, finish);
+      else if (runner === "ts") CW.runTS(ta.value, finish);
+      else if (runner === "kotlin") CW.runKotlin(ta.value, finish);
       else if (isDom) CW.runDOM(ta.value, ex.html, document.getElementById("ex-preview"), finish);
       else CW.runJS(ta.value, finish);
     };

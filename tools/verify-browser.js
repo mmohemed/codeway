@@ -28,6 +28,25 @@ require(path.resolve(__dirname, "..", "js", "content", course + ".js"));
       body: JSON.stringify(error ? { error } : { result: js })
     });
   });
+  // دورات Kotlin: نحاكي خدمة Kotlin Playground بترجمة وتشغيل محليين على JVM، بنفس صيغة استجابتها
+  await page.route(/api\.kotlinlang\.org\/versions/, route => route.fulfill({
+    status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" },
+    body: JSON.stringify([{ version: "2.4.21", latestStable: true }])
+  }));
+  await page.route(/api\.kotlinlang\.org\/api\/.*\/compiler\/run/, async route => {
+    const { runKotlinRaw } = require("./verify.js");
+    const code = JSON.parse(route.request().postData()).files[0].text;
+    const r = runKotlinRaw(code);
+    const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    await route.fulfill({
+      status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({
+        errors: { "File.kt": r.errors.map(e => ({ interval: { start: { line: e.line - 1, ch: 0 }, end: { line: e.line - 1, ch: 0 } }, message: e.message, severity: "ERROR" })) },
+        exception: r.exception,
+        text: r.stdout ? `<outStream>${esc(r.stdout)}</outStream>` : ""
+      })
+    });
+  });
   const errors = [];
   page.on("pageerror", e => errors.push(e.message));
   let fails = 0, n = 0, domN = 0;

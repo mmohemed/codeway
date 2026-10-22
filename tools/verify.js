@@ -6,7 +6,9 @@
 // تمارين DOM (التي فيها ~~~html) تُختبر في المتصفح عبر tools/verify-browser.js
 // دورات SQL تُشغَّل بمحرك sql.js نفسه الذي يعمل في المتصفح (npm install)،
 // ودورات Dart تُشغَّل بـ Dart SDK حقيقي (الأمر dart في PATH أو المتغير DART)
-// الاستخدام: node tools/verify.js javascript | sql | dart
+// ودورات TypeScript تُفحص أنواعها بمترجم typescript نفسه الذي يعمل في المتصفح (npm install)،
+// ودورات Kotlin تُترجم وتُشغَّل على JVM حقيقي (المتغير KOTLIN_LIB: مجلد jars المترجم و stdlib)
+// الاستخدام: node tools/verify.js javascript | sql | dart | typescript | kotlin
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
@@ -50,7 +52,7 @@ const dir = path.join(__dirname, "..", "content", course);
 const cfgPath = path.join(dir, "course.json");
 const cfg = fs.existsSync(cfgPath) ? JSON.parse(fs.readFileSync(cfgPath, "utf8")) : {};
 const runner = cfg.runner || "js";
-const lang = { js: "js", sql: "sql", dart: "dart" }[runner];
+const lang = { js: "js", sql: "sql", dart: "dart", ts: "ts", kotlin: "kotlin" }[runner];
 const courseSetup = cfg.setup ? fs.readFileSync(path.join(dir, cfg.setup), "utf8") : "";
 
 // ---------- مشغّلات اللغات ----------
@@ -81,9 +83,70 @@ function runDart(code) {
   if (error) return "ERR: " + error.split("\n").filter(l => /Error/.test(l)).slice(0, 3).join(" ");
   return runJs("globalThis.self = globalThis;\n" + js);
 }
-module.exports = { compileDart };
 
-const run = (code, setup) => runner === "sql" ? runSql(code, setup) : runner === "dart" ? runDart(code) : runJs(code);
+// TypeScript: نفس دالة الفحص والتحويل المستخدمة في المتصفح
+require(path.join(__dirname, "..", "js", "ts-runner.js"));
+let tsLibs = null;
+function runTs(code) {
+  const ts = require("typescript");
+  if (!tsLibs) {
+    const ctx = {};
+    ctx.window = ctx; // كما في المتصفح: window هو الكائن العام نفسه
+    require("vm").runInNewContext(fs.readFileSync(path.join(__dirname, "..", "js", "vendor", "ts-libs.js"), "utf8"), ctx);
+    tsLibs = ctx.CW.tsLibs;
+  }
+  const { js, errors } = globalThis.CW.tsCompile(ts, tsLibs, code);
+  if (errors.length) return "ERR: " + globalThis.CW.tsErrorText(errors).split("\n").join(" | ");
+  return runJs(js);
+}
+
+// Kotlin: ترجمة وتشغيل على JVM، مع ذاكرة مؤقتة للنتائج لأن كل ترجمة تأخذ ثوانيَ
+const crypto = require("crypto");
+const cacheDir = path.join(os.tmpdir(), "cw-kotlin-cache");
+fs.mkdirSync(cacheDir, { recursive: true });
+function runKotlinRaw(code) {
+  const lib = process.env.KOTLIN_LIB;
+  if (!lib) throw new Error("حدد مجلد مكتبات Kotlin في المتغير KOTLIN_LIB");
+  const key = path.join(cacheDir, crypto.createHash("sha1").update(code).digest("hex") + ".json");
+  if (fs.existsSync(key)) return JSON.parse(fs.readFileSync(key, "utf8"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "cw-kt-"));
+  const java = ["-Dfile.encoding=UTF-8", "-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8"];
+  const jars = fs.readdirSync(lib).filter(f => f.endsWith(".jar"));
+  const runtimeCp = jars.filter(f => /^kotlin-stdlib|^kotlinx-coroutines/.test(f)).map(f => path.join(lib, f)).join(":");
+  fs.writeFileSync(path.join(dir, "File.kt"), code);
+  const result = { stdout: "", errors: [], exception: null };
+  try {
+    execFileSync("java", [...java, "-cp", path.join(lib, "*"), "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler",
+      path.join(dir, "File.kt"), "-d", path.join(dir, "out"), "-no-stdlib", "-cp", runtimeCp, "-nowarn"],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 120000 });
+  } catch (e) {
+    for (const m of String(e.stderr || "").matchAll(/File\.kt:(\d+):\d+: error: (.*)/g)) result.errors.push({ line: +m[1], message: m[2] });
+    if (!result.errors.length) result.errors.push({ line: 0, message: String(e.stderr || e.message).split("\n")[0] });
+  }
+  if (!result.errors.length) {
+    try {
+      result.stdout = execFileSync("java", [...java, "-cp", path.join(dir, "out") + ":" + runtimeCp, "FileKt"],
+        { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 30000 });
+    } catch (e) {
+      result.stdout = String(e.stdout || "");
+      const line = String(e.stderr || "").split("\n").find(l => /Exception|Error/.test(l)) || "";
+      const m = line.match(/(?:Exception in thread "main" )?([\w.$]+)(?::\s*(.*))?/);
+      result.exception = { fullName: m ? m[1] : line, message: m && m[2] ? m[2] : null };
+    }
+  }
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.writeFileSync(key, JSON.stringify(result));
+  return result;
+}
+function runKotlin(code) {
+  const r = runKotlinRaw(code);
+  if (r.errors.length) return "ERR: " + r.errors.map(e => `سطر ${e.line}: ${e.message}`).join(" | ");
+  return r.stdout + (r.exception ? `ERR: Exception: ${r.exception.fullName}${r.exception.message ? ": " + r.exception.message : ""}` : "");
+}
+
+module.exports = { compileDart, runKotlinRaw };
+
+const run = (code, setup) => ({ sql: () => runSql(code, setup), dart: () => runDart(code), ts: () => runTs(code), kotlin: () => runKotlin(code) }[runner] || (() => runJs(code)))();
 
 let fails = 0, checks = 0;
 const fail = (where, msg) => { fails++; console.log(`✗ ${where}\n  ${msg.replace(/\n/g, "\n  ")}`); };

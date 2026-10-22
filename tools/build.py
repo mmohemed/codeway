@@ -81,10 +81,20 @@ def markdown(src):
                 i += 1
             i += 1
             label = {"js": "JavaScript", "html": "HTML", "css": "CSS", "text": "المخرجات", "output": "المخرجات", "js-error": "JavaScript",
-                     "sql": "SQL", "sql-error": "SQL", "dart": "Dart", "dart-error": "Dart"}.get(lang, lang)
+                     "sql": "SQL", "sql-error": "SQL", "dart": "Dart", "dart-error": "Dart",
+                     "ts": "TypeScript", "ts-error": "TypeScript", "kotlin": "Kotlin", "kotlin-error": "Kotlin"}.get(lang, lang)
             cls = "out" if lang in ("text", "output") else "src"
             if lang == "output" and prev_lang == "sql":
                 out.append(f'<div class="code-block out sql-out"><span class="code-label">النتيجة</span><div class="table-wrap">{sql_result_html(chr(10).join(code))}</div></div>')
+                prev_lang = lang
+                continue
+            # أخطاء مقصودة في المخرجات (مثل أخطاء الأنواع) تُعرض كتنبيه تحت الكود
+            if lang == "output" and any(l.startswith("ERR: ") for l in code):
+                ok = [l for l in code if not l.startswith("ERR: ")]
+                errs = [e.strip() for l in code if l.startswith("ERR: ") for e in l[5:].split(" | ")]
+                body = f'<pre dir="ltr"><code>{html.escape(chr(10).join(ok))}</code></pre>' if ok else ""
+                err_html = "".join(f'<div class="sql-err" dir="ltr">⚠️ {html.escape(e)}</div>' for e in errs)
+                out.append(f'<div class="code-block out"><span class="code-label">{label}</span>{body}<div class="out-errs">{err_html}</div></div>')
                 prev_lang = lang
                 continue
             prev_lang = lang
