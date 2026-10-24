@@ -158,6 +158,11 @@ if (require.main === module) (async () => {
     console.log(r.fails ? `\n${r.fails} مشكلة من ${r.checks} فحصاً` : `✓ ${r.checks} فحصاً ناجحاً في ${course}`);
     process.exit(r.fails ? 1 : 0);
   }
+  if (runner === "next") {
+    const r = await require("./verify-next.js")(dir, process.argv.includes("--fill"));
+    console.log(r.fails ? `\n${r.fails} مشكلة من ${r.checks} فحصاً` : `✓ ${r.checks} فحصاً ناجحاً في ${course}`);
+    process.exit(r.fails ? 1 : 0);
+  }
   if (runner === "tailwind") {
     const r = await require("./verify-tw.js")(dir, process.argv.includes("--fill"));
     console.log(r.fails ? `\n${r.fails} مشكلة من ${r.checks} فحصاً` : `✓ ${r.checks} فحصاً ناجحاً في ${course}`);

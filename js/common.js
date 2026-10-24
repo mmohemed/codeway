@@ -58,7 +58,7 @@
   // كل دورة لها ملف js/content/<id>.js يُحمَّل عند الحاجة فقط حتى يبقى الموقع سريعاً
   CW.content = {};
   // الدورات التي اكتمل محتوى دروسها (لها ملف في js/content)
-  CW.contentReady = ["javascript", "sql", "dart", "typescript", "kotlin", "git", "vite", "tailwind"];
+  CW.contentReady = ["javascript", "sql", "dart", "typescript", "kotlin", "git", "vite", "tailwind", "nextjs"];
   CW.contentMeta = {};
   CW.registerContent = (id, modules, meta) => { CW.content[id] = modules; CW.contentMeta[id] = meta || {}; };
   CW.loadContent = (id, done) => {

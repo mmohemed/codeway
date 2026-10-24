@@ -42,6 +42,7 @@ js/dart-runner.js     تشغيل Dart عبر خدمة الترجمة الرسم�
 js/ts-runner.js       فحص أنواع TypeScript وتحويلها بالمترجم الرسمي في المتصفح (js/vendor، يعمل دون إنترنت)
 js/kotlin-runner.js   تشغيل Kotlin عبر خدمة Kotlin Playground الرسمية من JetBrains (يحتاج إنترنت)
 js/git-sim.js         طرفية محاكاة لـ Git و GitHub CLI وأوامر الملفات، بمخرجات مطابقة للأدوات الحقيقية
+js/next-sim.js        محاكي Next.js (App Router): توجيه بالملفات ومكونات خادم وعميل و Server Actions و Route Handlers وتخزين مؤقت
 js/tw-runner.js       معاينة Tailwind الحقيقي (js/vendor/tailwind-src.js) في إطار معزول، مع فحص للأنماط المحسوبة
 js/npm-sim.js         امتداد الطرفية: npm و node و Vite، و ESLint و Prettier الحقيقيان (js/vendor، يُحمَّلان عند الحاجة)
 js/content/           محتوى الدروس المولَّد لكل دورة
@@ -65,6 +66,7 @@ js/*.js               سكربت لكل صفحة
 | Dart | ✅ مكتملة: 5 وحدات، 15 درساً، تمهيداً لـ Flutter |
 | TypeScript | ✅ مكتملة: 8 وحدات، 28 درساً، وأخطاء الأنواع تظهر في المحرر كما في VS Code |
 | Kotlin | ✅ مكتملة: 6 وحدات، 19 درساً، تمهيداً لتطوير Android |
+| Next.js | ✅ مكتملة: 5 وحدات، 15 درساً، الفحص يزور صفحات تطبيق الطالب ويتفاعل معها ويبني جدول next build |
 | Tailwind CSS | ✅ مكتملة: 3 وحدات، 8 دروس، كل مثال بمعاينة حية، والتصحيح يقارن الأنماط المحسوبة فعلاً |
 | Vite و npm | ✅ مكتملة: 3 وحدات، 8 دروس: package.json والحزم والسكربتات، ومشاريع Vite والبناء، و ESLint و Prettier |
 | Git و GitHub | ✅ مكتملة: 4 وحدات، 14 درساً، تمارينها في طرفية محاكاة (فروع ودمج وتعارضات و Pull Requests و Issues) |

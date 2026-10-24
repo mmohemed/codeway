@@ -107,7 +107,7 @@ def markdown(src):
             label = {"js": "JavaScript", "html": "HTML", "css": "CSS", "text": "المخرجات", "output": "المخرجات", "js-error": "JavaScript",
                      "sql": "SQL", "sql-error": "SQL", "dart": "Dart", "dart-error": "Dart",
                      "ts": "TypeScript", "ts-error": "TypeScript", "kotlin": "Kotlin", "kotlin-error": "Kotlin",
-                     "bash": "الطرفية", "json": "JSON", "yaml": "YAML", "tsx": "TSX", "jsx": "JSX", "ini": "الإعدادات",
+                     "bash": "الطرفية", "tsx-error": "TSX", "json": "JSON", "yaml": "YAML", "tsx": "TSX", "jsx": "JSX", "ini": "الإعدادات",
                      "terminal": "الطرفية", "terminal-new": "الطرفية", "terminal-error": "الطرفية"}.get(lang, lang)
             cls = "out" if lang in ("text", "output") else "src"
             if lang == "output" and prev_lang == "sql":
@@ -121,6 +121,12 @@ def markdown(src):
                 body = f'<pre dir="ltr"><code>{html.escape(chr(10).join(ok))}</code></pre>' if ok else ""
                 err_html = "".join(f'<div class="sql-err" dir="ltr">⚠️ {html.escape(e)}</div>' for e in errs)
                 out.append(f'<div class="code-block out"><span class="code-label">{label}</span>{body}<div class="out-errs">{err_html}</div></div>')
+                prev_lang = lang
+                continue
+            if lang == "next":
+                # ملفات المشروع، وما بعد السطر // test فحص لا يُعرض (مخرجاته في كتلة output التالية)
+                src = re.split(r"^// test\s*$", chr(10).join(code), flags=re.M)[0].rstrip()
+                out.append(f'<div class="code-block src"><span class="code-label">Next.js</span><pre dir="ltr"><code>{html.escape(src)}</code></pre></div>')
                 prev_lang = lang
                 continue
             if lang == "tw":
