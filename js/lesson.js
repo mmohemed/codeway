@@ -86,7 +86,7 @@
     const runner = meta.runner || "js";
     const isDom = runner === "js" && !!ex.html;
     const setup = ex.setup || meta.setup || "";
-    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt" }[runner] || (isDom ? "script.js" : "exercise.js");
+    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal" }[runner] || (isDom ? "script.js" : "exercise.js");
     const key = `cw-code-${c.id}-${m}-${l}`;
     const saved = CW.store.get(key, null);
     box.innerHTML = `
@@ -94,6 +94,7 @@
         <div class="prose">${ex.prompt}</div>
         ${runner === "sql" && meta.schema ? `<details class="acc schema-box"><summary>📋 جداول قاعدة البيانات في هذا التمرين</summary><div class="acc-body">${ex.schema || meta.schema}</div></details>` : ""}
         ${runner === "dart" ? `<p class="muted net-note">🌐 تشغيل Dart يتم عبر خدمة الترجمة الرسمية لـ DartPad، لذلك يحتاج اتصالاً بالإنترنت.</p>` : ""}
+        ${runner === "terminal" ? `<p class="muted net-note">💻 هذه طرفية محاكاة داخل المتصفح: اكتب كل أمر في سطر، وستُنفَّذ بالترتيب على مستودع جديد في كل تشغيل. تدعم أوامر Git الأساسية و gh وأوامر الملفات مثل echo و cat و ls.</p>` : ""}
         ${runner === "kotlin" ? `<p class="muted net-note">🌐 تشغيل Kotlin يتم عبر خدمة Kotlin Playground الرسمية من JetBrains، لذلك يحتاج اتصالاً بالإنترنت، وقد يستغرق ثوانيَ قليلة.</p>` : ""}
         <div class="editor">
           <div class="editor-bar">
@@ -122,10 +123,16 @@
     ta.style.minHeight = Math.min(420, Math.max(160, ex.starter.split("\n").length * 24 + 40)) + "px";
     ta.addEventListener("input", () => CW.store.set(key, ta.value));
 
-    const execute = done => {
+    // بعض المشغّلات تُرجع مخرجات للعرض (shown) ومخرجات فحص مخفي (graded) هي التي تُصحَّح
+    const execute = (done, grading) => {
       out.innerHTML = '<span class="hint">جاري التشغيل...</span>';
-      const finish = lines => { CW.renderOutput(out, lines); done && done(lines); };
-      if (runner === "sql") CW.runSQL(ta.value, setup, finish);
+      const finish = (lines, graded) => {
+        const view = graded && grading ? [...lines, { kind: "sep", text: "🔎 نتيجة الفحص:" }, ...graded] : lines;
+        CW.renderOutput(out, view);
+        done && done(graded || lines, !!graded);
+      };
+      if (runner === "terminal") CW.gitRun(ta.value, ex.setup || "", ex.test || "").then(r => finish(r.shown, ex.test ? r.graded : undefined));
+      else if (runner === "sql") CW.runSQL(ta.value, setup, finish);
       else if (runner === "dart") CW.runDart(ta.value, finish);
       else if (runner === "ts") CW.runTS(ta.value, finish);
       else if (runner === "kotlin") CW.runKotlin(ta.value, finish);
@@ -133,9 +140,9 @@
       else CW.runJS(ta.value, finish);
     };
     const norm = s => s.split("\n").map(x => x.trim()).join("\n").trim();
-    const check = () => execute(lines => {
-      const errors = lines.filter(x => x.kind === "err");
-      const got = norm(lines.filter(x => x.kind !== "err" && x.kind !== "info").map(x => x.text).join(runner === "sql" ? "\n\n" : "\n"));
+    const check = () => execute((lines, isGraded) => {
+      const errors = lines.filter(x => x.kind === "err" && !isGraded);
+      const got = norm(lines.filter(x => !["err", "info", "cmd", "sep"].includes(x.kind)).map(x => x.text).join(runner === "sql" ? "\n\n" : "\n"));
       const want = norm(ex.expected);
       if (!errors.length && got === want) {
         result.innerHTML = `<div class="result ok">🎉 أحسنت! حلّك صحيح، وتم تسجيل الدرس كمنجز.</div>`;
@@ -148,7 +155,7 @@
             <div><span>مخرجاتك</span><pre dir="ltr">${CW.esc(got) || "(لا شيء)"}</pre></div>
           </div></div>`;
       }
-    });
+    }, true);
     document.getElementById("ex-run").onclick = () => { result.innerHTML = ""; execute(); };
     document.getElementById("ex-check").onclick = check;
     document.getElementById("ex-reset").onclick = () => { ta.value = ex.starter; CW.store.set(key, null); result.innerHTML = ""; };

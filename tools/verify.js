@@ -8,7 +8,8 @@
 // ودورات Dart تُشغَّل بـ Dart SDK حقيقي (الأمر dart في PATH أو المتغير DART)
 // ودورات TypeScript تُفحص أنواعها بمترجم typescript نفسه الذي يعمل في المتصفح (npm install)،
 // ودورات Kotlin تُترجم وتُشغَّل على JVM حقيقي (المتغير KOTLIN_LIB: مجلد jars المترجم و stdlib)
-// الاستخدام: node tools/verify.js javascript | sql | dart | typescript | kotlin
+// ودورات الطرفية (git و vite) تُشغَّل على المحاكي js/git-sim.js عبر tools/verify-term.js
+// الاستخدام: node tools/verify.js javascript | sql | dart | typescript | kotlin | git | vite
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
@@ -152,6 +153,11 @@ let fails = 0, checks = 0;
 const fail = (where, msg) => { fails++; console.log(`✗ ${where}\n  ${msg.replace(/\n/g, "\n  ")}`); };
 
 if (require.main === module) (async () => {
+  if (runner === "terminal") {
+    const r = await require("./verify-term.js")(dir, process.argv.includes("--fill"), cfg.extensions || []);
+    console.log(r.fails ? `\n${r.fails} مشكلة من ${r.checks} فحصاً` : `✓ ${r.checks} فحصاً ناجحاً في ${course}`);
+    process.exit(r.fails ? 1 : 0);
+  }
   if (runner === "sql") SQL = await require("sql.js")();
 
   // --fill: يحسب المخرجات المكتوبة كـ "?" بتشغيل الكود فعلاً، ثم يكمل التحقق

@@ -13,7 +13,11 @@
     ~~~expected       المخرجات المتوقعة من console.log (سطراً بسطر)
     ~~~solution       الحل النموذجي
     ~~~html           (اختياري) صفحة HTML يعمل عليها الكود في دروس DOM
-    ~~~setup          (اختياري، SQL) جداول خاصة بهذا التمرين بدل قاعدة الدورة المشتركة
+    ~~~setup          (اختياري) SQL: جداول خاصة بالتمرين، git: أوامر مخفية تُنفَّذ قبل كود الطالب
+    ~~~test           (اختياري) فحص مخفي يعمل بعد كود الطالب، ومخرجاته هي التي تُقارن بـ expected
+
+كتل ```terminal في الشرح جلسة طرفية: $ أمر، و > تكملة، و ERR: خطأ، والباقي مخرجات.
+الكتل المتتالية في الدرس تشترك في نفس المستودع، و ```terminal-new تبدأ مستودعاً جديداً.
 
 إعدادات الدورة في content/<course>/course.json، مثلاً:
     {"runner": "sql", "setup": "setup.sql"}   أو   {"runner": "dart"}
@@ -66,6 +70,21 @@ def sql_result_html(text):
     return "".join(tables) + "".join(f'<div class="sql-err" dir="ltr">⚠️ {html.escape(e)}</div>' for e in errors)
 
 
+def terminal_html(code):
+    """جلسة طرفية: الأسطر التي تبدأ بـ $ أوامر، و > تكملة أمر، و ERR: رسائل خطأ، والباقي مخرجات"""
+    out = []
+    for l in code:
+        if l.startswith("$ "):
+            out.append(f'<span class="t-cmd"><span class="t-ps">$</span> {html.escape(l[2:])}</span>')
+        elif l.startswith("> ") or l == ">":
+            out.append(f'<span class="t-cmd"><span class="t-ps">&gt;</span> {html.escape(l[2:])}</span>')
+        elif l.startswith("ERR: "):
+            out.append(f'<span class="t-err">{html.escape(l[5:])}</span>')
+        else:
+            out.append(html.escape(l))
+    return "\n".join(out)
+
+
 def markdown(src):
     lines = src.strip("\n").split("\n")
     out, i = [], 0
@@ -82,7 +101,9 @@ def markdown(src):
             i += 1
             label = {"js": "JavaScript", "html": "HTML", "css": "CSS", "text": "المخرجات", "output": "المخرجات", "js-error": "JavaScript",
                      "sql": "SQL", "sql-error": "SQL", "dart": "Dart", "dart-error": "Dart",
-                     "ts": "TypeScript", "ts-error": "TypeScript", "kotlin": "Kotlin", "kotlin-error": "Kotlin"}.get(lang, lang)
+                     "ts": "TypeScript", "ts-error": "TypeScript", "kotlin": "Kotlin", "kotlin-error": "Kotlin",
+                     "bash": "الطرفية", "json": "JSON", "yaml": "YAML", "tsx": "TSX", "jsx": "JSX", "ini": "الإعدادات",
+                     "terminal": "الطرفية", "terminal-new": "الطرفية", "terminal-error": "الطرفية"}.get(lang, lang)
             cls = "out" if lang in ("text", "output") else "src"
             if lang == "output" and prev_lang == "sql":
                 out.append(f'<div class="code-block out sql-out"><span class="code-label">النتيجة</span><div class="table-wrap">{sql_result_html(chr(10).join(code))}</div></div>')
@@ -95,6 +116,10 @@ def markdown(src):
                 body = f'<pre dir="ltr"><code>{html.escape(chr(10).join(ok))}</code></pre>' if ok else ""
                 err_html = "".join(f'<div class="sql-err" dir="ltr">⚠️ {html.escape(e)}</div>' for e in errs)
                 out.append(f'<div class="code-block out"><span class="code-label">{label}</span>{body}<div class="out-errs">{err_html}</div></div>')
+                prev_lang = lang
+                continue
+            if lang.startswith("terminal"):
+                out.append(f'<div class="code-block term"><span class="code-label">{label}</span><pre dir="ltr"><code>{terminal_html(code)}</code></pre></div>')
                 prev_lang = lang
                 continue
             prev_lang = lang
@@ -195,7 +220,7 @@ def schema_html(setup):
     return "".join(parts)
 
 
-def parse_lesson(src):
+def parse_lesson(src, runner="js"):
     parts = re.split(r"^--- (exercise|quiz)\s*$", src, flags=re.M)
     lesson = {"body": markdown(parts[0])}
     for kind, text in zip(parts[1::2], parts[2::2]):
@@ -204,7 +229,7 @@ def parse_lesson(src):
             for key in ("starter", "expected", "solution"):
                 assert key in blocks, f"التمرين ينقصه ~~~{key}"
             lesson["exercise"] = {"prompt": markdown(prompt), **blocks}
-            if "setup" in blocks:
+            if "setup" in blocks and runner == "sql":
                 lesson["exercise"]["schema"] = schema_html(blocks["setup"])
         else:
             lesson["quiz"] = parse_quiz(text)
@@ -213,11 +238,13 @@ def parse_lesson(src):
 
 def build(course):
     src_dir = ROOT / "content" / course
+    cfg_path = src_dir / "course.json"
+    runner = json.loads(cfg_path.read_text(encoding="utf-8")).get("runner", "js") if cfg_path.exists() else "js"
     files = sorted(src_dir.glob("m*.md"), key=lambda p: int(re.findall(r"\d+", p.stem)[0]))
     modules = []
     for f in files:
         text = f.read_text(encoding="utf-8")
-        lessons = [parse_lesson(chunk) for chunk in re.split(r"^=== lesson\s*$", text, flags=re.M)[1:]]
+        lessons = [parse_lesson(chunk, runner) for chunk in re.split(r"^=== lesson\s*$", text, flags=re.M)[1:]]
         modules.append(lessons)
     out = ROOT / "js" / "content" / f"{course}.js"
     out.parent.mkdir(parents=True, exist_ok=True)

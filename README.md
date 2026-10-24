@@ -41,6 +41,7 @@ js/sql-runner.js      تشغيل SQL بمحرك SQLite كامل في المتص�
 js/dart-runner.js     تشغيل Dart عبر خدمة الترجمة الرسمية لـ DartPad (يحتاج إنترنت)
 js/ts-runner.js       فحص أنواع TypeScript وتحويلها بالمترجم الرسمي في المتصفح (js/vendor، يعمل دون إنترنت)
 js/kotlin-runner.js   تشغيل Kotlin عبر خدمة Kotlin Playground الرسمية من JetBrains (يحتاج إنترنت)
+js/git-sim.js         طرفية محاكاة لـ Git و GitHub CLI وأوامر الملفات، بمخرجات مطابقة للأدوات الحقيقية
 js/content/           محتوى الدروس المولَّد لكل دورة
 js/*.js               سكربت لكل صفحة
 ```
@@ -62,6 +63,7 @@ js/*.js               سكربت لكل صفحة
 | Dart | ✅ مكتملة: 5 وحدات، 15 درساً، تمهيداً لـ Flutter |
 | TypeScript | ✅ مكتملة: 8 وحدات، 28 درساً، وأخطاء الأنواع تظهر في المحرر كما في VS Code |
 | Kotlin | ✅ مكتملة: 6 وحدات، 19 درساً، تمهيداً لتطوير Android |
+| Git و GitHub | ✅ مكتملة: 4 وحدات، 14 درساً، تمارينها في طرفية محاكاة (فروع ودمج وتعارضات و Pull Requests و Issues) |
 | بقية الدورات | الهيكل جاهز والمحتوى قيد الإعداد |
 
 ### كتابة الدروس
@@ -75,6 +77,9 @@ node tools/verify.js sql --fill          # --fill يحسب المخرجات ال
 DART=/path/to/dart node tools/verify.js dart   # Dart يتطلب Dart SDK، ويُترجم بـ dart2js كما في المتصفح
 node tools/verify.js typescript          # بنفس مترجم TypeScript الذي يعمل في المتصفح
 KOTLIN_LIB=/path/to/jars node tools/verify.js kotlin   # مجلد فيه kotlin-compiler-embeddable و kotlin-stdlib و kotlinx-coroutines
+node tools/verify.js git --fill          # دورات الطرفية: يعيد كتابة كتل ```terminal من مخرجات المحاكي
+python3 tools/reset-expected.py git      # بعد تعديل المحاكي: يعيد كل expected إلى "?" لتُحسب من جديد
+node tools/shot.js git 1 2 out.png       # لقطة شاشة لدرس بعد تشغيل حله النموذجي (أضف mobile لعرض الجوال)
 node tools/vendor-ts.js                  # عند تحديث إصدار TypeScript: يعيد توليد js/vendor/typescript.min.js و ts-libs.js
 python3 tools/build.py javascript        # يولّد js/content/javascript.js
 node tools/verify-browser.js javascript  # يختبر كل تمرين وأمثلة DOM في متصفح حقيقي (يتطلب Playwright)

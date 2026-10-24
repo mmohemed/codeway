@@ -129,7 +129,7 @@ const renderTable = t => `<table class="out-table"><thead><tr>${t.columns.map(c 
 CW.renderOutput = (output, lines) => {
   output.innerHTML = lines.length
     ? lines.map(l => l.kind === "table" ? renderTable(l.table)
-      : `<div class="${l.kind === "err" ? "err" : l.kind === "info" ? "hint" : ""}">${CW.esc(l.text)}</div>`).join("")
+      : `<div class="${({ err: "err", info: "hint", cmd: "cmd", sep: "sep" })[l.kind] || ""}">${CW.esc(l.text)}</div>`).join("")
     : '<span class="hint">لا توجد مخرجات. استخدم console.log لطباعة النتائج.</span>';
 };
 
