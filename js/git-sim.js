@@ -30,6 +30,20 @@
     return out;
   };
   const sortKeys = o => Object.keys(o).sort();
+  // تقسيم السطر عند && خارج علامات التنصيص فقط
+  const splitAnd = line => {
+    const parts = [];
+    let cur = "", q = null;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (q) { if (ch === q) q = null; cur += ch; continue; }
+      if (ch === '"' || ch === "'") { q = ch; cur += ch; continue; }
+      if (ch === "&" && line[i + 1] === "&") { parts.push(cur.trim()); cur = ""; i++; continue; }
+      cur += ch;
+    }
+    parts.push(cur.trim());
+    return parts.filter(Boolean);
+  };
   const lines = s => (s === "" ? [] : s.replace(/\n$/, "").split("\n"));
 
   // فرق الأسطر بأطول تسلسل مشترك (الملفات في التمارين صغيرة)
@@ -937,21 +951,73 @@ fatal: Need to specify how to reconcile divergent branches.`);
         r.files[file] = redirect[3] === ">>" ? (r.files[file] || "") + content : content;
         return;
       }
+      const norm = f => f.replace(/^\.\//, "").replace(/\/$/, "");
+      // توسيع * في أسماء الملفات كما تفعل الطرفية
+      const expand = list => list.flatMap(f => {
+        f = norm(f);
+        if (!f.includes("*")) return [f];
+        const re = new RegExp("^" + f.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^/]*") + "$");
+        const hits = sortKeys(r.files).filter(p => re.test(p));
+        return hits.length ? hits : [f];
+      });
+      const isDir = d => Object.keys(r.files).some(p => p.startsWith(d + "/"));
       switch (cmd) {
         case "echo": return say(tokens.slice(1).join(" "));
-        case "cat": return tokens.slice(1).forEach(f => r.files[f] === undefined ? err(`cat: ${f}: No such file or directory`) : say(r.files[f]));
+        case "cat": return expand(tokens.slice(1)).forEach(f => r.files[f] === undefined ? err(`cat: ${f}: ${isDir(f) ? "Is a directory" : "No such file or directory"}`) : say(r.files[f]));
+        case "head": case "tail": {
+          const ni = tokens.indexOf("-n");
+          const n = ni >= 0 ? +tokens[ni + 1] : 10;
+          const files = expand(tokens.slice(1).filter((t, i) => !t.startsWith("-") && tokens[i] !== "-n"));
+          return files.forEach(f => {
+            if (r.files[f] === undefined) return err(`${cmd}: cannot open '${f}' for reading: No such file or directory`);
+            const ls = lines(r.files[f]);
+            say((cmd === "head" ? ls.slice(0, n) : ls.slice(-n)).join("\n"));
+          });
+        }
+        case "grep": {
+          const args = tokens.slice(1).filter(t => !t.startsWith("-"));
+          const pattern = args[0];
+          const files = expand(args.slice(1));
+          const showName = files.length > 1;
+          let found = false;
+          files.forEach(f => {
+            if (r.files[f] === undefined) return err(`grep: ${f}: No such file or directory`);
+            lines(r.files[f]).forEach(l => {
+              if (l.includes(pattern) || (tokens.includes("-i") && l.toLowerCase().includes(pattern.toLowerCase()))) {
+                found = true;
+                if (!tokens.includes("-q")) say((showName ? f + ":" : "") + (tokens.includes("-o") ? pattern : l));
+              }
+            });
+          });
+          return found;
+        }
         case "ls": {
           const all = tokens.includes("-a");
-          const names = new Set();
-          Object.keys(r.files).forEach(p => names.add(p.split("/")[0]));
-          Object.keys(world.repos).forEach(d => { if (world.cwd === "." && d !== ".") names.add(d); });
-          if (all && r.git) names.add(".git");
-          let list = [...names].sort();
-          if (!all) list = list.filter(n => !n.startsWith("."));
-          return say(list.join("  "));
+          const dirs = tokens.slice(1).filter(t => !t.startsWith("-")).map(norm);
+          const listDir = dir => {
+            const prefix = dir ? dir + "/" : "";
+            if (dir && r.files[dir] !== undefined) return [dir];
+            if (dir && !isDir(dir)) { err(`ls: cannot access '${dir}': No such file or directory`); return null; }
+            const names = new Set();
+            Object.keys(r.files).forEach(p => { if (p.startsWith(prefix)) names.add(p.slice(prefix.length).split("/")[0]); });
+            if (!dir) {
+              Object.keys(world.repos).forEach(d => { if (world.cwd === "." && d !== ".") names.add(d); });
+              if (all && r.git) names.add(".git");
+            }
+            let list = [...names].sort();
+            if (!all) list = list.filter(n => !n.startsWith("."));
+            return list;
+          };
+          if (dirs.length <= 1) { const l = listDir(dirs[0]); if (l) say(l.join("  ")); return; }
+          return dirs.forEach((d, i) => { const l = listDir(d); if (l) { if (i) say(""); say(`${d}:`); say(l.join("  ")); } });
         }
         case "touch": return tokens.slice(1).forEach(f => { if (r.files[f] === undefined) r.files[f] = ""; });
-        case "rm": return tokens.slice(1).filter(t => !t.startsWith("-")).forEach(f => { delete r.files[f]; });
+        case "rm": return expand(tokens.slice(1).filter(t => !t.startsWith("-"))).forEach(f => {
+          if (r.files[f] !== undefined) delete r.files[f];
+          else if (isDir(f) && /r/.test(tokens.filter(t => t.startsWith("-")).join(""))) Object.keys(r.files).forEach(p => { if (p.startsWith(f + "/")) delete r.files[p]; });
+          else if (!tokens.includes("-f") && !tokens.includes("-rf")) err(`rm: cannot remove '${f}': ${isDir(f) ? "Is a directory" : "No such file or directory"}`);
+        });
+        case "exit": { if (+(tokens[1] || 0)) world.failed = true; return; }
         case "mv": { const [a, b] = tokens.slice(1); r.files[b] = r.files[a]; delete r.files[a]; return; }
         case "mkdir": return;
         case "pwd": return say("/project" + (world.cwd === "." ? "" : "/" + world.cwd));
@@ -969,7 +1035,7 @@ fatal: Need to specify how to reconcile divergent branches.`);
 
     // ---------- تنفيذ السكربت ----------
     // يدعم: الأسطر العادية، و && بين الأوامر، و cat > file <<'EOF' ... EOF لكتابة ملفات متعددة الأسطر
-    const api = { world, repo, say, err, git, tokenize, lines, ignored };
+    const api = { world, repo, say, err, git, tokenize, lines, ignored, out, newDir, splitAnd };
     const exec = async raw => {
       const tokens = tokenize(raw);
       const ext = CW.termExt && CW.termExt[tokens[0]];
@@ -978,6 +1044,7 @@ fatal: Need to specify how to reconcile divergent branches.`);
       else if (ext) return ext(tokens.slice(1), api, raw);
       else shell(tokens, raw);
     };
+    api.exec = exec;
     const all = script.split("\n");
     for (let i = 0; i < all.length; i++) {
       const raw = all[i].trim();
@@ -995,11 +1062,12 @@ fatal: Need to specify how to reconcile divergent branches.`);
         continue;
       }
       out.push({ kind: "cmd", text: "$ " + raw });
-      for (const part of raw.split(/\s+&&\s+/)) {
+      for (const part of splitAnd(raw)) {
         const mark = out.length;
+        world.failed = false;
         try { await exec(part); }
         catch (e) { err("خطأ في المحاكي: " + e.message); }
-        if (out.slice(mark).some(l => l.kind === "err" && !l.soft)) break;
+        if (world.failed || out.slice(mark).some(l => l.kind === "err" && !l.soft)) break;
       }
     }
   }

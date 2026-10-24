@@ -94,7 +94,7 @@
         <div class="prose">${ex.prompt}</div>
         ${runner === "sql" && meta.schema ? `<details class="acc schema-box"><summary>📋 جداول قاعدة البيانات في هذا التمرين</summary><div class="acc-body">${ex.schema || meta.schema}</div></details>` : ""}
         ${runner === "dart" ? `<p class="muted net-note">🌐 تشغيل Dart يتم عبر خدمة الترجمة الرسمية لـ DartPad، لذلك يحتاج اتصالاً بالإنترنت.</p>` : ""}
-        ${runner === "terminal" ? `<p class="muted net-note">💻 هذه طرفية محاكاة داخل المتصفح: اكتب كل أمر في سطر، وستُنفَّذ بالترتيب على مستودع جديد في كل تشغيل. تدعم أوامر Git الأساسية و gh وأوامر الملفات مثل echo و cat و ls.</p>` : ""}
+        ${runner === "terminal" ? `<p class="muted net-note">💻 هذه طرفية محاكاة داخل المتصفح: اكتب كل أمر في سطر، وستُنفَّذ بالترتيب على مستودع جديد في كل تشغيل. تدعم أوامر Git و gh و npm و node و Vite و ESLint و Prettier، وأوامر الملفات مثل echo و cat و ls، وكتابة ملف من عدة أسطر بـ cat > file &lt;&lt;EOF.</p>` : ""}
         ${runner === "kotlin" ? `<p class="muted net-note">🌐 تشغيل Kotlin يتم عبر خدمة Kotlin Playground الرسمية من JetBrains، لذلك يحتاج اتصالاً بالإنترنت، وقد يستغرق ثوانيَ قليلة.</p>` : ""}
         <div class="editor">
           <div class="editor-bar">

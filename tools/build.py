@@ -73,10 +73,15 @@ def sql_result_html(text):
 def terminal_html(code):
     """جلسة طرفية: الأسطر التي تبدأ بـ $ أوامر، و > تكملة أمر، و ERR: رسائل خطأ، والباقي مخرجات"""
     out = []
+    doc = None  # نهاية heredoc الجاري: أسطر > تكملة للأمر حتى تصل إليها
     for l in code:
         if l.startswith("$ "):
             out.append(f'<span class="t-cmd"><span class="t-ps">$</span> {html.escape(l[2:])}</span>')
-        elif l.startswith("> ") or l == ">":
+            m = re.search(r"<<\s*-?\s*['\"]?(\w+)['\"]?\s*$", l)
+            doc = m.group(1) if m else None
+        elif doc and (l.startswith("> ") or l == ">"):
+            if l[2:].strip() == doc:
+                doc = None
             out.append(f'<span class="t-cmd"><span class="t-ps">&gt;</span> {html.escape(l[2:])}</span>')
         elif l.startswith("ERR: "):
             out.append(f'<span class="t-err">{html.escape(l[5:])}</span>')
