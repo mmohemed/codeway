@@ -91,7 +91,7 @@ require(path.resolve(__dirname, "..", "js", "content", course + ".js"));
         await page.fill("#ex-code", code);
         await page.evaluate(() => { document.getElementById("ex-result").innerHTML = ""; });
         await page.click("#ex-check");
-        await page.waitForSelector("#ex-result .result", { timeout: 8000 });
+        await page.waitForSelector("#ex-result .result", { timeout: 30000 });
         return page.$eval("#ex-result .result", el => el.className.includes("ok") ? "ok" : el.innerText);
       };
       const sol = await tryCode(ex.solution);

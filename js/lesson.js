@@ -75,6 +75,7 @@
       <div class="prose">${lesson.body}</div>
       ${lesson.exercise ? `<h2 class="sec-title">⌨️ التمرين العملي</h2><div id="exercise"></div>` : ""}
       ${lesson.quiz ? `<h2 class="sec-title">📝 اختبر فهمك</h2><div id="quiz"></div>` : ""}`;
+    if (CW.renderTwDemos) CW.renderTwDemos(document.querySelector(".prose"));
     if (lesson.exercise) renderExercise(lesson.exercise);
     if (lesson.quiz) renderQuiz(lesson.quiz);
   });
@@ -85,8 +86,9 @@
     const meta = CW.contentMeta[c.id] || {};
     const runner = meta.runner || "js";
     const isDom = runner === "js" && !!ex.html;
+    const isTw = runner === "tailwind";
     const setup = ex.setup || meta.setup || "";
-    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal" }[runner] || (isDom ? "script.js" : "exercise.js");
+    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal", tailwind: "index.html" }[runner] || (isDom ? "script.js" : "exercise.js");
     const key = `cw-code-${c.id}-${m}-${l}`;
     const saved = CW.store.get(key, null);
     box.innerHTML = `
@@ -94,6 +96,7 @@
         <div class="prose">${ex.prompt}</div>
         ${runner === "sql" && meta.schema ? `<details class="acc schema-box"><summary>📋 جداول قاعدة البيانات في هذا التمرين</summary><div class="acc-body">${ex.schema || meta.schema}</div></details>` : ""}
         ${runner === "dart" ? `<p class="muted net-note">🌐 تشغيل Dart يتم عبر خدمة الترجمة الرسمية لـ DartPad، لذلك يحتاج اتصالاً بالإنترنت.</p>` : ""}
+        ${isTw ? `<p class="muted net-note">🎨 اكتب HTML بأصناف Tailwind، وستظهر المعاينة تحت المحرر. الفحص يقارن الأنماط المحسوبة فعلاً، فأي أصناف تعطي نفس النتيجة مقبولة.</p>` : ""}
         ${runner === "terminal" ? `<p class="muted net-note">💻 هذه طرفية محاكاة داخل المتصفح: اكتب كل أمر في سطر، وستُنفَّذ بالترتيب على مستودع جديد في كل تشغيل. تدعم أوامر Git و gh و npm و node و Vite و ESLint و Prettier، وأوامر الملفات مثل echo و cat و ls، وكتابة ملف من عدة أسطر بـ cat > file &lt;&lt;EOF.</p>` : ""}
         ${runner === "kotlin" ? `<p class="muted net-note">🌐 تشغيل Kotlin يتم عبر خدمة Kotlin Playground الرسمية من JetBrains، لذلك يحتاج اتصالاً بالإنترنت، وقد يستغرق ثوانيَ قليلة.</p>` : ""}
         <div class="editor">
@@ -107,7 +110,7 @@
             </span>
           </div>
           <textarea id="ex-code" wrap="off" spellcheck="false" aria-label="محرر التمرين"></textarea>
-          ${isDom ? `<div class="preview"><span class="preview-label">معاينة الصفحة</span><div id="ex-preview"></div></div>` : ""}
+          ${isDom || isTw ? `<div class="preview${isTw ? " tw" : ""}"><span class="preview-label">معاينة الصفحة</span><div id="ex-preview"></div></div>` : ""}
           <pre class="editor-out" id="ex-out"><span class="hint">// اضغط «تشغيل» لرؤية المخرجات، أو «تحقق من الحل» لتصحيح التمرين (Ctrl+Enter للتشغيل)</span></pre>
         </div>
         <div id="ex-result"></div>
@@ -136,6 +139,10 @@
       else if (runner === "dart") CW.runDart(ta.value, finish);
       else if (runner === "ts") CW.runTS(ta.value, finish);
       else if (runner === "kotlin") CW.runKotlin(ta.value, finish);
+      else if (isTw) CW.runTailwind(ta.value, grading ? ex.test || "" : "", document.getElementById("ex-preview"), lines => {
+        const errs = lines.filter(l => l.kind === "err");
+        finish(grading ? errs : [...errs, { kind: "info", text: "✓ تم تحديث المعاينة. اضغط «تحقق من الحل» لفحص التصميم." }], grading ? lines : undefined);
+      });
       else if (isDom) CW.runDOM(ta.value, ex.html, document.getElementById("ex-preview"), finish);
       else CW.runJS(ta.value, finish);
     };
@@ -160,7 +167,7 @@
     document.getElementById("ex-check").onclick = check;
     document.getElementById("ex-reset").onclick = () => { ta.value = ex.starter; CW.store.set(key, null); result.innerHTML = ""; };
     CW.editorKeys(ta, () => execute());
-    if (isDom) execute();
+    if (isDom || isTw) execute();
   }
 
   // ---------- الاختبار ----------

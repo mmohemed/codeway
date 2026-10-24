@@ -42,6 +42,7 @@ js/dart-runner.js     تشغيل Dart عبر خدمة الترجمة الرسم�
 js/ts-runner.js       فحص أنواع TypeScript وتحويلها بالمترجم الرسمي في المتصفح (js/vendor، يعمل دون إنترنت)
 js/kotlin-runner.js   تشغيل Kotlin عبر خدمة Kotlin Playground الرسمية من JetBrains (يحتاج إنترنت)
 js/git-sim.js         طرفية محاكاة لـ Git و GitHub CLI وأوامر الملفات، بمخرجات مطابقة للأدوات الحقيقية
+js/tw-runner.js       معاينة Tailwind الحقيقي (js/vendor/tailwind-src.js) في إطار معزول، مع فحص للأنماط المحسوبة
 js/npm-sim.js         امتداد الطرفية: npm و node و Vite، و ESLint و Prettier الحقيقيان (js/vendor، يُحمَّلان عند الحاجة)
 js/content/           محتوى الدروس المولَّد لكل دورة
 js/*.js               سكربت لكل صفحة
@@ -64,6 +65,7 @@ js/*.js               سكربت لكل صفحة
 | Dart | ✅ مكتملة: 5 وحدات، 15 درساً، تمهيداً لـ Flutter |
 | TypeScript | ✅ مكتملة: 8 وحدات، 28 درساً، وأخطاء الأنواع تظهر في المحرر كما في VS Code |
 | Kotlin | ✅ مكتملة: 6 وحدات، 19 درساً، تمهيداً لتطوير Android |
+| Tailwind CSS | ✅ مكتملة: 3 وحدات، 8 دروس، كل مثال بمعاينة حية، والتصحيح يقارن الأنماط المحسوبة فعلاً |
 | Vite و npm | ✅ مكتملة: 3 وحدات، 8 دروس: package.json والحزم والسكربتات، ومشاريع Vite والبناء، و ESLint و Prettier |
 | Git و GitHub | ✅ مكتملة: 4 وحدات، 14 درساً، تمارينها في طرفية محاكاة (فروع ودمج وتعارضات و Pull Requests و Issues) |
 | بقية الدورات | الهيكل جاهز والمحتوى قيد الإعداد |
@@ -81,6 +83,7 @@ node tools/verify.js typescript          # بنفس مترجم TypeScript الذ
 KOTLIN_LIB=/path/to/jars node tools/verify.js kotlin   # مجلد فيه kotlin-compiler-embeddable و kotlin-stdlib و kotlinx-coroutines
 node tools/verify.js git --fill          # دورات الطرفية: يعيد كتابة كتل ```terminal من مخرجات المحاكي
 python3 tools/reset-expected.py git      # بعد تعديل المحاكي: يعيد كل expected إلى "?" لتُحسب من جديد
+node tools/verify.js tailwind --fill     # Tailwind يُتحقق منه في متصفح حقيقي (Playwright)
 node tools/shot.js git 1 2 out.png       # لقطة شاشة لدرس بعد تشغيل حله النموذجي (أضف mobile لعرض الجوال)
 node tools/vendor-ts.js                  # عند تحديث إصدار TypeScript: يعيد توليد js/vendor/typescript.min.js و ts-libs.js
 python3 tools/build.py javascript        # يولّد js/content/javascript.js

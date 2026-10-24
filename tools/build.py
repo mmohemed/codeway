@@ -123,6 +123,12 @@ def markdown(src):
                 out.append(f'<div class="code-block out"><span class="code-label">{label}</span>{body}<div class="out-errs">{err_html}</div></div>')
                 prev_lang = lang
                 continue
+            if lang == "tw":
+                src = chr(10).join(code)
+                out.append(f'<div class="code-block src tw-code"><span class="code-label">HTML + Tailwind</span><pre dir="ltr"><code>{html.escape(src)}</code></pre></div>'
+                           f'<div class="tw-preview" data-src="{html.escape(src, quote=True)}"></div>')
+                prev_lang = lang
+                continue
             if lang.startswith("terminal"):
                 out.append(f'<div class="code-block term"><span class="code-label">{label}</span><pre dir="ltr"><code>{terminal_html(code)}</code></pre></div>')
                 prev_lang = lang
