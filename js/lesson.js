@@ -88,7 +88,7 @@
     const isDom = runner === "js" && !!ex.html;
     const isTw = runner === "tailwind";
     const setup = ex.setup || meta.setup || "";
-    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal", tailwind: "index.html", next: "Next.js" }[runner] || (isDom ? "script.js" : "exercise.js");
+    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal", tailwind: "index.html", next: "Next.js", tests: "Vitest / Playwright" }[runner] || (isDom ? "script.js" : "exercise.js");
     const key = `cw-code-${c.id}-${m}-${l}`;
     const saved = CW.store.get(key, null);
     box.innerHTML = `
@@ -96,6 +96,7 @@
         <div class="prose">${ex.prompt}</div>
         ${runner === "sql" && meta.schema ? `<details class="acc schema-box"><summary>📋 جداول قاعدة البيانات في هذا التمرين</summary><div class="acc-body">${ex.schema || meta.schema}</div></details>` : ""}
         ${runner === "dart" ? `<p class="muted net-note">🌐 تشغيل Dart يتم عبر خدمة الترجمة الرسمية لـ DartPad، لذلك يحتاج اتصالاً بالإنترنت.</p>` : ""}
+        ${runner === "tests" ? `<p class="muted net-note">🧪 اكتب ملفات المشروع والاختبارات في المحرر، وابدأ كل ملف بسطر <code dir="ltr">// file: اسم-الملف</code>. التشغيل ينفّذ الاختبارات ويعرض النتيجة كما تعرضها Vitest و Playwright.</p>` : ""}
         ${runner === "next" ? `<p class="muted net-note">▲ اكتب ملفات المشروع في المحرر، وابدأ كل ملف بسطر مثل <code dir="ltr">// file: app/page.tsx</code>. التشغيل يبني التطبيق ويزور صفحاته ويطبع النتيجة، كما يفعل الفحص.</p>` : ""}
         ${isTw ? `<p class="muted net-note">🎨 اكتب HTML بأصناف Tailwind، وستظهر المعاينة تحت المحرر. الفحص يقارن الأنماط المحسوبة فعلاً، فأي أصناف تعطي نفس النتيجة مقبولة.</p>` : ""}
         ${runner === "terminal" ? `<p class="muted net-note">💻 هذه طرفية محاكاة داخل المتصفح: اكتب كل أمر في سطر، وستُنفَّذ بالترتيب على مستودع جديد في كل تشغيل. تدعم أوامر Git و gh و npm و node و Vite و ESLint و Prettier، وأوامر الملفات مثل echo و cat و ls، وكتابة ملف من عدة أسطر بـ cat > file &lt;&lt;EOF.</p>` : ""}
@@ -135,7 +136,8 @@
         CW.renderOutput(out, view);
         done && done(graded || lines, !!graded);
       };
-      if (runner === "next") CW.loadTS().then(() => CW.nextRun(ta.value, ex.setup || "", ex.test || "")).then(lines => finish(lines), e => finish([{ kind: "err", text: e.message }]));
+      if (runner === "tests") CW.runTests(ta.value, ex.setup || "", ex.test || "", null, lines => finish(lines));
+      else if (runner === "next") CW.loadTS().then(() => CW.nextRun(ta.value, ex.setup || "", ex.test || "")).then(lines => finish(lines), e => finish([{ kind: "err", text: e.message }]));
       else if (runner === "terminal") CW.gitRun(ta.value, ex.setup || "", ex.test || "").then(r => finish(r.shown, ex.test ? r.graded : undefined));
       else if (runner === "sql") CW.runSQL(ta.value, setup, finish);
       else if (runner === "dart") CW.runDart(ta.value, finish);

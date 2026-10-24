@@ -123,6 +123,11 @@ def markdown(src):
                 out.append(f'<div class="code-block out"><span class="code-label">{label}</span>{body}<div class="out-errs">{err_html}</div></div>')
                 prev_lang = lang
                 continue
+            if lang == "testfiles":
+                src = re.split(r"^// test\s*$", chr(10).join(code), flags=re.M)[0].rstrip()
+                out.append(f'<div class="code-block src"><span class="code-label">ملفات المشروع</span><pre dir="ltr"><code>{html.escape(src)}</code></pre></div>')
+                prev_lang = lang
+                continue
             if lang == "next":
                 # ملفات المشروع، وما بعد السطر // test فحص لا يُعرض (مخرجاته في كتلة output التالية)
                 src = re.split(r"^// test\s*$", chr(10).join(code), flags=re.M)[0].rstrip()
