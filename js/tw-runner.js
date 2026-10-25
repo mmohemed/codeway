@@ -144,7 +144,7 @@ ${styles.join("\n")}
   // أمثلة الشرح: كل كتلة ```tw لها معاينة حية تحتها
   // تُنشأ المعاينة عند اقترابها من الشاشة فقط، حتى لا تُحمَّل كل الأمثلة دفعة واحدة
   CW.renderTwDemos = root => {
-    const boxes = root.querySelectorAll(".tw-preview[data-src]");
+    const boxes = root.querySelectorAll(".tw-preview[data-src]:not(.fw-preview)");
     const start = box => { if (!box.dataset.done) { box.dataset.done = "1"; CW.runTailwind(box.dataset.src, "", box, null); } };
     if (!("IntersectionObserver" in window)) return boxes.forEach(start);
     const io = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { io.unobserve(e.target); start(e.target); } }), { rootMargin: "400px" });

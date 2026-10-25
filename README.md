@@ -42,6 +42,7 @@ js/dart-runner.js     تشغيل Dart عبر خدمة الترجمة الرسم�
 js/ts-runner.js       فحص أنواع TypeScript وتحويلها بالمترجم الرسمي في المتصفح (js/vendor، يعمل دون إنترنت)
 js/kotlin-runner.js   تشغيل Kotlin عبر خدمة Kotlin Playground الرسمية من JetBrains (يحتاج إنترنت)
 js/git-sim.js         طرفية محاكاة لـ Git و GitHub CLI وأوامر الملفات، بمخرجات مطابقة للأدوات الحقيقية
+js/fw-runner.js       Vue و Angular الحقيقيان في إطار معاينة: ترجمة ملفات .vue و TypeScript في المتصفح، وواجهة وهمية وأدوات فحص
 js/test-runner.js     مشغّل اختبارات في إطار معزول: واجهة Vitest و Testing Library و Playwright ومحاكاة GitHub Actions
 js/next-sim.js        محاكي Next.js (App Router): توجيه بالملفات ومكونات خادم وعميل و Server Actions و Route Handlers وتخزين مؤقت
 js/tw-runner.js       معاينة Tailwind الحقيقي (js/vendor/tailwind-src.js) في إطار معزول، مع فحص للأنماط المحسوبة
@@ -67,6 +68,7 @@ js/*.js               سكربت لكل صفحة
 | Dart | ✅ مكتملة: 5 وحدات، 15 درساً، تمهيداً لـ Flutter |
 | TypeScript | ✅ مكتملة: 8 وحدات، 28 درساً، وأخطاء الأنواع تظهر في المحرر كما في VS Code |
 | Kotlin | ✅ مكتملة: 6 وحدات، 19 درساً، تمهيداً لتطوير Android |
+| Vue.js | ✅ مكتملة: 4 وحدات، 11 درساً بـ Vue 3 الحقيقي (ملفات .vue و script setup) مع Vue Router و Pinia، وكل مثال بمعاينة حية |
 | اختبار الواجهات | ✅ مكتملة: 3 وحدات، 8 دروس: Vitest والمحاكاة و Testing Library و Playwright و CI، والتصحيح يشغّل اختبارات الطالب على نسخ معطوبة من الكود ليتأكد أنها تكشفها |
 | Next.js | ✅ مكتملة: 5 وحدات، 15 درساً، الفحص يزور صفحات تطبيق الطالب ويتفاعل معها ويبني جدول next build |
 | Tailwind CSS | ✅ مكتملة: 3 وحدات، 8 دروس، كل مثال بمعاينة حية، والتصحيح يقارن الأنماط المحسوبة فعلاً |
@@ -88,6 +90,7 @@ KOTLIN_LIB=/path/to/jars node tools/verify.js kotlin   # مجلد فيه kotlin-
 node tools/verify.js git --fill          # دورات الطرفية: يعيد كتابة كتل ```terminal من مخرجات المحاكي
 python3 tools/reset-expected.py git      # بعد تعديل المحاكي: يعيد كل expected إلى "?" لتُحسب من جديد
 node tools/verify.js tailwind --fill     # Tailwind يُتحقق منه في متصفح حقيقي (Playwright)
+node tools/verify.js vue --fill          # Vue و Angular يُتحقق منهما في متصفح حقيقي بنفس مشغّل الطالب
 node tools/shot.js git 1 2 out.png       # لقطة شاشة لدرس بعد تشغيل حله النموذجي (أضف mobile لعرض الجوال)
 node tools/vendor-ts.js                  # عند تحديث إصدار TypeScript: يعيد توليد js/vendor/typescript.min.js و ts-libs.js
 python3 tools/build.py javascript        # يولّد js/content/javascript.js

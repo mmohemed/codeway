@@ -123,6 +123,14 @@ def markdown(src):
                 out.append(f'<div class="code-block out"><span class="code-label">{label}</span>{body}<div class="out-errs">{err_html}</div></div>')
                 prev_lang = lang
                 continue
+            if lang in ("vue", "angular"):
+                # ملفات المشروع ومعاينة حية، وما بعد // test فحص لا يُعرض
+                src = re.split(r"^// test\s*$", chr(10).join(code), flags=re.M)[0].rstrip()
+                name = "Vue" if lang == "vue" else "Angular"
+                out.append(f'<div class="code-block src tw-code"><span class="code-label">{name}</span><pre dir="ltr"><code>{html.escape(src)}</code></pre></div>'
+                           f'<div class="tw-preview fw-preview" data-kind="{lang}" data-src="{html.escape(src, quote=True)}"></div>')
+                prev_lang = lang
+                continue
             if lang == "testfiles":
                 src = re.split(r"^// test\s*$", chr(10).join(code), flags=re.M)[0].rstrip()
                 out.append(f'<div class="code-block src"><span class="code-label">ملفات المشروع</span><pre dir="ltr"><code>{html.escape(src)}</code></pre></div>')

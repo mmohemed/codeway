@@ -76,6 +76,7 @@
       ${lesson.exercise ? `<h2 class="sec-title">⌨️ التمرين العملي</h2><div id="exercise"></div>` : ""}
       ${lesson.quiz ? `<h2 class="sec-title">📝 اختبر فهمك</h2><div id="quiz"></div>` : ""}`;
     if (CW.renderTwDemos) CW.renderTwDemos(document.querySelector(".prose"));
+    if (CW.renderFwDemos) CW.renderFwDemos(document.querySelector(".prose"));
     if (lesson.exercise) renderExercise(lesson.exercise);
     if (lesson.quiz) renderQuiz(lesson.quiz);
   });
@@ -87,8 +88,9 @@
     const runner = meta.runner || "js";
     const isDom = runner === "js" && !!ex.html;
     const isTw = runner === "tailwind";
+    const isFw = runner === "vue" || runner === "angular";
     const setup = ex.setup || meta.setup || "";
-    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal", tailwind: "index.html", next: "Next.js", tests: "Vitest / Playwright" }[runner] || (isDom ? "script.js" : "exercise.js");
+    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal", tailwind: "index.html", next: "Next.js", tests: "Vitest / Playwright", vue: "Vue", angular: "Angular" }[runner] || (isDom ? "script.js" : "exercise.js");
     const key = `cw-code-${c.id}-${m}-${l}`;
     const saved = CW.store.get(key, null);
     box.innerHTML = `
@@ -96,6 +98,7 @@
         <div class="prose">${ex.prompt}</div>
         ${runner === "sql" && meta.schema ? `<details class="acc schema-box"><summary>📋 جداول قاعدة البيانات في هذا التمرين</summary><div class="acc-body">${ex.schema || meta.schema}</div></details>` : ""}
         ${runner === "dart" ? `<p class="muted net-note">🌐 تشغيل Dart يتم عبر خدمة الترجمة الرسمية لـ DartPad، لذلك يحتاج اتصالاً بالإنترنت.</p>` : ""}
+        ${isFw ? `<p class="muted net-note">${runner === "vue" ? "💚 Vue 3 الحقيقي مع Vue Router و Pinia" : "🅰️ Angular الحقيقي (يُترجم في المتصفح)"} يعمل في المعاينة. اكتب ملفات المشروع وابدأ كل ملف بسطر <code dir="ltr">// file: المسار</code> (أو <code dir="ltr">&lt;!-- file: المسار --&gt;</code> لملفات ${runner === "vue" ? ".vue" : "HTML"}). أول تحميل قد يستغرق ثوانيَ.</p>` : ""}
         ${runner === "tests" ? `<p class="muted net-note">🧪 اكتب ملفات المشروع والاختبارات في المحرر، وابدأ كل ملف بسطر <code dir="ltr">// file: اسم-الملف</code>. التشغيل ينفّذ الاختبارات ويعرض النتيجة كما تعرضها Vitest و Playwright.</p>` : ""}
         ${runner === "next" ? `<p class="muted net-note">▲ اكتب ملفات المشروع في المحرر، وابدأ كل ملف بسطر مثل <code dir="ltr">// file: app/page.tsx</code>. التشغيل يبني التطبيق ويزور صفحاته ويطبع النتيجة، كما يفعل الفحص.</p>` : ""}
         ${isTw ? `<p class="muted net-note">🎨 اكتب HTML بأصناف Tailwind، وستظهر المعاينة تحت المحرر. الفحص يقارن الأنماط المحسوبة فعلاً، فأي أصناف تعطي نفس النتيجة مقبولة.</p>` : ""}
@@ -112,7 +115,7 @@
             </span>
           </div>
           <textarea id="ex-code" wrap="off" spellcheck="false" aria-label="محرر التمرين"></textarea>
-          ${isDom || isTw ? `<div class="preview${isTw ? " tw" : ""}"><span class="preview-label">معاينة الصفحة</span><div id="ex-preview"></div></div>` : ""}
+          ${isDom || isTw || isFw ? `<div class="preview${isTw || isFw ? " tw" : ""}"><span class="preview-label">معاينة الصفحة</span><div id="ex-preview"></div></div>` : ""}
           <pre class="editor-out" id="ex-out"><span class="hint">// اضغط «تشغيل» لرؤية المخرجات، أو «تحقق من الحل» لتصحيح التمرين (Ctrl+Enter للتشغيل)</span></pre>
         </div>
         <div id="ex-result"></div>
@@ -136,7 +139,11 @@
         CW.renderOutput(out, view);
         done && done(graded || lines, !!graded);
       };
-      if (runner === "tests") CW.runTests(ta.value, ex.setup || "", ex.test || "", null, lines => finish(lines));
+      if (isFw) CW.runFramework(runner, ta.value, ex.setup || "", grading ? ex.test || "" : "", document.getElementById("ex-preview"), lines => {
+        const errs = lines.filter(l => l.kind === "err" || l.kind === "info");
+        finish(grading ? errs : [...errs, { kind: "info", text: "✓ تم تشغيل التطبيق في المعاينة. اضغط «تحقق من الحل» لفحصه." }], grading ? lines.filter(l => l.kind !== "info") : undefined);
+      });
+      else if (runner === "tests") CW.runTests(ta.value, ex.setup || "", ex.test || "", null, lines => finish(lines));
       else if (runner === "next") CW.loadTS().then(() => CW.nextRun(ta.value, ex.setup || "", ex.test || "")).then(lines => finish(lines), e => finish([{ kind: "err", text: e.message }]));
       else if (runner === "terminal") CW.gitRun(ta.value, ex.setup || "", ex.test || "").then(r => finish(r.shown, ex.test ? r.graded : undefined));
       else if (runner === "sql") CW.runSQL(ta.value, setup, finish);
@@ -171,7 +178,7 @@
     document.getElementById("ex-check").onclick = check;
     document.getElementById("ex-reset").onclick = () => { ta.value = ex.starter; CW.store.set(key, null); result.innerHTML = ""; };
     CW.editorKeys(ta, () => execute());
-    if (isDom || isTw) execute();
+    if (isDom || isTw || isFw) execute();
   }
 
   // ---------- الاختبار ----------
