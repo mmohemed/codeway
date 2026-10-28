@@ -35,7 +35,9 @@ module.exports = async function verifyXl(dir, runner, fill) {
         const [all, kind, code, gap, want] = m;
         checks++;
         let got;
-        try { got = textOf(exec(code, kind === "dax" ? courseSetup : "", "").shown); }
+        // أمثلة Power Query و DAX تعمل على بيانات الدورة، وأمثلة الصيغ مكتفية بجداولها
+        const isM = /^\s*(\/\/.*\n\s*)*let\b/i.test(code);
+        try { got = textOf(exec(code, kind === "dax" || isM ? courseSetup : "", "").shown.filter(l => l.kind !== "info")); }
         catch (e) { fail(`${where} مثال ${ei}`, e.stack); continue; }
         if (want === undefined) { if (/^ERR: /m.test(got)) fail(`${where} مثال ${ei}`, "مثال بلا مخرجات فيه خطأ:\n" + got); }
         else if (fill && want.trim() === "?") {

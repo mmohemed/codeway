@@ -881,12 +881,15 @@
     });
   }
   function loadText(wb, text, defaultSheet) {
-    let sheet = defaultSheet || wb.order[0] || "Sheet1", anchor = { r: 1, c: 1 }, tableRow = 0;
+    let sheet = defaultSheet || wb.order[0] || "Sheet1", anchor = { r: 1, c: 1 }, tableRow = 0, inFile = false;
     const errors = [];
     text.split("\n").forEach((raw, ln) => {
       const line = raw.replace(/\r$/, "");
       const t = line.trim();
-      if (!t || t.startsWith("#")) return;
+      // أقسام الملفات (== file: x.csv) لـ Power Query وحده، لا تُكتب في الأوراق
+      if (/^==\s*(file|table|relationship)\s*:/i.test(t)) { inFile = true; return; }
+      if (/^==/.test(t)) inFile = false;
+      if (inFile || !t || t.startsWith("#")) return;
       let m;
       if ((m = /^==\s*(.+?)\s*$/.exec(t))) { sheet = m[1]; wb.sheet(sheet); anchor = { r: 1, c: 1 }; tableRow = 0; return; }
       if ((m = /^@\s*\$?([A-Za-z]{1,3})\$?(\d+)\s*$/.exec(t))) { anchor = { r: +m[2], c: colNum(m[1]) }; tableRow = 0; return; }

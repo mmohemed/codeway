@@ -77,7 +77,7 @@
       ${lesson.quiz ? `<h2 class="sec-title">📝 اختبر فهمك</h2><div id="quiz"></div>` : ""}`;
     if (CW.renderTwDemos) CW.renderTwDemos(document.querySelector(".prose"));
     if (CW.renderFwDemos) CW.renderFwDemos(document.querySelector(".prose"));
-    if (CW.renderXlDemos) CW.renderXlDemos(document.querySelector(".prose"));
+    if (CW.renderXlDemos) CW.renderXlDemos(document.querySelector(".prose"), (CW.contentMeta[c.id] || {}).setup);
     if (CW.renderPyDemos) CW.renderPyDemos(document.querySelector(".prose"), (CW.contentMeta[c.id] || {}).setup, (CW.contentMeta[c.id] || {}).notebook);
     if (lesson.exercise) renderExercise(lesson.exercise);
     if (lesson.quiz) renderQuiz(lesson.quiz);

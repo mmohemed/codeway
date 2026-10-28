@@ -140,17 +140,19 @@
     try { r = CW.excelExec(code, setup, test); }
     catch (e) { return onDone([{ kind: "err", text: e.message }]); }
     if (r.book && r.book.wb) CW.renderWorkbook(container, r.book);
-    else if (r.table && CW.renderMTable) CW.renderMTable(container, r);
+    else if (r.steps && CW.renderMTable) CW.renderMTable(container, r);
     onDone(r.shown, r.graded);
   };
 
   // أمثلة الدروس: كل كتلة excel تُعرض جدولاً محسوباً
-  CW.renderXlDemos = function (rootEl) {
+  CW.renderXlDemos = function (rootEl, setup) {
     rootEl.querySelectorAll(".xl-preview[data-src]").forEach(el => {
       try {
-        const r = CW.excelExec(el.dataset.src, "", "");
+        const isM = /^\s*(\/\/.*\n\s*)*let\b/i.test(el.dataset.src);
+        const r = el.dataset.kind === "dax" ? CW.daxExec(el.dataset.src, setup || "", "") : CW.excelExec(el.dataset.src, isM ? setup || "" : "", "");
         if (r.book && r.book.wb) CW.renderWorkbook(el, r.book);
-        else if (r.table && CW.renderMTable) CW.renderMTable(el, r);
+        else if (r.model && CW.renderDaxModel) CW.renderDaxModel(el, r);
+        else if (r.steps && CW.renderMTable) CW.renderMTable(el, r);
       } catch (e) { el.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
     });
   };
