@@ -887,7 +887,7 @@
       const line = raw.replace(/\r$/, "");
       const t = line.trim();
       // أقسام الملفات (== file: x.csv) لـ Power Query وحده، لا تُكتب في الأوراق
-      if (/^==\s*(file|table|relationship)\s*:/i.test(t)) { inFile = true; return; }
+      if (/^==\s*(file|table|relationship|datetable)\s*:/i.test(t)) { inFile = true; return; }
       if (/^==/.test(t)) inFile = false;
       if (inFile || !t || t.startsWith("#")) return;
       let m;

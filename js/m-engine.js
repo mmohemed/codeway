@@ -580,7 +580,7 @@
     (setup || "").split("\n").forEach(line => {
       const m = /^==\s*(file|table)\s*:\s*(.+?)\s*$/i.exec(line.trim());
       if (m) { cur = m[1].toLowerCase() === "table" ? m[2] + ".csv" : m[2]; files[cur] = []; return; }
-      if (/^==\s*relationship\s*:/i.test(line.trim())) { cur = null; return; }
+      if (/^==\s*(relationship|datetable)\s*:/i.test(line.trim())) { cur = null; return; }
       if (/^==/.test(line.trim())) { cur = null; xlLines.push(line); return; }
       if (cur) files[cur].push(line); else xlLines.push(line);
     });

@@ -43,6 +43,10 @@ js/ts-runner.js       فحص أنواع TypeScript وتحويلها بالمتر
 js/kotlin-runner.js   تشغيل Kotlin عبر خدمة Kotlin Playground الرسمية من JetBrains (يحتاج إنترنت)
 js/git-sim.js         طرفية محاكاة لـ Git و GitHub CLI وأوامر الملفات، بمخرجات مطابقة للأدوات الحقيقية
 js/fw-runner.js       Vue و Angular الحقيقيان في إطار معاينة: ترجمة ملفات .vue و TypeScript في المتصفح، وواجهة وهمية وأدوات فحص
+js/py-runner.js       Python الحقيقي (Pyodide) في Web Worker مع NumPy و Pandas و Matplotlib و SciPy، وعرض يشبه Jupyter، ووضع دفتر بـ IPython (يُحمَّل من الإنترنت)
+js/xl-engine.js       محرك صيغ Excel: المراجع والتعبئة والمصفوفات المنسكبة ونحو 100 دالة، و js/xl-runner.js لورقة العمل والرسوم
+js/m-engine.js        محرك Power Query (لغة M) مع الخطوات المطبقة، لدورتي Excel و Power BI
+js/dax-engine.js      نموذج Power BI ومحرك DAX: العلاقات وسياق التصفية و CALCULATE والذكاء الزمني والمرئيات و RLS
 js/test-runner.js     مشغّل اختبارات في إطار معزول: واجهة Vitest و Testing Library و Playwright ومحاكاة GitHub Actions
 js/next-sim.js        محاكي Next.js (App Router): توجيه بالملفات ومكونات خادم وعميل و Server Actions و Route Handlers وتخزين مؤقت
 js/tw-runner.js       معاينة Tailwind الحقيقي (js/vendor/tailwind-src.js) في إطار معزول، مع فحص للأنماط المحسوبة
@@ -75,6 +79,13 @@ js/*.js               سكربت لكل صفحة
 | Tailwind CSS | ✅ مكتملة: 3 وحدات، 8 دروس، كل مثال بمعاينة حية، والتصحيح يقارن الأنماط المحسوبة فعلاً |
 | Vite و npm | ✅ مكتملة: 3 وحدات، 8 دروس: package.json والحزم والسكربتات، ومشاريع Vite والبناء، و ESLint و Prettier |
 | Git و GitHub | ✅ مكتملة: 4 وحدات، 14 درساً، تمارينها في طرفية محاكاة (فروع ودمج وتعارضات و Pull Requests و Issues) |
+| NumPy | ✅ مكتملة: وحدتان، 6 دروس بـ Python الحقيقي في المتصفح |
+| Pandas | ✅ مكتملة: 5 وحدات، 16 درساً على بيانات متجر (ملفات CSV)، من القراءة والتنظيف حتى التجميع والدمج والسلاسل الزمنية |
+| الإحصاء للبيانات | ✅ مكتملة: 3 وحدات، 10 دروس بـ NumPy و SciPy و statsmodels: الوصفي والاحتمالات وبايز والاستدلال واختبارات A/B والانحدار |
+| التصور البياني | ✅ مكتملة: 4 وحدات، 9 دروس: Matplotlib و Seaborn و Plotly (تفاعلي) ومبادئ التصور، والرسوم محفوظة صوراً في img/lessons |
+| Jupyter | ✅ مكتملة: 3 دروس، الخلايا تُنفَّذ بـ IPython الحقيقي (الأوامر السحرية و Out[n] وخلايا Markdown) |
+| Excel للتحليل | ✅ مكتملة: 3 وحدات، 8 دروس بمحاكي صيغ Excel (يحاكي ولا يشغّل Excel نفسه)، والجداول المحورية بـ GROUPBY و PIVOTBY، و Power Query |
+| Power BI | ✅ مكتملة: 3 وحدات، 8 دروس بمحاكي نموذج Power BI ومحرك DAX (يحاكي ولا يشغّل Power BI نفسه) |
 | بقية الدورات | الهيكل جاهز والمحتوى قيد الإعداد |
 
 ### كتابة الدروس
@@ -92,6 +103,9 @@ node tools/verify.js git --fill          # دورات الطرفية: يعيد �
 python3 tools/reset-expected.py git      # بعد تعديل المحاكي: يعيد كل expected إلى "?" لتُحسب من جديد
 node tools/verify.js tailwind --fill     # Tailwind يُتحقق منه في متصفح حقيقي (Playwright)
 node tools/verify.js vue --fill          # Vue و Angular يُتحقق منهما في متصفح حقيقي بنفس مشغّل الطالب
+PYODIDE_DIR=/path/to/pyodide node tools/verify.js pandas --fill   # دورات Python: توزيعة Pyodide 0.29.5 الكاملة (من إصدارات GitHub)، وتُحفظ الرسوم في img/lessons
+node tools/verify.js excel --fill        # Excel و Power BI بنفس محركات المتصفح (xl-engine و m-engine و dax-engine)
+python3 tools/reset-outputs.py pandas m2.md   # يعيد كتل output و expected إلى "?" لإعادة ملئها
 node tools/shot.js git 1 2 out.png       # لقطة شاشة لدرس بعد تشغيل حله النموذجي (أضف mobile لعرض الجوال)
 node tools/vendor-ts.js                  # عند تحديث إصدار TypeScript: يعيد توليد js/vendor/typescript.min.js و ts-libs.js
 python3 tools/build.py javascript        # يولّد js/content/javascript.js

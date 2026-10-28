@@ -108,7 +108,7 @@ def markdown(src):
                      "sql": "SQL", "sql-error": "SQL", "dart": "Dart", "dart-error": "Dart",
                      "ts": "TypeScript", "ts-error": "TypeScript", "kotlin": "Kotlin", "kotlin-error": "Kotlin",
                      "bash": "الطرفية", "tsx-error": "TSX", "json": "JSON", "yaml": "YAML", "tsx": "TSX", "jsx": "JSX", "ini": "الإعدادات",
-                     "terminal": "الطرفية", "terminal-new": "الطرفية", "terminal-error": "الطرفية", "python-norun": "Python"}.get(lang, lang)
+                     "terminal": "الطرفية", "terminal-new": "الطرفية", "terminal-error": "الطرفية", "python-norun": "Python", "dax-text": "DAX"}.get(lang, lang)
             cls = "out" if lang in ("text", "output") else "src"
             if lang == "output" and prev_lang == "sql":
                 out.append(f'<div class="code-block out sql-out"><span class="code-label">النتيجة</span><div class="table-wrap">{sql_result_html(chr(10).join(code))}</div></div>')
