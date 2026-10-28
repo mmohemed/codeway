@@ -77,6 +77,7 @@
       ${lesson.quiz ? `<h2 class="sec-title">📝 اختبر فهمك</h2><div id="quiz"></div>` : ""}`;
     if (CW.renderTwDemos) CW.renderTwDemos(document.querySelector(".prose"));
     if (CW.renderFwDemos) CW.renderFwDemos(document.querySelector(".prose"));
+    if (CW.renderGameDemos) CW.renderGameDemos(document.querySelector(".prose"));
     if (CW.renderXlDemos) CW.renderXlDemos(document.querySelector(".prose"), (CW.contentMeta[c.id] || {}).setup);
     if (CW.renderPyDemos) CW.renderPyDemos(document.querySelector(".prose"), (CW.contentMeta[c.id] || {}).setup, (CW.contentMeta[c.id] || {}).notebook);
     if (lesson.exercise) renderExercise(lesson.exercise);
@@ -93,8 +94,9 @@
     const isFw = runner === "vue" || runner === "angular";
     const isPy = runner === "python";
     const isXl = runner === "excel" || runner === "dax";
+    const isGame = ["phaser", "godot", "unity", "unreal"].includes(runner);
     const setup = ex.setup || meta.setup || "";
-    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal", tailwind: "index.html", next: "Next.js", tests: "Vitest / Playwright", vue: "Vue", angular: "Angular", python: meta.notebook ? "notebook.ipynb" : "main.py", excel: "Book1.xlsx", dax: "Report.pbix" }[runner] || (isDom ? "script.js" : "exercise.js");
+    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal", tailwind: "index.html", next: "Next.js", tests: "Vitest / Playwright", vue: "Vue", angular: "Angular", python: meta.notebook ? "notebook.ipynb" : "main.py", excel: "Book1.xlsx", dax: "Report.pbix", phaser: "game.js", godot: "player.gd", unity: "PlayerController.cs", unreal: "Unreal" }[runner] || (isDom ? "script.js" : "exercise.js");
     const key = `cw-code-${c.id}-${m}-${l}`;
     const saved = CW.store.get(key, null);
     box.innerHTML = `
@@ -110,6 +112,7 @@
         ${isPy ? `<p class="muted net-note">🐍 Python الحقيقي (Pyodide) يعمل في متصفحك مع NumPy و Pandas و Matplotlib و SciPy. يُحمَّل من الإنترنت عند أول تشغيل فقط وقد يستغرق ثوانيَ. كما في Jupyter: قيمة آخر سطر تُعرض تلقائياً، والرسوم تظهر تحت المخرجات.</p>` : ""}
         ${runner === "excel" ? `<p class="muted net-note">📗 محاكي Excel: اكتب كل خلية في سطر بالصيغة <code dir="ltr">D2: =B2*C2</code>، ولتعبئة الصيغة لأسفل كما تسحبها في Excel اكتب النطاق: <code dir="ltr">D2:D6: =B2*C2</code> (المراجع النسبية تتعدل تلقائياً و $ تثبتها). البيانات جاهزة في الجدول تحت المحرر.</p>` : ""}
         ${runner === "dax" ? `<p class="muted net-note">📊 محاكي Power BI: اكتب تعليمات النموذج سطراً سطراً: مقياس <code dir="ltr">Total = SUM(Sales[Units])</code>، وعمود محسوب <code dir="ltr">Sales[X] = ...</code>، و <code dir="ltr">relationship:</code> و <code dir="ltr">visual:</code> و <code dir="ltr">filter:</code>، والأسطر المزاحة تكمل السطر السابق. والاستعلام الذي يبدأ بـ <code dir="ltr">let</code> يُنفَّذ في Power Query.</p>` : ""}
+        ${runner === "phaser" ? `<p class="muted net-note">🎮 Phaser الحقيقي (الإصدار 4) يعمل في المعاينة: انقر على اللعبة ثم استخدم لوحة المفاتيح. الرسوم المتاحة: <code dir="ltr">assets/player.png</code> و <code dir="ltr">platform</code> و <code dir="ltr">star</code> و <code dir="ltr">coin</code> و <code dir="ltr">enemy</code> و <code dir="ltr">bomb</code> و <code dir="ltr">bullet</code> و <code dir="ltr">ship</code> و <code dir="ltr">sky</code>. الفحص يشغّل لعبتك إطاراً إطاراً ويضغط المفاتيح بنفسه.</p>` : ""}
         ${runner === "kotlin" ? `<p class="muted net-note">🌐 تشغيل Kotlin يتم عبر خدمة Kotlin Playground الرسمية من JetBrains، لذلك يحتاج اتصالاً بالإنترنت، وقد يستغرق ثوانيَ قليلة.</p>` : ""}
         <div class="editor">
           <div class="editor-bar">
@@ -123,6 +126,7 @@
           </div>
           <textarea id="ex-code" wrap="off" spellcheck="false" aria-label="محرر التمرين"></textarea>
           ${isDom || isTw || isFw ? `<div class="preview${isTw || isFw ? " tw" : ""}"><span class="preview-label">معاينة الصفحة</span><div id="ex-preview"></div></div>` : ""}
+          ${isGame ? `<div class="preview game"><span class="preview-label">${runner === "phaser" ? "اللعبة" : "المشهد"}</span><div id="ex-preview"></div></div>` : ""}
           ${isXl ? `<div class="preview xl"><span class="preview-label">${runner === "dax" ? "النموذج والمرئيات" : "ورقة العمل"}</span><div id="ex-preview" class="xl-preview"></div></div>` : ""}
           <pre class="editor-out" id="ex-out"><span class="hint">// اضغط «تشغيل» لرؤية المخرجات، أو «تحقق من الحل» لتصحيح التمرين (Ctrl+Enter للتشغيل)</span></pre>
         </div>
@@ -156,6 +160,10 @@
       else if (runner === "terminal") CW.gitRun(ta.value, ex.setup || "", ex.test || "").then(r => finish(r.shown, ex.test ? r.graded : undefined));
       else if (isPy) CW.runPython(ta.value, [meta.setup, ex.setup].filter(Boolean).join("\n"), grading ? ex.test || "" : "", (shown, graded) =>
         finish(shown.length ? shown : [{ kind: "info", text: "لا توجد مخرجات. استخدم print() أو اكتب اسم المتغير في آخر سطر." }], graded), out, meta.notebook);
+      else if (isGame) CW.runGame(runner, ta.value, [meta.setup, ex.setup].filter(Boolean).join("\n"), grading ? ex.test || "" : "", document.getElementById("ex-preview"), lines => {
+        const errs = lines.filter(l => l.kind === "err" || l.kind === "info");
+        finish(grading ? errs : lines.length ? lines : [{ kind: "info", text: "✓ تعمل اللعبة في المعاينة. اضغط «تحقق من الحل» لفحصها." }], grading ? lines.filter(l => l.kind !== "info") : undefined);
+      });
       else if (runner === "excel") CW.runExcel(ta.value, [meta.setup, ex.setup].filter(Boolean).join("\n"), grading ? ex.test || "" : "", document.getElementById("ex-preview"), (shown, graded) => finish(shown, graded));
       else if (runner === "dax") CW.runDax(ta.value, [meta.setup, ex.setup].filter(Boolean).join("\n"), grading ? ex.test || "" : "", document.getElementById("ex-preview"), (shown, graded) => finish(shown, graded));
       else if (runner === "sql") CW.runSQL(ta.value, setup, finish);
@@ -190,7 +198,7 @@
     document.getElementById("ex-check").onclick = check;
     document.getElementById("ex-reset").onclick = () => { ta.value = ex.starter; CW.store.set(key, null); result.innerHTML = ""; };
     CW.editorKeys(ta, () => execute());
-    if (isDom || isTw || isFw || isXl) execute();
+    if (isDom || isTw || isFw || isXl || isGame) execute();
   }
 
   // ---------- الاختبار ----------

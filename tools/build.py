@@ -151,6 +151,14 @@ def markdown(src):
                 out.append(f'<div class="code-block out"><span class="code-label">{label}</span>{"".join(parts)}</div>')
                 prev_lang = lang
                 continue
+            if lang in ("phaser", "godot", "unity", "unreal"):
+                # مثال لعبة: الكود ثم معاينة حية، وما بعد // test فحص لا يُعرض
+                src = re.split(r"^(?://|#) test\s*$", chr(10).join(code), flags=re.M)[0].rstrip()
+                name = {"phaser": "Phaser", "godot": "GDScript", "unity": "C# (Unity)", "unreal": "Unreal"}[lang]
+                out.append(f'<div class="code-block src game-code"><span class="code-label">{name}</span><pre dir="ltr"><code>{html.escape(src)}</code></pre></div>'
+                           f'<div class="game-preview" data-kind="{lang}" data-src="{html.escape(src, quote=True)}"></div>')
+                prev_lang = lang
+                continue
             if lang in ("vue", "angular"):
                 # ملفات المشروع ومعاينة حية، وما بعد // test فحص لا يُعرض
                 src = re.split(r"^// test\s*$", chr(10).join(code), flags=re.M)[0].rstrip()

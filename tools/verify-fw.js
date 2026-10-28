@@ -5,6 +5,9 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 
+// محاكيات محركات الألعاب: ملفات تُحمَّل في صفحة الفحص لكل نوع
+const GAME_SIMS = { godot: ["game-sim.js", "gd-interp.js"], unity: ["game-sim.js", "cs-interp.js"], unreal: ["game-sim.js", "cs-interp.js", "bp-interp.js"] };
+const GAME_KINDS = ["phaser", "godot", "unity", "unreal"];
 module.exports = async function verifyFw(dir, kind, fill) {
   let playwright;
   try { playwright = require("playwright"); }
@@ -13,15 +16,15 @@ module.exports = async function verifyFw(dir, kind, fill) {
   // الصفحة المؤقتة في جذر المشروع حتى تعمل المسارات النسبية (js/vendor/...)
   const harness = path.join(root, `.cw-harness-${process.pid}.html`);
   fs.writeFileSync(harness, `<!DOCTYPE html><html><head><meta charset="utf-8"><script>window.CW = {};</script>
-<script src="js/ts-runner.js"></script><script src="js/fw-runner.js"></script></head><body></body></html>`);
+<script src="js/ts-runner.js"></script><script src="js/fw-runner.js"></script><script src="js/game-runner.js"></script>${(GAME_SIMS[kind] || []).map(f => `<script src="js/${f}"></script>`).join("")}</head><body></body></html>`);
   const browser = await playwright.chromium.launch();
   const page = await browser.newPage();
   const pageErrors = [];
   page.on("pageerror", e => pageErrors.push(e.message));
   await page.goto("file://" + harness);
-  const run = (code, setup, test) => page.evaluate(([kind, code, setup, test]) => new Promise(res => {
-    CW.runFramework(kind, code, setup, test, null, lines => res(lines.filter(l => l.kind !== "info").map(l => (l.kind === "err" ? "ERR: " : "") + l.text).join("\n")));
-  }), [kind, code, setup, test]);
+  const run = (code, setup, test) => page.evaluate(([kind, code, setup, test, GAME]) => new Promise(res => {
+    (GAME ? CW.runGame : CW.runFramework)(kind, code, setup, test, null, lines => res(lines.filter(l => l.kind !== "info").map(l => (l.kind === "err" ? "ERR: " : "") + l.text).join("\n")));
+  }), [kind, code, setup, test, GAME_KINDS.includes(kind)]);
 
   let fails = 0, checks = 0;
   const fail = (where, msg) => { fails++; console.log(`✗ ${where}\n  ${msg.replace(/\n/g, "\n  ")}`); };
