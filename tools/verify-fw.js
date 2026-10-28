@@ -6,7 +6,7 @@ const path = require("path");
 const { execSync } = require("child_process");
 
 // محاكيات محركات الألعاب: ملفات تُحمَّل في صفحة الفحص لكل نوع
-const GAME_SIMS = { godot: ["game-sim.js", "gd-interp.js"], unity: ["game-sim.js", "cs-interp.js", "unity-sim.js"], unreal: ["game-sim.js", "cs-interp.js", "bp-interp.js"] };
+const GAME_SIMS = { godot: ["game-sim.js", "gd-interp.js"], unity: ["game-sim.js", "cs-interp.js", "unity-sim.js"], unreal: ["game-sim.js", "cs-interp.js", "bp-interp.js", "unreal-sim.js"] };
 const GAME_KINDS = ["phaser", "godot", "unity", "unreal"];
 module.exports = async function verifyFw(dir, kind, fill) {
   let playwright;

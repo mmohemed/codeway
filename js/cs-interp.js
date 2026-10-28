@@ -90,7 +90,7 @@
       }
       let m;
       const rest = src.slice(i, i + 64);
-      if ((m = /^(0[xX][0-9a-fA-F_]+|(?:\d[\d_]*)?\.\d[\d_]*(?:[eE][-+]?\d+)?|\d[\d_]*(?:[eE][-+]?\d+)?|\d+\.(?=[fF]))([fFdDmMuUlL]{0,2})/.exec(rest))) {
+      if ((m = /^(0[xX][0-9a-fA-F_]+|(?:\d[\d_]*)?\.\d[\d_]*(?:[eE][-+]?\d+)?|\d+\.(?=[fF])|\d[\d_]*(?:[eE][-+]?\d+)?)([fFdDmMuUlL]{0,2})/.exec(rest))) {
         const body = m[1].replace(/_/g, ""), suf = m[2].toLowerCase();
         let kind;
         if (suf.includes("f")) kind = "f";
@@ -359,7 +359,7 @@
     function declAhead() {
       const save = p;
       const ty = tryType();
-      const ok = ty && at("id") && !KEYWORDS.has(t[p].v) && peek().k === "op" && ["=", ";", ",", "{", "("].includes(peek().v) && !(peek().v === "(" );
+      const ok = ty && at("id") && !KEYWORDS.has(t[p].v) && peek().k === "op" && ["=", ";", ",", "{", "("].includes(peek().v) && !(peek().v === "(" && !cpp);
       p = save;
       return !!ok;
     }
@@ -395,6 +395,17 @@
           case "do": { p++; const body = statement(); if (!isId("while")) fail("error CS1003: Syntax error, 'while' expected", line()); p++; expect("("); const c = expr(); expect(")"); expect(";"); return { k: "do", c, body, line: ln }; }
           case "for": {
             p++; expect("(");
+            if (cpp) {
+              // for (AActor* A : Actors)
+              const save = p;
+              const ty = tryType();
+              if (ty && at("id") && peek().k === "op" && peek().v === ":") {
+                const name = next().v; p++;
+                const iter = expr(); expect(")");
+                return { k: "foreach", type: ty, name, iter, body: statement(), line: ln };
+              }
+              p = save;
+            }
             let init = [];
             if (!isOp(";")) { if (isId("var") || declAhead()) init = [localDecl(false)]; else { do { if (isOp(",")) p++; init.push({ k: "expr", e: expr() }); } while (isOp(",")); } }
             expect(";");
@@ -558,6 +569,7 @@
     function member(cls) {
       const attrs = attributes();
       if (isOp(";")) { p++; return; }
+      if (isOp("}") || (cpp && at("id") && ["public", "private", "protected"].includes(t[p].v) && peek().k === "op" && peek().v === ":")) return;
       const mods = modifiers();
       const ln = line();
       if (isId("class") || isId("struct") || isId("interface") || isId("enum")) { const kind = next().v; const d = typeDecl(kind, cls, attrs); d.outer = cls.name; cls.nested.push(d); types.push(d); return; }
@@ -653,7 +665,8 @@
           if (mname === cname) {
             if (isOp(":")) { p++; while (!isOp("{")) p++; }
             const { body } = methodBody();
-            cls.ctors.push({ params: ps, body, line: ln });
+            const decl = cls.ctors.find(c => !c.body && c.params.length === ps.length);
+            if (decl) Object.assign(decl, { params: ps, body, line: ln }); else cls.ctors.push({ params: ps, body, line: ln });
           } else {
             const { body, iter } = methodBody();
             const list = cls.methods.get(mname) || [];
@@ -729,8 +742,9 @@
     return (neg && r !== 0 ? "-" : "") + r.toFixed(d);
   }
 
-  let toStrHook = null;
+  let toStrHook = null, primHook = null;
   function toStr(v) {
+    if (primHook) { const r = primHook(v); if (r !== undefined) return r; }
     if (v === null || v === undefined) return "";
     if (typeof v === "string") return v;
     if (typeof v === "boolean") return v ? "True" : "False";
@@ -764,7 +778,7 @@
   class TypeRef { constructor(name, cls, native) { this.name = name; this.cls = cls; this.native = native; } __str() { return this.name; } }
 
   CW.cs = { lex, parse, CSError, CSException, Num, Chr, F, D, EnumVal, Obj, CList, CArr, CDict, Callable, Multicast, TypeRef, fstr, toStr, formatNum, fail, raise, isNum, nv, numKind, keyOf,
-    setToStrHook: h => { toStrHook = h; } };
+    setToStrHook: h => { toStrHook = h; }, setPrimHook: h => { primHook = h; } };
 })(typeof window !== "undefined" ? window : globalThis);
 
 // ---------- التنفيذ ----------
@@ -790,8 +804,9 @@
   }
 
   class Runtime {
-    constructor(types, host) {
+    constructor(types, host, opts = {}) {
       this.host = host;
+      this.cpp = !!opts.cpp;
       this.classes = new Map();
       this.enums = new Map();
       this.steps = 0;
@@ -875,6 +890,7 @@
     }
     // 5.5 بلا f في متغير float: رسالة C# الخاصة بالقيم الحرفية
     litCheck(e, type, line) {
+      if (this.cpp) return;
       if (e && e.k === "lit" && e.v instanceof Num && e.v.t === "d" && type && type.name === "float") fail("error CS0664: Literal of type double cannot be implicitly converted to type 'float'; use an 'F' suffix to create a literal of this type", line);
       if (e && e.k === "unary" && e.op === "-") this.litCheck(e.e, type, line);
     }
@@ -890,12 +906,14 @@
       if (v === null || v === undefined) { if (NUMS.has(n) || n === "bool") fail(`error CS0037: Cannot convert null to '${n}' because it is a non-nullable value type`, line); return null; }
       if (INTS.has(n)) {
         if (typeof v === "number") return v;
+        if (this.cpp && v instanceof Num) return Math.trunc(v.v) | 0;   // C++ يحوّل ضمنياً (مع تحذير)
+        if (this.cpp && typeof v === "boolean") return v ? 1 : 0;
         if (v instanceof Chr) return v.c.charCodeAt(0);
         if (v instanceof Num) conv(numKind(v), n);
         if (v instanceof EnumVal) conv(v.type, n);
         bad();
       }
-      if (n === "float") { if (typeof v === "number") return F(v); if (v instanceof Num) { if (v.t === "f") return v; conv("double", "float"); } if (v instanceof Chr) return F(v.c.charCodeAt(0)); bad(); }
+      if (n === "float") { if (typeof v === "number") return F(v); if (v instanceof Num) { if (v.t === "f") return v; if (this.cpp) return F(v.v); conv("double", "float"); } if (v instanceof Chr) return F(v.c.charCodeAt(0)); bad(); }
       if (n === "double" || n === "decimal") { if (isNum(v)) return D(nv(v)); bad(); }
       if (n === "bool") { if (typeof v === "boolean") return v; if (v && v.__bool) return v.__bool(); bad(); }
       if (n === "string" || n === "FString") { if (typeof v === "string") return v; if (n === "FString" && v && v.__type === "FText") return v.s; bad(); }
@@ -999,7 +1017,7 @@
         scope.set(p.name, { v: this.coerce(v, p.type, line || m.line), type: p.type });
       });
       if (!m.body) return null;
-      if (m.iter) return new Enumerator(() => this.execBlock(m.body.body, env), m.name);
+      if (m.iter) { const en = new Enumerator(() => this.execBlock(m.body.body, env), m.name); return m.event && this.host.runEvent ? this.host.runEvent(en, self, m) : en; }
       const r = this.runBlock(m.body, env);
       if (m.ret && m.ret.name !== "void" && r !== undefined) return this.coerce(r, m.ret, m.line);
       return r === undefined ? null : r;
@@ -1041,7 +1059,7 @@
           for (const d of s.decls) {
             if (this.lookupLocal(env, d.name)) fail(`error CS0128: A local variable named '${d.name}' is already defined in this scope`, s.line);
             this.litCheck(d.init, s.type, s.line);
-            let v = d.init ? this.eval(d.init, env, s.type) : (s.type.name === "var" ? fail("error CS0818: Implicitly-typed variables must be initialized", s.line) : undefined);
+            let v = d.init ? this.eval(d.init, env, s.type) : (s.type.name === "var" ? fail("error CS0818: Implicitly-typed variables must be initialized", s.line) : this.cpp ? this.defaultFor(s.type) : undefined);
             const type = s.type.name === "var" || s.type.name === "auto" ? this.typeOfValue(v) : s.type;
             if (v !== undefined) v = this.coerce(v, type, s.line);
             sc.set(d.name, { v, type, konst: s.konst, unassigned: v === undefined });
@@ -1225,6 +1243,8 @@
     // ----- التعبيرات -----
     truthy(v, line) {
       if (typeof v === "boolean") return v;
+      if (this.cpp && isNum(v)) return nv(v) !== 0;
+      if (this.cpp && (v === null || v === undefined)) return false;
       if (v && v.__bool) return v.__bool();
       if (v === null || v === undefined) { if (this.host.nullTruth) return false; }
       if (this.host.truth) { const t = this.host.truth(v); if (t !== undefined) return t; }
@@ -1365,7 +1385,7 @@
           if (pr) return this.getProp(null, pr, line);
           const nst = obj.cls.nested.find(x => x.name === name);
           if (nst) return new TypeRef(name, this.classes.get(name));
-          if (this.hasMethod(obj.cls, name)) return new Callable((...a) => this.callStatic(obj.cls, name, a, line), name);
+          if (this.hasMethod(obj.cls, name)) { const c = new Callable((...a) => this.callStatic(obj.cls, name, a, line), name); c.method = name; c.cls = obj.cls; return c; }
           fail(`error CS0117: '${obj.name}' does not contain a definition for '${name}'`, line);
         }
         if (this.enums.has(obj.name)) {
@@ -1423,6 +1443,8 @@
     builtinCall(obj, name, args, targs, line) {
       const A = args;
       if (obj instanceof TypeRef) {
+        if (obj.cls && name === "StaticClass") return obj;   // ACoin::StaticClass() في Unreal
+        if (obj.cls && !this.hasMethod(obj.cls, name) && this.host.typeCall) { const r = this.host.typeCall(obj, name, args, targs, line); if (r !== undefined) return r.v; }
         if (obj.cls) return this.callStatic(obj.cls, name, args, line, targs);
         if (this.enums.has(obj.name)) fail(`error CS0117: '${obj.name}' does not contain a definition for '${name}'`, line);
         if (obj.native && obj.native.__call) { const r = obj.native.__call(name, args, targs, line); if (r !== undefined) return r.v; }
@@ -1459,6 +1481,8 @@
       const range = (a, l) => { if (a < 0 || a > s.length || (l !== undefined && (l < 0 || a + l > s.length))) raise("ArgumentOutOfRangeException", "Index and length must refer to a location within the string."); };
       switch (name) {
         case "ToUpper": case "ToUpperInvariant": return s.toUpperCase();
+        case "Len": return s.length;
+        case "IsEmpty": return s.length === 0;
         case "ToLower": case "ToLowerInvariant": return s.toLowerCase();
         case "Contains": return s.includes(toStr(A[0]));
         case "StartsWith": return s.startsWith(toStr(A[0]));
@@ -1498,13 +1522,20 @@
         case "Sort": if (A.length) a.sort((x, y) => nv(fn(A[0])(x, y))); else a.sort((x, y) => isNum(x) ? nv(x) - nv(y) : toStr(x) < toStr(y) ? -1 : toStr(x) > toStr(y) ? 1 : 0); bump(); return { v: null };
         case "Reverse": a.reverse(); bump(); return { v: null };
         case "ToArray": return { v: new CArr(a.slice(), L.elem) };
-        case "Find": { const f = fn(A[0]); const x = a.find(y => this.truthy(f(y))); return { v: x === undefined ? this.defaultFor(L.elem) : x }; }
+        case "Find": { if (!(A[0] instanceof Callable)) return { v: a.findIndex(x => this.equals(x, A[0])) }; const f = fn(A[0]); const x = a.find(y => this.truthy(f(y))); return { v: x === undefined ? this.defaultFor(L.elem) : x }; }
         case "FindIndex": { const f = fn(A[0]); return { v: a.findIndex(y => this.truthy(f(y))) }; }
         case "FindAll": { const f = fn(A[0]); return { v: mk(a.filter(y => this.truthy(f(y)))) }; }
         case "Exists": { const f = fn(A[0]); return { v: a.some(y => this.truthy(f(y))) }; }
         case "ForEach": { const f = fn(A[0]); a.slice().forEach(x => f(x)); return { v: null }; }
       }
       switch (name) {
+        case "Num": case "Length": return { v: a.length };
+        case "Get": { const k = nv(A[0]); if (k < 0 || k >= a.length) raise("ArgumentOutOfRangeException", `Attempted to access index ${k} from array of length ${a.length}`); return { v: a[k] }; }
+        case "IsValidIndex": return { v: nv(A[0]) >= 0 && nv(A[0]) < a.length };
+        case "IsEmpty": return { v: a.length === 0 };
+        case "Empty": a.length = 0; bump(); return { v: null };
+        case "Find": if (!isList || !(A[0] instanceof Callable)) return { v: a.findIndex(x => this.equals(x, A[0])) }; break;
+        case "AddUnique": if (!a.some(x => this.equals(x, A[0]))) { a.push(A[0]); bump(); return { v: a.length - 1 }; } return { v: a.findIndex(x => this.equals(x, A[0])) };
         case "Contains": return { v: a.some(x => this.equals(x, A[0])) };
         case "IndexOf": return { v: a.findIndex(x => this.equals(x, A[0])) };
         // LINQ (using System.Linq)
@@ -1712,6 +1743,11 @@
           if (bc) { const m = this.findMethod(bc, f.name, args.length, args); if (m) return this.invoke(m.m, m.cls, env.self, args, e.line); }
           if (this.host.baseCall) { const r = this.host.baseCall(env.self, f.name, args, e.line); if (r !== undefined) return r.v; }
           return null;
+        }
+        // Base::Method() في C++: استدعاء نسخة صنف أب على this نفسه
+        if (this.cpp && f.obj.k === "id" && this.classes.has(f.obj.name) && env.self instanceof Obj && env.self.cls.allBases.has(f.obj.name) && !this.lookupLocal(env, f.obj.name)) {
+          const m = this.findMethod(this.classes.get(f.obj.name), f.name, args.length, args);
+          if (m && !m.m.mods.has("static")) return this.invoke(m.m, m.cls, env.self, args, e.line);
         }
         const obj = this.eval(f.obj, env);
         if (f.cond && this.isNullish(obj)) return null;

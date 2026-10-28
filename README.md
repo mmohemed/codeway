@@ -47,6 +47,12 @@ js/py-runner.js       Python الحقيقي (Pyodide) في Web Worker مع NumPy
 js/xl-engine.js       محرك صيغ Excel: المراجع والتعبئة والمصفوفات المنسكبة ونحو 100 دالة، و js/xl-runner.js لورقة العمل والرسوم
 js/m-engine.js        محرك Power Query (لغة M) مع الخطوات المطبقة، لدورتي Excel و Power BI
 js/dax-engine.js      نموذج Power BI ومحرك DAX: العلاقات وسياق التصفية و CALCULATE والذكاء الزمني والمرئيات و RLS
+js/game-runner.js     Phaser 4 الحقيقي (js/vendor/phaser-src.js) في إطار معزول، بخطوات إطار ثابتة ومدخلات محاكاة في الفحص، و js/game-assets.js رسوم الدروس
+js/game-sim.js        عالم ألعاب ثنائي الأبعاد مشترك للمحاكيات: كيانات وأجسام وتصادم صناديق محاذية و Raycast ومدخلات ورسم
+js/gd-interp.js       محاكي Godot: مفسّر GDScript (Godot 4) وشجرة العقد والإشارات و await
+js/cs-interp.js       مفسّر C# (ووضع C++ لـ Unreal): أصناف وخصائص و List و Dictionary ومكررات و float بـ 32 بت وأخطاء الترجمة الشائعة
+js/unity-sim.js       محاكي Unity: GameObjects ومكوّنات ودورة حياة MonoBehaviour والفيزياء و Input و Coroutines والمشاهد والواجهة و Animator
+js/bp-interp.js       Blueprints نصية (كل سطر عقدة) تُترجم لنفس شجرة التنفيذ، و js/unreal-sim.js محاكي Unreal: Actors ومكوّنات و Delay و Timers و UE_LOG
 js/test-runner.js     مشغّل اختبارات في إطار معزول: واجهة Vitest و Testing Library و Playwright ومحاكاة GitHub Actions
 js/next-sim.js        محاكي Next.js (App Router): توجيه بالملفات ومكونات خادم وعميل و Server Actions و Route Handlers وتخزين مؤقت
 js/tw-runner.js       معاينة Tailwind الحقيقي (js/vendor/tailwind-src.js) في إطار معزول، مع فحص للأنماط المحسوبة
@@ -86,6 +92,10 @@ js/*.js               سكربت لكل صفحة
 | Jupyter | ✅ مكتملة: 3 دروس، الخلايا تُنفَّذ بـ IPython الحقيقي (الأوامر السحرية و Out[n] وخلايا Markdown) |
 | Excel للتحليل | ✅ مكتملة: 3 وحدات، 8 دروس بمحاكي صيغ Excel (يحاكي ولا يشغّل Excel نفسه)، والجداول المحورية بـ GROUPBY و PIVOTBY، و Power Query |
 | Power BI | ✅ مكتملة: 3 وحدات، 8 دروس بمحاكي نموذج Power BI ومحرك DAX (يحاكي ولا يشغّل Power BI نفسه) |
+| Phaser.js | ✅ مكتملة: وحدتان، 5 دروس، كل مثال لعبة حقيقية بـ Phaser 4 تُلعب بلوحة المفاتيح |
+| Godot | ✅ مكتملة: وحدتان، 5 دروس بمحاكي Godot تعليمي (مفسّر GDScript وفيزياء مبسطة، وليس محرك Godot نفسه) |
+| Unity | ✅ مكتملة: 5 وحدات، 14 درساً بمحاكي Unity تعليمي (مفسّر C# وفيزياء ثنائية الأبعاد مبسطة، وليس محرر Unity نفسه) |
+| Unreal Engine | ✅ مكتملة: 3 وحدات، 6 دروس بمحاكي Unreal تعليمي: Blueprints مكتوبة نصاً ومجموعة من C++ بأسلوب Unreal على مستوى جانبي (وليس Unreal نفسه) |
 | بقية الدورات | الهيكل جاهز والمحتوى قيد الإعداد |
 
 ### كتابة الدروس
@@ -105,6 +115,7 @@ node tools/verify.js tailwind --fill     # Tailwind يُتحقق منه في م�
 node tools/verify.js vue --fill          # Vue و Angular يُتحقق منهما في متصفح حقيقي بنفس مشغّل الطالب
 PYODIDE_DIR=/path/to/pyodide node tools/verify.js pandas --fill   # دورات Python: توزيعة Pyodide 0.29.5 الكاملة (من إصدارات GitHub)، وتُحفظ الرسوم في img/lessons
 node tools/verify.js excel --fill        # Excel و Power BI بنفس محركات المتصفح (xl-engine و m-engine و dax-engine)
+node tools/verify.js unity --fill        # الألعاب (phaser و godot و unity و unreal) تُتحقق في متصفح حقيقي: ما بعد السطر "// test" أو "# test" فحص يتقدم إطاراً إطاراً
 python3 tools/reset-outputs.py pandas m2.md   # يعيد كتل output و expected إلى "?" لإعادة ملئها
 node tools/shot.js git 1 2 out.png       # لقطة شاشة لدرس بعد تشغيل حله النموذجي (أضف mobile لعرض الجوال)
 node tools/vendor-ts.js                  # عند تحديث إصدار TypeScript: يعيد توليد js/vendor/typescript.min.js و ts-libs.js
