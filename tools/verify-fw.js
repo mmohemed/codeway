@@ -47,7 +47,7 @@ module.exports = async function verifyFw(dir, kind, fill) {
         while ((m = re.exec(body))) {
           bi++;
           checks++;
-          const [code, test] = m[1].split(/^\/\/ test\s*$/m);
+          const [code, test] = m[1].split(/^(?:\/\/|#) test\s*$/m);
           const got = await run(code, "", test || "");
           if (m[3] !== undefined) {
             if (fill && m[3].trim() === "?") {
