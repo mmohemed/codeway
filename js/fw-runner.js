@@ -180,6 +180,7 @@
       const method = String(init.method || (input && input.method) || "GET").toUpperCase();
       if (!/^(https:\/\/api\.codeway\.dev|\/api\/|http:\/\/localhost:4200\/api\/)/.test(url)) return realFetch ? Promise.reject(new TypeError("Failed to fetch")) : null;
       api.calls++; api.log.push(`${method} ${url.replace(/^https?:\/\/[^/]+/, "")}`);
+      try { api.lastHeaders = Object.fromEntries(new Headers(init.headers || (input && input.headers) || {})); } catch (e) { api.lastHeaders = {}; }
       api.pending++;
       try {
         await new Promise(r => setTimeout(r, api.delay));
@@ -208,7 +209,7 @@
         return ref;
       };
       libs = {
-        "@angular/core": c, "@angular/common": NG.common, "@angular/common/http": NG.http, "@angular/router": NG.router, "@angular/forms": NG.forms,
+        "@angular/core": c, "@angular/core/rxjs-interop": NG.rxjsInterop, "@angular/common": NG.common, "@angular/common/http": NG.http, "@angular/router": NG.router, "@angular/forms": NG.forms,
         "@angular/platform-browser": Object.assign({}, NG.platformBrowser, { bootstrapApplication }), rxjs: NG.rxjs, "rxjs/operators": NG.operators
       };
     }
@@ -248,6 +249,7 @@
       print: (...a) => say(a.map(fmt).join(" ")),
       check: (label, cond) => say(`${cond ? "✓" : "✗"} ${label}`),
       $, $$, api, settle,
+      wait: async ms => { await tick(ms); await settle(); },
       // innerText يحترم العناصر الكتلية، فتُفصل الأسطر بمسافة بدل أن تلتصق الكلمات
       text: s => { const e = typeof s === "string" ? $(s) : s; return e ? norm(e.innerText !== undefined ? e.innerText : e.textContent) : null; },
       texts: s => $$(s).map(e => norm(e.innerText !== undefined ? e.innerText : e.textContent)),
@@ -270,6 +272,8 @@
         const r = window.__ngApp && window.__ngApp.injector.get(NG.router.Router, null); return r ? r.url : null;
       },
       inject: token => window.__ngApp.injector.get(token),
+      // use("src/app/role.ts") أو use("@angular/router"): الوصول إلى وحدات المشروع والمكتبات من الفحص
+      use: spec => requireFrom("")(libs[spec] ? spec : "./" + spec.replace(/^\.\//, "")),
       store: id => { const p = window.__app && window.__app.config.globalProperties.$pinia; return p ? p._s.get(id) : null; },
       html: s => el(s).innerHTML.replace(/<!--[\s\S]*?-->/g, "").replace(/ (data-v-[\w-]+|_ngcontent-[\w-]+|_nghost-[\w-]+|ng-reflect-[\w-]+="[^"]*"|ng-version="[^"]*")(="")?/g, "")
     };

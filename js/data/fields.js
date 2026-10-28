@@ -34,11 +34,11 @@ CW.tools = [
   { id: "angular", name: "Angular", short: "A", color: "#dd0031", kind: "إطار عمل", level: "متقدم", hours: 40,
     desc: "إطار Google المتكامل لتطبيقات الشركات الكبيرة.",
     modules: [
-      { t: "الأساسيات", l: ["Angular CLI", "المكونات", "ربط البيانات"] },
-      { t: "الخدمات", l: ["Services", "حقن الاعتماديات DI", "HttpClient"] },
-      { t: "التوجيه", l: ["Router", "Guards", "Lazy Loading"] },
-      { t: "RxJS", l: ["Observables", "العمليات Operators", "Signals"] },
-      { t: "النماذج", l: ["Template Forms", "Reactive Forms", "التحقق"] }
+      { t: "الأساسيات", l: ["Angular CLI والمكونات", "المدخلات والمخرجات", "ربط البيانات و Signals"] },
+      { t: "الخدمات", l: ["Services وحقن الاعتماديات DI", "دورة الحياة و effect", "الأنابيب Pipes"] },
+      { t: "التوجيه", l: ["Router", "معاملات المسار والمسارات المتداخلة", "Guards و Lazy Loading"] },
+      { t: "HttpClient و RxJS", l: ["HttpClient", "Observables والعمليات Operators", "الأخطاء و toSignal والمعترضات"] },
+      { t: "النماذج", l: ["Template Forms", "Reactive Forms", "المدققات المخصصة و FormArray"] }
     ], project: "نظام إدارة موظفين" },
   { id: "tailwind", name: "Tailwind CSS", short: "TW", color: "#38bdf8", kind: "مكتبة", level: "مبتدئ", hours: 10,
     desc: "تنسيق سريع بالأصناف الجاهزة دون كتابة CSS منفصل.",
