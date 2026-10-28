@@ -77,6 +77,8 @@
       ${lesson.quiz ? `<h2 class="sec-title">📝 اختبر فهمك</h2><div id="quiz"></div>` : ""}`;
     if (CW.renderTwDemos) CW.renderTwDemos(document.querySelector(".prose"));
     if (CW.renderFwDemos) CW.renderFwDemos(document.querySelector(".prose"));
+    if (CW.renderXlDemos) CW.renderXlDemos(document.querySelector(".prose"));
+    if (CW.renderPyDemos) CW.renderPyDemos(document.querySelector(".prose"), (CW.contentMeta[c.id] || {}).setup, (CW.contentMeta[c.id] || {}).notebook);
     if (lesson.exercise) renderExercise(lesson.exercise);
     if (lesson.quiz) renderQuiz(lesson.quiz);
   });
@@ -89,8 +91,10 @@
     const isDom = runner === "js" && !!ex.html;
     const isTw = runner === "tailwind";
     const isFw = runner === "vue" || runner === "angular";
+    const isPy = runner === "python";
+    const isXl = runner === "excel" || runner === "dax";
     const setup = ex.setup || meta.setup || "";
-    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal", tailwind: "index.html", next: "Next.js", tests: "Vitest / Playwright", vue: "Vue", angular: "Angular" }[runner] || (isDom ? "script.js" : "exercise.js");
+    const fileName = { sql: "query.sql", dart: "main.dart", ts: "main.ts", kotlin: "Main.kt", terminal: "Terminal", tailwind: "index.html", next: "Next.js", tests: "Vitest / Playwright", vue: "Vue", angular: "Angular", python: meta.notebook ? "notebook.ipynb" : "main.py", excel: "Book1.xlsx", dax: "Report.pbix" }[runner] || (isDom ? "script.js" : "exercise.js");
     const key = `cw-code-${c.id}-${m}-${l}`;
     const saved = CW.store.get(key, null);
     box.innerHTML = `
@@ -103,6 +107,8 @@
         ${runner === "next" ? `<p class="muted net-note">▲ اكتب ملفات المشروع في المحرر، وابدأ كل ملف بسطر مثل <code dir="ltr">// file: app/page.tsx</code>. التشغيل يبني التطبيق ويزور صفحاته ويطبع النتيجة، كما يفعل الفحص.</p>` : ""}
         ${isTw ? `<p class="muted net-note">🎨 اكتب HTML بأصناف Tailwind، وستظهر المعاينة تحت المحرر. الفحص يقارن الأنماط المحسوبة فعلاً، فأي أصناف تعطي نفس النتيجة مقبولة.</p>` : ""}
         ${runner === "terminal" ? `<p class="muted net-note">💻 هذه طرفية محاكاة داخل المتصفح: اكتب كل أمر في سطر، وستُنفَّذ بالترتيب على مستودع جديد في كل تشغيل. تدعم أوامر Git و gh و npm و node و Vite و ESLint و Prettier، وأوامر الملفات مثل echo و cat و ls، وكتابة ملف من عدة أسطر بـ cat > file &lt;&lt;EOF.</p>` : ""}
+        ${isPy ? `<p class="muted net-note">🐍 Python الحقيقي (Pyodide) يعمل في متصفحك مع NumPy و Pandas و Matplotlib و SciPy. يُحمَّل من الإنترنت عند أول تشغيل فقط وقد يستغرق ثوانيَ. كما في Jupyter: قيمة آخر سطر تُعرض تلقائياً، والرسوم تظهر تحت المخرجات.</p>` : ""}
+        ${runner === "excel" ? `<p class="muted net-note">📗 محاكي Excel: اكتب كل خلية في سطر بالصيغة <code dir="ltr">D2: =B2*C2</code>، ولتعبئة الصيغة لأسفل كما تسحبها في Excel اكتب النطاق: <code dir="ltr">D2:D6: =B2*C2</code> (المراجع النسبية تتعدل تلقائياً و $ تثبتها). البيانات جاهزة في الجدول تحت المحرر.</p>` : ""}
         ${runner === "kotlin" ? `<p class="muted net-note">🌐 تشغيل Kotlin يتم عبر خدمة Kotlin Playground الرسمية من JetBrains، لذلك يحتاج اتصالاً بالإنترنت، وقد يستغرق ثوانيَ قليلة.</p>` : ""}
         <div class="editor">
           <div class="editor-bar">
@@ -116,6 +122,7 @@
           </div>
           <textarea id="ex-code" wrap="off" spellcheck="false" aria-label="محرر التمرين"></textarea>
           ${isDom || isTw || isFw ? `<div class="preview${isTw || isFw ? " tw" : ""}"><span class="preview-label">معاينة الصفحة</span><div id="ex-preview"></div></div>` : ""}
+          ${isXl ? `<div class="preview xl"><span class="preview-label">${runner === "dax" ? "النموذج والمرئيات" : "ورقة العمل"}</span><div id="ex-preview" class="xl-preview"></div></div>` : ""}
           <pre class="editor-out" id="ex-out"><span class="hint">// اضغط «تشغيل» لرؤية المخرجات، أو «تحقق من الحل» لتصحيح التمرين (Ctrl+Enter للتشغيل)</span></pre>
         </div>
         <div id="ex-result"></div>
@@ -146,6 +153,10 @@
       else if (runner === "tests") CW.runTests(ta.value, ex.setup || "", ex.test || "", null, lines => finish(lines));
       else if (runner === "next") CW.loadTS().then(() => CW.nextRun(ta.value, ex.setup || "", ex.test || "")).then(lines => finish(lines), e => finish([{ kind: "err", text: e.message }]));
       else if (runner === "terminal") CW.gitRun(ta.value, ex.setup || "", ex.test || "").then(r => finish(r.shown, ex.test ? r.graded : undefined));
+      else if (isPy) CW.runPython(ta.value, [meta.setup, ex.setup].filter(Boolean).join("\n"), grading ? ex.test || "" : "", (shown, graded) =>
+        finish(shown.length ? shown : [{ kind: "info", text: "لا توجد مخرجات. استخدم print() أو اكتب اسم المتغير في آخر سطر." }], graded), out, meta.notebook);
+      else if (runner === "excel") CW.runExcel(ta.value, [meta.setup, ex.setup].filter(Boolean).join("\n"), grading ? ex.test || "" : "", document.getElementById("ex-preview"), (shown, graded) => finish(shown, graded));
+      else if (runner === "dax") CW.runDax(ta.value, [meta.setup, ex.setup].filter(Boolean).join("\n"), grading ? ex.test || "" : "", document.getElementById("ex-preview"), (shown, graded) => finish(shown, graded));
       else if (runner === "sql") CW.runSQL(ta.value, setup, finish);
       else if (runner === "dart") CW.runDart(ta.value, finish);
       else if (runner === "ts") CW.runTS(ta.value, finish);
@@ -160,7 +171,7 @@
     const norm = s => s.split("\n").map(x => x.trim()).join("\n").trim();
     const check = () => execute((lines, isGraded) => {
       const errors = lines.filter(x => x.kind === "err" && !isGraded);
-      const got = norm(lines.filter(x => !["err", "info", "cmd", "sep"].includes(x.kind)).map(x => x.text).join(runner === "sql" ? "\n\n" : "\n"));
+      const got = norm(lines.filter(x => !["err", "info", "cmd", "sep", "img", "plotly"].includes(x.kind)).map(x => x.text).join(runner === "sql" ? "\n\n" : "\n"));
       const want = norm(ex.expected);
       if (!errors.length && got === want) {
         result.innerHTML = `<div class="result ok">🎉 أحسنت! حلّك صحيح، وتم تسجيل الدرس كمنجز.</div>`;
@@ -178,7 +189,7 @@
     document.getElementById("ex-check").onclick = check;
     document.getElementById("ex-reset").onclick = () => { ta.value = ex.starter; CW.store.set(key, null); result.innerHTML = ""; };
     CW.editorKeys(ta, () => execute());
-    if (isDom || isTw || isFw) execute();
+    if (isDom || isTw || isFw || isXl) execute();
   }
 
   // ---------- الاختبار ----------

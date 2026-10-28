@@ -108,7 +108,7 @@ def markdown(src):
                      "sql": "SQL", "sql-error": "SQL", "dart": "Dart", "dart-error": "Dart",
                      "ts": "TypeScript", "ts-error": "TypeScript", "kotlin": "Kotlin", "kotlin-error": "Kotlin",
                      "bash": "الطرفية", "tsx-error": "TSX", "json": "JSON", "yaml": "YAML", "tsx": "TSX", "jsx": "JSX", "ini": "الإعدادات",
-                     "terminal": "الطرفية", "terminal-new": "الطرفية", "terminal-error": "الطرفية"}.get(lang, lang)
+                     "terminal": "الطرفية", "terminal-new": "الطرفية", "terminal-error": "الطرفية", "python-norun": "Python"}.get(lang, lang)
             cls = "out" if lang in ("text", "output") else "src"
             if lang == "output" and prev_lang == "sql":
                 out.append(f'<div class="code-block out sql-out"><span class="code-label">النتيجة</span><div class="table-wrap">{sql_result_html(chr(10).join(code))}</div></div>')
@@ -121,6 +121,34 @@ def markdown(src):
                 body = f'<pre dir="ltr"><code>{html.escape(chr(10).join(ok))}</code></pre>' if ok else ""
                 err_html = "".join(f'<div class="sql-err" dir="ltr">⚠️ {html.escape(e)}</div>' for e in errs)
                 out.append(f'<div class="code-block out"><span class="code-label">{label}</span>{body}<div class="out-errs">{err_html}</div></div>')
+                prev_lang = lang
+                continue
+            if lang in ("excel", "dax"):
+                # مثال Excel أو Power BI: الكود ثم جدول محسوب بالمحاكي في الصفحة
+                src = chr(10).join(code)
+                name = "Excel" if lang == "excel" else "Power BI"
+                out.append(f'<div class="code-block src xl-code"><span class="code-label">{name}</span><pre dir="ltr"><code>{html.escape(src)}</code></pre></div>'
+                           f'<div class="xl-preview" data-kind="{lang}" data-src="{html.escape(src, quote=True)}"></div>')
+                prev_lang = lang
+                continue
+            if lang == "python":
+                # مثال Python: زر «شغّل المثال» يشغّله فعلاً في المتصفح (js/py-runner.js)
+                src = chr(10).join(code)
+                out.append(f'<div class="code-block src py-run" data-src="{html.escape(src, quote=True)}"><span class="code-label">Python</span><pre dir="ltr"><code>{html.escape(src)}</code></pre></div>')
+                prev_lang = lang
+                continue
+            if lang == "output" and any(re.fullmatch(r"\[\[img:[^\]]+\]\]", l) for l in code):
+                # رسوم مولَّدة عند التحقق (tools/verify-py.js) ومحفوظة في img/lessons
+                parts, buf = [], []
+                for l in code:
+                    m = re.fullmatch(r"\[\[img:([^\]]+)\]\]", l)
+                    if m:
+                        if buf: parts.append(f'<pre dir="ltr"><code>{html.escape(chr(10).join(buf))}</code></pre>'); buf = []
+                        parts.append(f'<img class="py-fig" src="{html.escape(m.group(1))}" alt="الرسم الناتج" loading="lazy">')
+                    else:
+                        buf.append(l)
+                if buf: parts.append(f'<pre dir="ltr"><code>{html.escape(chr(10).join(buf))}</code></pre>')
+                out.append(f'<div class="code-block out"><span class="code-label">{label}</span>{"".join(parts)}</div>')
                 prev_lang = lang
                 continue
             if lang in ("vue", "angular"):
@@ -286,7 +314,8 @@ def build(course):
         meta.update(json.loads(cfg.read_text(encoding="utf-8")))
     if "setup" in meta:
         meta["setup"] = (src_dir / meta["setup"]).read_text(encoding="utf-8")
-        meta["schema"] = schema_html(meta["setup"])
+        if meta.get("runner") == "sql":
+            meta["schema"] = schema_html(meta["setup"])
     meta_json = json.dumps(meta, ensure_ascii=False)
     out.write_text(f"// ملف مولَّد من content/{course} عبر tools/build.py، لا تعدّله يدوياً\nCW.registerContent({json.dumps(course)}, {payload}, {meta_json});\n", encoding="utf-8")
     total = sum(len(m) for m in modules)

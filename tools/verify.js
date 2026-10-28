@@ -163,6 +163,16 @@ if (require.main === module) (async () => {
     console.log(r.fails ? `\n${r.fails} مشكلة من ${r.checks} فحصاً` : `✓ ${r.checks} فحصاً ناجحاً في ${course}`);
     process.exit(r.fails ? 1 : 0);
   }
+  if (runner === "excel" || runner === "dax") {
+    const r = await require("./verify-xl.js")(dir, runner, process.argv.includes("--fill"));
+    console.log(r.fails ? `\n${r.fails} مشكلة من ${r.checks} فحصاً` : `✓ ${r.checks} فحصاً ناجحاً في ${course}`);
+    process.exit(r.fails ? 1 : 0);
+  }
+  if (runner === "python") {
+    const r = await require("./verify-py.js")(dir, course, process.argv.includes("--fill"));
+    console.log(r.fails ? `\n${r.fails} مشكلة من ${r.checks} فحصاً` : `✓ ${r.checks} فحصاً ناجحاً في ${course}`);
+    process.exit(r.fails ? 1 : 0);
+  }
   if (runner === "tests") {
     const r = await require("./verify-tests.js")(dir, process.argv.includes("--fill"));
     console.log(r.fails ? `\n${r.fails} مشكلة من ${r.checks} فحصاً` : `✓ ${r.checks} فحصاً ناجحاً في ${course}`);

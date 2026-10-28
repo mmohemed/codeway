@@ -17,6 +17,25 @@ require(path.resolve(__dirname, "..", "js", "content", course + ".js"));
 (async () => {
   const browser = await playwright.chromium.launch();
   const page = await browser.newPage();
+  // دورات Python: نخدم توزيعة Pyodide الكاملة محلياً (PYODIDE_DIR) بدلاً من jsDelivr
+  if (process.env.PYODIDE_DIR) {
+    const http = require("http"), fs = require("fs");
+    const types = { ".js": "text/javascript", ".wasm": "application/wasm", ".json": "application/json", ".zip": "application/zip" };
+    const server = http.createServer((req, res) => {
+      const file = path.join(process.env.PYODIDE_DIR, decodeURIComponent(req.url.split("?")[0]));
+      if (!file.startsWith(path.resolve(process.env.PYODIDE_DIR)) || !fs.existsSync(file)) { res.writeHead(404); return res.end(); }
+      res.writeHead(200, { "Content-Type": types[path.extname(file)] || "application/octet-stream", "Access-Control-Allow-Origin": "*" });
+      fs.createReadStream(file).pipe(res);
+    }).listen(0);
+    await new Promise(r => server.on("listening", r));
+    server.unref();
+    await page.addInitScript(base => { window.CW_PYODIDE_BASE = base; }, `http://127.0.0.1:${server.address().port}/`);
+    // الحزم من PyPI (seaborn و plotly و openpyxl) تُجلب عبر Node، لأن متصفح بيئة التحقق قد لا يصل للإنترنت مباشرة
+    await page.route(/https:\/\/(pypi\.org|files\.pythonhosted\.org)\//, async route => {
+      const r = await fetch(route.request().url());
+      await route.fulfill({ status: r.status, headers: { "content-type": r.headers.get("content-type") || "application/octet-stream", "access-control-allow-origin": "*" }, body: Buffer.from(await r.arrayBuffer()) });
+    });
+  }
   // دورات Dart: نعترض طلبات خدمة الترجمة (DartPad) ونترجم محلياً بـ dart2js،
   // فنختبر المسار الكامل في المتصفح (إرسال الكود ← JavaScript ← تشغيله في Worker) دون إنترنت
   await page.route(/api\.dartpad\.dev/, async route => {
@@ -91,7 +110,7 @@ require(path.resolve(__dirname, "..", "js", "content", course + ".js"));
         await page.fill("#ex-code", code);
         await page.evaluate(() => { document.getElementById("ex-result").innerHTML = ""; });
         await page.click("#ex-check");
-        await page.waitForSelector("#ex-result .result", { timeout: 30000 });
+        await page.waitForSelector("#ex-result .result", { timeout: 120000 });
         return page.$eval("#ex-result .result", el => el.className.includes("ok") ? "ok" : el.innerText);
       };
       const sol = await tryCode(ex.solution);

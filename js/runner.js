@@ -126,11 +126,15 @@ const renderTable = t => `<table class="out-table"><thead><tr>${t.columns.map(c 
   t.rows.length ? t.rows.map(r => `<tr>${r.map(v => `<td class="${v === null ? "null" : ""}">${CW.esc(v === null ? "NULL" : v)}</td>`).join("")}</tr>`).join("")
   : `<tr><td colspan="${t.columns.length}" class="null">(لا توجد صفوف)</td></tr>`}</tbody></table>`;
 
+// html و img و plotly مخرجات غنية من Python (جداول Pandas والرسوم) تُعرض بـ CW.renderRich
+const RICH = ["html", "img", "plotly"];
 CW.renderOutput = (output, lines) => {
   output.innerHTML = lines.length
-    ? lines.map(l => l.kind === "table" ? renderTable(l.table)
+    ? lines.map((l, i) => l.kind === "table" ? renderTable(l.table)
+      : RICH.includes(l.kind) ? `<div data-rich="${i}"></div>`
       : `<div class="${({ err: "err", info: "hint", cmd: "cmd", sep: "sep" })[l.kind] || ""}">${CW.esc(l.text)}</div>`).join("")
     : '<span class="hint">لا توجد مخرجات. استخدم console.log لطباعة النتائج.</span>';
+  output.querySelectorAll("[data-rich]").forEach(el => CW.renderRich(el, lines[+el.dataset.rich]));
 };
 
 CW.editorKeys = (textarea, run) => {
