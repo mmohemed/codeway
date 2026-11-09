@@ -4,10 +4,13 @@
 const fs = require("fs");
 const path = require("path");
 
-module.exports = async function verifyTerm(dir, fill, extensions = []) {
+module.exports = async function verifyTerm(dir, fill, extensions = [], sim = null) {
   require(path.join(__dirname, "..", "js", "git-sim.js"));
   extensions.forEach(f => require(path.join(__dirname, "..", "js", f)));
   const CW = globalThis.CW;
+  // دورة Linux تستخدم محاكي js/linux-sim.js بدل طرفية Git
+  if (sim === "linux") require(path.join(__dirname, "..", "js", "linux-sim.js"));
+  const T = sim === "linux" ? { world: CW.linuxSim.world, run: CW.linuxSim.run, text: CW.linuxSim.text, exec: CW.linuxSim.exec } : { world: CW.termWorld, run: CW.termRun, text: CW.termText, exec: CW.gitRun };
   const norm = s => s.split("\n").map(x => x.trimEnd()).join("\n").trim();
   let fails = 0, checks = 0;
   const fail = (where, msg) => { fails++; console.log(`✗ ${where}\n  ${msg.replace(/\n/g, "\n  ")}`); };
@@ -43,17 +46,17 @@ module.exports = async function verifyTerm(dir, fill, extensions = []) {
       li++;
       const where = `${file} درس ${li}`;
       const [body, ...restParts] = chunk.split(/(?=^--- (?:exercise|quiz)\s*$)/m);
-      let world = CW.termWorld();
+      let world = T.world();
       let bi = 0;
       const blocks = [];
       const re = /^```(terminal(?:-new)?)\n([\s\S]*?)^```[ \t]*$/gm;
       let m, last = 0, newBody = "";
       while ((m = re.exec(body))) {
         bi++;
-        if (m[1] === "terminal-new") world = CW.termWorld();
+        if (m[1] === "terminal-new") world = T.world();
         const out = [];
-        await CW.termRun(world, commandsOf(m[2]), out);
-        const got = CW.termText(out);
+        await T.run(world, commandsOf(m[2]), out);
+        const got = T.text(out);
         checks++;
         if (fill) {
           newBody += body.slice(last, m.index) + "```" + m[1] + "\n" + got + "\n```";
@@ -72,7 +75,7 @@ module.exports = async function verifyTerm(dir, fill, extensions = []) {
         const solution = block(ex, "solution"), starter = block(ex, "starter"), setup = block(ex, "setup") || "", test = block(ex, "test") || "";
         let expected = block(ex, "expected");
         checks++;
-        const sol = await CW.gitRun(solution, setup, test);
+        const sol = await T.exec(solution, setup, test);
         const graded = sol.graded.map(l => (l.kind === "err" ? "ERR: " : "") + l.text).join("\n");
         if (fill && expected === "?") {
           newChunk = newChunk.replace(/^~~~expected\n\?\n~~~/m, () => "~~~expected\n" + graded + "\n~~~");
@@ -82,7 +85,7 @@ module.exports = async function verifyTerm(dir, fill, extensions = []) {
         if (norm(graded) !== norm(expected)) fail(`${where} الحل`, `المتوقع:\n${norm(expected)}\nالفعلي:\n${norm(graded)}`);
         const shownErr = sol.shown.filter(l => l.kind === "err").map(l => l.text);
         if (shownErr.length && fill) console.log(`⚠️ ${where} الحل فيه أخطاء ظاهرة (تأكد أنها مقصودة):\n  ${shownErr.join("\n  ")}`);
-        const st = await CW.gitRun(starter, setup, test);
+        const st = await T.exec(starter, setup, test);
         const stGraded = st.graded.map(l => (l.kind === "err" ? "ERR: " : "") + l.text).join("\n");
         if (norm(stGraded) === norm(expected)) fail(`${where} البداية`, "كود البداية يجتاز التمرين دون حل");
       }
