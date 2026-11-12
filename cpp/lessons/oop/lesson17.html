@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeWay | الوراثة (Inheritance) في C++</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js لتلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0f1e 0%, #1a1f35 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(145deg, #0b1120cc 0%, #1e2740cc 100%);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 5%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border: 2px solid #ffd700;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .header-content {
+            text-align: center;
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-content h1 span {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* عنوان الصفحة */
+        .page-header {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* جدول المحتويات */
+        .table-of-contents {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .table-of-contents h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: rgba(255, 215, 0, 0.15);
+            transform: translateX(-5px);
+        }
+
+        .toc-item i {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .toc-item a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .toc-item:hover a {
+            color: #ffd700;
+        }
+
+        /* أقسام الشرح */
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 30px;
+            padding: 3rem;
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, transparent);
+        }
+
+        .section h3 {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin: 2rem 0 1rem;
+        }
+
+        .section p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* صناديق الكود */
+        .code-box {
+            background: #1a1f2e;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .code-header span {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+        }
+
+        pre {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            background: transparent !important;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 1rem !important;
+        }
+
+        /* شرح الكود */
+        .code-explanation {
+            background: rgba(255, 215, 0, 0.03);
+            border-right: 3px solid #ffd700;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .code-explanation p {
+            margin: 0.5rem 0;
+        }
+
+        .code-explanation i {
+            color: #ffd700;
+            margin-left: 0.5rem;
+        }
+
+        /* بطاقات المفاهيم */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .concept-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .concept-card i {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .concept-card h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        /* جدول أنواع الوراثة */
+        .inheritance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .inheritance-table th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .inheritance-table td {
+            padding: 1rem;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .inheritance-table tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        /* تمثيل الوراثة */
+        .inheritance-viz {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .class-box {
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .parent-box {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .child-box {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .arrow-down {
+            color: #ffd700;
+            font-size: 2rem;
+            margin: 0 1rem;
+        }
+
+        /* صندوق النتائج */
+        .result-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .result-box h4 {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            color: #ffffff;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        /* التمارين التفاعلية */
+        .exercise-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .exercise-box h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .exercise-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            color: #e0e0e0;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .exercise-btn {
+            background: #ffd700;
+            color: #0a0f1e;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0;
+        }
+
+        .exercise-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .exercise-output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace;
+            min-height: 60px;
+        }
+
+        /* أزرار التنقل */
+        .lesson-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+        }
+
+        .nav-lesson-btn {
+            background: transparent;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-lesson-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+            transform: translateX(-5px);
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            background: linear-gradient(145deg, #0b1120cc, #1a1f35cc);
+            backdrop-filter: blur(10px);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: #b0b0b0;
+            text-decoration: none;
+            display: block;
+            margin: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffd700;
+        }
+
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0f1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffaa00;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .section {
+                padding: 2rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-content {
+                margin: 0.5rem 0;
+            }
+
+            .inheritance-viz {
+                flex-direction: column;
+            }
+
+            .arrow-down {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CodeWay</a>
+            <div class="header-content">
+                <h1>شرح <span>الوراثة (Inheritance)</span> في C++</h1>
+            </div>
+            <div style="width: 100px;"></div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- رأس الصفحة -->
+        <div class="page-header">
+            <h1>الوراثة في C++</h1>
+            <p>تعلم كيفية إعادة استخدام الكود وبناء علاقات بين الفئات باستخدام الوراثة في لغة C++</p>
+        </div>
+
+        <!-- جدول المحتويات -->
+        <div class="table-of-contents">
+            <h2><i class="fas fa-list"></i> محتويات الدرس</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <i class="fas fa-info-circle"></i>
+                    <a href="#intro">مقدمة عن الوراثة</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-code"></i>
+                    <a href="#basic">الوراثة الأساسية</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-sitemap"></i>
+                    <a href="#types">أنواع الوراثة</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-lock"></i>
+                    <a href="#access">مستويات الوصول</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-cog"></i>
+                    <a href="#constructors">المُنشئات في الوراثة</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-code-branch"></i>
+                    <a href="#multiple">الوراثة المتعددة</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-tasks"></i>
+                    <a href="#exercises">تمارين وتطبيقات</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم المقدمة -->
+        <section id="intro" class="section">
+            <h2>مقدمة عن الوراثة (Inheritance)</h2>
+            <p>الوراثة هي أحد المبادئ الأساسية في البرمجة الكائنية (OOP) والتي تسمح لفئة (Class) بوراثة خصائص ودوال من فئة أخرى. هذا يساعد في إعادة استخدام الكود وتنظيم العلاقات بين الفئات.</p>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <i class="fas fa-arrow-up"></i>
+                    <h3>الفئة الأساسية (Base Class)</h3>
+                    <p>الفئة الأم التي يتم الوراثة منها. تحتوي على الخصائص والدوال المشتركة.</p>
+                </div>
+                <div class="concept-card">
+                    <i class="fas fa-arrow-down"></i>
+                    <h3>الفئة المشتقة (Derived Class)</h3>
+                    <p>الفئة التي ترث من الفئة الأساسية. يمكنها إضافة خصائص ودوال جديدة.</p>
+                </div>
+                <div class="concept-card">
+                    <i class="fas fa-sync-alt"></i>
+                    <h3>إعادة الاستخدام</h3>
+                    <p>تسمح الوراثة بإعادة استخدام الكود المكتوب وتوسيعه دون تعديله.</p>
+                </div>
+            </div>
+
+            <div class="inheritance-viz">
+                <div class="class-box parent-box">
+                    <i class="fas fa-cube" style="color: #ffd700; font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                    <h3 style="color: #ffd700;">الفئة الأساسية (Animal)</h3>
+                    <p style="color: #b0b0b0;">+ name: string<br>+ age: int<br>+ eat()<br>+ sleep()</p>
+                </div>
+                
+                <div class="arrow-down">
+                    <i class="fas fa-long-arrow-alt-down"></i>
+                </div>
+                
+                <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
+                    <div class="class-box child-box">
+                        <i class="fas fa-dog" style="color: #ffd700; font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                        <h3 style="color: #ffd700;">كلب (Dog)</h3>
+                        <p style="color: #b0b0b0;">+ breed: string<br>+ bark()<br>+ (يرث من Animal)</p>
+                    </div>
+                    
+                    <div class="class-box child-box">
+                        <i class="fas fa-cat" style="color: #ffd700; font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                        <h3 style="color: #ffd700;">قطة (Cat)</h3>
+                        <p style="color: #b0b0b0;">+ color: string<br>+ meow()<br>+ (يرث من Animal)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الوراثة الأساسية -->
+        <section id="basic" class="section">
+            <h2>الوراثة الأساسية (Basic Inheritance)</h2>
+            <p>لإنشاء فئة ترث من فئة أخرى، نستخدم النقطتين : متبوعين بمعدل الوصول واسم الفئة الأساسية.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 1: وراثة بسيطة</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+// الفئة الأساسية (Parent Class)
+class Animal {
+protected:
+    string name;
+    int age;
+    
+public:
+    void setName(string n) {
+        name = n;
+    }
+    
+    void setAge(int a) {
+        age = a;
+    }
+    
+    void eat() {
+        cout &lt;&lt; name &lt;&lt; " is eating" &lt;&lt; endl;
+    }
+    
+    void sleep() {
+        cout &lt;&lt; name &lt;&lt; " is sleeping" &lt;&lt; endl;
+    }
+};
+
+// الفئة المشتقة (Child Class) - ترث من Animal
+class Dog : public Animal {
+private:
+    string breed;
+    
+public:
+    void setBreed(string b) {
+        breed = b;
+    }
+    
+    void bark() {
+        cout &lt;&lt; name &lt;&lt; " is barking: Woof! Woof!" &lt;&lt; endl;
+    }
+    
+    void displayInfo() {
+        cout &lt;&lt; "Name: " &lt;&lt; name &lt;&lt; endl;
+        cout &lt;&lt; "Age: " &lt;&lt; age &lt;&lt; " years" &lt;&lt; endl;
+        cout &lt;&lt; "Breed: " &lt;&lt; breed &lt;&lt; endl;
+    }
+};
+
+int main() {
+    // إنشاء كائن من الفئة المشتقة
+    Dog myDog;
+    
+    // استخدام دوال من الفئة الأساسية
+    myDog.setName("Max");
+    myDog.setAge(3);
+    
+    // استخدام دوال من الفئة المشتقة
+    myDog.setBreed("Golden Retriever");
+    
+    // عرض المعلومات
+    myDog.displayInfo();
+    myDog.eat();
+    myDog.sleep();
+    myDog.bark();
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="result-box">
+                <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                <div class="result-value">
+                    Name: Max<br>
+                    Age: 3 years<br>
+                    Breed: Golden Retriever<br>
+                    Max is eating<br>
+                    Max is sleeping<br>
+                    Max is barking: Woof! Woof!
+                </div>
+            </div>
+
+            <div class="code-explanation">
+                <p><i class="fas fa-check-circle"></i> <strong>ملاحظات مهمة:</strong></p>
+                <p><strong>protected:</strong> تسمح للفئات المشتقة بالوصول إلى الأعضاء، ولكن ليس من خارج الفئة</p>
+                <p><strong>public Animal:</strong> تعني أننا نرث من Animal بشكل عام (public inheritance)</p>
+                <p>الفئة المشتقة يمكنها استخدام كل الأعضاء public و protected من الفئة الأساسية</p>
+            </div>
+        </section>
+
+        <!-- قسم أنواع الوراثة -->
+        <section id="types" class="section">
+            <h2>أنواع الوراثة (Types of Inheritance)</h2>
+            <p>يمكن التحكم في كيفية وراثة أعضاء الفئة الأساسية باستخدام معدّلات الوصول المختلفة.</p>
+
+            <table class="inheritance-table">
+                <tr>
+                    <th>نوع الوراثة</th>
+                    <th>الوصف</th>
+                    <th>public في الأساسي</th>
+                    <th>protected في الأساسي</th>
+                    <th>private في الأساسي</th>
+                </tr>
+                <tr>
+                    <td>public inheritance</td>
+                    <td>تحافظ على مستويات الوصول الأصلية</td>
+                    <td>public</td>
+                    <td>protected</td>
+                    <td>لا يمكن الوصول</td>
+                </tr>
+                <tr>
+                    <td>protected inheritance</td>
+                    <td>تحول public إلى protected</td>
+                    <td>protected</td>
+                    <td>protected</td>
+                    <td>لا يمكن الوصول</td>
+                </tr>
+                <tr>
+                    <td>private inheritance</td>
+                    <td>تحول public و protected إلى private</td>
+                    <td>private</td>
+                    <td>private</td>
+                    <td>لا يمكن الوصول</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 2: أنواع الوراثة</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+class Base {
+public:
+    int publicVar;
+protected:
+    int protectedVar;
+private:
+    int privateVar;
+};
+
+// public inheritance
+class PublicDerived : public Base {
+public:
+    void access() {
+        publicVar = 10;     // public → public
+        protectedVar = 20;  // protected → protected
+        // privateVar = 30; // خطأ! لا يمكن الوصول
+    }
+};
+
+// protected inheritance
+class ProtectedDerived : protected Base {
+public:
+    void access() {
+        publicVar = 10;     // public → protected
+        protectedVar = 20;  // protected → protected
+        // privateVar = 30; // خطأ! لا يمكن الوصول
+    }
+};
+
+// private inheritance
+class PrivateDerived : private Base {
+public:
+    void access() {
+        publicVar = 10;     // public → private
+        protectedVar = 20;  // protected → private
+        // privateVar = 30; // خطأ! لا يمكن الوصول
+    }
+};
+
+int main() {
+    PublicDerived pub;
+    pub.publicVar = 50;  // صحيح! public في الفئة المشتقة
+    
+    ProtectedDerived pro;
+    // pro.publicVar = 50; // خطأ! أصبح protected
+    
+    PrivateDerived pri;
+    // pri.publicVar = 50; // خطأ! أصبح private
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم المُنشئات في الوراثة -->
+        <section id="constructors" class="section">
+            <h2>المُنشئات في الوراثة (Constructors in Inheritance)</h2>
+            <p>عند إنشاء كائن من فئة مشتقة، يتم استدعاء مُنشئ الفئة الأساسية أولاً، ثم مُنشئ الفئة المشتقة.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 3: المُنشئات في الوراثة</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Person {
+protected:
+    string name;
+    int age;
+    
+public:
+    // مُنشئ الفئة الأساسية
+    Person(string n, int a) {
+        name = n;
+        age = a;
+        cout &lt;&lt; "Person constructor called for " &lt;&lt; name &lt;&lt; endl;
+    }
+    
+    void display() {
+        cout &lt;&lt; "Name: " &lt;&lt; name &lt;&lt; ", Age: " &lt;&lt; age &lt;&lt; endl;
+    }
+};
+
+class Student : public Person {
+private:
+    int studentId;
+    double gpa;
+    
+public:
+    // مُنشئ الفئة المشتقة - يستدعي مُنشئ الفئة الأساسية
+    Student(string n, int a, int id, double g) : Person(n, a) {
+        studentId = id;
+        gpa = g;
+        cout &lt;&lt; "Student constructor called for " &lt;&lt; name &lt;&lt; endl;
+    }
+    
+    void displayStudent() {
+        Person::display();  // استدعاء دالة الفئة الأساسية
+        cout &lt;&lt; "Student ID: " &lt;&lt; studentId &lt;&lt; ", GPA: " &lt;&lt; gpa &lt;&lt; endl;
+    }
+};
+
+int main() {
+    Student s1("Ahmed", 20, 2021001, 3.8);
+    cout &lt;&lt; "\nStudent Information:" &lt;&lt; endl;
+    s1.displayStudent();
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="result-box">
+                <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                <div class="result-value">
+                    Person constructor called for Ahmed<br>
+                    Student constructor called for Ahmed<br>
+                    <br>
+                    Student Information:<br>
+                    Name: Ahmed, Age: 20<br>
+                    Student ID: 2021001, GPA: 3.8
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الوراثة المتعددة -->
+        <section id="multiple" class="section">
+            <h2>الوراثة المتعددة (Multiple Inheritance)</h2>
+            <p>يمكن للفئة أن ترث من أكثر من فئة أساسية في نفس الوقت.</p>
+
+            <div class="inheritance-viz">
+                <div style="display: flex; gap: 2rem; justify-content: center;">
+                    <div class="class-box parent-box">
+                        <i class="fas fa-laptop" style="color: #ffd700;"></i>
+                        <h3>Printable</h3>
+                    </div>
+                    <div class="class-box parent-box">
+                        <i class="fas fa-save" style="color: #ffd700;"></i>
+                        <h3>Serializable</h3>
+                    </div>
+                </div>
+                
+                <div class="arrow-down">
+                    <i class="fas fa-long-arrow-alt-down"></i>
+                </div>
+                
+                <div class="class-box child-box">
+                    <i class="fas fa-file" style="color: #ffd700;"></i>
+                    <h3>Document</h3>
+                </div>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 4: الوراثة المتعددة</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+// الفئة الأساسية الأولى
+class Printable {
+public:
+    void print() {
+        cout &lt;&lt; "Printing document..." &lt;&lt; endl;
+    }
+};
+
+// الفئة الأساسية الثانية
+class Serializable {
+public:
+    void serialize() {
+        cout &lt;&lt; "Serializing document..." &lt;&lt; endl;
+    }
+};
+
+// الفئة المشتقة - ترث من كلا الفئتين
+class Document : public Printable, public Serializable {
+private:
+    string title;
+    string content;
+    
+public:
+    Document(string t, string c) : title(t), content(c) {}
+    
+    void display() {
+        cout &lt;&lt; "Title: " &lt;&lt; title &lt;&lt; endl;
+        cout &lt;&lt; "Content: " &lt;&lt; content &lt;&lt; endl;
+    }
+};
+
+int main() {
+    Document doc("Report", "This is the annual report...");
+    
+    doc.display();
+    doc.print();      // من Printable
+    doc.serialize();  // من Serializable
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- تمارين وتطبيقات -->
+        <section id="exercises" class="section">
+            <h2>تمارين وتطبيقات عملية</h2>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 1: نظام إدارة الموظفين</h3>
+                <p>قم بإنشاء نظام إدارة موظفين باستخدام الوراثة:</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+// الفئة الأساسية
+class Employee {
+protected:
+    string name;
+    int id;
+    double baseSalary;
+    
+public:
+    Employee(string n, int i, double salary) {
+        name = n;
+        id = i;
+        baseSalary = salary;
+    }
+    
+    virtual double calculateSalary() {
+        return baseSalary;
+    }
+    
+    virtual void display() {
+        cout &lt;&lt; "ID: " &lt;&lt; id &lt;&lt; ", Name: " &lt;&lt; name;
+        cout &lt;&lt; ", Salary: $" &lt;&lt; calculateSalary() &lt;&lt; endl;
+    }
+    
+    virtual ~Employee() {}
+};
+
+// موظف عادي
+class RegularEmployee : public Employee {
+public:
+    RegularEmployee(string n, int i, double salary) 
+        : Employee(n, i, salary) {}
+};
+
+// مدير - له مكافأة إضافية
+class Manager : public Employee {
+private:
+    double bonus;
+    
+public:
+    Manager(string n, int i, double salary, double b) 
+        : Employee(n, i, salary), bonus(b) {}
+    
+    double calculateSalary() override {
+        return baseSalary + bonus;
+    }
+    
+    void display() override {
+        Employee::display();
+        cout &lt;&lt; "  (Manager Bonus: $" &lt;&lt; bonus &lt;&lt; ")" &lt;&lt; endl;
+    }
+};
+
+// مبرمج - له overtime
+class Programmer : public Employee {
+private:
+    int overtimeHours;
+    double overtimeRate;
+    
+public:
+    Programmer(string n, int i, double salary, int hours, double rate) 
+        : Employee(n, i, salary), overtimeHours(hours), overtimeRate(rate) {}
+    
+    double calculateSalary() override {
+        return baseSalary + (overtimeHours * overtimeRate);
+    }
+    
+    void display() override {
+        Employee::display();
+        cout &lt;&lt; "  (Overtime: " &lt;&lt; overtimeHours &lt;&lt; " hours)" &lt;&lt; endl;
+    }
+};
+
+int main() {
+    vector&lt;Employee*&gt; employees;
+    
+    employees.push_back(new RegularEmployee("Ahmed", 1001, 5000));
+    employees.push_back(new Manager("Sara", 1002, 7000, 1500));
+    employees.push_back(new Programmer("Mohamed", 1003, 6000, 20, 50));
+    
+    cout &lt;&lt; "Employee Information:" &lt;&lt; endl;
+    for(auto emp : employees) {
+        emp->display();
+    }
+    
+    // تنظيف الذاكرة
+    for(auto emp : employees) {
+        delete emp;
+    }
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 2: أشكال هندسية</h3>
+                <p>قم بإنشاء نظام للأشكال الهندسية باستخدام الوراثة:</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cmath&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+// الفئة الأساسية المجردة
+class Shape {
+protected:
+    string color;
+    
+public:
+    Shape(string c) : color(c) {}
+    
+    virtual double getArea() = 0;  // دالة افتراضية خالصة
+    virtual double getPerimeter() = 0;
+    
+    virtual void display() {
+        cout &lt;&lt; "Shape color: " &lt;&lt; color &lt;&lt; endl;
+        cout &lt;&lt; "Area: " &lt;&lt; getArea() &lt;&lt; endl;
+        cout &lt;&lt; "Perimeter: " &lt;&lt; getPerimeter() &lt;&lt; endl;
+    }
+    
+    virtual ~Shape() {}
+};
+
+class Circle : public Shape {
+private:
+    double radius;
+    
+public:
+    Circle(string c, double r) : Shape(c), radius(r) {}
+    
+    double getArea() override {
+        return M_PI * radius * radius;
+    }
+    
+    double getPerimeter() override {
+        return 2 * M_PI * radius;
+    }
+    
+    void display() override {
+        cout &lt;&lt; "\nCircle:" &lt;&lt; endl;
+        Shape::display();
+        cout &lt;&lt; "Radius: " &lt;&lt; radius &lt;&lt; endl;
+    }
+};
+
+class Rectangle : public Shape {
+private:
+    double width;
+    double height;
+    
+public:
+    Rectangle(string c, double w, double h) : Shape(c), width(w), height(h) {}
+    
+    double getArea() override {
+        return width * height;
+    }
+    
+    double getPerimeter() override {
+        return 2 * (width + height);
+    }
+    
+    void display() override {
+        cout &lt;&lt; "\nRectangle:" &lt;&lt; endl;
+        Shape::display();
+        cout &lt;&lt; "Width: " &lt;&lt; width &lt;&lt; ", Height: " &lt;&lt; height &lt;&lt; endl;
+    }
+};
+
+int main() {
+    vector&lt;Shape*&gt; shapes;
+    
+    shapes.push_back(new Circle("Red", 5));
+    shapes.push_back(new Rectangle("Blue", 4, 6));
+    
+    for(auto shape : shapes) {
+        shape->display();
+    }
+    
+    for(auto shape : shapes) {
+        delete shape;
+    }
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- تمرين تفاعلي -->
+            <div class="exercise-box">
+                <h3><i class="fas fa-laptop-code"></i> جرب بنفسك</h3>
+                <p>أدخل بيانات لإنشاء كائنات مختلفة باستخدام الوراثة:</p>
+                
+                <select id="objectType" class="exercise-input">
+                    <option value="dog">كلب (Dog)</option>
+                    <option value="cat">قطة (Cat)</option>
+                </select>
+                
+                <input type="text" id="animalName" class="exercise-input" placeholder="الاسم" value="Max">
+                <input type="number" id="animalAge" class="exercise-input" placeholder="العمر" value="3">
+                <input type="text" id="animalBreed" class="exercise-input" placeholder="السلالة/اللون" value="Golden">
+                
+                <button class="exercise-btn" onclick="testInheritance()">إنشاء الكائن</button>
+                
+                <div id="output" class="exercise-output">
+                    النتائج ستظهر هنا...
+                </div>
+            </div>
+        </section>
+
+        <!-- أزرار التنقل بين الدروس -->
+        <div class="lesson-navigation">
+            <a href="lesson-classes.html" class="nav-lesson-btn">
+                <i class="fas fa-arrow-right"></i> الدرس السابق: الفئات والكائنات
+            </a>
+            <a href="lesson-polymorphism.html" class="nav-lesson-btn">
+                الدرس التالي: تعدد الأشكال <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CodeWay</h3>
+                <p>منصة عربية متكاملة لتعليم البرمجة</p>
+            </div>
+            <div class="footer-section">
+                <h3>روابط مفيدة</h3>
+                <a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> الدروس</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> المشاريع</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> عن المنصة</a>
+            </div>
+            <div class="footer-section">
+                <h3>تابعنا</h3>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+                <a href="#"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem; color: #808080;">
+            <p>© 2024 CodeWay - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+
+    <script>
+        // شريط التقدم
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress").style.width = scrolled + "%";
+        };
+
+        // نسخ الكود
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = "تم النسخ!";
+                setTimeout(() => {
+                    button.textContent = "نسخ";
+                }, 2000);
+            });
+        }
+
+        // التمرين التفاعلي
+        function testInheritance() {
+            const type = document.getElementById('objectType').value;
+            const name = document.getElementById('animalName').value;
+            const age = document.getElementById('animalAge').value;
+            const extra = document.getElementById('animalBreed').value;
+            
+            if (!name || !age || !extra) {
+                document.getElementById('output').innerHTML = '<i class="fas fa-exclamation-circle" style="color: #ff4444;"></i> الرجاء إدخال جميع البيانات';
+                return;
+            }
+            
+            let output = document.getElementById('output');
+            
+            if (type === 'dog') {
+                output.innerHTML = `
+                    <i class="fas fa-dog" style="color: #ffd700;"></i> <strong>تم إنشاء كائن Dog:</strong><br>
+                    <br>
+                    <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                        <strong>معلومات الكلب (يرث من Animal):</strong><br>
+                        • الاسم: ${name}<br>
+                        • العمر: ${age} سنوات<br>
+                        • السلالة: ${extra}<br>
+                        <br>
+                        <strong>الدوال الموروثة:</strong><br>
+                        • eat() → ${name} is eating<br>
+                        • sleep() → ${name} is sleeping<br>
+                        <strong>الدوال الخاصة:</strong><br>
+                        • bark() → ${name} is barking: Woof! Woof!<br>
+                        • guard() → ${name} is guarding the house
+                    </div>
+                `;
+            } else {
+                output.innerHTML = `
+                    <i class="fas fa-cat" style="color: #ffd700;"></i> <strong>تم إنشاء كائن Cat:</strong><br>
+                    <br>
+                    <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                        <strong>معلومات القطة (ترث من Animal):</strong><br>
+                        • الاسم: ${name}<br>
+                        • العمر: ${age} سنوات<br>
+                        • اللون: ${extra}<br>
+                        <br>
+                        <strong>الدوال الموروثة:</strong><br>
+                        • eat() → ${name} is eating<br>
+                        • sleep() → ${name} is sleeping<br>
+                        <strong>الدوال الخاصة:</strong><br>
+                        • meow() → ${name} is meowing: Meow! Meow!<br>
+                        • climb() → ${name} is climbing trees
+                    </div>
+                `;
+            }
+            
+            output.innerHTML += `<br><i class="fas fa-check-circle" style="color: #00ff00;"></i> تم إنشاء الكائن بنجاح باستخدام الوراثة!`;
+        }
+
+        // تمرير سلس للروابط الداخلية
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

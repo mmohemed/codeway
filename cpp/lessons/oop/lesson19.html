@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeWay | التغليف (Encapsulation) في C++</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js لتلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0f1e 0%, #1a1f35 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(145deg, #0b1120cc 0%, #1e2740cc 100%);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 5%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border: 2px solid #ffd700;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .header-content {
+            text-align: center;
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-content h1 span {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* عنوان الصفحة */
+        .page-header {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* جدول المحتويات */
+        .table-of-contents {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .table-of-contents h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: rgba(255, 215, 0, 0.15);
+            transform: translateX(-5px);
+        }
+
+        .toc-item i {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .toc-item a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .toc-item:hover a {
+            color: #ffd700;
+        }
+
+        /* أقسام الشرح */
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 30px;
+            padding: 3rem;
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, transparent);
+        }
+
+        .section h3 {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin: 2rem 0 1rem;
+        }
+
+        .section p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* صناديق الكود */
+        .code-box {
+            background: #1a1f2e;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .code-header span {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+        }
+
+        pre {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            background: transparent !important;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 1rem !important;
+        }
+
+        /* شرح الكود */
+        .code-explanation {
+            background: rgba(255, 215, 0, 0.03);
+            border-right: 3px solid #ffd700;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .code-explanation p {
+            margin: 0.5rem 0;
+        }
+
+        .code-explanation i {
+            color: #ffd700;
+            margin-left: 0.5rem;
+        }
+
+        /* بطاقات المفاهيم */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .concept-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .concept-card i {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .concept-card h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        /* جدول مقارنة التغليف */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        /* تمثيل التغليف */
+        .encapsulation-viz {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .capsule {
+            border: 3px solid #ffd700;
+            border-radius: 50px;
+            padding: 2rem;
+            margin: 1rem auto;
+            max-width: 500px;
+            position: relative;
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .capsule::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 50%;
+        }
+
+        .capsule-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .data-field {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            padding: 0.8rem;
+            text-align: center;
+        }
+
+        .method-field {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            padding: 0.8rem;
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        .lock-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        /* صندوق النتائج */
+        .result-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .result-box h4 {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            color: #ffffff;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        /* التمارين التفاعلية */
+        .exercise-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .exercise-box h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .exercise-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            color: #e0e0e0;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .exercise-btn {
+            background: #ffd700;
+            color: #0a0f1e;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0;
+        }
+
+        .exercise-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .exercise-output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace;
+            min-height: 60px;
+        }
+
+        /* أزرار التنقل */
+        .lesson-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+        }
+
+        .nav-lesson-btn {
+            background: transparent;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-lesson-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+            transform: translateX(-5px);
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            background: linear-gradient(145deg, #0b1120cc, #1a1f35cc);
+            backdrop-filter: blur(10px);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: #b0b0b0;
+            text-decoration: none;
+            display: block;
+            margin: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffd700;
+        }
+
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0f1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffaa00;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .section {
+                padding: 2rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-content {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CodeWay</a>
+            <div class="header-content">
+                <h1>شرح <span>التغليف (Encapsulation)</span> في C++</h1>
+            </div>
+            <div style="width: 100px;"></div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- رأس الصفحة -->
+        <div class="page-header">
+            <h1>التغليف في C++</h1>
+            <p>تعلم كيفية حماية البيانات وتنظيم الكود باستخدام مبدأ التغليف (Encapsulation) في البرمجة الكائنية</p>
+        </div>
+
+        <!-- جدول المحتويات -->
+        <div class="table-of-contents">
+            <h2><i class="fas fa-list"></i> محتويات الدرس</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <i class="fas fa-info-circle"></i>
+                    <a href="#intro">مقدمة عن التغليف</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-lock"></i>
+                    <a href="#access">معدّلات الوصول</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-arrows-alt"></i>
+                    <a href="#getters">Getters و Setters</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <a href="#benefits">فوائد التغليف</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-code-branch"></i>
+                    <a href="#examples">أمثلة متقدمة</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-tasks"></i>
+                    <a href="#exercises">تمارين وتطبيقات</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم المقدمة -->
+        <section id="intro" class="section">
+            <h2>ما هو التغليف (Encapsulation)؟</h2>
+            <p>التغليف هو أحد المبادئ الأساسية في البرمجة الكائنية (OOP) والذي يهدف إلى:</p>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>إخفاء البيانات</h3>
+                    <p>إخفاء التفاصيل الداخلية للكائن ومنع الوصول المباشر للبيانات</p>
+                </div>
+                <div class="concept-card">
+                    <i class="fas fa-cubes"></i>
+                    <h3>تجميع البيانات</h3>
+                    <p>تجميع البيانات (الخصائص) والدوال (السلوكيات) في وحدة واحدة</p>
+                </div>
+                <div class="concept-card">
+                    <i class="fas fa-lock"></i>
+                    <h3>التحكم بالوصول</h3>
+                    <p>تحديد كيفية وأين يمكن الوصول للبيانات</p>
+                </div>
+            </div>
+
+            <div class="encapsulation-viz">
+                <h3 style="color: #ffd700; margin-bottom: 1rem;">تمثيل التغليف</h3>
+                <div class="capsule">
+                    <i class="fas fa-lock lock-icon"></i>
+                    <div class="capsule-content">
+                        <div class="data-field">
+                            <i class="fas fa-database"></i> -balance: double
+                        </div>
+                        <div class="data-field">
+                            <i class="fas fa-database"></i> -accountNumber: string
+                        </div>
+                        <div class="method-field">
+                            <i class="fas fa-code"></i> +deposit(amount: double): void
+                        </div>
+                        <div class="method-field">
+                            <i class="fas fa-code"></i> +withdraw(amount: double): bool
+                        </div>
+                        <div class="method-field">
+                            <i class="fas fa-code"></i> +getBalance(): double
+                        </div>
+                    </div>
+                </div>
+                <p style="color: #b0b0b0; text-align: center; margin-top: 1rem;">الخصائص خاصة (private) والدوال عامة (public)</p>
+            </div>
+        </section>
+
+        <!-- قسم معدّلات الوصول -->
+        <section id="access" class="section">
+            <h2>معدّلات الوصول (Access Specifiers)</h2>
+            <p>تستخدم معدّلات الوصول لتحقيق التغليف وتحديد مدى إمكانية الوصول لأعضاء الفئة.</p>
+
+            <table class="comparison-table">
+                <tr>
+                    <th>المعدّل</th>
+                    <th>الرمز</th>
+                    <th>الوصف</th>
+                    <th>مثال</th>
+                </tr>
+                <tr>
+                    <td>public</td>
+                    <td><span style="color: #ffd700;">+</span></td>
+                    <td>يمكن الوصول من أي مكان في البرنامج</td>
+                    <td><code>public: int x;</code></td>
+                </tr>
+                <tr>
+                    <td>private</td>
+                    <td><span style="color: #ffd700;">-</span></td>
+                    <td>يمكن الوصول فقط داخل نفس الفئة</td>
+                    <td><code>private: int y;</code></td>
+                </tr>
+                <tr>
+                    <td>protected</td>
+                    <td><span style="color: #ffd700;">#</span></td>
+                    <td>يمكن الوصول داخل الفئة والفئات المشتقة</td>
+                    <td><code>protected: int z;</code></td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 1: تطبيق التغليف</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class BankAccount {
+private:
+    // بيانات خاصة - لا يمكن الوصول المباشر من خارج الفئة
+    string accountNumber;
+    string ownerName;
+    double balance;
+    string pinCode;
+    
+public:
+    // مُنشئ لتهيئة الحساب
+    BankAccount(string accNum, string name, double initialBalance, string pin) {
+        accountNumber = accNum;
+        ownerName = name;
+        if(initialBalance >= 0) {
+            balance = initialBalance;
+        } else {
+            balance = 0;
+        }
+        pinCode = pin;
+    }
+    
+    // واجهة عامة للتعامل مع البيانات
+    bool deposit(double amount) {
+        if(amount > 0) {
+            balance += amount;
+            return true;
+        }
+        return false;
+    }
+    
+    bool withdraw(double amount, string pin) {
+        if(pin == pinCode && amount > 0 && amount <= balance) {
+            balance -= amount;
+            return true;
+        }
+        return false;
+    }
+    
+    double getBalance(string pin) {
+        if(pin == pinCode) {
+            return balance;
+        }
+        return -1; // رمز للدلالة على خطأ
+    }
+    
+    string getAccountNumber() {
+        return accountNumber;
+    }
+    
+    string getOwnerName() {
+        return ownerName;
+    }
+};
+
+int main() {
+    BankAccount myAccount("123456", "Ahmed Ali", 5000, "1234");
+    
+    // myAccount.balance = 10000; // خطأ! لا يمكن الوصول المباشر
+    
+    // استخدام الواجهة العامة
+    cout &lt;&lt; "Owner: " &lt;&lt; myAccount.getOwnerName() &lt;&lt; endl;
+    cout &lt;&lt; "Account: " &lt;&lt; myAccount.getAccountNumber() &lt;&lt; endl;
+    
+    myAccount.deposit(1000);
+    cout &lt;&lt; "Balance: $" &lt;&lt; myAccount.getBalance("1234") &lt;&lt; endl;
+    
+    if(myAccount.withdraw(500, "1234")) {
+        cout &lt;&lt; "Withdrawal successful" &lt;&lt; endl;
+    }
+    
+    cout &lt;&lt; "Final balance: $" &lt;&lt; myAccount.getBalance("1234") &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-explanation">
+                <p><i class="fas fa-check-circle"></i> <strong>شرح المثال:</strong></p>
+                <p><strong>private:</strong> البيانات (accountNumber, balance, pinCode) مخفية</p>
+                <p><strong>public:</strong> الدوال العامة هي الواجهة للتعامل مع الكائن</p>
+                <p><strong>التحقق:</strong> نتحقق من صحة المدخلات قبل تعديل البيانات</p>
+                <p><strong>الأمان:</strong> الرقم السري محمي ولا يمكن الوصول إليه مباشرة</p>
+            </div>
+        </section>
+
+        <!-- قسم Getters و Setters -->
+        <section id="getters" class="section">
+            <h2>Getters و Setters</h2>
+            <p>الدوال التي تسمح بالوصول الآمن للخصائص الخاصة (private) وتعديلها.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 2: استخدام Getters و Setters</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Student {
+private:
+    string name;
+    int age;
+    double gpa;
+    string studentId;
+    
+public:
+    // Constructor
+    Student(string id) {
+        studentId = id;
+        name = "غير محدد";
+        age = 0;
+        gpa = 0.0;
+    }
+    
+    // Setters مع التحقق من صحة البيانات
+    void setName(string n) {
+        if(!n.empty()) {
+            name = n;
+        } else {
+            cout &lt;&lt; "خطأ: الاسم لا يمكن أن يكون فارغاً" &lt;&lt; endl;
+        }
+    }
+    
+    void setAge(int a) {
+        if(a >= 5 && a <= 100) {
+            age = a;
+        } else {
+            cout &lt;&lt; "خطأ: العمر يجب أن يكون بين 5 و 100" &lt;&lt; endl;
+        }
+    }
+    
+    void setGPA(double g) {
+        if(g >= 0.0 && g <= 4.0) {
+            gpa = g;
+        } else {
+            cout &lt;&lt; "خطأ: المعدل يجب أن يكون بين 0 و 4" &lt;&lt; endl;
+        }
+    }
+    
+    // Getters
+    string getName() {
+        return name;
+    }
+    
+    int getAge() {
+        return age;
+    }
+    
+    double getGPA() {
+        return gpa;
+    }
+    
+    string getStudentId() {
+        return studentId;
+    }
+    
+    // دوال إضافية
+    bool isExcellent() {
+        return gpa >= 3.5;
+    }
+    
+    void displayInfo() {
+        cout &lt;&lt; "=== معلومات الطالب ===" &lt;&lt; endl;
+        cout &lt;&lt; "الرقم الجامعي: " &lt;&lt; studentId &lt;&lt; endl;
+        cout &lt;&lt; "الاسم: " &lt;&lt; name &lt;&lt; endl;
+        cout &lt;&lt; "العمر: " &lt;&lt; age &lt;&lt; " سنة" &lt;&lt; endl;
+        cout &lt;&lt; "المعدل: " &lt;&lt; gpa &lt;&lt; endl;
+        cout &lt;&lt; "الحالة: " &lt;&lt; (isExcellent() ? "متفوق" : "عادي") &lt;&lt; endl;
+    }
+};
+
+int main() {
+    Student s1("2021001");
+    
+    // استخدام setters
+    s1.setName("Ahmed Mohamed");
+    s1.setAge(20);
+    s1.setGPA(3.7);
+    
+    // استخدام getters
+    cout &lt;&lt; "Student Name: " &lt;&lt; s1.getName() &lt;&lt; endl;
+    
+    s1.displayInfo();
+    
+    // محاولة إدخال قيم غير صحيحة
+    cout &lt;&lt; "\nمحاولة إدخال قيم غير صحيحة:" &lt;&lt; endl;
+    s1.setAge(150);  // سيتم رفضها
+    s1.setGPA(5.0);  // سيتم رفضها
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="result-box">
+                <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                <div class="result-value">
+                    Student Name: Ahmed Mohamed<br>
+                    === معلومات الطالب ===<br>
+                    الرقم الجامعي: 2021001<br>
+                    الاسم: Ahmed Mohamed<br>
+                    العمر: 20 سنة<br>
+                    المعدل: 3.7<br>
+                    الحالة: متفوق<br>
+                    <br>
+                    محاولة إدخال قيم غير صحيحة:<br>
+                    خطأ: العمر يجب أن يكون بين 5 و 100<br>
+                    خطأ: المعدل يجب أن يكون بين 0 و 4
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم فوائد التغليف -->
+        <section id="benefits" class="section">
+            <h2>فوائد التغليف (Benefits of Encapsulation)</h2>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>حماية البيانات</h3>
+                    <p>تمنع التعديل غير المصرح به أو غير الصحيح للبيانات</p>
+                </div>
+                <div class="concept-card">
+                    <i class="fas fa-check-double"></i>
+                    <h3>التحقق من الصحة</h3>
+                    <p>يمكن التحقق من صحة البيانات قبل تعيينها</p>
+                </div>
+                <div class="concept-card">
+                    <i class="fas fa-code-branch"></i>
+                    <h3>سهولة الصيانة</h3>
+                    <p>يمكن تعديل التنفيذ الداخلي دون التأثير على الكود الخارجي</p>
+                </div>
+                <div class="concept-card">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <h3>إعادة الاستخدام</h3>
+                    <p>تسهل إعادة استخدام الكود في أجزاء مختلفة من البرنامج</p>
+                </div>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 3: بدون تغليف ومع تغليف</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// بدون تغليف - مشاكل محتملة
+class BadRectangle {
+public:
+    double width;
+    double height;
+};
+
+// مع تغليف - آمن ومنظم
+class GoodRectangle {
+private:
+    double width;
+    double height;
+    
+public:
+    void setDimensions(double w, double h) {
+        if(w > 0 && h > 0) {
+            width = w;
+            height = h;
+        } else {
+            cout &lt;&lt; "خطأ: الأبعاد يجب أن تكون موجبة" &lt;&lt; endl;
+        }
+    }
+    
+    double getWidth() {
+        return width;
+    }
+    
+    double getHeight() {
+        return height;
+    }
+    
+    double getArea() {
+        return width * height;
+    }
+    
+    double getPerimeter() {
+        return 2 * (width + height);
+    }
+};
+
+int main() {
+    // الطريقة السيئة
+    BadRectangle badRect;
+    badRect.width = -5;  // يمكن تعيين قيمة سالبة!
+    badRect.height = 10;
+    cout &lt;&lt; "Bad Rectangle Area: " &lt;&lt; badRect.width * badRect.height &lt;&lt; endl;
+    
+    // الطريقة الجيدة
+    GoodRectangle goodRect;
+    goodRect.setDimensions(-5, 10);  // سيتم رفضها
+    goodRect.setDimensions(5, 10);   // قيمة صحيحة
+    cout &lt;&lt; "Good Rectangle Area: " &lt;&lt; goodRect.getArea() &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم أمثلة متقدمة -->
+        <section id="examples" class="section">
+            <h2>أمثلة متقدمة على التغليف</h2>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 4: نظام إدارة الموظفين</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+class Employee {
+private:
+    int id;
+    string name;
+    double baseSalary;
+    double bonus;
+    string department;
+    vector&lt;string&gt; skills;
+    
+    // دوال مساعدة خاصة
+    double calculateTax() {
+        double salary = getTotalSalary();
+        if(salary < 5000) return 0;
+        if(salary < 10000) return salary * 0.1;
+        return salary * 0.2;
+    }
+    
+public:
+    Employee(int empId, string empName, double salary, string dept) {
+        id = empId;
+        name = empName;
+        baseSalary = salary;
+        bonus = 0;
+        department = dept;
+    }
+    
+    // إدارة الراتب
+    void setBonus(double b) {
+        if(b >= 0) {
+            bonus = b;
+        }
+    }
+    
+    double getTotalSalary() {
+        return baseSalary + bonus;
+    }
+    
+    double getNetSalary() {
+        return getTotalSalary() - calculateTax();
+    }
+    
+    // إدارة المهارات
+    void addSkill(string skill) {
+        skills.push_back(skill);
+    }
+    
+    bool hasSkill(string skill) {
+        for(const string& s : skills) {
+            if(s == skill) return true;
+        }
+        return false;
+    }
+    
+    void displaySkills() {
+        cout &lt;&lt; "مهارات " &lt;&lt; name &lt;&lt; ": ";
+        for(const string& s : skills) {
+            cout &lt;&lt; s &lt;&lt; " ";
+        }
+        cout &lt;&lt; endl;
+    }
+    
+    // Getters
+    int getId() { return id; }
+    string getName() { return name; }
+    string getDepartment() { return department; }
+    
+    // عرض كامل المعلومات
+    void displayInfo() {
+        cout &lt;&lt; "\n=== موظف: " &lt;&lt; name &lt;&lt; " ===" &lt;&lt; endl;
+        cout &lt;&lt; "ID: " &lt;&lt; id &lt;&lt; endl;
+        cout &lt;&lt; "القسم: " &lt;&lt; department &lt;&lt; endl;
+        cout &lt;&lt; "الراتب الأساسي: $" &lt;&lt; baseSalary &lt;&lt; endl;
+        cout &lt;&lt; "المكافأة: $" &lt;&lt; bonus &lt;&lt; endl;
+        cout &lt;&lt; "إجمالي الراتب: $" &lt;&lt; getTotalSalary() &lt;&lt; endl;
+        cout &lt;&lt; "صافي الراتب: $" &lt;&lt; getNetSalary() &lt;&lt; endl;
+        displaySkills();
+    }
+};
+
+int main() {
+    Employee emp1(1001, "Ahmed Ali", 8000, "IT");
+    
+    emp1.setBonus(1000);
+    emp1.addSkill("C++");
+    emp1.addSkill("Python");
+    emp1.addSkill("SQL");
+    
+    emp1.displayInfo();
+    
+    if(emp1.hasSkill("C++")) {
+        cout &lt;&lt; emp1.getName() &lt;&lt; " لديه مهارة C++" &lt;&lt; endl;
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- تمارين وتطبيقات -->
+        <section id="exercises" class="section">
+            <h2>تمارين وتطبيقات عملية</h2>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 1: نظام إدارة مكتبة</h3>
+                <p>قم بإنشاء فئة Book مع تطبيق مبدأ التغليف:</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Book {
+private:
+    string title;
+    string author;
+    string isbn;
+    int publicationYear;
+    bool isBorrowed;
+    string borrowedBy;
+    
+public:
+    Book(string t, string a, string i, int year) {
+        title = t;
+        author = a;
+        isbn = i;
+        publicationYear = year;
+        isBorrowed = false;
+        borrowedBy = "";
+    }
+    
+    bool borrowBook(string borrower) {
+        if(!isBorrowed) {
+            isBorrowed = true;
+            borrowedBy = borrower;
+            return true;
+        }
+        return false;
+    }
+    
+    bool returnBook() {
+        if(isBorrowed) {
+            isBorrowed = false;
+            borrowedBy = "";
+            return true;
+        }
+        return false;
+    }
+    
+    string getTitle() { return title; }
+    string getAuthor() { return author; }
+    string getISBN() { return isbn; }
+    int getYear() { return publicationYear; }
+    bool getStatus() { return isBorrowed; }
+    string getBorrower() { return borrowedBy; }
+    
+    void displayInfo() {
+        cout &lt;&lt; "\n=== معلومات الكتاب ===" &lt;&lt; endl;
+        cout &lt;&lt; "العنوان: " &lt;&lt; title &lt;&lt; endl;
+        cout &lt;&lt; "المؤلف: " &lt;&lt; author &lt;&lt; endl;
+        cout &lt;&lt; "ISBN: " &lt;&lt; isbn &lt;&lt; endl;
+        cout &lt;&lt; "سنة النشر: " &lt;&lt; publicationYear &lt;&lt; endl;
+        cout &lt;&lt; "الحالة: " &lt;&lt; (isBorrowed ? "معار" : "متاح") &lt;&lt; endl;
+        if(isBorrowed) {
+            cout &lt;&lt; "مستعار من: " &lt;&lt; borrowedBy &lt;&lt; endl;
+        }
+    }
+};
+
+int main() {
+    Book book1("C++ Programming", "Bjarne Stroustrup", "978-0-321-99278-9", 2013);
+    
+    book1.displayInfo();
+    
+    if(book1.borrowBook("Ahmed")) {
+        cout &lt;&lt; "\nتم استعارة الكتاب بنجاح" &lt;&lt; endl;
+    }
+    
+    book1.displayInfo();
+    
+    book1.returnBook();
+    cout &lt;&lt; "\nتم إعادة الكتاب" &lt;&lt; endl;
+    
+    book1.displayInfo();
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 2: نظام إدارة المنتجات</h3>
+                <p>قم بإنشاء فئة Product مع تطبيق مبدأ التغليف:</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;iomanip&gt;
+using namespace std;
+
+class Product {
+private:
+    int id;
+    string name;
+    double price;
+    int quantity;
+    string category;
+    static double discountRate;  // نسبة خصم عامة
+    
+    double calculateDiscount() {
+        return price * discountRate;
+    }
+    
+public:
+    Product(int i, string n, double p, int q, string c) {
+        id = i;
+        name = n;
+        price = p;
+        quantity = q;
+        category = c;
+    }
+    
+    // تحديث المخزون
+    bool sell(int amount) {
+        if(amount > 0 && amount <= quantity) {
+            quantity -= amount;
+            return true;
+        }
+        return false;
+    }
+    
+    void restock(int amount) {
+        if(amount > 0) {
+            quantity += amount;
+        }
+    }
+    
+    // تعديل السعر مع التحقق
+    void setPrice(double newPrice) {
+        if(newPrice > 0) {
+            price = newPrice;
+        }
+    }
+    
+    double getPrice() {
+        return price;
+    }
+    
+    double getPriceAfterDiscount() {
+        return price - calculateDiscount();
+    }
+    
+    // Getters
+    int getId() { return id; }
+    string getName() { return name; }
+    int getQuantity() { return quantity; }
+    string getCategory() { return category; }
+    
+    // عرض المعلومات
+    void displayInfo() {
+        cout &lt;&lt; fixed &lt;&lt; setprecision(2);
+        cout &lt;&lt; "\n=== " &lt;&lt; name &lt;&lt; " ===" &lt;&lt; endl;
+        cout &lt;&lt; "ID: " &lt;&lt; id &lt;&lt; endl;
+        cout &lt;&lt; "التصنيف: " &lt;&lt; category &lt;&lt; endl;
+        cout &lt;&lt; "السعر الأصلي: $" &lt;&lt; price &lt;&lt; endl;
+        cout &lt;&lt; "السعر بعد الخصم: $" &lt;&lt; getPriceAfterDiscount() &lt;&lt; endl;
+        cout &lt;&lt; "الكمية المتوفرة: " &lt;&lt; quantity &lt;&lt; endl;
+    }
+};
+
+double Product::discountRate = 0.1;  // 10% خصم عام
+
+int main() {
+    Product laptop(1001, "Laptop Dell XPS", 1200, 10, "Electronics");
+    
+    laptop.displayInfo();
+    
+    if(laptop.sell(2)) {
+        cout &lt;&lt; "\nتم بيع المنتج" &lt;&lt; endl;
+    }
+    
+    laptop.displayInfo();
+    
+    laptop.restock(5);
+    cout &lt;&lt; "\nتم إضافة 5 وحدات" &lt;&lt; endl;
+    
+    laptop.displayInfo();
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- تمرين تفاعلي -->
+            <div class="exercise-box">
+                <h3><i class="fas fa-laptop-code"></i> جرب بنفسك</h3>
+                <p>أدخل بيانات شخص لإنشاء كائن مع تطبيق التغليف:</p>
+                
+                <input type="text" id="personName" class="exercise-input" placeholder="الاسم" value="أحمد">
+                <input type="number" id="personAge" class="exercise-input" placeholder="العمر" value="25">
+                <input type="email" id="personEmail" class="exercise-input" placeholder="البريد الإلكتروني" value="ahmed@email.com">
+                
+                <button class="exercise-btn" onclick="testEncapsulation()">إنشاء الكائن</button>
+                
+                <div id="output" class="exercise-output">
+                    النتائج ستظهر هنا...
+                </div>
+            </div>
+        </section>
+
+        <!-- أزرار التنقل بين الدروس -->
+        <div class="lesson-navigation">
+            <a href="lesson-inheritance.html" class="nav-lesson-btn">
+                <i class="fas fa-arrow-right"></i> الدرس السابق: الوراثة
+            </a>
+            <a href="lesson-polymorphism.html" class="nav-lesson-btn">
+                الدرس التالي: تعدد الأشكال <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CodeWay</h3>
+                <p>منصة عربية متكاملة لتعليم البرمجة</p>
+            </div>
+            <div class="footer-section">
+                <h3>روابط مفيدة</h3>
+                <a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> الدروس</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> المشاريع</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> عن المنصة</a>
+            </div>
+            <div class="footer-section">
+                <h3>تابعنا</h3>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+                <a href="#"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem; color: #808080;">
+            <p>© 2024 CodeWay - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+
+    <script>
+        // شريط التقدم
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress").style.width = scrolled + "%";
+        };
+
+        // نسخ الكود
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = "تم النسخ!";
+                setTimeout(() => {
+                    button.textContent = "نسخ";
+                }, 2000);
+            });
+        }
+
+        // التمرين التفاعلي - محاكاة التغليف
+        function testEncapsulation() {
+            const name = document.getElementById('personName').value;
+            const age = parseInt(document.getElementById('personAge').value);
+            const email = document.getElementById('personEmail').value;
+            
+            if (!name || !age || !email) {
+                document.getElementById('output').innerHTML = '<i class="fas fa-exclamation-circle" style="color: #ff4444;"></i> الرجاء إدخال جميع البيانات';
+                return;
+            }
+            
+            // التحقق من صحة البيانات
+            const isValidAge = age >= 0 && age <= 150;
+            const isValidEmail = email.includes('@') && email.includes('.');
+            
+            const output = document.getElementById('output');
+            output.innerHTML = `
+                <i class="fas fa-lock" style="color: #ffd700;"></i> <strong>محاكاة التغليف (Encapsulation):</strong><br>
+                <br>
+                <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                    <strong>البيانات المدخلة:</strong><br>
+                    • الاسم: ${name}<br>
+                    • العمر: ${age} سنة<br>
+                    • البريد: ${email}<br>
+                </div>
+                <br>
+                <div style="background: rgba(255,215,0,0.05); padding: 1rem; border-radius: 10px;">
+                    <strong>التحقق من الصحة (في setters):</strong><br>
+                    • ${isValidAge ? '✓' : '✗'} العمر ${isValidAge ? 'صحيح' : 'غير صحيح'} (يجب أن يكون بين 0 و 150)<br>
+                    • ${isValidEmail ? '✓' : '✗'} البريد الإلكتروني ${isValidEmail ? 'صحيح' : 'غير صحيح'}<br>
+                </div>
+                <br>
+                <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                    <strong>الوصول عبر Getters:</strong><br>
+                    • getName() → ${name}<br>
+                    • getAge() → ${isValidAge ? age : 'غير متاح (قيمة غير صحيحة)'}<br>
+                    • getEmail() → ${isValidEmail ? email : 'غير متاح (بريد غير صحيح)'}<br>
+                </div>
+            `;
+            
+            output.innerHTML += `<br><i class="fas fa-check-circle" style="color: #00ff00;"></i> تم تطبيق مبدأ التغليف بنجاح!`;
+        }
+
+        // تمرير سلس للروابط الداخلية
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

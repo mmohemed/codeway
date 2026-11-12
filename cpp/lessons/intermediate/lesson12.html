@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeWay | السلاسل النصية (Strings) في C++</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js لتلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0f1e 0%, #1a1f35 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(145deg, #0b1120cc 0%, #1e2740cc 100%);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 5%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border: 2px solid #ffd700;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .header-content {
+            text-align: center;
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-content h1 span {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* عنوان الصفحة */
+        .page-header {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* جدول المحتويات */
+        .table-of-contents {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .table-of-contents h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: rgba(255, 215, 0, 0.15);
+            transform: translateX(-5px);
+        }
+
+        .toc-item i {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .toc-item a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .toc-item:hover a {
+            color: #ffd700;
+        }
+
+        /* أقسام الشرح */
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 30px;
+            padding: 3rem;
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, transparent);
+        }
+
+        .section h3 {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin: 2rem 0 1rem;
+        }
+
+        .section p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* صناديق الكود */
+        .code-box {
+            background: #1a1f2e;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .code-header span {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+        }
+
+        pre {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            background: transparent !important;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 1rem !important;
+        }
+
+        /* شرح الكود */
+        .code-explanation {
+            background: rgba(255, 215, 0, 0.03);
+            border-right: 3px solid #ffd700;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .code-explanation p {
+            margin: 0.5rem 0;
+        }
+
+        .code-explanation i {
+            color: #ffd700;
+            margin-left: 0.5rem;
+        }
+
+        /* بطاقات المفاهيم */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .concept-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .concept-card i {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .concept-card h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        /* جدول دوال النصوص */
+        .functions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .functions-table th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .functions-table td {
+            padding: 1rem;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .functions-table tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        /* تمثيل النص في الذاكرة */
+        .memory-viz {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .memory-cell {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            margin: 0.2rem;
+            text-align: center;
+            line-height: 60px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .memory-cell span {
+            display: block;
+            font-size: 0.7rem;
+            color: #b0b0b0;
+            margin-top: -15px;
+        }
+
+        .null-cell {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: #ff4444;
+        }
+
+        /* صندوق النتائج */
+        .result-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .result-box h4 {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            color: #ffffff;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        /* التمارين التفاعلية */
+        .exercise-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .exercise-box h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .exercise-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            color: #e0e0e0;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .exercise-btn {
+            background: #ffd700;
+            color: #0a0f1e;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0;
+        }
+
+        .exercise-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .exercise-output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace;
+            min-height: 60px;
+        }
+
+        /* أزرار التنقل */
+        .lesson-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+        }
+
+        .nav-lesson-btn {
+            background: transparent;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-lesson-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+            transform: translateX(-5px);
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            background: linear-gradient(145deg, #0b1120cc, #1a1f35cc);
+            backdrop-filter: blur(10px);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: #b0b0b0;
+            text-decoration: none;
+            display: block;
+            margin: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffd700;
+        }
+
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0f1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffaa00;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .section {
+                padding: 2rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-content {
+                margin: 0.5rem 0;
+            }
+
+            .memory-cell {
+                width: 40px;
+                height: 40px;
+                line-height: 40px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CodeWay</a>
+            <div class="header-content">
+                <h1>شرح <span>السلاسل النصية (Strings)</span> في C++</h1>
+            </div>
+            <div style="width: 100px;"></div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- رأس الصفحة -->
+        <div class="page-header">
+            <h1>السلاسل النصية في C++</h1>
+            <p>تعلم كيفية التعامل مع النصوص في لغة C++ باستخدام string و C-strings مع شرح مفصل وأمثلة عملية</p>
+        </div>
+
+        <!-- جدول المحتويات -->
+        <div class="table-of-contents">
+            <h2><i class="fas fa-list"></i> محتويات الدرس</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <i class="fas fa-info-circle"></i>
+                    <a href="#intro">مقدمة عن السلاسل النصية</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-code"></i>
+                    <a href="#cstrings">C-Strings (أسلوب C)</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-cube"></i>
+                    <a href="#cppstrings">string (أسلوب C++)</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-tools"></i>
+                    <a href="#operations">عمليات على النصوص</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-search"></i>
+                    <a href="#methods">دوال البحث والتعديل</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    <a href="#conversion">التحويل بين الأنواع</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-tasks"></i>
+                    <a href="#exercises">تمارين وتطبيقات</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم المقدمة -->
+        <section id="intro" class="section">
+            <h2>مقدمة عن السلاسل النصية</h2>
+            <p>السلاسل النصية (Strings) هي تسلسل من الأحرف تستخدم لتخزين ومعالجة النصوص. في C++، هناك طريقتان رئيسيتان للتعامل مع النصوص:</p>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <i class="fas fa-code-branch"></i>
+                    <h3>C-Strings</h3>
+                    <p>مصفوفات من الأحرف تنتهي بحرف null '\0'، موروثة من لغة C</p>
+                </div>
+                <div class="concept-card">
+                    <i class="fas fa-cube"></i>
+                    <h3>string Class</h3>
+                    <p>كلاس متكامل من مكتبة C++ القياسية يوفر دوالاً سهلة للتعامل مع النصوص</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم C-Strings -->
+        <section id="cstrings" class="section">
+            <h2>C-Strings (أسلوب C)</h2>
+            <p>في أسلوب C، يتم تمثيل النصوص كمصفوفات من الأحرف تنتهي بالحرف الفارغ '\0'.</p>
+
+            <div class="memory-viz">
+                <h3 style="color: #ffd700; margin-bottom: 1rem;">تمثيل C-String في الذاكرة</h3>
+                <div class="memory-cell">H</div>
+                <div class="memory-cell">e</div>
+                <div class="memory-cell">l</div>
+                <div class="memory-cell">l</div>
+                <div class="memory-cell">o</div>
+                <div class="memory-cell null-cell">\0</div>
+                <div style="margin-top: 1rem; color: #b0b0b0;">كلمة "Hello" في الذاكرة + حرف null</div>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 1: تعريف واستخدام C-Strings</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cstring&gt;  // لدوال النصوص في C
+using namespace std;
+
+int main() {
+    // طرق مختلفة لتعريف C-Strings
+    char str1[] = "Hello";           // مصفوفة أحرف
+    char str2[20] = "World";         // مصفوفة بحجم محدد
+    char str3[] = {'C', '+', '+', '\0'};  // تعريف يدوي
+    
+    cout &lt;&lt; "str1: " &lt;&lt; str1 &lt;&lt; endl;
+    cout &lt;&lt; "str2: " &lt;&lt; str2 &lt;&lt; endl;
+    cout &lt;&lt; "str3: " &lt;&lt; str3 &lt;&lt; endl;
+    
+    // حساب طول النص
+    cout &lt;&lt; "طول str1: " &lt;&lt; strlen(str1) &lt;&lt; endl;
+    cout &lt;&lt; "حجم str1 في الذاكرة: " &lt;&lt; sizeof(str1) &lt;&lt; " بايت" &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <h3>دوال مهمة للتعامل مع C-Strings:</h3>
+            <table class="functions-table">
+                <tr>
+                    <th>الدالة</th>
+                    <th>الوصف</th>
+                    <th>مثال</th>
+                </tr>
+                <tr>
+                    <td>strlen()</td>
+                    <td>حساب طول النص</td>
+                    <td>strlen("Hello") → 5</td>
+                </tr>
+                <tr>
+                    <td>strcpy()</td>
+                    <td>نسخ نص</td>
+                    <td>strcpy(dest, src)</td>
+                </tr>
+                <tr>
+                    <td>strcat()</td>
+                    <td>دمج نصين</td>
+                    <td>strcat(str1, str2)</td>
+                </tr>
+                <tr>
+                    <td>strcmp()</td>
+                    <td>مقارنة نصين</td>
+                    <td>strcmp(str1, str2)</td>
+                </tr>
+                <tr>
+                    <td>strchr()</td>
+                    <td>البحث عن حرف</td>
+                    <td>strchr(str, 'a')</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 2: دوال C-Strings</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cstring&gt;
+using namespace std;
+
+int main() {
+    char name[50] = "Ahmed";
+    char lastName[] = " Mohamed";
+    char copy[50];
+    
+    // نسخ نص
+    strcpy(copy, name);
+    cout &lt;&lt; "نسخة من الاسم: " &lt;&lt; copy &lt;&lt; endl;
+    
+    // دمج النصوص
+    strcat(name, lastName);
+    cout &lt;&lt; "الاسم الكامل: " &lt;&lt; name &lt;&lt; endl;
+    
+    // مقارنة النصوص
+    char str1[] = "apple";
+    char str2[] = "banana";
+    int result = strcmp(str1, str2);
+    
+    if(result < 0)
+        cout &lt;&lt; str1 &lt;&lt; " أصغر من " &lt;&lt; str2 &lt;&lt; endl;
+    else if(result > 0)
+        cout &lt;&lt; str1 &lt;&lt; " أكبر من " &lt;&lt; str2 &lt;&lt; endl;
+    else
+        cout &lt;&lt; "النصان متساويان" &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم string في C++ -->
+        <section id="cppstrings" class="section">
+            <h2>string Class (أسلوب C++)</h2>
+            <p>توفر مكتبة C++ القياسية كلاس string الذي يسهل التعامل مع النصوص بشكل كبير.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 3: تعريف واستخدام string</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;  // مكتبة string
+using namespace std;
+
+int main() {
+    // طرق مختلفة لتعريف string
+    string s1;                    // نص فارغ
+    string s2 = "Hello";          // تهيئة بنص
+    string s3("World");           // تهيئة باستخدام constructor
+    string s4(s2);                // نسخ من s2
+    string s5(5, '*');            // تكرار حرف 5 مرات "*****"
+    
+    cout &lt;&lt; "s1: '" &lt;&lt; s1 &lt;&lt; "'" &lt;&lt; endl;
+    cout &lt;&lt; "s2: " &lt;&lt; s2 &lt;&lt; endl;
+    cout &lt;&lt; "s3: " &lt;&lt; s3 &lt;&lt; endl;
+    cout &lt;&lt; "s4: " &lt;&lt; s4 &lt;&lt; endl;
+    cout &lt;&lt; "s5: " &lt;&lt; s5 &lt;&lt; endl;
+    
+    // إدخال نص من المستخدم
+    string name;
+    cout &lt;&lt; "\nأدخل اسمك: ";
+    getline(cin, name);  // لقراءة سطر كامل
+    
+    cout &lt;&lt; "مرحباً " &lt;&lt; name &lt;&lt; "!" &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-explanation">
+                <p><i class="fas fa-info-circle"></i> <strong>ملاحظة مهمة:</strong> استخدم <strong>getline(cin, str)</strong> لقراءة سطر كامل يتضمن مسافات، بينما <strong>cin >> str</strong> يقرأ حتى أول مسافة فقط.</p>
+            </div>
+        </section>
+
+        <!-- قسم العمليات على النصوص -->
+        <section id="operations" class="section">
+            <h2>العمليات الأساسية على النصوص</h2>
+
+            <h3>الإسناد والدمج</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 4: إسناد ودمج النصوص</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    string firstName = "Ahmed";
+    string lastName = "Ali";
+    
+    // الإسناد
+    string fullName = firstName;  // نسخ
+    cout &lt;&lt; "fullName = " &lt;&lt; fullName &lt;&lt; endl;
+    
+    // الدمج باستخدام +
+    fullName = firstName + " " + lastName;
+    cout &lt;&lt; "الاسم الكامل: " &lt;&lt; fullName &lt;&lt; endl;
+    
+    // الدمج باستخدام +=
+    fullName += " Mohamed";
+    cout &lt;&lt; "بعد الإضافة: " &lt;&lt; fullName &lt;&lt; endl;
+    
+    // إضافة حرف
+    fullName.push_back('!');
+    cout &lt;&lt; "بعد إضافة !: " &lt;&lt; fullName &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <h3>الوصول للأحرف</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 5: الوصول للأحرف</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    string text = "Programming";
+    
+    // الوصول للأحرف باستخدام []
+    cout &lt;&lt; "الحرف الأول: " &lt;&lt; text[0] &lt;&lt; endl;
+    cout &lt;&lt; "الحرف الثالث: " &lt;&lt; text[2] &lt;&lt; endl;
+    cout &lt;&lt; "آخر حرف: " &lt;&lt; text[text.length() - 1] &lt;&lt; endl;
+    
+    // استخدام at() (أكثر أماناً)
+    cout &lt;&lt; "الحرف الرابع: " &lt;&lt; text.at(3) &lt;&lt; endl;
+    
+    // تعديل حرف
+    text[0] = 'p';
+    cout &lt;&lt; "بعد التعديل: " &lt;&lt; text &lt;&lt; endl;
+    
+    // عرض جميع الأحرف
+    cout &lt;&lt; "جميع الأحرف: ";
+    for(char c : text) {
+        cout &lt;&lt; c &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <h3>حجم النص وفحصه</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 6: دوال الحجم</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    string str = "Hello, World!";
+    
+    cout &lt;&lt; "النص: " &lt;&lt; str &lt;&lt; endl;
+    cout &lt;&lt; "الطول: " &lt;&lt; str.length() &lt;&lt; endl;
+    cout &lt;&lt; "الحجم: " &lt;&lt; str.size() &lt;&lt; endl;  // نفس length()
+    cout &lt;&lt; "السعة: " &lt;&lt; str.capacity() &lt;&lt; endl;
+    
+    // فحص إذا كان النص فارغاً
+    string empty;
+    if(empty.empty()) {
+        cout &lt;&lt; "النص فارغ" &lt;&lt; endl;
+    }
+    
+    // تغيير الحجم
+    str.resize(5);
+    cout &lt;&lt; "بعد تصغير الحجم: " &lt;&lt; str &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم دوال البحث والتعديل -->
+        <section id="methods" class="section">
+            <h2>دوال البحث والتعديل المتقدمة</h2>
+
+            <table class="functions-table">
+                <tr>
+                    <th>الدالة</th>
+                    <th>الوصف</th>
+                    <th>مثال</th>
+                </tr>
+                <tr>
+                    <td>find()</td>
+                    <td>البحث عن نص فرعي</td>
+                    <td>str.find("world")</td>
+                </tr>
+                <tr>
+                    <td>substr()</td>
+                    <td>استخراج جزء من النص</td>
+                    <td>str.substr(0, 5)</td>
+                </tr>
+                <tr>
+                    <td>insert()</td>
+                    <td>إدراج نص في موضع محدد</td>
+                    <td>str.insert(5, "xxx")</td>
+                </tr>
+                <tr>
+                    <td>erase()</td>
+                    <td>حذف جزء من النص</td>
+                    <td>str.erase(0, 3)</td>
+                </tr>
+                <tr>
+                    <td>replace()</td>
+                    <td>استبدال جزء من النص</td>
+                    <td>str.replace(0, 3, "new")</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 7: البحث والتعديل</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    string text = "The quick brown fox jumps over the lazy dog";
+    
+    // البحث عن نص فرعي
+    string word = "fox";
+    size_t found = text.find(word);
+    
+    if(found != string::npos) {
+        cout &lt;&lt; "تم العثور على '" &lt;&lt; word &lt;&lt; "' في الموضع " &lt;&lt; found &lt;&lt; endl;
+    }
+    
+    // استخراج جزء من النص
+    string sub = text.substr(4, 5);  // 5 أحرف من الموضع 4
+    cout &lt;&lt; "نص فرعي: " &lt;&lt; sub &lt;&lt; endl;
+    
+    // إدراج نص
+    text.insert(10, "very ");
+    cout &lt;&lt; "بعد الإدراج: " &lt;&lt; text &lt;&lt; endl;
+    
+    // حذف جزء
+    text.erase(0, 4);  // احذف أول 4 أحرف
+    cout &lt;&lt; "بعد الحذف: " &lt;&lt; text &lt;&lt; endl;
+    
+    // استبدال جزء
+    text.replace(0, 5, "A");  // استبدل 5 أحرف بـ "A"
+    cout &lt;&lt; "بعد الاستبدال: " &lt;&lt; text &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم التحويل بين الأنواع -->
+        <section id="conversion" class="section">
+            <h2>التحويل بين الأنواع</h2>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 8: تحويل النصوص والأرقام</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;sstream&gt;  // stringstream
+using namespace std;
+
+int main() {
+    // تحويل رقم إلى نص (C++11)
+    int num = 123;
+    string strNum = to_string(num);
+    cout &lt;&lt; "رقم كنص: " &lt;&lt; strNum &lt;&lt; endl;
+    
+    // تحويل نص إلى رقم
+    string numStr = "456";
+    int value = stoi(numStr);  // string to int
+    double dValue = stod("78.9");  // string to double
+    
+    cout &lt;&lt; "قيمة رقمية: " &lt;&lt; value &lt;&lt; endl;
+    cout &lt;&lt; "قيمة عشرية: " &lt;&lt; dValue &lt;&lt; endl;
+    
+    // استخدام stringstream للتحويلات المعقدة
+    stringstream ss;
+    ss &lt;&lt; 123 &lt;&lt; " " &lt;&lt; 45.67;
+    
+    int x;
+    double y;
+    ss >> x >> y;
+    
+    cout &lt;&lt; "x = " &lt;&lt; x &lt;&lt; ", y = " &lt;&lt; y &lt;&lt; endl;
+    
+    // تحويل C-string إلى string
+    const char* cstr = "C string";
+    string cppstr = cstr;
+    
+    // تحويل string إلى C-string
+    const char* backToC = cppstr.c_str();
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- تطبيقات عملية متقدمة -->
+        <section id="advanced" class="section">
+            <h2>تطبيقات عملية متقدمة</h2>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 9: تحليل نص (String Parsing)</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;sstream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    string data = "Ahmed,25,Cairo;Sara,22,Alex;Mohamed,30,Giza";
+    vector&lt;string&gt; people;
+    
+    // تقسيم النص باستخدام ;
+    stringstream ss(data);
+    string person;
+    
+    while(getline(ss, person, ';')) {
+        people.push_back(person);
+    }
+    
+    cout &lt;&lt; "بيانات الأشخاص:\n";
+    for(const string& p : people) {
+        stringstream ps(p);
+        string name, age, city;
+        
+        getline(ps, name, ',');
+        getline(ps, age, ',');
+        getline(ps, city, ',');
+        
+        cout &lt;&lt; "الاسم: " &lt;&lt; name &lt;&lt; ", العمر: " &lt;&lt; age 
+             &lt;&lt; ", المدينة: " &lt;&lt; city &lt;&lt; endl;
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 10: عكس النص</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;algorithm&gt;
+using namespace std;
+
+string reverseString(string str) {
+    string reversed = str;
+    reverse(reversed.begin(), reversed.end());
+    return reversed;
+}
+
+bool isPalindrome(string str) {
+    string temp = str;
+    // تحويل إلى أحرف صغيرة وتجاهل المسافات
+    temp.erase(remove_if(temp.begin(), temp.end(), ::isspace), temp.end());
+    transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+    
+    string rev = temp;
+    reverse(rev.begin(), rev.end());
+    return temp == rev;
+}
+
+int main() {
+    string text = "Hello, World!";
+    cout &lt;&lt; "النص الأصلي: " &lt;&lt; text &lt;&lt; endl;
+    cout &lt;&lt; "النص المعكوس: " &lt;&lt; reverseString(text) &lt;&lt; endl;
+    
+    // اختبار palindrome
+    string test1 = "A man a plan a canal Panama";
+    string test2 = "Hello";
+    
+    cout &lt;&lt; boolalpha;
+    cout &lt;&lt; "'" &lt;&lt; test1 &lt;&lt; "' is palindrome? " &lt;&lt; isPalindrome(test1) &lt;&lt; endl;
+    cout &lt;&lt; "'" &lt;&lt; test2 &lt;&lt; "' is palindrome? " &lt;&lt; isPalindrome(test2) &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- تمارين وتطبيقات -->
+        <section id="exercises" class="section">
+            <h2>تمارين وتطبيقات عملية</h2>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 1: عداد الكلمات</h3>
+                <p>قم بكتابة دالة تحسب عدد الكلمات في نص معين.</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;sstream&gt;
+using namespace std;
+
+int countWords(const string& text) {
+    stringstream ss(text);
+    string word;
+    int count = 0;
+    
+    while(ss >> word) {
+        count++;
+    }
+    
+    return count;
+}
+
+int main() {
+    string text = "C++ is a powerful programming language";
+    
+    cout &lt;&lt; "النص: " &lt;&lt; text &lt;&lt; endl;
+    cout &lt;&lt; "عدد الكلمات: " &lt;&lt; countWords(text) &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 2: استبدال الكلمات</h3>
+                <p>قم بكتابة دالة تستبدل كل كلمة معينة بكلمة أخرى في النص.</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+string replaceWord(string text, const string& oldWord, const string& newWord) {
+    size_t pos = 0;
+    while((pos = text.find(oldWord, pos)) != string::npos) {
+        text.replace(pos, oldWord.length(), newWord);
+        pos += newWord.length();
+    }
+    return text;
+}
+
+int main() {
+    string text = "I like C++, C++ is great";
+    cout &lt;&lt; "النص الأصلي: " &lt;&lt; text &lt;&lt; endl;
+    
+    string replaced = replaceWord(text, "C++", "Python");
+    cout &lt;&lt; "بعد الاستبدال: " &lt;&lt; replaced &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- تمرين تفاعلي -->
+            <div class="exercise-box">
+                <h3><i class="fas fa-laptop-code"></i> جرب بنفسك</h3>
+                <p>أدخل نصاً وجرب عمليات النصوص المختلفة:</p>
+                
+                <input type="text" id="stringInput" class="exercise-input" placeholder="أدخل نصاً" value="Hello, C++ Programming!">
+                <input type="text" id="searchInput" class="exercise-input" placeholder="كلمة للبحث" value="C++">
+                
+                <button class="exercise-btn" onclick="testStrings()">تشغيل العمليات</button>
+                
+                <div id="output" class="exercise-output">
+                    النتائج ستظهر هنا...
+                </div>
+            </div>
+        </section>
+
+        <!-- أزرار التنقل بين الدروس -->
+        <div class="lesson-navigation">
+            <a href="lesson-pointers.html" class="nav-lesson-btn">
+                <i class="fas fa-arrow-right"></i> الدرس السابق: المؤشرات
+            </a>
+            <a href="lesson-classes.html" class="nav-lesson-btn">
+                الدرس التالي: الكلاسات والكائنات <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CodeWay</h3>
+                <p>منصة عربية متكاملة لتعليم البرمجة</p>
+            </div>
+            <div class="footer-section">
+                <h3>روابط مفيدة</h3>
+                <a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> الدروس</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> المشاريع</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> عن المنصة</a>
+            </div>
+            <div class="footer-section">
+                <h3>تابعنا</h3>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+                <a href="#"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem; color: #808080;">
+            <p>© 2024 CodeWay - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+
+    <script>
+        // شريط التقدم
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress").style.width = scrolled + "%";
+        };
+
+        // نسخ الكود
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = "تم النسخ!";
+                setTimeout(() => {
+                    button.textContent = "نسخ";
+                }, 2000);
+            });
+        }
+
+        // التمرين التفاعلي
+        function testStrings() {
+            const text = document.getElementById('stringInput').value;
+            const searchWord = document.getElementById('searchInput').value;
+            const output = document.getElementById('output');
+            
+            if (!text) {
+                output.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #ff4444;"></i> الرجاء إدخال نص';
+                return;
+            }
+            
+            // عمليات على النص
+            const length = text.length;
+            const words = text.split(' ').filter(w => w.length > 0).length;
+            const reversed = text.split('').reverse().join('');
+            const upper = text.toUpperCase();
+            const lower = text.toLowerCase();
+            
+            // البحث عن كلمة
+            const found = text.includes(searchWord);
+            const position = text.indexOf(searchWord);
+            
+            output.innerHTML = `
+                <i class="fas fa-font" style="color: #ffd700;"></i> <strong>معلومات عن النص:</strong><br>
+                <br>
+                <strong>النص المدخل:</strong> "${text}"<br>
+                <strong>الطول:</strong> ${length} حرف<br>
+                <strong>عدد الكلمات:</strong> ${words} كلمة<br>
+                <hr style="border-color: #ffd700; margin: 10px 0;">
+                <strong>العمليات:</strong><br>
+                <i class="fas fa-arrow-up"></i> أحرف كبيرة: ${upper}<br>
+                <i class="fas fa-arrow-down"></i> أحرف صغيرة: ${lower}<br>
+                <i class="fas fa-undo-alt"></i> النص المعكوس: ${reversed}<br>
+                <hr style="border-color: #ffd700; margin: 10px 0;">
+                <strong>البحث عن "${searchWord}":</strong><br>
+                ${found ? 
+                    `<i class="fas fa-check-circle" style="color: #00ff00;"></i> تم العثور عليها في الموضع ${position}` : 
+                    `<i class="fas fa-times-circle" style="color: #ff4444;"></i> لم يتم العثور عليها`
+                }
+            `;
+        }
+
+        // تمرير سلس للروابط الداخلية
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

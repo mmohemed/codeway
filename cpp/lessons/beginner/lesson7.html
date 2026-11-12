@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>++C حلقات التكرار في لغة | شرح شامل ومتكامل</title>
+    <!-- الخطوط والأيقونات -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- تلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: radial-gradient(circle at 10% 30%, #e9f2fa, #d4e4f5);
+            color: #1b2b40;
+            line-height: 1.7;
+            padding: 2rem 1.8rem;
+            direction: rtl;
+        }
+
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الحاوية الأساسية */
+        .main-container {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 4rem;
+            box-shadow: 0 35px 70px -15px #0a263b, 0 0 0 1px rgba(255, 255, 255, 0.5);
+            padding: 3rem 3.2rem;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        /* الرأس العلمي */
+        .hero {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .hero h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #0F3B5E, #1F4C73, #2A5F8A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero h1 i {
+            background: #1d456b;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 90px;
+            font-size: 2.2rem;
+            -webkit-text-fill-color: white;
+            box-shadow: 0 10px 20px #0a2e4a;
+        }
+
+        .hero-sub {
+            font-size: 1.5rem;
+            font-weight: 500;
+            background: #c7dfffcc;
+            padding: 0.7rem 2.5rem;
+            border-radius: 60px;
+            display: inline-block;
+            margin-top: 1.2rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid white;
+        }
+
+        /* شبكة البطاقات المدخلية */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2.2rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .intro-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 2.5rem;
+            padding: 2rem 1.8rem;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 12px 30px -8px #1e3f5b50;
+            transition: 0.2s;
+        }
+
+        .intro-card:hover {
+            background: #ffffffcc;
+            transform: scale(1.02);
+            border-color: #608ab0;
+        }
+
+        .intro-icon {
+            background: #1b3f60;
+            width: 70px;
+            height: 70px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            color: white;
+            margin-bottom: 1.3rem;
+        }
+
+        .intro-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0d314b;
+            margin-bottom: 0.8rem;
+        }
+
+        .intro-card p {
+            font-size: 1.1rem;
+            color: #1f3e5a;
+        }
+
+        /* عناوين الفصول */
+        .chapter-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin: 3.5rem 0 2rem 0;
+            position: relative;
+            display: inline-block;
+        }
+        .chapter-title:after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            right: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #1f4c73, #6495b9, #c4ddf5);
+            border-radius: 8px;
+        }
+
+        .section-header {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin: 2.8rem 0 1.5rem 0;
+            color: #0f3a58;
+            border-right: 8px solid #1e4e79;
+            padding-right: 1.5rem;
+        }
+
+        /* كتلة الأكواد */
+        .code-block {
+            background: #1d2f3f;
+            border-radius: 2.2rem;
+            padding: 2rem;
+            margin: 2.2rem 0;
+            box-shadow: 0 20px 30px -10px #02121f, inset 0 1px 5px #7495b3;
+            border: 1px solid #3c607f;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+        }
+
+        /* جدول مقارنات متقدم */
+        .compare-box {
+            background: #ffffffd1;
+            backdrop-filter: blur(6px);
+            border-radius: 2.5rem;
+            overflow: hidden;
+            margin: 3rem 0;
+            border: 1px solid #b7d3ed;
+        }
+
+        .compare-box table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.15rem;
+        }
+
+        .compare-box th {
+            background: #1d3d5c;
+            color: white;
+            font-weight: 700;
+            padding: 1.2rem 1rem;
+            font-size: 1.4rem;
+        }
+
+        .compare-box td {
+            padding: 1.4rem 1.2rem;
+            border-bottom: 1px solid #aac2db;
+            color: #0f2b42;
+        }
+
+        .compare-box tr:last-child td {
+            border-bottom: none;
+        }
+
+        .compare-box td:first-child {
+            background: #e7f0fa;
+            font-weight: 700;
+            width: 30%;
+        }
+
+        /* بطاقات نصائح وأخطاء شائعة */
+        .insight-card {
+            background: linear-gradient(105deg, #172f44, #1d405b);
+            color: white;
+            border-radius: 2rem;
+            padding: 2rem 2.5rem;
+            margin: 2.5rem 0;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            box-shadow: 0 20px 30px #091f30;
+        }
+
+        .insight-card i {
+            font-size: 3rem;
+            color: #ffcf7a;
+        }
+
+        .insight-card p {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .warning-note {
+            background: #fcf0dd;
+            border-right: 8px solid #c47b2c;
+            border-radius: 2rem;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .warning-note i {
+            font-size: 2.5rem;
+            color: #b16414;
+        }
+
+        /* تذييل الصفحة */
+        .document-footer {
+            margin-top: 5rem;
+            padding-top: 2.5rem;
+            border-top: 3px solid #9ab9d6;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #1f3f59;
+            font-size: 1.1rem;
+        }
+
+        .footer-badge {
+            background: #1c3d59;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.7rem; }
+            .main-container { padding: 1.5rem; }
+            .hero h1 { font-size: 2.4rem; }
+            .chapter-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+    <div class="main-container">
+
+        <!-- الرأس التفاعلي -->
+        <div class="hero">
+            <h1>
+                <i class="fas fa-sync-alt fa-spin" style="--fa-animation-duration: 8s;"></i>
+                حلقات التكرار في لغة ++C
+                <i class="fas fa-infinity"></i>
+            </h1>
+            <div class="hero-sub">
+                <i class="fas fa-redo-alt"></i> التكرار: جوهر البرمجة الفعالة
+            </div>
+        </div>
+
+        <!-- بطاقات تعريفية -->
+        <div class="intro-grid">
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-hourglass-half"></i></div>
+                <h3>توفير الجهد</h3>
+                <p>بدلاً من كتابة نفس الكود عشرات المرات، نكتبه مرة واحدة داخل حلقة لتكراره تلقائياً.</p>
+            </div>
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-chart-line"></i></div>
+                <h3>معالجة المجموعات</h3>
+                <p>أساسي للتعامل مع المصفوفات، القوائم، والبيانات المتسلسلة.</p>
+            </div>
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-gamepad"></i></div>
+                <h3>التحكم بالتدفق</h3>
+                <p>إعادة تنفيذ أوامر حتى يتحقق شرط معين، مما يضيف ديناميكية للبرامج.</p>
+            </div>
+        </div>
+
+        <!-- 1. حلقة for -->
+        <h2 class="chapter-title"><i class="fas fa-hashtag"></i> 1. حلقة for (المعدودة)</h2>
+        <p style="font-size:1.25rem;">تُستخدم عندما نعرف عدد التكرارات مسبقاً. تتكون من ثلاثة أجزاء: initialization ; condition ; increment.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">// الصيغة العامة
+for (initialization; condition; update) {
+    // كتلة الأوامر
+}
+
+// مثال: طباعة الأعداد من 1 إلى 10
+for (int i = 1; i <= 10; i++) {
+    cout &lt;&lt; i &lt;&lt; " ";
+}
+// الناتج: 1 2 3 4 5 6 7 8 9 10</code></pre>
+        </div>
+        <div class="warning-note">
+            <i class="fas fa-exclamation-circle"></i>
+            <div><strong>ملاحظة:</strong> المتغير i معرف داخل الحلقة فقط (إذا استخدمت C++11 وما بعد). يمكن تعريفه خارجاً إذا أردت استخدامه بعد الحلقة.</div>
+        </div>
+
+        <!-- 2. حلقة while -->
+        <h2 class="chapter-title"><i class="fas fa-arrow-right"></i> 2. حلقة while (الشرط المسبق)</h2>
+        <p style="font-size:1.25rem;">تكرر الكود طالما الشرط صحيح. يتم فحص الشرط قبل التنفيذ، فقد لا تنفذ أبداً إذا كان الشرط خاطئاً منذ البداية.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">// الصيغة
+while (condition) {
+    // جسم الحلقة
+}
+
+// مثال: جمع الأعداد المدخلة حتى يدخل المستخدم صفر
+int sum = 0, num;
+cout &lt;&lt; "أدخل أعداداً (0 للإنهاء): ";
+cin &gt;&gt; num;
+while (num != 0) {
+    sum += num;
+    cin &gt;&gt; num;
+}
+cout &lt;&lt; "المجموع = " &lt;&lt; sum;</code></pre>
+        </div>
+
+        <!-- 3. حلقة do-while -->
+        <h2 class="chapter-title"><i class="fas fa-redo"></i> 3. حلقة do-while (الشرط اللاحق)</h2>
+        <p style="font-size:1.25rem;">تنفذ الجسم مرة واحدة على الأقل، ثم تفحص الشرط. مناسبة للقوائم التي يجب أن تظهر مرة واحدة.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">// الصيغة
+do {
+    // جسم الحلقة
+} while (condition);
+
+// مثال: قائمة طعام تظهر مرة ثم تطلب الرقم
+int choice;
+do {
+    cout &lt;&lt; "\n1. شاي\n2. قهوة\n3. إنهاء\nاختر: ";
+    cin &gt;&gt; choice;
+    // معالجة الاختيار...
+} while (choice != 3);</code></pre>
+        </div>
+
+        <!-- بطاقة ذهبية: الفروقات الأساسية -->
+        <div class="insight-card">
+            <i class="fas fa-code-branch"></i>
+            <p><strong>الفرق الجوهري:</strong> <code>for</code> تستخدم للتكرار المحدد، <code>while</code> تكرر طالما الشرط قائم وقد لا تنفذ إطلاقاً، أما <code>do-while</code> فتنفذ مرة واحدة على الأقل.</p>
+        </div>
+
+        <!-- 4. حلقة for المحسنة (range-based) C++11 -->
+        <h2 class="chapter-title"><i class="fas fa-star"></i> 4. for المحسّنة (Range-based for loop)</h2>
+        <p style="font-size:1.25rem;">متوفرة من معيار C++11، وتستخدم للتكرار على عناصر المجموعات (مصفوفات، vectors) بسهولة.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">// الصيغة
+for (النوع اسم_المتغير : المجموعة) {
+    // استخدم اسم_المتغير
+}
+
+// مثال: طباعة عناصر مصفوفة
+int numbers[] = {10, 20, 30, 40};
+for (int num : numbers) {
+    cout &lt;&lt; num &lt;&lt; " ";
+}
+// الناتج: 10 20 30 40
+
+// يمكن استخدام auto لاستنتاج النوع تلقائياً
+for (auto x : {1,2,3,4}) cout &lt;&lt; x;</code></pre>
+        </div>
+
+        <!-- جدول مقارنة متقدم بين أنواع الحلقات -->
+        <h2 class="section-header"><i class="fas fa-table"></i> مقارنة شاملة بين حلقات التكرار</h2>
+        <div class="compare-box">
+            <table>
+                <tr><th>نوع الحلقة</th><th>عدد التكرارات</th><th>وقت الفحص</th><th>الاستخدام النموذجي</th></tr>
+                <tr><td>for</td><td>معروف مسبقاً (باستخدام عداد)</td><td>بداية كل تكرار</td><td>المصفوفات، العد التصاعدي/التنازلي</td></tr>
+                <tr><td>while</td><td>غير معروف، يعتمد على شرط</td><td>قبل الدخول (صفر أو أكثر)</td><td>قراءة بيانات حتى نهاية الملف، انتظار إشارة</td></tr>
+                <tr><td>do-while</td><td>غير معروف لكن تنفيذ مرة على الأقل</td><td>بعد نهاية الجسم (مرة واحدة على الأقل)</td><td>قوائم تفاعلية، التحقق من المدخلات</td></tr>
+                <tr><td>range-based for</td><td>حسب حجم المجموعة</td><td>تلقائي</td><td>التكرار السريع على الحاويات (vector, array, list)</td></tr>
+            </table>
+        </div>
+
+        <!-- 5. التحكم بالحلقات: break, continue -->
+        <h2 class="chapter-title"><i class="fas fa-stop-circle"></i> 5. كلمات التحكم break و continue</h2>
+        <p><code>break</code> ينهي الحلقة فوراً. <code>continue</code> يتخطى باقي الجسد وينتقل للتكرار التالي.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">// break: الخروج القسري
+for (int i = 0; i < 10; i++) {
+    if (i == 5) break;   // الحلقة تتوقف عند i=5
+    cout &lt;&lt; i << " ";    // يطبع 0 1 2 3 4
+}
+
+// continue: تخطي دورة
+for (int i = 0; i < 10; i++) {
+    if (i % 2 == 0) continue;  // يتخطى الأعداد الزوجية
+    cout &lt;&lt; i << " ";          // يطبع 1 3 5 7 9
+}</code></pre>
+        </div>
+
+        <!-- حلقات لا نهائية وأخطاء شائعة -->
+        <h2 class="section-header"><i class="fas fa-bug"></i> أخطاء شائعة وحلقات لا نهائية</h2>
+        <div class="warning-note">
+            <i class="fas fa-skull-crosswalk"></i>
+            <div>
+                <strong>حلقات لا نهائية:</strong> تحدث عندما لا يتغير الشرط أبداً.
+                <pre style="background:#1d2a33; color:#eee; padding:0.8rem; border-radius:1rem; margin-top:0.8rem; direction:ltr;">int i = 0;
+while (i < 5) {
+   // نسيت i++ !!
+}</pre>
+            </div>
+        </div>
+        <div class="insight-card" style="background: #284b63;">
+            <i class="fas fa-check-circle"></i>
+            <p>تأكد دائماً من تحديث عداد الحلقة أو تغيير قيمة الشرط داخل الجسم. استخدم <code>break</code> بحذر.</p>
+        </div>
+
+        <!-- حلقات متداخلة Nested Loops -->
+        <h2 class="chapter-title"><i class="fas fa-layer-group"></i> 6. الحلقات المتداخلة</h2>
+        <p>حلقة داخل أخرى. مفيدة للتعامل مع الجداول والمصفوفات ثنائية الأبعاد.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">// طباعة مثلث نجمي
+for (int i = 1; i <= 5; i++) {
+    for (int j = 1; j <= i; j++) {
+        cout &lt;&lt; "*";
+    }
+    cout &lt;&lt; endl;
+}
+// الناتج:
+// *
+// **
+// ***
+// ****
+// *****</code></pre>
+        </div>
+
+        <!-- أمثلة حياتية وتطبيقات -->
+        <h2 class="section-header"><i class="fas fa-cubes"></i> تطبيقات عملية مع الحلقات</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 1.8rem; margin: 2rem 0;">
+            <div style="flex: 1 1 250px; background: #edf5fd; border-radius: 2rem; padding: 1.6rem;">
+                <i class="fas fa-calculator" style="font-size:2rem; color:#124263;"></i>
+                <h4>حساب المضروب</h4>
+                <pre style="background:#122231; color:#ddd; padding:1rem; border-radius:1.2rem; direction:ltr; overflow-x:auto;">int fact = 1, n=5;
+for(int i=1; i<=n; i++)
+    fact *= i;
+// fact = 120</pre>
+            </div>
+            <div style="flex: 1 1 250px; background: #edf5fd; border-radius: 2rem; padding: 1.6rem;">
+                <i class="fas fa-search" style="font-size:2rem; color:#124263;"></i>
+                <h4>البحث في مصفوفة</h4>
+                <pre style="background:#122231; color:#ddd; padding:1rem; border-radius:1.2rem; direction:ltr;">int arr[] = {3,7,1,9};
+int key=7, pos=-1;
+for(int i=0; i<4; i++)
+   if(arr[i]==key) pos=i;
+// pos = 1</pre>
+            </div>
+        </div>
+
+        <!-- تمرين مختبر -->
+        <div style="background: #bed9f0; border-radius: 2.2rem; padding: 2rem; margin: 3rem 0;">
+            <h3 style="font-size: 2rem; color: #07344f;"><i class="fas fa-flask"></i> تمرين: اكتب حلقة تطبع الأعداد الزوجية من 2 إلى 20</h3>
+            <p style="font-size:1.2rem;">حاول استخدام for، while، ثم range-based (إذا استخدمت مصفوفة).</p>
+            <details style="margin-top:1.5rem; background: white; border-radius: 1.5rem; padding: 1.2rem;">
+                <summary><i class="fas fa-lightbulb"></i> عرض حل مقترح</summary>
+                <pre style="direction:ltr; background:#1e2f3c; color:#e4eef7; padding:1rem;">// باستخدام for
+for (int i = 2; i <= 20; i += 2) cout &lt;&lt; i << " ";
+
+// باستخدام while
+int i = 2;
+while (i <= 20) { cout << i << " "; i += 2; }
+
+// باستخدام range-based (تخزين الأعداد بمصفوفة)
+int evens[] = {2,4,6,8,10,12,14,16,18,20};
+for (int x : evens) cout << x << " ";</pre>
+            </details>
+        </div>
+
+        <!-- خاتمة وأفضل الممارسات -->
+        <div style="background: #10344e; color: white; border-radius: 2.5rem; padding: 2.2rem; margin-top: 3rem;">
+            <i class="fas fa-medal" style="font-size: 2.5rem; float: right; margin-right: 1rem;"></i>
+            <h3 style="font-size:2rem; margin-bottom:1rem;">أفضل الممارسات (Best Practices)</h3>
+            <ul style="list-style: none; columns: 2; column-gap: 2.5rem;">
+                <li><i class="fas fa-check-circle" style="color:#8fc9ff;"></i> اختر نوع الحلقة المناسب للمهمة.</li>
+                <li><i class="fas fa-check-circle" style="color:#8fc9ff;"></i> تجنب الأرقام الثابتة (magic numbers) واستخدم الثوابت.</li>
+                <li><i class="fas fa-check-circle" style="color:#8fc9ff;"></i> لا تضع عمليات معقدة في شرط الحلقة.</li>
+                <li><i class="fas fa-check-circle" style="color:#8fc9ff;"></i> اجعل جسم الحلقة قصيراً وواضحاً.</li>
+                <li><i class="fas fa-check-circle" style="color:#8fc9ff;"></i> استخدم continue بحذر حتى لا تجعل الكود مربكاً.</li>
+                <li><i class="fas fa-check-circle" style="color:#8fc9ff;"></i> في الحلقات المتداخلة، انتبه لأسماء العدادات.</li>
+            </ul>
+        </div>
+
+        <!-- تذييل -->
+        <div class="document-footer">
+            <span class="footer-badge"><i class="fas fa-copyright"></i> مرجع ++C القياسي</span>
+            <span><i class="fas fa-code"></i> جميع الأمثلة جاهزة للتجربة</span>
+            <span><i class="fas fa-calendar-check"></i> الإصدار 3.0 – حلقات متقنة</span>
+        </div>
+
+    </div> <!-- main-container -->
+</div> <!-- page-wrapper -->
+
+<script>Prism.highlightAll();</script>
+</body>
+</html>

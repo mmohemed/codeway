@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>++C معالجة الأخطاء (Exception Handling) في لغة | شرح شامل ومتكامل</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(145deg, #122433, #1c3a52);
+            color: #e6f3ff;
+            line-height: 1.7;
+            padding: 2rem 1.8rem;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الحاوية الرئيسية */
+        .glass-panel {
+            background: rgba(22, 48, 70, 0.85);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-radius: 5rem;
+            box-shadow: 0 45px 90px -20px #000000, 0 0 0 2px rgba(100, 180, 255, 0.25);
+            padding: 3.2rem 3.8rem;
+            border: 1px solid rgba(70, 150, 220, 0.5);
+        }
+
+        /* الرأس */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #ffb8b8, #ffd8b8, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero h1 i {
+            background: #c84f2f;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 130px;
+            font-size: 2.8rem;
+            -webkit-text-fill-color: white;
+            box-shadow: 0 18px 35px #4a1e0a;
+        }
+
+        .hero-sub {
+            font-size: 1.8rem;
+            font-weight: 500;
+            background: #7a4a2ecc;
+            padding: 0.9rem 3.5rem;
+            border-radius: 90px;
+            display: inline-block;
+            margin-top: 1.6rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid #ff9f5a;
+            color: #ffffff;
+        }
+
+        /* بطاقات تمهيدية */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.2rem;
+            margin: 4rem 0;
+        }
+
+        .intro-card {
+            background: rgba(40, 45, 70, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 3rem;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border: 1px solid #d68f3f;
+            transition: 0.3s;
+        }
+
+        .intro-card:hover {
+            transform: translateY(-10px);
+            background: #5a3d2ae0;
+            border-color: #ffa55a;
+        }
+
+        .intro-icon {
+            background: #d37c32;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            margin: 0 auto 1.5rem;
+            color: white;
+        }
+
+        .intro-card h3 {
+            font-size: 2.2rem;
+            color: #ffd9b0;
+            margin-bottom: 1rem;
+        }
+
+        .intro-card p {
+            font-size: 1.2rem;
+            color: #ffe4c4;
+        }
+
+        @media (max-width: 800px) {
+            .intro-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 500px) {
+            .intro-grid { grid-template-columns: 1fr; }
+        }
+
+        /* عناوين رئيسية */
+        .main-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 4rem 0 2.5rem 0;
+            position: relative;
+            display: inline-block;
+            color: #ffd9b0;
+        }
+        .main-title:after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            right: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #d68f3f, #ffa55a, #ffd2a5);
+            border-radius: 10px;
+        }
+
+        .sub-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 3rem 0 2rem 0;
+            color: #ffd9b0;
+            border-right: 12px solid #ff8c42;
+            padding-right: 2rem;
+        }
+
+        /* كتلة الكود */
+        .code-box {
+            background: #1a2632;
+            border-radius: 3.2rem;
+            padding: 2.5rem;
+            margin: 2.8rem 0;
+            box-shadow: 0 30px 45px -18px #000000, inset 0 1px 12px #d68f3f;
+            border: 1px solid #b55a1a;
+        }
+
+        .code-box pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+            color: #f0e6d2;
+        }
+
+        /* بطاقات مميزة */
+        .highlight-box {
+            background: linear-gradient(115deg, #7a4a2e, #a55a2a);
+            color: white;
+            border-radius: 3.2rem;
+            padding: 2.5rem 3.2rem;
+            margin: 3rem 0;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            box-shadow: 0 28px 45px -15px #000000b3;
+        }
+
+        .highlight-box i {
+            font-size: 3.5rem;
+            color: #ffde9e;
+        }
+
+        .highlight-box p {
+            font-size: 1.35rem;
+            font-weight: 500;
+        }
+
+        .note-box {
+            background: #2a3342;
+            border-right: 12px solid #ffaa33;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #ffdeb4;
+        }
+
+        .note-box i {
+            font-size: 3rem;
+            color: #f39c12;
+        }
+
+        .warning-box {
+            background: #3d1f1f;
+            border-right: 12px solid #ff4d4d;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #ffb4b4;
+        }
+
+        .warning-box i {
+            font-size: 3rem;
+            color: #ff6b6b;
+        }
+
+        /* جدول أنيق */
+        .elegant-table {
+            background: #2a3a48ef;
+            backdrop-filter: blur(6px);
+            border-radius: 3.5rem;
+            overflow: hidden;
+            margin: 3.2rem 0;
+            border: 1px solid #d68f3f;
+        }
+
+        .elegant-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.25rem;
+            color: #ffe4c4;
+        }
+
+        .elegant-table th {
+            background: #b55a1a;
+            color: white;
+            font-weight: 700;
+            padding: 1.6rem 1.2rem;
+            font-size: 1.6rem;
+        }
+
+        .elegant-table td {
+            padding: 1.6rem 1.8rem;
+            border-bottom: 1px solid #d68f3f;
+            color: #ffe4c4;
+        }
+
+        .elegant-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .elegant-table td:first-child {
+            background: #4a3a2a;
+            font-weight: 700;
+            width: 30%;
+        }
+
+        /* تذييل */
+        .page-footer {
+            margin-top: 5.5rem;
+            padding-top: 3rem;
+            border-top: 5px solid #d68f3f;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #ffd9b0;
+            font-size: 1.25rem;
+        }
+
+        .footer-badge {
+            background: #b55a1a;
+            color: white;
+            padding: 0.6rem 2.2rem;
+            border-radius: 70px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .glass-panel { padding: 2rem; }
+            .hero h1 { font-size: 2.8rem; }
+            .main-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="glass-panel">
+
+        <!-- الرأس -->
+        <div class="hero">
+            <h1>
+                <i class="fas fa-exclamation-triangle"></i>
+                معالجة الأخطاء (Exception Handling)
+                <i class="fas fa-shield"></i>
+            </h1>
+            <div class="hero-sub">
+                <i class="fas fa-bug"></i> try / throw / catch – برامج قوية وآمنة
+            </div>
+        </div>
+
+        <!-- مقدمة -->
+        <p style="font-size:1.4rem; text-align:center; margin-bottom:2rem;">معالجة الأخطاء (Exception Handling) هي آلية تسمح للبرنامج بالتعامل مع الأخطاء أو الحالات الاستثنائية (مثل قسمة على صفر، فشل في فتح ملف، نفاد الذاكرة) بطريقة منظمة، دون انهيار البرنامج فجأة.</p>
+
+        <!-- بطاقات تمهيدية -->
+        <div class="intro-grid">
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-play"></i></div>
+                <h3>try</h3>
+                <p>كتلة الكود التي قد تسبب خطأ. يتم وضعها داخل try لمراقبة الاستثناءات.</p>
+            </div>
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-bomb"></i></div>
+                <h3>throw</h3>
+                <p>يستخدم لإلقاء (رمي) استثناء عند حدوث خطأ. يمكن رمي أي نوع (int, string, class).</p>
+            </div>
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-hand"></i></div>
+                <h3>catch</h3>
+                <p>كتلة تلتقط الاستثناء وتعالجه. يمكن أن يكون عدة catch لأنواع مختلفة.</p>
+            </div>
+        </div>
+
+        <!-- 1. الأساسيات: try/throw/catch -->
+        <h2 class="main-title"><i class="fas fa-code"></i> 1. البنية الأساسية (try / throw / catch)</h2>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    try {
+        // كود قد يسبب خطأ
+        int age;
+        cout &lt;&lt; "أدخل عمرك: ";
+        cin &gt;&gt; age;
+
+        if (age < 0) {
+            throw "العمر لا يمكن أن يكون سالباً!";  // رمي استثناء (نص)
+        }
+
+        if (age > 150) {
+            throw 150;  // رمي استثناء (رقم)
+        }
+
+        cout &lt;&lt; "عمرك: " &lt;&lt; age &lt;&lt; endl;
+    }
+    catch (const char* msg) {  // التقاط الاستثناء النصي
+        cout &lt;&lt; "خطأ: " &lt;&lt; msg &lt;&lt; endl;
+    }
+    catch (int maxAge) {  // التقاط الاستثناء الرقمي
+        cout &lt;&lt; "خطأ: العمر لا يمكن أن يتجاوز " &lt;&lt; maxAge &lt;&lt; endl;
+    }
+
+    cout &lt;&lt; "البرنامج مستمر..." &lt;&lt; endl;
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 2. أنواع الاستثناءات المتعددة -->
+        <h2 class="main-title"><i class="fas fa-tags"></i> 2. التقاط أنواع متعددة من الاستثناءات</h2>
+        <p>يمكن أن يكون لديك عدة catch blocks للتعامل مع أنواع مختلفة من الاستثناءات. يتم تنفيذ أول catch يطابق نوع الاستثناء.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;  // للاستثناءات القياسية
+using namespace std;
+
+double divide(double a, double b) {
+    if (b == 0) {
+        throw runtime_error("خطأ: قسمة على صفر!");
+    }
+    if (b < 0) {
+        throw "لا يمكن القسمة على سالب";  // نص
+    }
+    return a / b;
+}
+
+int main() {
+    try {
+        double result = divide(10, 0);
+        cout &lt;&lt; "النتيجة: " &lt;&lt; result &lt;&lt; endl;
+    }
+    catch (const runtime_error& e) {
+        cout &lt;&lt; "استثناء قياسي: " &lt;&lt; e.what() &lt;&lt; endl;
+    }
+    catch (const char* msg) {
+        cout &lt;&lt; "استثناء نصي: " &lt;&lt; msg &lt;&lt; endl;
+    }
+    catch (...) {  // يلتقط أي استثناء آخر
+        cout &lt;&lt; "حدث خطأ غير معروف!" &lt;&lt; endl;
+    }
+    return 0;
+}</code></pre>
+        </div>
+        <div class="highlight-box">
+            <i class="fas fa-ellipsis-h"></i>
+            <p><strong>catch (...):</strong> يستخدم لالتقاط أي استثناء بغض النظر عن نوعه. يفضل وضعه في النهاية كملاذ أخير.</p>
+        </div>
+
+        <!-- 3. الاستثناءات القياسية (Standard Exceptions) -->
+        <h2 class="main-title"><i class="fas fa-database"></i> 3. الاستثناءات القياسية (Standard Exceptions)</h2>
+        <p>توفر ++C مكتبة &lt;stdexcept&gt; تحتوي على أصناف استثناءات جاهزة يمكن استخدامها أو وراثتها.</p>
+        <div class="elegant-table">
+            <table>
+                <tr><th>الاستثناء</th><th>الوصف</th></tr>
+                <tr><td>exception</td><td>الصنف الأساسي لجميع الاستثناءات القياسية.</td></tr>
+                <tr><td>runtime_error</td><td>خطأ يحدث أثناء تنفيذ البرنامج.</td></tr>
+                <tr><td>logic_error</td><td>خطأ في المنطق البرمجي (مثل انتهاك precondition).</td></tr>
+                <tr><td>invalid_argument</td><td>تم تمرير معامل غير صحيح لدالة.</td></tr>
+                <tr><td>out_of_range</td><td>محاولة الوصول إلى عنصر خارج حدود المصفوفة.</td></tr>
+                <tr><td>bad_alloc</td><td>فشل في تخصيص الذاكرة (من new).</td></tr>
+            </table>
+        </div>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    try {
+        vector&lt;int&gt; vec(5);
+        vec.at(10) = 100;  // at() تتحقق من الحدود وترمي out_of_range
+    }
+    catch (const out_of_range& e) {
+        cout &lt;&lt; "خطأ نطاق: " &lt;&lt; e.what() &lt;&lt; endl;
+    }
+
+    try {
+        int* p = new int[100000000000];  // قد يفشل
+    }
+    catch (const bad_alloc& e) {
+        cout &lt;&lt; "فشل تخصيص ذاكرة: " &lt;&lt; e.what() &lt;&lt; endl;
+    }
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 4. إنشاء استثناءات مخصصة -->
+        <h2 class="main-title"><i class="fas fa-pen"></i> 4. إنشاء استثناءات مخصصة (Custom Exceptions)</h2>
+        <p>يمكنك إنشاء أصناف استثناء خاصة بك بوراثة من std::exception أو runtime_error.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+#include &lt;string&gt;
+using namespace std;
+
+// استثناء مخصص
+class InsufficientFundsException : public runtime_error {
+public:
+    InsufficientFundsException(double balance, double amount)
+        : runtime_error("رصيد غير كافٍ"), m_balance(balance), m_amount(amount) {}
+
+    double getBalance() const { return m_balance; }
+    double getAmount() const { return m_amount; }
+
+private:
+    double m_balance;
+    double m_amount;
+};
+
+class BankAccount {
+private:
+    double balance;
+public:
+    BankAccount(double b) : balance(b) {}
+
+    void withdraw(double amount) {
+        if (amount > balance) {
+            throw InsufficientFundsException(balance, amount);
+        }
+        balance -= amount;
+        cout &lt;&lt; "تم السحب. الرصيد الجديد: " &lt;&lt; balance &lt;&lt; endl;
+    }
+};
+
+int main() {
+    BankAccount acc(500);
+    try {
+        acc.withdraw(600);
+    }
+    catch (const InsufficientFundsException& e) {
+        cout &lt;&lt; "خطأ: " &lt;&lt; e.what() &lt;&lt; endl;
+        cout &lt;&lt; "الرصيد الحالي: " &lt;&lt; e.getBalance()
+             &lt;&lt; ", المبلغ المطلوب: " &lt;&lt; e.getAmount() &lt;&lt; endl;
+    }
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 5. ضمانات الاستثناء (Exception Safety) -->
+        <h2 class="main-title"><i class="fas fa-shield-alt"></i> 5. ضمانات الاستثناء (Exception Safety)</h2>
+        <p>عند كتابة كود قد يرمي استثناءات، يجب أن نضمن أن البرنامج يبقى في حالة سليمة. هناك ثلاثة مستويات:</p>
+        <div class="elegant-table">
+            <table>
+                <tr><th>المستوى</th><th>الوصف</th></tr>
+                <tr><td>Basic guarantee</td><td>لا يوجد تسرب للموارد، وكل الكائنات في حالة سليمة (قد تكون غير محددة).</td></tr>
+                <tr><td>Strong guarantee</td><td>إذا فشلت العملية، يعود البرنامج إلى الحالة التي كان عليها قبل العملية (commit or rollback).</td></tr>
+                <tr><td>No-throw guarantee</td><td>الدالة لا ترمي استثناءات أبداً (تستخدم noexcept).</td></tr>
+            </table>
+        </div>
+
+        <!-- 6. noexcept -->
+        <h3 class="sub-title"><i class="fas fa-check-circle"></i> 6. المواصفة noexcept (C++11)</h3>
+        <p>تستخدم لتحديد أن الدالة لا ترمي استثناءات. يساعد المترجم في التحسينات ويزيد الأمان.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// هذه الدالة تعد بعدم رمي استثناءات
+int add(int a, int b) noexcept {
+    return a + b;
+}
+
+// دالة قد ترمي استثناء
+int divide(int a, int b) {
+    if (b == 0) throw "division by zero";
+    return a / b;
+}
+
+int main() {
+    cout &lt;&lt; "add is noexcept? " &lt;&lt; noexcept(add(1, 2)) &lt;&lt; endl;  // 1 (true)
+    cout &lt;&lt; "divide is noexcept? " &lt;&lt; noexcept(divide(1, 2)) &lt;&lt; endl; // 0 (false)
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 7. إعادة رمي الاستثناء -->
+        <h2 class="main-title"><i class="fas fa-redo"></i> 7. إعادة رمي الاستثناء (Rethrow)</h2>
+        <p>أحياناً نريد التقاط استثناء، القيام ببعض الإجراءات (مثل تسجيل الخطأ)، ثم إعادة رميه لمستوى أعلى ليعالجه كتلة أخرى.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+using namespace std;
+
+void processFile(const string& filename) {
+    try {
+        ifstream file(filename);
+        if (!file) {
+            throw runtime_error("لا يمكن فتح الملف");
+        }
+        // معالجة الملف...
+    }
+    catch (const runtime_error& e) {
+        cout &lt;&lt; "تسجيل الخطأ: " &lt;&lt; e.what() &lt;&lt; endl;
+        throw;  // إعادة رمي نفس الاستثناء
+    }
+}
+
+int main() {
+    try {
+        processFile("non_existent.txt");
+    }
+    catch (const runtime_error& e) {
+        cout &lt;&lt; "تم التعامل مع الخطأ في main: " &lt;&lt; e.what() &lt;&lt; endl;
+    }
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- تطبيقات عملية -->
+        <h2 class="sub-title"><i class="fas fa-flask"></i> تطبيقات عملية</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2.2rem; margin: 3rem 0;">
+            <div style="flex: 1 1 300px; background: #4a3a2a; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-calculator"></i> آلة حاسبة آمنة</h4>
+                <pre style="background:#1a2632; color:#f0e6d2; padding:1.2rem; border-radius:2rem; direction:ltr;">double safeDivide(double a, double b) {
+    if (b == 0) 
+        throw invalid_argument("القسمة على صفر");
+    return a / b;
+}
+
+try {
+    cout << safeDivide(5, 0);
+} catch (const exception& e) {
+    cout << "خطأ: " << e.what();
+}</pre>
+            </div>
+            <div style="flex: 1 1 300px; background: #4a3a2a; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-database"></i> التحقق من المدخلات</h4>
+                <pre style="background:#1a2632; color:#f0e6d2; padding:1.2rem; border-radius:2rem; direction:ltr;">int readPositiveInt() {
+    int x;
+    cin >> x;
+    if (cin.fail()) {
+        cin.clear();
+        throw runtime_error("إدخال غير صحيح");
+    }
+    if (x <= 0) 
+        throw out_of_range("يجب أن يكون موجباً");
+    return x;
+}</pre>
+            </div>
+        </div>
+
+        <!-- تمرين شامل -->
+        <div style="background: #7a4a2e; border-radius: 3.5rem; padding: 2.8rem; margin: 3.5rem 0;">
+            <h3 style="font-size: 2.4rem; color: #ffffff;"><i class="fas fa-pen"></i> تمرين: اكتب برنامجاً لإدارة حساب بنكي. أنشئ صنف BankAccount برصيد، وأضف دوال الإيداع والسحب. تأكد من أن السحب لا يتجاوز الرصيد باستخدام استثناء مخصص.</h3>
+            <details style="margin-top:2rem; background: #4a3a2a; border-radius: 2.5rem; padding: 1.8rem;">
+                <summary style="color:#ffd9b0;"><i class="fas fa-lightbulb"></i> عرض الحل</summary>
+                <pre style="direction:ltr; background:#1a2632; color:#f0e6d2; padding:1.5rem;">#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+using namespace std;
+
+class InsufficientBalanceException : public runtime_error {
+public:
+    InsufficientBalanceException(double balance, double amount)
+        : runtime_error("رصيد غير كافٍ"), balance(balance), amount(amount) {}
+    double getBalance() const { return balance; }
+    double getAmount() const { return amount; }
+private:
+    double balance, amount;
+};
+
+class BankAccount {
+private:
+    double balance;
+public:
+    BankAccount(double initial) : balance(initial) {
+        if (initial < 0) throw invalid_argument("الرصيد الأولي لا يمكن أن يكون سالباً");
+    }
+
+    void deposit(double amount) {
+        if (amount <= 0) throw invalid_argument("مبلغ الإيداع يجب أن يكون موجباً");
+        balance += amount;
+        cout &lt;&lt; "تم الإيداع. الرصيد الجديد: " &lt;&lt; balance &lt;&lt; endl;
+    }
+
+    void withdraw(double amount) {
+        if (amount <= 0) throw invalid_argument("مبلغ السحب يجب أن يكون موجباً");
+        if (amount > balance) throw InsufficientBalanceException(balance, amount);
+        balance -= amount;
+        cout &lt;&lt; "تم السحب. الرصيد الجديد: " &lt;&lt; balance &lt;&lt; endl;
+    }
+
+    double getBalance() const { return balance; }
+};
+
+int main() {
+    try {
+        BankAccount acc(1000);
+        acc.deposit(500);
+        acc.withdraw(2000);
+    }
+    catch (const InsufficientBalanceException& e) {
+        cout &lt;&lt; "خطأ: " &lt;&lt; e.what() &lt;&lt; endl;
+        cout &lt;&lt; "الرصيد: " &lt;&lt; e.getBalance() &lt;&lt; ", المطلوب: " &lt;&lt; e.getAmount() &lt;&lt; endl;
+    }
+    catch (const exception& e) {
+        cout &lt;&lt; "خطأ عام: " &lt;&lt; e.what() &lt;&lt; endl;
+    }
+    return 0;
+}</pre>
+            </details>
+        </div>
+
+        <!-- خاتمة وأفضل الممارسات -->
+        <div style="background: #4a3a2a; border-radius: 3.5rem; padding: 2.8rem; margin-top: 3.5rem;">
+            <i class="fas fa-crown" style="font-size: 3rem; float: right; margin-left: 2rem; color:#ffd966;"></i>
+            <h3 style="font-size:2.5rem; margin-bottom:1.5rem; color:#ffffff;">أفضل الممارسات في معالجة الأخطاء</h3>
+            <ul style="list-style: none; columns: 2; column-gap: 3rem; font-size:1.3rem; color:#ffe4c4;">
+                <li><i class="fas fa-check-circle" style="color:#ffaa55;"></i> استخدم الاستثناءات للأخطاء الاستثنائية فقط، ليس للتحكم العادي بالتدفق.</li>
+                <li><i class="fas fa-check-circle" style="color:#ffaa55;"></i> التقط الاستثناءات بالمرجع (const exception&) لتجنب النسخ والقطع (slicing).</li>
+                <li><i class="fas fa-check-circle" style="color:#ffaa55;"></i> نظم كتل catch من الأكثر تخصصاً إلى الأكثر عمومية.</li>
+                <li><i class="fas fa-check-circle" style="color:#ffaa55;"></i> استخدم الاستثناءات القياسية أو اشتق منها لاستثناءاتك المخصصة.</li>
+                <li><i class="fas fa-check-circle" style="color:#ffaa55;"></i> تأكد من أن المدمرات لا ترمي استثناءات (استخدم noexcept).</li>
+                <li><i class="fas fa-check-circle" style="color:#ffaa55;"></i> وثق الاستثناءات التي قد ترميها دوالك.</li>
+            </ul>
+        </div>
+
+        <!-- تذييل -->
+        <div class="page-footer">
+            <span class="footer-badge"><i class="fas fa-copyright"></i> ++C Exception Handling</span>
+            <span><i class="fas fa-exclamation-circle"></i> try / throw / catch</span>
+            <span><i class="fas fa-check-double"></i> برامج آمنة ومتينة</span>
+        </div>
+
+    </div> <!-- glass-panel -->
+</div> <!-- container -->
+<script>Prism.highlightAll();</script>
+</body>
+</html>

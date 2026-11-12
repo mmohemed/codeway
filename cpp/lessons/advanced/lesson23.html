@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeWay | STL - الخوارزميات (Algorithms) في C++</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js لتلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0f1e 0%, #1a1f35 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(145deg, #0b1120cc 0%, #1e2740cc 100%);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 5%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border: 2px solid #ffd700;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .header-content {
+            text-align: center;
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-content h1 span {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* عنوان الصفحة */
+        .page-header {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* جدول المحتويات */
+        .table-of-contents {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .table-of-contents h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: rgba(255, 215, 0, 0.15);
+            transform: translateX(-5px);
+        }
+
+        .toc-item i {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .toc-item a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .toc-item:hover a {
+            color: #ffd700;
+        }
+
+        /* أقسام الشرح */
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 30px;
+            padding: 3rem;
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, transparent);
+        }
+
+        .section h3 {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin: 2rem 0 1rem;
+        }
+
+        .section p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* صناديق الكود */
+        .code-box {
+            background: #1a1f2e;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .code-header span {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+        }
+
+        pre {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            background: transparent !important;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 1rem !important;
+        }
+
+        /* شرح الكود */
+        .code-explanation {
+            background: rgba(255, 215, 0, 0.03);
+            border-right: 3px solid #ffd700;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .code-explanation p {
+            margin: 0.5rem 0;
+        }
+
+        .code-explanation i {
+            color: #ffd700;
+            margin-left: 0.5rem;
+        }
+
+        /* بطاقات أنواع الخوارزميات */
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .algorithm-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .algorithm-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .algorithm-card i {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .algorithm-card h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .complexity-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+        }
+
+        /* جدول مقارنة الخوارزميات */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        /* تمثيل الخوارزميات */
+        .algorithm-viz {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .sort-viz, .search-viz {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .viz-item {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            padding: 1rem;
+            min-width: 60px;
+            text-align: center;
+            color: #ffd700;
+        }
+
+        .viz-highlight {
+            background: rgba(255, 215, 0, 0.3);
+            border: 2px solid #ffd700;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .viz-arrow {
+            color: #ffd700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        /* صندوق النتائج */
+        .result-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .result-box h4 {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            color: #ffffff;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        /* التمارين التفاعلية */
+        .exercise-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .exercise-box h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .exercise-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            color: #e0e0e0;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .exercise-btn {
+            background: #ffd700;
+            color: #0a0f1e;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0;
+        }
+
+        .exercise-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .exercise-output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace;
+            min-height: 60px;
+        }
+
+        /* أزرار التنقل */
+        .lesson-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+        }
+
+        .nav-lesson-btn {
+            background: transparent;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-lesson-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+            transform: translateX(-5px);
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            background: linear-gradient(145deg, #0b1120cc, #1a1f35cc);
+            backdrop-filter: blur(10px);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: #b0b0b0;
+            text-decoration: none;
+            display: block;
+            margin: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffd700;
+        }
+
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0f1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffaa00;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .section {
+                padding: 2rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-content {
+                margin: 0.5rem 0;
+            }
+
+            .algorithm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CodeWay</a>
+            <div class="header-content">
+                <h1>شرح <span>STL - الخوارزميات (Algorithms)</span> في C++</h1>
+            </div>
+            <div style="width: 100px;"></div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- رأس الصفحة -->
+        <div class="page-header">
+            <h1>مكتبة القوالب المعيارية STL - الخوارزميات</h1>
+            <p>دليل شامل لأهم الخوارزميات الجاهزة في STL وكيفية استخدامها بفعالية</p>
+        </div>
+
+        <!-- جدول المحتويات -->
+        <div class="table-of-contents">
+            <h2><i class="fas fa-list"></i> محتويات الدرس</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <i class="fas fa-info-circle"></i>
+                    <a href="#intro">مقدمة عن الخوارزميات</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-sort-amount-down"></i>
+                    <a href="#sorting">خوارزميات الترتيب</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-search"></i>
+                    <a href="#searching">خوارزميات البحث</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-copy"></i>
+                    <a href="#modifying">خوارزميات التعديل</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-calculator"></i>
+                    <a href="#numeric">خوارزميات عددية</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-filter"></i>
+                    <a href="#set">خوارزميات المجموعات</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-tasks"></i>
+                    <a href="#exercises">تمارين وتطبيقات</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم المقدمة -->
+        <section id="intro" class="section">
+            <h2>مقدمة عن خوارزميات STL</h2>
+            <p>توفر STL مجموعة غنية من الخوارزميات الجاهزة للاستخدام مع الحاويات المختلفة. هذه الخوارزميات مصممة للعمل مع المكررات (iterators) وتتميز بالكفاءة العالية.</p>
+            
+            <div class="algorithm-grid">
+                <div class="algorithm-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>كفاءة عالية</h3>
+                    <div class="complexity-badge">O(n) to O(log n)</div>
+                    <p>خوارزميات محسّنة لأقصى أداء</p>
+                </div>
+                <div class="algorithm-card">
+                    <i class="fas fa-sync-alt"></i>
+                    <h3>قابلة لإعادة الاستخدام</h3>
+                    <p>تعمل مع أي حاوية تدعم المكررات</p>
+                </div>
+                <div class="algorithm-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>مختبرة ومضمونة</h3>
+                    <p>خوارزميات موثوقة من المكتبة القياسية</p>
+                </div>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> تضمين مكتبة الخوارزميات</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+#include &lt;numeric&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers = {5, 2, 8, 1, 9, 3};
+    
+    // استخدام الخوارزميات
+    sort(numbers.begin(), numbers.end());
+    
+    for(int num : numbers) {
+        cout &lt;&lt; num &lt;&lt; " ";
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم خوارزميات الترتيب -->
+        <section id="sorting" class="section">
+            <h2>خوارزميات الترتيب (Sorting Algorithms)</h2>
+            <p>خوارزميات لترتيب العناصر بطرق مختلفة.</p>
+
+            <div class="algorithm-viz">
+                <h3 style="color: #ffd700; margin-bottom: 1rem;">ترتيب تصاعدي</h3>
+                <div class="sort-viz">
+                    <div class="viz-item">5</div>
+                    <div class="viz-item">2</div>
+                    <div class="viz-item">8</div>
+                    <div class="viz-item">1</div>
+                    <div class="viz-item">9</div>
+                    <div class="viz-arrow">→</div>
+                    <div class="viz-item viz-highlight">1</div>
+                    <div class="viz-item viz-highlight">2</div>
+                    <div class="viz-item viz-highlight">5</div>
+                    <div class="viz-item viz-highlight">8</div>
+                    <div class="viz-item viz-highlight">9</div>
+                </div>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> sort() - الترتيب التصاعدي</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers = {50, 20, 60, 10, 30, 40};
+    
+    cout &lt;&lt; "قبل الترتيب: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    // ترتيب تصاعدي
+    sort(numbers.begin(), numbers.end());
+    
+    cout &lt;&lt; "بعد الترتيب التصاعدي: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    // ترتيب تنازلي
+    sort(numbers.begin(), numbers.end(), greater&lt;int&gt;());
+    
+    cout &lt;&lt; "بعد الترتيب التنازلي: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="result-box">
+                <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                <div class="result-value">
+                    قبل الترتيب: 50 20 60 10 30 40<br>
+                    بعد الترتيب التصاعدي: 10 20 30 40 50 60<br>
+                    بعد الترتيب التنازلي: 60 50 40 30 20 10
+                </div>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> partial_sort() - ترتيب جزئي</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers = {50, 20, 60, 10, 30, 40, 70, 80};
+    
+    cout &lt;&lt; "المصفوفة الأصلية: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    // ترتيب أول 4 عناصر فقط
+    partial_sort(numbers.begin(), numbers.begin() + 4, numbers.end());
+    
+    cout &lt;&lt; "بعد الترتيب الجزئي (أول 4): ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم خوارزميات البحث -->
+        <section id="searching" class="section">
+            <h2>خوارزميات البحث (Searching Algorithms)</h2>
+            <p>خوارزميات للبحث عن عناصر في المجموعات.</p>
+
+            <div class="algorithm-viz">
+                <h3 style="color: #ffd700; margin-bottom: 1rem;">بحث ثنائي</h3>
+                <div class="search-viz">
+                    <div class="viz-item">10</div>
+                    <div class="viz-item">20</div>
+                    <div class="viz-item">30</div>
+                    <div class="viz-item viz-highlight">40</div>
+                    <div class="viz-item">50</div>
+                    <div class="viz-item">60</div>
+                </div>
+                <p style="color: #b0b0b0;">العثور على 40 في مصفوفة مرتبة</p>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> find() - بحث خطي</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers = {10, 20, 30, 40, 50, 30, 60};
+    
+    // البحث عن 30
+    auto it = find(numbers.begin(), numbers.end(), 30);
+    
+    if(it != numbers.end()) {
+        cout &lt;&lt; "تم العثور على 30 في الموقع: " 
+             &lt;&lt; (it - numbers.begin()) &lt;&lt; endl;
+    }
+    
+    // البحث عن 100
+    it = find(numbers.begin(), numbers.end(), 100);
+    
+    if(it == numbers.end()) {
+        cout &lt;&lt; "لم يتم العثور على 100" &lt;&lt; endl;
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> binary_search() - بحث ثنائي</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers = {10, 20, 30, 40, 50, 60, 70};
+    
+    // البحث الثنائي يتطلب مصفوفة مرتبة
+    bool found = binary_search(numbers.begin(), numbers.end(), 40);
+    
+    cout &lt;&lt; "هل 40 موجود؟ " &lt;&lt; (found ? "نعم" : "لا") &lt;&lt; endl;
+    
+    found = binary_search(numbers.begin(), numbers.end(), 45);
+    cout &lt;&lt; "هل 45 موجود؟ " &lt;&lt; (found ? "نعم" : "لا") &lt;&lt; endl;
+    
+    // lower_bound و upper_bound
+    auto lower = lower_bound(numbers.begin(), numbers.end(), 35);
+    auto upper = upper_bound(numbers.begin(), numbers.end(), 45);
+    
+    cout &lt;&lt; "أول عنصر >= 35: " &lt;&lt; *lower &lt;&lt; endl;
+    cout &lt;&lt; "أول عنصر > 45: " &lt;&lt; *upper &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم خوارزميات التعديل -->
+        <section id="modifying" class="section">
+            <h2>خوارزميات التعديل (Modifying Algorithms)</h2>
+            <p>خوارزميات لتعديل محتويات المجموعات.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> reverse() - عكس الترتيب</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers = {1, 2, 3, 4, 5, 6};
+    
+    cout &lt;&lt; "قبل العكس: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    reverse(numbers.begin(), numbers.end());
+    
+    cout &lt;&lt; "بعد العكس: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> replace() - استبدال القيم</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers = {10, 20, 30, 20, 40, 20, 50};
+    
+    cout &lt;&lt; "قبل الاستبدال: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    // استبدال كل 20 بـ 99
+    replace(numbers.begin(), numbers.end(), 20, 99);
+    
+    cout &lt;&lt; "بعد الاستبدال: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> rotate() - تدوير العناصر</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers = {1, 2, 3, 4, 5, 6, 7};
+    
+    cout &lt;&lt; "قبل التدوير: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    // تدوير بحيث يصبح العنصر الرابع أولاً
+    rotate(numbers.begin(), numbers.begin() + 3, numbers.end());
+    
+    cout &lt;&lt; "بعد التدوير: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم الخوارزميات العددية -->
+        <section id="numeric" class="section">
+            <h2>الخوارزميات العددية (Numeric Algorithms)</h2>
+            <p>خوارزميات للعمليات الحسابية على المجموعات.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> accumulate() - حساب المجموع</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;numeric&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers = {10, 20, 30, 40, 50};
+    
+    // حساب مجموع العناصر
+    int sum = accumulate(numbers.begin(), numbers.end(), 0);
+    cout &lt;&lt; "مجموع الأرقام: " &lt;&lt; sum &lt;&lt; endl;
+    
+    // حساب مجموع العناصر مع قيمة بداية 100
+    sum = accumulate(numbers.begin(), numbers.end(), 100);
+    cout &lt;&lt; "المجموع + 100: " &lt;&lt; sum &lt;&lt; endl;
+    
+    // حساب حاصل ضرب العناصر
+    int product = accumulate(numbers.begin(), numbers.end(), 1, 
+                             multiplies&lt;int&gt;());
+    cout &lt;&lt; "حاصل الضرب: " &lt;&lt; product &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> inner_product() - الضرب القياسي</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;numeric&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; v1 = {1, 2, 3, 4};
+    vector&lt;int&gt; v2 = {5, 6, 7, 8};
+    
+    // حساب الضرب القياسي: 1*5 + 2*6 + 3*7 + 4*8
+    int result = inner_product(v1.begin(), v1.end(), v2.begin(), 0);
+    
+    cout &lt;&lt; "الضرب القياسي: " &lt;&lt; result &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> iota() - تعبئة بأرقام متتالية</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;numeric&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers(10);
+    
+    // تعبئة المصفوفة بالأرقام 1 إلى 10
+    iota(numbers.begin(), numbers.end(), 1);
+    
+    cout &lt;&lt; "الأرقام المتتالية: ";
+    for(int n : numbers) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم خوارزميات المجموعات -->
+        <section id="set" class="section">
+            <h2>خوارزميات المجموعات (Set Algorithms)</h2>
+            <p>خوارزميات للتعامل مع المجموعات المرتبة.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> عمليات المجموعات</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; set1 = {1, 2, 3, 4, 5};
+    vector&lt;int&gt; set2 = {3, 4, 5, 6, 7};
+    vector&lt;int&gt; result(10);
+    
+    // اتحاد المجموعتين
+    auto it = set_union(set1.begin(), set1.end(),
+                        set2.begin(), set2.end(),
+                        result.begin());
+    result.resize(it - result.begin());
+    
+    cout &lt;&lt; "الاتحاد: ";
+    for(int n : result) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    // تقاطع المجموعتين
+    it = set_intersection(set1.begin(), set1.end(),
+                          set2.begin(), set2.end(),
+                          result.begin());
+    result.resize(it - result.begin());
+    
+    cout &lt;&lt; "التقاطع: ";
+    for(int n : result) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    // الفرق بين المجموعتين
+    it = set_difference(set1.begin(), set1.end(),
+                        set2.begin(), set2.end(),
+                        result.begin());
+    result.resize(it - result.begin());
+    
+    cout &lt;&lt; "الفرق (set1 - set2): ";
+    for(int n : result) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> includes() - تضمين المجموعة</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; superset = {1, 2, 3, 4, 5, 6, 7};
+    vector&lt;int&gt; subset = {3, 5, 7};
+    
+    bool result = includes(superset.begin(), superset.end(),
+                          subset.begin(), subset.end());
+    
+    cout &lt;&lt; "هل المجموعة الثانية مضمنة؟ " 
+         &lt;&lt; (result ? "نعم" : "لا") &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- تمارين وتطبيقات -->
+        <section id="exercises" class="section">
+            <h2>تمارين وتطبيقات عملية</h2>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 1: تحليل بيانات الطلاب</h3>
+                <p>استخدم الخوارزميات لتحليل درجات الطلاب:</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+#include &lt;numeric&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; grades = {85, 90, 78, 92, 88, 76, 95, 89};
+    
+    // الترتيب
+    sort(grades.begin(), grades.end());
+    
+    cout &lt;&lt; "الدرجات مرتبة: ";
+    for(int g : grades) cout &lt;&lt; g &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    // أعلى درجة
+    cout &lt;&lt; "أعلى درجة: " &lt;&lt; grades.back() &lt;&lt; endl;
+    
+    // أدنى درجة
+    cout &lt;&lt; "أدنى درجة: " &lt;&lt; grades.front() &lt;&lt; endl;
+    
+    // متوسط الدرجات
+    double avg = accumulate(grades.begin(), grades.end(), 0.0) / grades.size();
+    cout &lt;&lt; "المتوسط: " &lt;&lt; avg &lt;&lt; endl;
+    
+    // عدد الطلاب فوق 90
+    int count90 = count_if(grades.begin(), grades.end(),
+                           [](int g) { return g >= 90; });
+    cout &lt;&lt; "عدد الطلاب فوق 90: " &lt;&lt; count90 &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 2: معالجة النصوص</h3>
+                <p>استخدم الخوارزميات لمعالجة قائمة كلمات:</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    vector&lt;string&gt; words = {"apple", "banana", "cherry", "date", 
+                           "elderberry", "fig", "grape"};
+    
+    // ترتيب أبجدي
+    sort(words.begin(), words.end());
+    
+    cout &lt;&lt; "الكلمات مرتبة: ";
+    for(const string& w : words) cout &lt;&lt; w &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    // البحث عن كلمة
+    string searchWord = "cherry";
+    auto it = find(words.begin(), words.end(), searchWord);
+    
+    if(it != words.end()) {
+        cout &lt;&lt; "تم العثور على " &lt;&lt; searchWord &lt;&lt; endl;
+    }
+    
+    // عكس ترتيب الكلمات
+    reverse(words.begin(), words.end());
+    
+    cout &lt;&lt; "الكلمات بعد العكس: ";
+    for(const string& w : words) cout &lt;&lt; w &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- تمرين تفاعلي -->
+            <div class="exercise-box">
+                <h3><i class="fas fa-laptop-code"></i> جرب بنفسك</h3>
+                <p>أدخل أرقاماً مفصولة بفواصل وجرب الخوارزميات المختلفة:</p>
+                
+                <input type="text" id="numbersInput" class="exercise-input" placeholder="أدخل أرقاماً مفصولة بفواصل" value="45,12,78,34,23,89,56,67">
+                <input type="number" id="searchValue" class="exercise-input" placeholder="قيمة للبحث" value="56">
+                
+                <button class="exercise-btn" onclick="testAlgorithms()">تشغيل الخوارزميات</button>
+                
+                <div id="output" class="exercise-output">
+                    النتائج ستظهر هنا...
+                </div>
+            </div>
+        </section>
+
+        <!-- أزرار التنقل بين الدروس -->
+        <div class="lesson-navigation">
+            <a href="lesson-containers.html" class="nav-lesson-btn">
+                <i class="fas fa-arrow-right"></i> الدرس السابق: الحاويات
+            </a>
+            <a href="lesson-advanced.html" class="nav-lesson-btn">
+                الدرس التالي: مواضيع متقدمة <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CodeWay</h3>
+                <p>منصة عربية متكاملة لتعليم البرمجة</p>
+            </div>
+            <div class="footer-section">
+                <h3>روابط مفيدة</h3>
+                <a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> الدروس</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> المشاريع</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> عن المنصة</a>
+            </div>
+            <div class="footer-section">
+                <h3>تابعنا</h3>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+                <a href="#"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem; color: #808080;">
+            <p>© 2024 CodeWay - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+
+    <script>
+        // شريط التقدم
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress").style.width = scrolled + "%";
+        };
+
+        // نسخ الكود
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = "تم النسخ!";
+                setTimeout(() => {
+                    button.textContent = "نسخ";
+                }, 2000);
+            });
+        }
+
+        // التمرين التفاعلي
+        function testAlgorithms() {
+            const input = document.getElementById('numbersInput').value;
+            const searchVal = parseInt(document.getElementById('searchValue').value);
+            const numbers = input.split(',').map(n => parseInt(n.trim()));
+            
+            if (numbers.some(isNaN) || isNaN(searchVal)) {
+                document.getElementById('output').innerHTML = '<i class="fas fa-exclamation-circle" style="color: #ff4444;"></i> الرجاء إدخال أرقام صحيحة';
+                return;
+            }
+            
+            // نسخة للعمل عليها
+            let arr = [...numbers];
+            
+            // ترتيب
+            let sorted = [...arr].sort((a,b) => a-b);
+            
+            // بحث
+            let found = arr.includes(searchVal);
+            let position = arr.indexOf(searchVal);
+            
+            // مجموع
+            let sum = arr.reduce((a,b) => a + b, 0);
+            let avg = sum / arr.length;
+            
+            // أكبر وأصغر
+            let max = Math.max(...arr);
+            let min = Math.min(...arr);
+            
+            // عكس
+            let reversed = [...arr].reverse();
+            
+            let output = document.getElementById('output');
+            output.innerHTML = `
+                <i class="fas fa-robot" style="color: #ffd700;"></i> <strong>نتائج الخوارزميات:</strong><br>
+                <br>
+                <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                    <strong>المصفوفة الأصلية:</strong><br>
+                    [ ${arr.join(', ')} ]<br>
+                </div>
+                <br>
+                <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                    <strong>sort() - بعد الترتيب:</strong><br>
+                    [ ${sorted.join(', ')} ]<br>
+                </div>
+                <br>
+                <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                    <strong>find() - البحث عن ${searchVal}:</strong><br>
+                    ${found ? `✓ تم العثور في الموقع ${position}` : '✗ غير موجود'}<br>
+                </div>
+                <br>
+                <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                    <strong>accumulate() - العمليات الحسابية:</strong><br>
+                    • المجموع: ${sum}<br>
+                    • المتوسط: ${avg.toFixed(2)}<br>
+                    • القيمة العظمى: ${max}<br>
+                    • القيمة الصغرى: ${min}<br>
+                </div>
+                <br>
+                <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                    <strong>reverse() - بعد العكس:</strong><br>
+                    [ ${reversed.join(', ')} ]<br>
+                </div>
+            `;
+        }
+
+        // تمرير سلس للروابط الداخلية
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

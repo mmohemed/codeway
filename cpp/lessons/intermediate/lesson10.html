@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeWay | المؤشرات (Pointers) في C++</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js لتلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0f1e 0%, #1a1f35 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(145deg, #0b1120cc 0%, #1e2740cc 100%);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 5%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border: 2px solid #ffd700;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .header-content {
+            text-align: center;
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-content h1 span {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* عنوان الصفحة */
+        .page-header {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* جدول المحتويات */
+        .table-of-contents {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .table-of-contents h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: rgba(255, 215, 0, 0.15);
+            transform: translateX(-5px);
+        }
+
+        .toc-item i {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .toc-item a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .toc-item:hover a {
+            color: #ffd700;
+        }
+
+        /* أقسام الشرح */
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 30px;
+            padding: 3rem;
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, transparent);
+        }
+
+        .section h3 {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin: 2rem 0 1rem;
+        }
+
+        .section p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* صناديق الكود */
+        .code-box {
+            background: #1a1f2e;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .code-header span {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+        }
+
+        pre {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            background: transparent !important;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 1rem !important;
+        }
+
+        /* شرح الكود */
+        .code-explanation {
+            background: rgba(255, 215, 0, 0.03);
+            border-right: 3px solid #ffd700;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .code-explanation p {
+            margin: 0.5rem 0;
+        }
+
+        .code-explanation i {
+            color: #ffd700;
+            margin-left: 0.5rem;
+        }
+
+        /* بطاقات المفاهيم */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .concept-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .concept-card i {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .concept-card h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        /* جدول مقارنة */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        /* تمثيل بصري للذاكرة */
+        .memory-viz {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .memory-cell {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            margin: 0.5rem;
+            text-align: center;
+            line-height: 80px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .memory-cell span {
+            display: block;
+            font-size: 0.8rem;
+            color: #b0b0b0;
+            margin-top: -20px;
+        }
+
+        .memory-arrow {
+            display: inline-block;
+            color: #ffd700;
+            font-size: 2rem;
+            margin: 0 1rem;
+        }
+
+        /* صندوق النتائج */
+        .result-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .result-box h4 {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            color: #ffffff;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        /* التمارين التفاعلية */
+        .exercise-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .exercise-box h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .exercise-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            color: #e0e0e0;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .exercise-btn {
+            background: #ffd700;
+            color: #0a0f1e;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0;
+        }
+
+        .exercise-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .exercise-output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace;
+            min-height: 60px;
+        }
+
+        /* أزرار التنقل */
+        .lesson-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+        }
+
+        .nav-lesson-btn {
+            background: transparent;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-lesson-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+            transform: translateX(-5px);
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            background: linear-gradient(145deg, #0b1120cc, #1a1f35cc);
+            backdrop-filter: blur(10px);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: #b0b0b0;
+            text-decoration: none;
+            display: block;
+            margin: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffd700;
+        }
+
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0f1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffaa00;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .section {
+                padding: 2rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-content {
+                margin: 0.5rem 0;
+            }
+
+            .memory-cell {
+                width: 60px;
+                height: 60px;
+                line-height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CodeWay</a>
+            <div class="header-content">
+                <h1>شرح <span>المؤشرات (Pointers)</span> في C++</h1>
+            </div>
+            <div style="width: 100px;"></div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- رأس الصفحة -->
+        <div class="page-header">
+            <h1>المؤشرات في C++</h1>
+            <p>تعلم كيفية التعامل مع عناوين الذاكرة والمؤشرات في لغة C++ مع شرح مفصل وأمثلة عملية</p>
+        </div>
+
+        <!-- جدول المحتويات -->
+        <div class="table-of-contents">
+            <h2><i class="fas fa-list"></i> محتويات الدرس</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <i class="fas fa-info-circle"></i>
+                    <a href="#intro">مقدمة عن المؤشرات</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-memory"></i>
+                    <a href="#basics">أساسيات المؤشرات</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-arrow-left"></i>
+                    <a href="#arithmetic">عمليات المؤشرات</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-link"></i>
+                    <a href="#arrays">المؤشرات والمصفوفات</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-sitemap"></i>
+                    <a href="#dynamic">الذاكرة الديناميكية</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-code-branch"></i>
+                    <a href="#functions">المؤشرات والدوال</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-tasks"></i>
+                    <a href="#exercises">تمارين وتطبيقات</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم المقدمة -->
+        <section id="intro" class="section">
+            <h2>ما هي المؤشرات؟</h2>
+            <p>المؤشرات (Pointers) هي متغيرات تخزن عناوين الذاكرة لمتغيرات أخرى. تعتبر المؤشرات من أقوى ميزات لغة C++ وتسمح بالتحكم المباشر في الذاكرة.</p>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>عنوان الذاكرة</h3>
+                    <p>كل متغير في الذاكرة له عنوان فريد يمكن الوصول إليه باستخدام المؤشرات</p>
+                </div>
+                <div class="concept-card">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h3>الوصول غير المباشر</h3>
+                    <p>تسمح المؤشرات بالوصول إلى المتغيرات وتعديلها بشكل غير مباشر</p>
+                </div>
+                <div class="concept-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>كفاءة عالية</h3>
+                    <p>تساعد في تحسين أداء البرامج وإدارة الذاكرة بكفاءة</p>
+                </div>
+            </div>
+
+            <div class="memory-viz">
+                <h3 style="color: #ffd700; margin-bottom: 2rem;">تمثيل المؤشرات في الذاكرة</h3>
+                <div class="memory-cell">
+                    42
+                    <span>قيمة x</span>
+                </div>
+                <div class="memory-arrow">
+                    <i class="fas fa-long-arrow-alt-left"></i>
+                </div>
+                <div class="memory-cell">
+                    0x7ffd5
+                    <span>عنوان x</span>
+                </div>
+                <div class="memory-arrow">
+                    <i class="fas fa-long-arrow-alt-left"></i>
+                </div>
+                <div class="memory-cell">
+                    0x7ffd5
+                    <span>مؤشر ptr</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم أساسيات المؤشرات -->
+        <section id="basics" class="section">
+            <h2>أساسيات المؤشرات</h2>
+            <p>لتعريف مؤشر، نستخدم النجمة * قبل اسم المتغير. المؤشر يخزن عنوان متغير من نفس النوع.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 1: تعريف واستخدام المؤشرات</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int x = 10;           // متغير عادي
+    int *ptr;             // تعريف مؤشر لعدد صحيح
+    ptr = &x;              // تخزين عنوان x في المؤشر
+    
+    cout &lt;&lt; "قيمة x: " &lt;&lt; x &lt;&lt; endl;
+    cout &lt;&lt; "عنوان x: " &lt;&lt; &x &lt;&lt; endl;
+    cout &lt;&lt; "قيمة ptr (العنوان المخزن): " &lt;&lt; ptr &lt;&lt; endl;
+    cout &lt;&lt; "القيمة التي يشير إليها ptr: " &lt;&lt; *ptr &lt;&lt; endl;  // Dereferencing
+    
+    // تغيير قيمة x باستخدام المؤشر
+    *ptr = 20;
+    cout &lt;&lt; "\nبعد التعديل باستخدام المؤشر:" &lt;&lt; endl;
+    cout &lt;&lt; "قيمة x الجديدة: " &lt;&lt; x &lt;&lt; endl;
+    cout &lt;&lt; "القيمة من خلال المؤشر: " &lt;&lt; *ptr &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-explanation">
+                <p><i class="fas fa-check-circle"></i> <strong>شرح الرموز:</strong></p>
+                <p><strong>&</strong>: عامل أخذ العنوان (Address-of operator)</p>
+                <p><strong>*</strong>: عامل الوصول للقيمة (Dereferencing operator) - يستخدم مرتين:</p>
+                <p>1. في تعريف المؤشر: int *ptr;</p>
+                <p>2. للوصول للقيمة: *ptr = 20;</p>
+            </div>
+
+            <div class="result-box">
+                <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                <div class="result-value">
+                    قيمة x: 10<br>
+                    عنوان x: 0x7ffd5e3a4 (عنوان افتراضي)<br>
+                    قيمة ptr (العنوان المخزن): 0x7ffd5e3a4<br>
+                    القيمة التي يشير إليها ptr: 10<br>
+                    <br>
+                    بعد التعديل باستخدام المؤشر:<br>
+                    قيمة x الجديدة: 20<br>
+                    القيمة من خلال المؤشر: 20
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم عمليات المؤشرات -->
+        <section id="arithmetic" class="section">
+            <h2>عمليات المؤشرات (Pointer Arithmetic)</h2>
+            <p>يمكن إجراء عمليات حسابية على المؤشرات مثل الجمع والطرح، ولكنها تعمل بشكل مختلف عن الأعداد العادية.</p>
+
+            <table class="comparison-table">
+                <tr>
+                    <th>العملية</th>
+                    <th>المعنى</th>
+                    <th>مثال</th>
+                </tr>
+                <tr>
+                    <td>ptr + n</td>
+                    <td>ينتقل n عنصر للأمام (حسب حجم نوع البيانات)</td>
+                    <td>int *ptr; ptr + 1 يزيد بمقدار 4 بايت</td>
+                </tr>
+                <tr>
+                    <td>ptr - n</td>
+                    <td>ينتقل n عنصر للخلف</td>
+                    <td>char *ptr; ptr - 2 يقل بمقدار 2 بايت</td>
+                </tr>
+                <tr>
+                    <td>ptr1 - ptr2</td>
+                    <td>يحسب عدد العناصر بين مؤشرين</td>
+                    <td>عدد العناصر = (ptr1 - ptr2)</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 2: عمليات المؤشرات</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int arr[] = {10, 20, 30, 40, 50};
+    int *ptr = arr;  // المؤشر يشير إلى أول عنصر في المصفوفة
+    
+    cout &lt;&lt; "المصفوفة الأصلية: ";
+    for(int i = 0; i < 5; i++) {
+        cout &lt;&lt; arr[i] &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    cout &lt;&lt; "الوصول للمصفوفة باستخدام المؤشر:" &lt;&lt; endl;
+    cout &lt;&lt; "ptr[0] = " &lt;&lt; ptr[0] &lt;&lt; endl;
+    cout &lt;&lt; "*(ptr + 1) = " &lt;&lt; *(ptr + 1) &lt;&lt; endl;
+    cout &lt;&lt; "*(ptr + 2) = " &lt;&lt; *(ptr + 2) &lt;&lt; endl;
+    
+    // التقدم بالمؤشر
+    ptr += 2;
+    cout &lt;&lt; "\nبعد ptr += 2، القيمة: " &lt;&lt; *ptr &lt;&lt; endl;
+    
+    // الفرق بين مؤشرين
+    int *ptr2 = &arr[4];
+    cout &lt;&lt; "عدد العناصر بين ptr و ptr2: " &lt;&lt; ptr2 - ptr &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم المؤشرات والمصفوفات -->
+        <section id="arrays" class="section">
+            <h2>المؤشرات والمصفوفات</h2>
+            <p>اسم المصفوفة هو في الواقع مؤشر ثابت يشير إلى أول عنصر في المصفوفة.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 3: العلاقة بين المؤشرات والمصفوفات</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int numbers[] = {100, 200, 300, 400, 500};
+    int *ptr = numbers;  // ptr يشير إلى numbers[0]
+    
+    // طرق مختلفة للوصول لعناصر المصفوفة
+    cout &lt;&lt; "الطريقة الأولى: numbers[2] = " &lt;&lt; numbers[2] &lt;&lt; endl;
+    cout &lt;&lt; "الطريقة الثانية: *(numbers + 2) = " &lt;&lt; *(numbers + 2) &lt;&lt; endl;
+    cout &lt;&lt; "الطريقة الثالثة: ptr[2] = " &lt;&lt; ptr[2] &lt;&lt; endl;
+    cout &lt;&lt; "الطريقة الرابعة: *(ptr + 2) = " &lt;&lt; *(ptr + 2) &lt;&lt; endl;
+    
+    cout &lt;&lt; "\nعرض جميع العناصر باستخدام المؤشر:" &lt;&lt; endl;
+    for(int i = 0; i < 5; i++) {
+        cout &lt;&lt; "*(ptr + " &lt;&lt; i &lt;&lt; ") = " &lt;&lt; *(ptr + i) &lt;&lt; endl;
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="memory-viz">
+                <h3 style="color: #ffd700; margin-bottom: 1rem;">المؤشرات والمصفوفات</h3>
+                <div class="memory-cell">100<br><span>numbers[0]</span></div>
+                <div class="memory-cell">200<br><span>numbers[1]</span></div>
+                <div class="memory-cell">300<br><span>numbers[2]</span></div>
+                <div class="memory-cell">400<br><span>numbers[3]</span></div>
+                <div class="memory-cell">500<br><span>numbers[4]</span></div>
+                <div style="margin-top: 1rem;">
+                    <span style="color: #ffd700;">ptr → numbers[0]</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الذاكرة الديناميكية -->
+        <section id="dynamic" class="section">
+            <h2>الذاكرة الديناميكية (Dynamic Memory)</h2>
+            <p>تستخدم المؤشرات لتخصيص وإدارة الذاكرة الديناميكية باستخدام new و delete.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 4: تخصيص ذاكرة ديناميكية</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    // تخصيص ذاكرة لمتغير واحد
+    int *p = new int;
+    *p = 42;
+    cout &lt;&lt; "قيمة المتغير الديناميكي: " &lt;&lt; *p &lt;&lt; endl;
+    delete p;  // تحرير الذاكرة
+    
+    // تخصيص ذاكرة لمصفوفة
+    int size = 5;
+    int *arr = new int[size];
+    
+    // إدخال قيم للمصفوفة
+    for(int i = 0; i < size; i++) {
+        arr[i] = (i + 1) * 10;
+    }
+    
+    // عرض القيم
+    cout &lt;&lt; "قيم المصفوفة الديناميكية: ";
+    for(int i = 0; i < size; i++) {
+        cout &lt;&lt; arr[i] &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    delete[] arr;  // تحرير الذاكرة (لاحظ استخدام [] مع delete)
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-explanation">
+                <p><i class="fas fa-exclamation-triangle"></i> <strong>ملاحظات مهمة:</strong></p>
+                <p>1. استخدم <strong>new</strong> لتخصيص الذاكرة الديناميكية</p>
+                <p>2. استخدم <strong>delete</strong> لتحرير الذاكرة المخصصة لمتغير واحد</p>
+                <p>3. استخدم <strong>delete[]</strong> لتحرير الذاكرة المخصصة لمصفوفة</p>
+                <p>4. عدم تحرير الذاكرة يؤدي إلى تسرب الذاكرة (Memory Leak)</p>
+            </div>
+        </section>
+
+        <!-- قسم المؤشرات والدوال -->
+        <section id="functions" class="section">
+            <h2>المؤشرات والدوال</h2>
+            <p>يمكن تمرير المؤشرات إلى الدوال لتعديل المتغيرات الأصلية أو للتعامل مع المصفوفات بكفاءة.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 5: تمرير مؤشرات للدوال</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// دالة تستقبل مؤشر وتعدل القيمة
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// دالة تستقبل مصفوفة كمؤشر
+void doubleArray(int *arr, int size) {
+    for(int i = 0; i < size; i++) {
+        arr[i] *= 2;
+    }
+}
+
+// دالة تُرجع مؤشر
+int* createArray(int size) {
+    int *arr = new int[size];
+    for(int i = 0; i < size; i++) {
+        arr[i] = i * 10;
+    }
+    return arr;
+}
+
+int main() {
+    int x = 5, y = 10;
+    
+    cout &lt;&lt; "قبل التبديل: x = " &lt;&lt; x &lt;&lt; ", y = " &lt;&lt; y &lt;&lt; endl;
+    swap(&x, &y);
+    cout &lt;&lt; "بعد التبديل: x = " &lt;&lt; x &lt;&lt; ", y = " &lt;&lt; y &lt;&lt; endl;
+    
+    int nums[] = {1, 2, 3, 4, 5};
+    doubleArray(nums, 5);
+    cout &lt;&lt; "المصفوفة بعد المضاعفة: ";
+    for(int i = 0; i < 5; i++) {
+        cout &lt;&lt; nums[i] &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    // استخدام دالة تُرجع مؤشر
+    int *arr = createArray(5);
+    cout &lt;&lt; "المصفوفة المنشأة ديناميكياً: ";
+    for(int i = 0; i < 5; i++) {
+        cout &lt;&lt; arr[i] &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    delete[] arr;  // تذكر دائماً تحرير الذاكرة
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- المؤشرات المتقدمة -->
+        <section id="advanced" class="section">
+            <h2>مفاهيم متقدمة في المؤشرات</h2>
+            
+            <h3>المؤشر لمؤشر (Pointer to Pointer)</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 6: مؤشر لمؤشر</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int x = 100;
+    int *ptr = &x;     // مؤشر لعدد صحيح
+    int **ptr2 = &ptr;  // مؤشر لمؤشر لعدد صحيح
+    
+    cout &lt;&lt; "قيمة x: " &lt;&lt; x &lt;&lt; endl;
+    cout &lt;&lt; "قيمة x من خلال ptr: " &lt;&lt; *ptr &lt;&lt; endl;
+    cout &lt;&lt; "قيمة x من خلال ptr2: " &lt;&lt; **ptr2 &lt;&lt; endl;
+    
+    **ptr2 = 200;  // تغيير القيمة من خلال ptr2
+    
+    cout &lt;&lt; "قيمة x بعد التعديل: " &lt;&lt; x &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <h3>المؤشرات الثابتة والمؤشرات للثوابت</h3>
+            <table class="comparison-table">
+                <tr>
+                    <th>النوع</th>
+                    <th>التركيب</th>
+                    <th>الوصف</th>
+                </tr>
+                <tr>
+                    <td>مؤشر لثابت</td>
+                    <td>const int *ptr</td>
+                    <td>لا يمكن تغيير القيمة التي يشير إليها</td>
+                </tr>
+                <tr>
+                    <td>مؤشر ثابت</td>
+                    <td>int *const ptr</td>
+                    <td>لا يمكن تغيير العنوان الذي يشير إليه</td>
+                </tr>
+                <tr>
+                    <td>مؤشر ثابت لثابت</td>
+                    <td>const int *const ptr</td>
+                    <td>لا يمكن تغيير العنوان ولا القيمة</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 7: const مع المؤشرات</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int x = 10, y = 20;
+    
+    // مؤشر لثابت - لا يمكن تغيير القيمة
+    const int *ptr1 = &x;
+    // *ptr1 = 30;  // خطأ! لا يمكن تعديل القيمة
+    ptr1 = &y;      // يمكن تغيير العنوان
+    
+    // مؤشر ثابت - لا يمكن تغيير العنوان
+    int *const ptr2 = &x;
+    *ptr2 = 30;     // يمكن تعديل القيمة
+    // ptr2 = &y;   // خطأ! لا يمكن تغيير العنوان
+    
+    // مؤشر ثابت لثابت
+    const int *const ptr3 = &x;
+    // *ptr3 = 40;  // خطأ! لا يمكن تعديل القيمة
+    // ptr3 = &y;   // خطأ! لا يمكن تغيير العنوان
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- تمارين وتطبيقات -->
+        <section id="exercises" class="section">
+            <h2>تمارين وتطبيقات عملية</h2>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 1: عكس مصفوفة باستخدام المؤشرات</h3>
+                <p>قم بكتابة دالة تعكس مصفوفة باستخدام المؤشرات فقط.</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+void reverseArray(int *arr, int size) {
+    int *start = arr;
+    int *end = arr + size - 1;
+    
+    while (start < end) {
+        // تبديل القيم باستخدام المؤشرات
+        int temp = *start;
+        *start = *end;
+        *end = temp;
+        
+        start++;
+        end--;
+    }
+}
+
+int main() {
+    int numbers[] = {1, 2, 3, 4, 5, 6, 7};
+    int size = sizeof(numbers) / sizeof(numbers[0]);
+    
+    cout &lt;&lt; "المصفوفة الأصلية: ";
+    for(int i = 0; i < size; i++) {
+        cout &lt;&lt; numbers[i] &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    reverseArray(numbers, size);
+    
+    cout &lt;&lt; "المصفوفة بعد العكس: ";
+    for(int i = 0; i < size; i++) {
+        cout &lt;&lt; numbers[i] &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 2: البحث عن أكبر عنصر</h3>
+                <p>قم بكتابة دالة تجد أكبر عنصر في مصفوفة وتعيد مؤشراً إليه.</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int* findMax(int *arr, int size) {
+    if (size == 0) return nullptr;
+    
+    int *maxPtr = arr;  // نفترض أن أول عنصر هو الأكبر
+    
+    for(int i = 1; i < size; i++) {
+        if (*(arr + i) > *maxPtr) {
+            maxPtr = arr + i;
+        }
+    }
+    
+    return maxPtr;
+}
+
+int main() {
+    int numbers[] = {45, 23, 89, 12, 67, 34, 91, 56};
+    int size = sizeof(numbers) / sizeof(numbers[0]);
+    
+    int *maxPtr = findMax(numbers, size);
+    
+    cout &lt;&lt; "عناصر المصفوفة: ";
+    for(int i = 0; i < size; i++) {
+        cout &lt;&lt; numbers[i] &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    cout &lt;&lt; "أكبر عنصر هو: " &lt;&lt; *maxPtr &lt;&lt; endl;
+    cout &lt;&lt; "موقعه في الذاكرة: " &lt;&lt; maxPtr &lt;&lt; endl;
+    cout &lt;&lt; "رقم الفهرس: " &lt;&lt; (maxPtr - numbers) &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- تمرين تفاعلي -->
+            <div class="exercise-box">
+                <h3><i class="fas fa-laptop-code"></i> جرب بنفسك</h3>
+                <p>أدخل قيماً للمصفوفة وشاهد كيفية عمل المؤشرات:</p>
+                
+                <input type="text" id="arrayInput" class="exercise-input" placeholder="أدخل أرقاماً مفصولة بفواصل (مثال: 5,10,15,20)" value="10,20,30,40,50">
+                <input type="number" id="indexInput" class="exercise-input" placeholder="أدخل رقم الفهرس (0-4)" value="2">
+                
+                <button class="exercise-btn" onclick="testPointers()">تشغيل المؤشرات</button>
+                
+                <div id="output" class="exercise-output">
+                    النتائج ستظهر هنا...
+                </div>
+            </div>
+        </section>
+
+        <!-- أزرار التنقل بين الدروس -->
+        <div class="lesson-navigation">
+            <a href="lesson-functions.html" class="nav-lesson-btn">
+                <i class="fas fa-arrow-right"></i> الدرس السابق: الدوال
+            </a>
+            <a href="lesson-classes.html" class="nav-lesson-btn">
+                الدرس التالي: الكلاسات والكائنات <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CodeWay</h3>
+                <p>منصة عربية متكاملة لتعليم البرمجة</p>
+            </div>
+            <div class="footer-section">
+                <h3>روابط مفيدة</h3>
+                <a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> الدروس</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> المشاريع</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> عن المنصة</a>
+            </div>
+            <div class="footer-section">
+                <h3>تابعنا</h3>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+                <a href="#"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem; color: #808080;">
+            <p>© 2024 CodeWay - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+
+    <script>
+        // شريط التقدم
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress").style.width = scrolled + "%";
+        };
+
+        // نسخ الكود
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = "تم النسخ!";
+                setTimeout(() => {
+                    button.textContent = "نسخ";
+                }, 2000);
+            });
+        }
+
+        // التمرين التفاعلي
+        function testPointers() {
+            const arrayInput = document.getElementById('arrayInput').value;
+            const index = parseInt(document.getElementById('indexInput').value);
+            const output = document.getElementById('output');
+            
+            // تحويل المدخلات إلى مصفوفة أرقام
+            const numbers = arrayInput.split(',').map(num => parseInt(num.trim()));
+            
+            if (numbers.some(isNaN)) {
+                output.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #ff4444;"></i> الرجاء إدخال أرقام صحيحة مفصولة بفواصل';
+                return;
+            }
+            
+            if (index < 0 || index >= numbers.length) {
+                output.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #ff4444;"></i> رقم الفهرس خارج نطاق المصفوفة';
+                return;
+            }
+            
+            // محاكاة عمل المؤشرات
+            const addresses = numbers.map((_, i) => `0x${(1000 + i * 4).toString(16)}`);
+            
+            output.innerHTML = `
+                <i class="fas fa-memory" style="color: #ffd700;"></i> <strong>محاكاة عمل المؤشرات:</strong><br>
+                <br>
+                <strong>المصفوفة في الذاكرة:</strong><br>
+                ${numbers.map((num, i) => `
+                    <div style="margin: 5px 0; padding: 5px; background: rgba(255,215,0,0.1); border-radius: 5px;">
+                        العنصر [${i}] = ${num} | العنوان: ${addresses[i]}
+                    </div>
+                `).join('')}
+                <hr style="border-color: #ffd700; margin: 10px 0;">
+                <strong>تجربة المؤشرات:</strong><br>
+                • قيمة العنصر في الفهرس ${index}: ${numbers[index]}<br>
+                • عنوان العنصر: ${addresses[index]}<br>
+                • عنوان بداية المصفوفة: ${addresses[0]}<br>
+                • عدد البايتات من البداية: ${index * 4} بايت<br>
+                • التعبير *(arr + ${index}) = ${numbers[index]}<br>
+                • التعبير arr[${index}] = ${numbers[index]}<br>
+                <hr style="border-color: #ffd700; margin: 10px 0;">
+                <i class="fas fa-check-circle" style="color: #00ff00;"></i> تم تنفيذ عمليات المؤشرات بنجاح!
+            `;
+        }
+
+        // تمرير سلس للروابط الداخلية
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINQ | CodeWay — درس شامل</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6d28d9;
+            --primary-dark: #5b21b6;
+            --primary-light: #a78bfa;
+            --primary-soft: #f5f3ff;
+            --ink: #0b1120;
+            --ink-2: #1e293b;
+            --slate: #475569;
+            --slate-2: #64748b;
+            --muted: #94a3b8;
+            --line: #e2e8f0;
+            --line-soft: #f1f5f9;
+            --bg-soft: #f8fafc;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --cyan: #06b6d4;
+            --header-h: 76px;
+            --shadow-sm: 0 1px 2px rgba(15,23,42,.06);
+            --shadow-md: 0 4px 16px rgba(15,23,42,.08);
+            --shadow-lg: 0 20px 50px -12px rgba(15,23,42,.15);
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
+            background: #ffffff;
+            color: var(--ink-2);
+            line-height: 1.8;
+            font-size: 17px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ================= HEADER ================= */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(120deg, #0b1120 0%, #1a1a2e 50%, #16213e 100%);
+            color: #fff;
+            border-bottom: 2px solid var(--primary);
+            box-shadow: 0 4px 24px rgba(0,0,0,.15);
+        }
+
+        .header-wrap {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: var(--header-h);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 900;
+            font-size: 1.35rem;
+            letter-spacing: .5px;
+        }
+
+        .brand-mark {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            display: grid;
+            place-items: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 14px rgba(109,40,217,.5);
+        }
+
+        .brand small {
+            display: block;
+            font-size: .62rem;
+            font-weight: 400;
+            color: var(--muted);
+            letter-spacing: 2px;
+            margin-top: -4px;
+        }
+
+        .header-right { display: flex; align-items: center; gap: 10px; }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 15px;
+            border-radius: 999px;
+            font-size: .82rem;
+            font-weight: 600;
+            border: 1px solid rgba(167,139,250,.35);
+            background: rgba(109,40,217,.22);
+            color: #ddd6fe;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: .85rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 10px;
+            transition: .2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,.08); color: #fff; }
+
+        .read-progress {
+            position: fixed;
+            top: var(--header-h);
+            right: 0;
+            height: 3px;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            z-index: 999;
+            transition: width .1s linear;
+        }
+
+        /* ================= LAYOUT ================= */
+        .page {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 36px 24px 100px;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        /* ================= SIDEBAR TOC ================= */
+        .toc {
+            position: sticky;
+            top: calc(var(--header-h) + 24px);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 20px 18px;
+            background: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toc-title {
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-list { list-style: none; }
+
+        .toc-list a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 9px;
+            color: var(--slate);
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 500;
+            transition: .18s;
+            border-right: 3px solid transparent;
+            margin-bottom: 2px;
+        }
+
+        .toc-list a .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--line);
+            flex-shrink: 0;
+            transition: .2s;
+        }
+
+        .toc-list a:hover { background: var(--bg-soft); color: var(--primary); }
+
+        .toc-list a.active {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border-right-color: var(--primary);
+            font-weight: 700;
+        }
+        .toc-list a.active .dot { background: var(--primary); transform: scale(1.3); }
+
+        /* ================= ARTICLE ================= */
+        .article { min-width: 0; }
+
+        .crumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .82rem;
+            color: var(--muted);
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+        .crumb a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .crumb a:hover { text-decoration: underline; }
+        .crumb i { font-size: .6rem; }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            border-radius: 24px;
+            padding: 44px 40px;
+            margin-bottom: 44px;
+            background:
+                radial-gradient(circle at 92% 8%, rgba(167,139,250,.18) 0%, transparent 40%),
+                radial-gradient(circle at 5% 95%, rgba(6,182,212,.1) 0%, transparent 40%),
+                linear-gradient(135deg, #faf8ff 0%, #f0f9ff 100%);
+            border: 1px solid #e6defd;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: -60px;
+            width: 180px; height: 180px;
+            border-radius: 50%;
+            border: 1.5px dashed rgba(109,40,217,.22);
+            animation: spin 40s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 13px;
+            border-radius: 8px;
+            font-size: .74rem;
+            font-weight: 700;
+            letter-spacing: .3px;
+            background: #fff;
+            color: var(--primary);
+            border: 1px solid #e3dbfd;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tag.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+        .tag.cyan { color: #0e7490; border-color: #cffafe; background: #ecfeff; }
+
+        h1.lesson-h1 {
+            font-size: clamp(1.8rem, 4vw, 2.9rem);
+            font-weight: 900;
+            color: var(--ink);
+            line-height: 1.18;
+            letter-spacing: -.5px;
+            margin-bottom: 10px;
+        }
+
+        .en-sub {
+            font-size: .95rem;
+            font-weight: 400;
+            color: var(--slate-2);
+            letter-spacing: .5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .en-sub i { color: var(--primary); font-size: .8rem; }
+
+        .hero-desc {
+            margin-top: 18px;
+            font-size: 1.05rem;
+            color: var(--slate);
+            max-width: 720px;
+        }
+
+        .meta-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 26px;
+            padding-top: 24px;
+            border-top: 1px dashed #ddd3f7;
+        }
+
+        .meta-item { display: flex; align-items: center; gap: 10px; }
+
+        .meta-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: #fff;
+            border: 1px solid #e3dbfd;
+            display: grid;
+            place-items: center;
+            color: var(--primary);
+            font-size: .95rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .meta-item b { display: block; font-size: .86rem; color: var(--ink); }
+        .meta-item span { font-size: .74rem; color: var(--muted); }
+
+        /* ================= SECTIONS ================= */
+        .sec {
+            margin-bottom: 60px;
+            scroll-margin-top: calc(var(--header-h) + 28px);
+        }
+
+        .sec-head {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .sec-num {
+            flex-shrink: 0;
+            width: 46px; height: 46px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.15rem;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 6px 18px rgba(109,40,217,.32);
+        }
+
+        .sec-head h2 {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.3;
+        }
+
+        .sec-head h2 .sub {
+            display: block;
+            font-size: .8rem;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: .5px;
+            margin-top: 2px;
+        }
+
+        .sec p { margin-bottom: 16px; color: var(--slate); }
+        .sec p strong { color: var(--ink); font-weight: 700; }
+
+        .sec h3.mini-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin: 28px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sec h3.mini-title i { color: var(--primary); font-size: .95rem; }
+
+        code.inline {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            background: #eef2ff;
+            color: var(--primary-dark);
+            padding: 2px 7px;
+            border-radius: 5px;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* callouts */
+        .callout {
+            display: flex;
+            gap: 16px;
+            padding: 20px 22px;
+            border-radius: 14px;
+            margin: 24px 0;
+            background: var(--primary-soft);
+            border: 1px solid #e6defd;
+            border-right: 4px solid var(--primary);
+        }
+
+        .callout .co-icon {
+            flex-shrink: 0;
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+        }
+
+        .callout p { margin: 0; color: var(--ink-2); font-size: .96rem; }
+        .callout p + p { margin-top: 8px; }
+        .callout b { color: var(--ink); }
+
+        .callout.warn {
+            background: #fffbeb;
+            border-color: #fde68a;
+            border-right-color: var(--amber);
+        }
+        .callout.warn .co-icon { background: var(--amber); }
+        .callout.warn p { color: #78350f; }
+
+        .callout.danger {
+            background: #fef2f2;
+            border-color: #fecaca;
+            border-right-color: var(--red);
+        }
+        .callout.danger .co-icon { background: var(--red); }
+        .callout.danger p { color: #7f1d1d; }
+
+        .callout.ok {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+            border-right-color: var(--green);
+        }
+        .callout.ok .co-icon { background: var(--green); }
+        .callout.ok p { color: #064e3b; }
+
+        /* ================= CODE BLOCKS ================= */
+        .code-card {
+            margin: 24px 0;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #0b1120;
+            border: 1px solid #1e293b;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .code-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 18px;
+            background: #111c30;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .code-dots { display: flex; gap: 7px; }
+        .code-dots span { width: 11px; height: 11px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+
+        .code-lang {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .72rem;
+            font-weight: 600;
+            color: #94a3b8;
+            letter-spacing: 1.5px;
+        }
+
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            padding: 5px 12px;
+            border-radius: 7px;
+            font-size: .75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: .2s;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .copy-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .copy-btn.copied { background: var(--green); border-color: var(--green); color: #fff; }
+
+        pre {
+            margin: 0;
+            padding: 20px 22px;
+            direction: ltr;
+            text-align: left;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .86rem;
+            line-height: 1.75;
+            color: #e2e8f0;
+        }
+
+        pre::-webkit-scrollbar { height: 8px; }
+        pre::-webkit-scrollbar-track { background: #0b1120; }
+        pre::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        .kw { color: #c084fc; font-weight: 500; }
+        .ty { color: #67e8f9; }
+        .st { color: #86efac; }
+        .cm { color: #64748b; font-style: italic; }
+        .nm { color: #fca5a5; }
+        .fn { color: #fbbf24; }
+        .op { color: #a78bfa; }
+
+        /* ================= TABLES ================= */
+        .table-wrap {
+            margin: 26px 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-sm);
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+
+        thead th {
+            background: var(--ink);
+            color: #fff;
+            padding: 15px 18px;
+            text-align: right;
+            font-weight: 600;
+            font-size: .86rem;
+            letter-spacing: .3px;
+        }
+
+        tbody td {
+            padding: 13px 18px;
+            border-bottom: 1px solid var(--line);
+            color: var(--slate);
+            vertical-align: top;
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:nth-child(even) { background: var(--bg-soft); }
+        tbody td strong { color: var(--ink); }
+        tbody td code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8rem;
+            background: #eef2ff;
+            color: var(--primary-dark);
+            padding: 2px 7px;
+            border-radius: 5px;
+        }
+
+        /* ================= CARDS ================= */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 16px;
+            margin: 26px 0;
+        }
+
+        .mini-card {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: var(--shadow-sm);
+            transition: .25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mini-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform .3s;
+        }
+
+        .mini-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .mini-card:hover::after { transform: scaleX(1); }
+
+        .mini-card .mc-icon {
+            width: 42px; height: 42px;
+            border-radius: 11px;
+            display: grid;
+            place-items: center;
+            font-size: 1.05rem;
+            margin-bottom: 13px;
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+
+        .mini-card h4 { font-size: 1.02rem; color: var(--ink); margin-bottom: 6px; font-weight: 700; }
+        .mini-card p { font-size: .88rem; color: var(--slate-2); margin: 0; }
+
+        /* ================= INTERACTIVE LAB ================= */
+        .lab {
+            border: 1px solid #e3dbfd;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 30px 0;
+            background: #fff;
+            box-shadow: var(--shadow-md);
+        }
+
+        .lab-head {
+            background: linear-gradient(135deg, var(--ink), #1e293b);
+            color: #fff;
+            padding: 16px 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: .96rem;
+        }
+
+        .lab-head i {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            background: rgba(167,139,250,.22);
+            color: var(--primary-light);
+            display: grid;
+            place-items: center;
+            font-size: .95rem;
+        }
+
+        .lab-head .live {
+            margin-right: auto;
+            font-size: .7rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #6ee7b7;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lab-head .live::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #6ee7b7;
+            animation: pulse 1.6s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .4; transform: scale(1.4); }
+        }
+
+        .lab-body { padding: 24px; }
+
+        .lab-body p.lab-desc {
+            font-size: .92rem;
+            color: var(--slate-2);
+            margin-bottom: 18px;
+        }
+
+        /* LINQ Query Builder */
+        .query-builder {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .qb-row {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .qb-label {
+            font-size: .82rem;
+            font-weight: 700;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .qb-label i { color: var(--primary); font-size: .8rem; }
+
+        .qb-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: .9rem;
+            color: var(--ink-2);
+            background: #fff;
+            cursor: pointer;
+            transition: .2s;
+            outline: none;
+        }
+
+        .qb-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(109,40,217,.1); }
+
+        .qb-code {
+            background: #0b1120;
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            color: #e2e8f0;
+            direction: ltr;
+            text-align: left;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            border: 1px solid #1e293b;
+        }
+
+        .qb-code .kw { color: #c084fc; }
+        .qb-code .ty { color: #67e8f9; }
+        .qb-code .st { color: #86efac; }
+        .qb-code .fn { color: #fbbf24; }
+        .qb-code .nm { color: #fca5a5; }
+
+        .result-area {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .result-head {
+            background: var(--bg-soft);
+            padding: 11px 18px;
+            font-size: .82rem;
+            font-weight: 700;
+            color: var(--ink);
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .result-count {
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--primary-soft);
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+
+        .result-list {
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 11px 14px;
+            border-radius: 9px;
+            transition: background .15s;
+            border-bottom: 1px solid var(--line-soft);
+        }
+
+        .result-item:last-child { border-bottom: none; }
+        .result-item:hover { background: var(--bg-soft); }
+
+        .result-item .ri-avatar {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: .82rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .result-item .ri-info { flex: 1; min-width: 0; }
+        .result-item .ri-info b { display: block; font-size: .88rem; color: var(--ink); }
+        .result-item .ri-info span { font-size: .76rem; color: var(--muted); }
+
+        .result-item .ri-badge {
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 999px;
+            flex-shrink: 0;
+        }
+
+        .badge-dev { background: #dbeafe; color: #1e40af; }
+        .badge-design { background: #fce7f3; color: #9d174d; }
+        .badge-mgmt { background: #fef3c7; color: #92400e; }
+        .badge-qa { background: #d1fae5; color: #065f46; }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--muted);
+            font-size: .88rem;
+        }
+
+        .empty-state i {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--line);
+        }
+
+        /* ================= OPERATORS GRID ================= */
+        .op-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 22px 0;
+        }
+
+        .op-card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px 16px;
+            background: #fff;
+            transition: .2s;
+        }
+
+        .op-card:hover { border-color: var(--primary-light); box-shadow: var(--shadow-sm); }
+
+        .op-card code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .op-card p { font-size: .8rem; color: var(--slate-2); margin: 0; }
+
+        /* ================= SUMMARY ================= */
+        .summary-box {
+            border: 1px solid #e3dbfd;
+            border-radius: 18px;
+            padding: 28px;
+            background: linear-gradient(135deg, #faf8ff, #f0f9ff);
+            margin-top: 10px;
+        }
+
+        .summary-box h3 {
+            color: var(--ink);
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .summary-box h3 i { color: var(--primary); }
+
+        .check-list { list-style: none; display: grid; gap: 10px; }
+
+        .check-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #fff;
+            padding: 14px 16px;
+            border-radius: 11px;
+            border: 1px solid #ece7fb;
+            font-size: .93rem;
+            color: var(--slate);
+        }
+
+        .check-list li i {
+            color: var(--green);
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        /* ================= QUIZ ================= */
+        .quiz {
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 28px;
+            margin: 40px 0;
+            background: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quiz-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .quiz-head .q-icon {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: var(--ink);
+            color: var(--primary-light);
+            display: grid;
+            place-items: center;
+        }
+
+        .quiz-head h3 { font-size: 1.15rem; color: var(--ink); }
+        .quiz > p { font-size: .88rem; color: var(--muted); margin-bottom: 22px; }
+
+        .q-item { margin-bottom: 22px; }
+        .q-item:last-child { margin-bottom: 0; }
+
+        .q-text {
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 10px;
+            font-size: .95rem;
+            display: flex;
+            gap: 8px;
+        }
+        .q-text .q-badge {
+            flex-shrink: 0;
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-size: .72rem;
+            font-weight: 800;
+            display: grid;
+            place-items: center;
+        }
+
+        .q-opts { display: grid; gap: 8px; }
+
+        .q-opt {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 15px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: .18s;
+            font-size: .9rem;
+            color: var(--slate);
+            background: #fff;
+        }
+
+        .q-opt:hover { border-color: var(--primary-light); background: var(--primary-soft); }
+
+        .q-opt .marker {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--line);
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            font-size: .6rem;
+            color: #fff;
+            transition: .18s;
+        }
+
+        .q-opt.correct {
+            border-color: var(--green);
+            background: #ecfdf5;
+            color: #065f46;
+        }
+        .q-opt.correct .marker { background: var(--green); border-color: var(--green); }
+
+        .q-opt.wrong {
+            border-color: var(--red);
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        .q-opt.wrong .marker { background: var(--red); border-color: var(--red); }
+
+        .q-opt.disabled { pointer-events: none; }
+
+        .quiz-result {
+            margin-top: 22px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quiz-result.show { display: flex; }
+        .quiz-result.pass { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .quiz-result.fail { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+        /* ================= FOOTER NAV ================= */
+        .lesson-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-top: 64px;
+            padding-top: 32px;
+            border-top: 1px solid var(--line);
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: .9rem;
+            transition: .2s;
+        }
+
+        .nav-link.prev {
+            color: var(--slate);
+            background: var(--bg-soft);
+            border: 1px solid var(--line);
+        }
+        .nav-link.prev:hover { background: #fff; border-color: var(--muted); }
+
+        .nav-link.next {
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 6px 18px rgba(109,40,217,.3);
+        }
+        .nav-link.next:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(109,40,217,.4); }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 1000px) {
+            .page { grid-template-columns: 1fr; gap: 0; }
+            .toc { display: none; }
+        }
+
+        @media (max-width: 640px) {
+            body { font-size: 16px; }
+            .header-wrap { padding: 0 16px; height: 64px; }
+            .pill { display: none; }
+            .hero { padding: 28px 22px; }
+            .lab-body { padding: 18px; }
+            .qb-row { grid-template-columns: 1fr; gap: 6px; }
+            .lesson-nav { flex-direction: column; }
+            .nav-link { width: 100%; justify-content: center; }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity .7s ease, transform .7s ease;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+    <div class="header-wrap">
+        <a href="#" class="brand">
+            <span class="brand-mark"><i class="fab fa-microsoft"></i></span>
+            <span>
+                CodeWay
+                <small>C# ACADEMY</small>
+            </span>
+        </a>
+        <div class="header-right">
+            <span class="pill"><i class="fas fa-crown"></i> مواضيع متقدمة</span>
+            <a href="#" class="back-btn"><i class="fas fa-arrow-right"></i> العودة للدورة</a>
+        </div>
+    </div>
+</header>
+
+<div class="read-progress" id="readProgress"></div>
+
+<!-- ================= PAGE ================= -->
+<div class="page">
+
+    <!-- Sidebar TOC -->
+    <aside class="toc">
+        <div class="toc-title"><i class="fas fa-list-ul"></i> محتويات الدرس</div>
+        <ul class="toc-list">
+            <li><a href="#s1" class="toc-link active"><span class="dot"></span> ما هي LINQ؟</a></li>
+            <li><a href="#s2" class="toc-link"><span class="dot"></span> صيغتا الكتابة</a></li>
+            <li><a href="#s3" class="toc-link"><span class="dot"></span> المؤثرات الأساسية</a></li>
+            <li><a href="#s4" class="toc-link"><span class="dot"></span> مختبر الاستعلامات</a></li>
+            <li><a href="#s5" class="toc-link"><span class="dot"></span> التأجيل والتنفيذ</a></li>
+            <li><a href="#s6" class="toc-link"><span class="dot"></span> أفضل الممارسات</a></li>
+            <li><a href="#s7" class="toc-link"><span class="dot"></span> الخلاصة والاختبار</a></li>
+        </ul>
+    </aside>
+
+    <!-- Article -->
+    <main class="article">
+
+        <!-- Breadcrumb -->
+        <nav class="crumb">
+            <a href="#">الرئيسية</a>
+            <i class="fas fa-chevron-left"></i>
+            <a href="#">مواضيع متقدمة</a>
+            <i class="fas fa-chevron-left"></i>
+            <span>LINQ</span>
+        </nav>
+
+        <!-- Hero -->
+        <div class="hero">
+            <div class="tag-row">
+                <span class="tag dark"><i class="fas fa-crown"></i> متقدم</span>
+                <span class="tag cyan"><i class="fas fa-database"></i> LINQ</span>
+                <span class="tag"><i class="fas fa-layer-group"></i> الدرس 02</span>
+            </div>
+            <h1 class="lesson-h1">LINQ — الاستعلام الموحّد في C#</h1>
+            <div class="en-sub"><i class="fas fa-angle-left"></i> Language Integrated Query</div>
+            <p class="hero-desc">
+                تعلّم كيف تكتب استعلامات قوية على المصفوفات والقوائم وقواعد البيانات بنفس الصياغة، مع مختبر تفاعلي لبناء استعلاماتك خطوة بخطوة ومشاهدة النتائج فوراً.
+            </p>
+            <div class="meta-strip">
+                <div class="meta-item">
+                    <div class="meta-icon"><i class="far fa-clock"></i></div>
+                    <div><b>70 دقيقة</b><span>زمن القراءة</span></div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-icon"><i class="fas fa-signal"></i></div>
+                    <div><b>مستوى متقدم</b><span>يتطلب Collections</span></div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-icon"><i class="fas fa-flask"></i></div>
+                    <div><b>مختبر تفاعلي</b><span>بناء استعلامات</span></div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-icon"><i class="fas fa-check-double"></i></div>
+                    <div><b>اختبار نهائي</b><span>3 أسئلة</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ SECTION 1 ============ -->
+        <section class="sec reveal" id="s1">
+            <div class="sec-head">
+                <div class="sec-num">1</div>
+                <h2>ما هي LINQ ولماذا نستخدمها؟
+                    <span class="sub">WHAT IS LINQ?</span>
+                </h2>
+            </div>
+            <p>
+                <strong>LINQ (Language Integrated Query)</strong> هي ميزة في C# تسمح لك بكتابة استعلامات على أي مجموعة بيانات — مصفوفة، <code class="inline">List&lt;T&gt;</code>، قاعدة بيانات SQL، XML، أو حتى كائنات في الذاكرة — <strong>بنفس الصياغة الموحّدة</strong>. بدلاً من كتابة حلقات <code class="inline">foreach</code> متداخلة ومعقدة، تكتب استعلاماً واضحاً يعبّر عن نيتك مباشرة.
+            </p>
+            <p>
+                تخيل أن لديك قائمة موظفين وتريد استخراج من هم أكبر من 30 سنة، مرتبين حسب الراتب، وأسماؤهم فقط. بدون LINQ تحتاج حلقة + شرط + قائمة مؤقتة + عملية ترتيب. مع LINQ، سطر واحد يفي بالغرض.
+            </p>
+
+            <h3 class="mini-title"><i class="fas fa-code-compare"></i> الفرق العملي — قبل وبعد</h3>
+
+            <div class="code-card">
+                <div class="code-top">
+                    <div class="code-dots"><span></span><span></span><span></span></div>
+                    <span class="code-lang">C# — بدون LINQ (الطريقة التقليدية)</span>
+                    <button class="copy-btn" data-copy><i class="far fa-copy"></i> نسخ</button>
+                </div>
+                <pre><code><span class="cm">// بدون LINQ: حلقة يدوية + قائمة مؤقتة</span>
+<span class="kw">var</span> result = <span class="kw">new</span> List&lt;<span class="ty">string</span>&gt;();
+<span class="kw">foreach</span> (<span class="kw">var</span> emp <span class="kw">in</span> employees)
+{
+    <span class="kw">if</span> (emp.Age &gt; <span class="nm">30</span>)
+        result.Add(emp.Name);
+}
+result.Sort(); <span class="cm">// ترتيب يدوي</span></code></pre>
+            </div>
+
+            <div class="code-card">
+                <div class="code-top">
+                    <div class="code-dots"><span></span><span></span><span></span></div>
+                    <span class="code-lang">C# — باستخدام LINQ (طريقة واحدة فقط)</span>
+                    <button class="copy-btn" data-copy><i class="far fa-copy"></i> نسخ</button>
+                </div>
+                <pre><code><span class="cm">// مع LINQ: تعبير واحد واضح</span>
+<span class="kw">var</span> result = employees
+    .Where(e =&gt; e.Age &gt; <span class="nm">30</span>)
+    .OrderBy(e =&gt; e.Name)
+    .Select(e =&gt; e.Name)
+    .ToList();</code></pre>
+            </div>
+
+            <div class="callout">
+                <div class="co-icon"><i class="fas fa-lightbulb"></i></div>
+                <div>
+                    <p><b>الفكرة الجوهرية:</b> LINQ لا تعطيك قدرات جديدة — كل ما تفعله يمكن فعله بحلقات. لكنها تعطيك <b>وضوحاً</b> (Readability) و<b>أماناً في الأنواع</b> (Type Safety) و<b>توحيداً</b> عبر مصادر بيانات مختلفة.</p>
+                </div>
+            </div>
+
+            <div class="card-grid">
+                <div class="mini-card">
+                    <div class="mc-icon"><i class="fas fa-layer-group"></i></div>
+                    <h4>مصدر واحد</h4>
+                    <p>نفس الصياغة تعمل على Objects و SQL و XML و Entities.</p>
+                </div>
+                <div class="mini-card">
+                    <div class="mc-icon" style="background:#e0f2fe;color:#0284c7;"><i class="fas fa-shield-halved"></i></div>
+                    <h4>أمان الأنواع</h4>
+                    <p>المترجم يكتشف الأخطاء وقت الترجمة، لا وقت التشغيل.</p>
+                </div>
+                <div class="mini-card">
+                    <div class="mc-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-wand-magic-sparkles"></i></div>
+                    <h4>إيجاز</h4>
+                    <p>سطر واحد يستبدل 10 أسطر من الحلقات المتداخلة.</p>
+                </div>
+                <div class="mini-card">
+                    <div class="mc-icon" style="background:#dcfce7;color:#059669;"><i class="fas fa-bolt"></i></div>
+                    <h4>تأجيل التنفيذ</h4>
+                    <p>الاستعلام لا يُنفّذ إلا عند التكرار عليه فعلياً.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ SECTION 2 ============ -->
+        <section class="sec reveal" id="s2">
+            <div class="sec-head">
+                <div class="sec-num">2</div>
+                <h2>صيغتا الكتابة — Query vs Method
+                    <span class="sub">TWO SYNTAXES</span>
+                </h2>
+            </div>
+            <p>
+                LINQ تدعم صيغتين متكافئتين تماماً: <strong>صيغة الاستعلام</strong> (Query Syntax) المشابهة لـ SQL، و<strong>صيغة الدوال</strong> (Method Syntax) التي تعتمد على دوال الامتداد (Extension Methods). كلاهما يُترجم إلى نفس الكود النهائي — اختر ما يقرأه فريقك بوضوح.
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المعيار</th>
+                            <th>Query Syntax</th>
+                            <th>Method Syntax</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>الشكل</strong></td>
+                            <td><code>from x in src where ... select ...</code></td>
+                            <td><code>src.Where(...).Select(...)</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>القراءة</strong></td>
+                            <td>أقرب لـ SQL — مألوفة لمن يعرف قواعد البيانات</td>
+                            <td>أقرب لبرمجة C# — متسلسلة وسهلة التركيب</td>
+                        </tr>
+                        <tr>
+                            <td><strong>المرونة</strong></td>
+                            <td>محدودة — لا تدعم كل المؤثرات</td>
+                            <td>كاملة — تدعم كل مؤثرات LINQ</td>
+                        </tr>
+                        <tr>
+                            <td><strong>الأداء</strong></td>
+                            <td>نفس الأداء تماماً</td>
+                            <td>نفس الأداء تماماً</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="mini-title"><i class="fas fa-equals"></i> نفس الاستعلام — صيغتان</h3>
+
+            <div class="code-card">
+                <div class="code-top">
+                    <div class="code-dots"><span></span><span></span><span></span></div>
+                    <span class="code-lang">C# — Query Syntax</span>
+                    <button class="copy-btn" data-copy><i class="far fa-copy"></i> نسخ</button>
+                </div>
+                <pre><code><span class="kw">var</span> highEarners =
+    <span class="kw">from</span> e <span class="kw">in</span> employees
+    <span class="kw">where</span> e.Salary &gt; <span class="nm">10000</span>
+    <span class="kw">orderby</span> e.Salary <span class="kw">descending</span>
+    <span class="kw">select</span> <span class="kw">new</span> { e.Name, e.Salary };</code></pre>
+            </div>
+
+            <div class="code-card">
+                <div class="code-top">
+                    <div class="code-dots"><span></span><span></span><span></span></div>
+                    <span class="code-lang">C# — Method Syntax (نفس النتيجة بالضبط)</span>
+                    <button class="copy-btn" data-copy><i class="far fa-copy"></i> نسخ</button>
+                </div>
+                <pre><code><span class="kw">var</span> highEarners = employees
+    .Where(e =&gt; e.Salary &gt; <span class="nm">10000</span>)
+    .OrderByDescending(e =&gt; e.Salary)
+    .Select(e =&gt; <span class="kw">new</span> { e.Name, e.Salary });</code></pre>
+            </div>
+
+            <div class="callout ok">
+                <div class="co-icon"><i class="fas fa-check"></i></div>
+                <div><p><b>توصية عملية:</b> ابدأ بصيغة الدوال (Method Syntax) لأنها الأكثر مرونة والأكثر شيوعاً في المشاريع الحقيقية. استخدم Query Syntax فقط عندما تكون فيه أوضح لفريقك (خاصة مع <code>join</code>).</p></div>
+            </div>
+        </section>
+
+        <!-- ============ SECTION 3 ============ -->
+        <section class="sec reveal" id="s3">
+            <div class="sec-head">
+                <div class="sec-num">3</div>
+                <h2>المؤثرات الأساسية في LINQ
+                    <span class="sub">CORE OPERATORS</span>
+                </h2>
+            </div>
+            <p>
+                مؤثرات LINQ تُصنّف إلى مجموعات حسب الوظيفة. إليك الأكثر استخداماً — أتقنها أولاً فهي تغطي 90% من احتياجك اليومي:
+            </p>
+
+            <div class="op-grid">
+                <div class="op-card">
+                    <code>Where</code>
+                    <p>تصفية العناصر حسب شرط</p>
+                </div>
+                <div class="op-card">
+                    <code>Select</code>
+                    <p>تحويل كل عنصر إلى شكل آخر</p>
+                </div>
+                <div class="op-card">
+                    <code>OrderBy / ThenBy</code>
+                    <p>ترتيب تصاعدي (أو تنازلي)</p>
+                </div>
+                <div class="op-card">
+                    <code>First / FirstOrDefault</code>
+                    <p>أول عنصر (أو null إن لم يوجد)</p>
+                </div>
+                <div class="op-card">
+                    <code>Any / All</code>
+                    <p>هل يوجد عنصر؟ هل كل العناصر؟</p>
+                </div>
+                <div class="op-card">
+                    <code>Count / Sum / Average</code>
+                    <p>إحصاءات سريعة على المجموعة</p>
+                </div>
+                <div class="op-card">
+                    <code>GroupBy</code>
+                    <p>تجميع العناصر حسب مفتاح</p>
+                </div>
+                <div class="op-card">
+                    <code>Distinct</code>
+                    <p>إزالة التكرار</p>
+                </div>
+                <div class="op-card">
+                    <code>Take / Skip</code>
+                    <p>أخذ أول N أو تجاوزها</p>
+                </div>
+                <div class="op-card">
+                    <code>Join</code>
+                    <p>ربط مجموعتين بمفتاح مشترك</p>
+                </div>
+                <div class="op-card">
+                    <code>SelectMany</code>
+                    <p>تسطيح المجموعات المتداخلة</p>
+                </div>
+                <div class="op-card">
+                    <code>ToList / ToArray</code>
+                    <p>تحويل النتيجة إلى مجموعة فعلية</p>
+                </div>
+            </div>
+
+            <h3 class="mini-title"><i class="fas fa-filter"></i> مثال تطبيقي — Where + Select + OrderBy</h3>
+
+            <div class="code-card">
+                <div class="code-top">
+                    <div class="code-dots"><span></span><span></span><span></span></div>
+                    <span class="code-lang">C# — نموذج البيانات والاستعلام</span>
+                    <button class="copy-btn" data-copy><i class="far fa-copy"></i> نسخ</button>
+                </div>
+                <pre><code><span class="kw">public record</span> <span class="ty">Employee</span>(<span class="ty">string</span> Name, <span class="ty">int</span> Age, <span class="ty">decimal</span> Salary, <span class="ty">string</span> Dept);
+
+<span class="kw">var</span> employees = <span class="kw">new</span> List&lt;Employee&gt;
+{
+    <span class="kw">new</span>(<span class="st">"أحمد"</span>,  <span class="nm">28</span>, <span class="nm">8500</span>,  <span class="st">"تطوير"</span>),
+    <span class="kw">new</span>(<span class="st">"سارة"</span>,  <span class="nm">35</span>, <span class="nm">12000</span>, <span class="st">"تصميم"</span>),
+    <span class="kw">new</span>(<span class="st">"خالد"</span>,  <span class="nm">42</span>, <span class="nm">15000</span>, <span class="st">"إدارة"</span>),
+    <span class="kw">new</span>(<span class="st">"نورة"</span>,  <span class="nm">31</span>, <span class="nm">9800</span>,  <span class="st">"تطوير"</span>),
+};
+
+<span class="cm">// الموظفون فوق 30 سنة، مرتبون حسب الراتب تنازلياً، الاسم والراتب فقط</span>
+<span class="kw">var</span> seniors = employees
+    .Where(e =&gt; e.Age &gt; <span class="nm">30</span>)
+    .OrderByDescending(e =&gt; e.Salary)
+    .Select(e =&gt; <span class="kw">new</span> { e.Name, e.Salary });
+
+<span class="kw">foreach</span> (<span class="kw">var</span> s <span class="kw">in</span> seniors)
+    Console.WriteLine(<span class="st">$"{s.Name} — {s.Salary:C}"</span>);
+
+<span class="cm">// الناتج:</span>
+<span class="cm">// خالد — 15,000</span>
+<span class="cm">// سارة — 12,000</span>
+<span class="cm">// نورة — 9,800</span></code></pre>
+            </div>
+
+            <h3 class="mini-title"><i class="fas fa-layer-group"></i> مثال — GroupBy (تجميع حسب القسم)</h3>
+
+            <div class="code-card">
+                <div class="code-top">
+                    <div class="code-dots"><span></span><span></span><span></span></div>
+                    <span class="code-lang">C# — التجميع والإحصاء</span>
+                    <button class="copy-btn" data-copy><i class="far fa-copy"></i> نسخ</button>
+                </div>
+                <pre><code><span class="kw">var</span> byDept = employees
+    .GroupBy(e =&gt; e.Dept)
+    .Select(g =&gt; <span class="kw">new</span>
+    {
+        Dept      = g.Key,
+        Count     = g.Count(),
+        AvgSalary = g.Average(e =&gt; e.Salary),
+        MaxSalary = g.Max(e =&gt; e.Salary)
+    });
+
+<span class="cm">// الناتج:</span>
+<span class="cm">// تطوير: 2 موظفين، متوسط 9,150، أعلى 9,800</span>
+<span class="cm">// تصميم: 1، متوسط 12,000، أعلى 12,000</span>
+<span class="cm">// إدارة:  1، متوسط 15,000، أعلى 15,000</span></code></pre>
+            </div>
+
+            <div class="callout warn">
+                <div class="co-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div>
+                    <p><b>انتبه للفرق بين <code>First</code> و<code>FirstOrDefault</code>:</b> الأول يرمي استثناءً <code>InvalidOperationException</code> إن لم يجد عنصراً، والثاني يُرجع <code>null</code>. في الإنتاج، فضّل <code>FirstOrDefault</code> مع فحص النتيجة.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ SECTION 4: LAB ============ -->
+        <section class="sec reveal" id="s4">
+            <div class="sec-head">
+                <div class="sec-num">4</div>
+                <h2>مختبر LINQ التفاعلي
+                    <span class="sub">INTERACTIVE QUERY BUILDER</span>
+                </h2>
+            </div>
+            <p>
+                جرّب بناء استعلامات LINQ بنفسك! اختر مؤثرات من القوائم المنسدلة وشاهد الكود الناتج والبيانات المصفاة تتحدث فورياً. هذه المحاكاة تعكس تماماً ما يحدث في الكود الحقيقي:
+            </p>
+
+            <div class="lab">
+                <div class="lab-head">
+                    <i class="fas fa-flask"></i>
+                    مختبر بناء استعلامات LINQ
+                    <span class="live">LIVE LAB</span>
+                </div>
+                <div class="lab-body">
+                    <p class="lab-desc">اختر المؤثرات لتكوين استعلامك. كل تغيير يحدّث الكود والنتائج مباشرة.</p>
+
+                    <div class="query-builder">
+                        <div class="qb-row">
+                            <div class="qb-label"><i class="fas fa-filter"></i> تصفية</div>
+                            <select class="qb-select" id="qbWhere">
+                                <option value="none">بدون تصفية</option>
+                                <option value="age30">العمر أكبر من 30</option>
+                                <option value="salary10k">الراتب أكبر من 10,000</option>
+                                <option value="dev">قسم التطوير فقط</option>
+                                <option value="young">العمر أصغر من 30</option>
+                            </select>
+                        </div>
+                        <div class="qb-row">
+                            <div class="qb-label"><i class="fas fa-sort"></i> ترتيب</div>
+                            <select class="qb-select" id="qbOrder">
+                                <option value="none">بدون ترتيب</option>
+                                <option value="salaryDesc">الراتب (تنازلي)</option>
+                                <option value="salaryAsc">الراتب (تصاعدي)</option>
+                                <option value="ageDesc">العمر (تنازلي)</option>
+                                <option value="nameAsc">الاسم (أبجدي)</option>
+                            </select>
+                        </div>
+                        <div class="qb-row">
+                            <div class="qb-label"><i class="fas fa-scissors"></i> تحديد</div>
+                            <select class="qb-select" id="qbSelect">
+                                <option value="all">كل الحقول</option>
+                                <option value="nameSalary">الاسم والراتب فقط</option>
+                                <option value="nameOnly">الأسماء فقط</option>
+                            </select>
+                        </div>
+                        <div class="qb-row">
+                            <div class="qb-label"><i class="fas fa-hashtag"></i> حد</div>
+                            <select class="qb-select" id="qbTake">
+                                <option value="all">بدون حد</option>
+                                <option value="2">أول عنصرين</option>
+                                <option value="3">أول 3 عناصر</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="qb-code" id="qbCode"><span class="cm">// استعلامك سيظهر هنا</span></div>
+
+                    <div class="result-area">
+                        <div class="result-head">
+                            <span><i class="fas fa-table-list"></i> النتائج</span>
+                            <span class="result-count" id="resultCount">0 عنصر</span>
+                        </div>
+                        <div class="result-list" id="resultList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout">
+                <div class="co-icon"><i class="fas fa-code"></i></div>
+                <div>
+                    <p><b>الكود الحقيقي وراء المختبر:</b> ما تراه في الصندوق الداكن أعلاه هو كود LINQ فعلي يعمل في .NET. المختبر يحاكيه بالكامل لتعطيك الفهم البصري قبل الكتابة اليدوية.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ SECTION 5 ============ -->
+        <section class="sec reveal" id="s5">
+            <div class="sec-head">
+                <div class="sec-num">5</div>
+                <h2>التأجيل والتنفيذ — Deferred Execution
+                    <span class="sub">DEFERRED VS EAGER EXECUTION</span>
+                </h2>
+            </div>
+            <p>
+                هذه من أكثر النقاط التي تفاجئ المبتدئين. عندما تكتب استعلام LINQ، فإنه <strong>لا يُنفّذ فوراً</strong>. الاستعلام يُخزّن فقط "الوصفة" (البيانات + المؤثرات)، ولا يُنفّذ فعلياً إلا عندما تكرّر عليه (foreach) أو تحوّله إلى مجموعة (<code class="inline">ToList</code>، <code class="inline">ToArray</code>) أو تطلب منه إحصاءً (<code class="inline">Count</code>، <code class="inline">Sum</code>).
+            </p>
+
+            <div class="code-card">
+                <div class="code-top">
+                    <div class="code-dots"><span></span><span></span><span></span></div>
+                    <span class="code-lang">C# — التأجيل في العمل</span>
+                    <button class="copy-btn" data-copy><i class="far fa-copy"></i> نسخ</button>
+                </div>
+                <pre><code><span class="kw">var</span> numbers = <span class="kw">new</span> List&lt;<span class="ty">int</span>&gt; { <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span> };
+
+<span class="cm">// لم يُنفّذ بعد! مجرد "وصفة"</span>
+<span class="kw">var</span> query = numbers.Where(n =&gt; n &gt; <span class="nm">2</span>);
+
+<span class="cm">// نضيف عنصراً جديداً إلى المصدر</span>
+numbers.Add(<span class="nm">10</span>);
+
+<span class="cm">// الآن فقط يُنفّذ — وسيلتقط العنصر الجديد أيضاً!</span>
+<span class="kw">foreach</span> (<span class="kw">var</span> n <span class="kw">in</span> query)
+    Console.Write(n + <span class="st">" "</span>);
+<span class="cm">// الناتج: 3 4 5 10</span>
+
+<span class="cm">// لو أردنا نتيجة ثابتة، نحول فوراً:</span>
+<span class="kw">var</span> snapshot = numbers.Where(n =&gt; n &gt; <span class="nm">2</span>).ToList();</code></pre>
+            </div>
+
+            <div class="callout danger">
+                <div class="co-icon"><i class="fas fa-bug"></i></div>
+                <div>
+                    <p><b>خطأ شائع:</b> استدعاء استعلام LINQ داخل حلقة (مثلاً في كل طلب HTTP) دون <code>ToList</code> قد يُنفّذ الاستعلام مرات عديدة على قاعدة البيانات. احفظ النتيجة في متغير منفّذ مسبقاً إذا كنت ستستخدمها أكثر من مرة.</p>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المؤثر</th>
+                            <th>نوع التنفيذ</th>
+                            <th>ملاحظة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Where, Select, OrderBy, GroupBy, Join</code></td>
+                            <td><strong>مؤجّل</strong> (Deferred)</td>
+                            <td>لا يُنفّذ حتى تكرّر عليه</td>
+                        </tr>
+                        <tr>
+                            <td><code>ToList, ToArray, ToDictionary</code></td>
+                            <td><strong>فوري</strong> (Eager)</td>
+                            <td>ينفّذ الاستعلام ويحفظ النتيجة</td>
+                        </tr>
+                        <tr>
+                            <td><code>Count, Sum, Any, All, First, Max</code></td>
+                            <td><strong>فوري</strong> (Eager)</td>
+                            <td>ينفّذ ويُرجع قيمة واحدة</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ============ SECTION 6 ============ -->
+        <section class="sec reveal" id="s6">
+            <div class="sec-head">
+                <div class="sec-num">6</div>
+                <h2>أفضل الممارسات الاحترافية
+                    <span class="sub">BEST PRACTICES</span>
+                </h2>
+            </div>
+            <p>لكتابة استعلامات LINQ نظيفة وفعّالة، اتبع هذه الإرشادات:</p>
+
+            <ul class="check-list">
+                <li>
+                    <i class="fas fa-circle-check"></i>
+                    <div><b>فضّل Method Syntax على Query Syntax</b> ما لم تكن Query أوضح لفريقك — خاصة في <code>join</code>.</div>
+                </li>
+                <li>
+                    <i class="fas fa-circle-check"></i>
+                    <div><b>استخدم <code>ToList()</code> أو <code>ToArray()</code></b> عندما تُريد حفظ النتيجة واستخدامها أكثر من مرة، لتجنّب التنفيذ المتكرر.</div>
+                </li>
+                <li>
+                    <i class="fas fa-circle-check"></i>
+                    <div><b>فضّل <code>Any()</code> على <code>Count() &gt; 0</code></b> لفحص وجود عنصر — <code>Any</code> يتوقف عن المراجعة عند أول تطابق، أسرع بكثير.</div>
+                </li>
+                <li>
+                    <i class="fas fa-circle-check"></i>
+                    <div><b>استخدم <code>FirstOrDefault</code> و<code>SingleOrDefault</code></b> في السياقات التي قد لا يوجد فيها العنصر المطلوب، مع فحص <code>null</code> بعدها.</div>
+                </li>
+                <li>
+                    <i class="fas fa-circle-check"></i>
+                    <div><b>لا تضع استعلام LINQ داخل حلقة</b> دون داعٍ — انقله خارج الحلقة إذا كان على نفس المصدر.</div>
+                </li>
+                <li>
+                    <i class="fas fa-circle-check"></i>
+                    <div><b>عند العمل مع EF Core</b>، تحقق من أن استعلامك قابل للترجمة إلى SQL. بعض الدوال (مثل الدوال المخصصة) قد تُنفّذ في الذاكرة بعد جلب كل البيانات.</div>
+                </li>
+            </ul>
+        </section>
+
+        <!-- ============ SECTION 7 ============ -->
+        <section class="sec reveal" id="s7">
+            <div class="sec-head">
+                <div class="sec-num">7</div>
+                <h2>الخلاصة والاختبار السريع
+                    <span class="sub">SUMMARY &amp; QUIZ</span>
+                </h2>
+            </div>
+
+            <div class="summary-box">
+                <h3><i class="fas fa-graduation-cap"></i> ما تعلمته في هذا الدرس</h3>
+                <ul class="check-list">
+                    <li><i class="fas fa-check"></i><div>ما هي LINQ ولماذا تُوحّد الاستعلامات عبر مصادر البيانات المختلفة.</div></li>
+                    <li><i class="fas fa-check"></i><div>الفرق بين Query Syntax و Method Syntax — ومتى تختار كلاً منهما.</div></li>
+                    <li><i class="fas fa-check"></i><div>المؤثرات الأساسية (Where / Select / OrderBy / GroupBy / Join) وأمثلة عملية.</div></li>
+                    <li><i class="fas fa-check"></i><div>مفهوم التأجيل (Deferred Execution) وأثره على الأداء والسلوك.</div></li>
+                    <li><i class="fas fa-check"></i><div>أفضل الممارسات لتجنّب التنفيذ المتكرر وأخطاء الأداء.</div></li>
+                </ul>
+            </div>
+
+            <!-- Quiz -->
+            <div class="quiz" id="quiz">
+                <div class="quiz-head">
+                    <div class="q-icon"><i class="fas fa-circle-question"></i></div>
+                    <h3>اختبر فهمك</h3>
+                </div>
+                <p>3 أسئلة سريعة — اختر إجابة واحدة لكل سؤال لتظهر النتيجة.</p>
+
+                <div class="q-item" data-answer="b">
+                    <div class="q-text"><span class="q-badge">1</span> متى يُنفّذ استعلام LINQ التالي فعلياً؟ <code class="inline">var q = list.Where(x =&gt; x &gt; 5);</code></div>
+                    <div class="q-opts">
+                        <div class="q-opt" data-opt="a"><span class="marker"><i class="fas fa-check"></i></span> فور كتابة السطر</div>
+                        <div class="q-opt" data-opt="b"><span class="marker"><i class="fas fa-check"></i></span> عند التكرار عليه أو تحويله إلى مجموعة</div>
+                        <div class="q-opt" data-opt="c"><span class="marker"><i class="fas fa-check"></i></span> عند استدعاء <code>Where</code> نفسها</div>
+                    </div>
+                </div>
+
+                <div class="q-item" data-answer="c">
+                    <div class="q-text"><span class="q-badge">2</span> ما الفرق بين <code class="inline">First()</code> و<code class="inline">FirstOrDefault()</code>؟</div>
+                    <div class="q-opts">
+                        <div class="q-opt" data-opt="a"><span class="marker"><i class="fas fa-check"></i></span> لا فرق — كلاهما يُرجع نفس الشيء</div>
+                        <div class="q-opt" data-opt="b"><span class="marker"><i class="fas fa-check"></i></span> <code>FirstOrDefault</code> أسرع دائماً</div>
+                        <div class="q-opt" data-opt="c"><span class="marker"><i class="fas fa-check"></i></span> <code>First</code> يرمي استثناءً إن لم يجد، والآخر يُرجع null</div>
+                    </div>
+                </div>
+
+                <div class="q-item" data-answer="a">
+                    <div class="q-text"><span class="q-badge">3</span> أي مما يلي أفضل لفحص "هل توجد عناصر تطابق شرطاً"؟</div>
+                    <div class="q-opts">
+                        <div class="q-opt" data-opt="a"><span class="marker"><i class="fas fa-check"></i></span> <code>Any()</code></div>
+                        <div class="q-opt" data-opt="b"><span class="marker"><i class="fas fa-check"></i></span> <code>Count() &gt; 0</code></div>
+                        <div class="q-opt" data-opt="c"><span class="marker"><i class="fas fa-check"></i></span> <code>Where(...).ToList().Count</code></div>
+                    </div>
+                </div>
+
+                <div class="quiz-result" id="quizResult"></div>
+            </div>
+        </section>
+
+        <!-- Footer nav -->
+        <nav class="lesson-nav">
+            <a href="#" class="nav-link prev"><i class="fas fa-arrow-right"></i> الدرس السابق: البرمجة متعددة المسارات</a>
+            <a href="#" class="nav-link next">الدرس التالي: المفوضيات والأحداث <i class="fas fa-arrow-left"></i></a>
+        </nav>
+
+    </main>
+</div>
+
+<script>
+/* ========== Copy Code ========== */
+document.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const code = btn.closest('.code-card').querySelector('pre').innerText;
+        navigator.clipboard.writeText(code).then(() => {
+            btn.classList.add('copied');
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<i class="far fa-copy"></i> نسخ';
+            }, 2000);
+        });
+    });
+});
+
+/* ========== Reading progress ========== */
+const progress = document.getElementById('readProgress');
+window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progress.style.width = pct + '%';
+});
+
+/* ========== TOC active on scroll ========== */
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = [...tocLinks].map(l => document.querySelector(l.getAttribute('href')));
+
+const secObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            tocLinks.forEach(l => l.classList.remove('active'));
+            const active = [...tocLinks].find(l => l.getAttribute('href') === '#' + e.target.id);
+            if (active) active.classList.add('active');
+        }
+    });
+}, { rootMargin: '-30% 0px -55% 0px' });
+
+sections.forEach(s => s && secObserver.observe(s));
+
+/* ========== Reveal on scroll ========== */
+const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            revealObserver.unobserve(e.target);
+        }
+    });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ========== LINQ Interactive Lab ========== */
+const employees = [
+    { name: 'أحمد', age: 28, salary: 8500, dept: 'تطوير' },
+    { name: 'سارة', age: 35, salary: 12000, dept: 'تصميم' },
+    { name: 'خالد', age: 42, salary: 15000, dept: 'إدارة' },
+    { name: 'نورة', age: 31, salary: 9800, dept: 'تطوير' },
+    { name: 'فيصل', age: 26, salary: 7200, dept: 'تطوير' },
+    { name: 'منى', age: 38, salary: 11500, dept: 'تسويق' },
+    { name: 'عمر', age: 45, salary: 18000, dept: 'إدارة' },
+    { name: 'ليلى', age: 29, salary: 8900, dept: 'تصميم' }
+];
+
+const deptClass = {
+    'تطوير': 'badge-dev',
+    'تصميم': 'badge-design',
+    'إدارة': 'badge-mgmt',
+    'تسويق': 'badge-qa'
+};
+
+const qbWhere = document.getElementById('qbWhere');
+const qbOrder = document.getElementById('qbOrder');
+const qbSelect = document.getElementById('qbSelect');
+const qbTake = document.getElementById('qbTake');
+const qbCode = document.getElementById('qbCode');
+const resultList = document.getElementById('resultList');
+const resultCount = document.getElementById('resultCount');
+
+function buildQuery() {
+    let data = [...employees];
+    let codeLines = ['<span class="kw">var</span> result = employees'];
+
+    // Where
+    const whereVal = qbWhere.value;
+    if (whereVal !== 'none') {
+        if (whereVal === 'age30') {
+            data = data.filter(e => e.age > 30);
+            codeLines.push('    .Where(e =&gt; e.Age &gt; <span class="nm">30</span>)');
+        } else if (whereVal === 'salary10k') {
+            data = data.filter(e => e.salary > 10000);
+            codeLines.push('    .Where(e =&gt; e.Salary &gt; <span class="nm">10000</span>)');
+        } else if (whereVal === 'dev') {
+            data = data.filter(e => e.dept === 'تطوير');
+            codeLines.push('    .Where(e =&gt; e.Dept == <span class="st">"تطوير"</span>)');
+        } else if (whereVal === 'young') {
+            data = data.filter(e => e.age < 30);
+            codeLines.push('    .Where(e =&gt; e.Age &lt; <span class="nm">30</span>)');
+        }
+    }
+
+    // OrderBy
+    const orderVal = qbOrder.value;
+    if (orderVal !== 'none') {
+        if (orderVal === 'salaryDesc') {
+            data.sort((a, b) => b.salary - a.salary);
+            codeLines.push('    .OrderByDescending(e =&gt; e.Salary)');
+        } else if (orderVal === 'salaryAsc') {
+            data.sort((a, b) => a.salary - b.salary);
+            codeLines.push('    .OrderBy(e =&gt; e.Salary)');
+        } else if (orderVal === 'ageDesc') {
+            data.sort((a, b) => b.age - a.age);
+            codeLines.push('    .OrderByDescending(e =&gt; e.Age)');
+        } else if (orderVal === 'nameAsc') {
+            data.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+            codeLines.push('    .OrderBy(e =&gt; e.Name)');
+        }
+    }
+
+    // Select
+    const selectVal = qbSelect.value;
+    if (selectVal === 'nameSalary') {
+        codeLines.push('    .Select(e =&gt; <span class="kw">new</span> { e.Name, e.Salary })');
+    } else if (selectVal === 'nameOnly') {
+        codeLines.push('    .Select(e =&gt; e.Name)');
+    }
+
+    // Take
+    const takeVal = qbTake.value;
+    if (takeVal !== 'all') {
+        const n = parseInt(takeVal);
+        data = data.slice(0, n);
+        codeLines.push(`    .Take(<span class="nm">${n}</span>)`);
+    }
+
+    codeLines.push('    .ToList();');
+    qbCode.innerHTML = codeLines.join('\n');
+
+    // Render results
+    resultList.innerHTML = '';
+    resultCount.textContent = data.length + ' عنصر';
+
+    if (data.length === 0) {
+        resultList.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i>لا توجد نتائج مطابقة</div>';
+        return;
+    }
+
+    data.forEach(e => {
+        const item = document.createElement('div');
+        item.className = 'result-item';
+
+        if (selectVal === 'nameOnly') {
+            item.innerHTML = `
+                <div class="ri-avatar">${e.name.charAt(0)}</div>
+                <div class="ri-info"><b>${e.name}</b></div>
+            `;
+        } else if (selectVal === 'nameSalary') {
+            item.innerHTML = `
+                <div class="ri-avatar">${e.name.charAt(0)}</div>
+                <div class="ri-info">
+                    <b>${e.name}</b>
+                    <span>${e.salary.toLocaleString('en-US')} ر.س</span>
+                </div>
+            `;
+        } else {
+            item.innerHTML = `
+                <div class="ri-avatar">${e.name.charAt(0)}</div>
+                <div class="ri-info">
+                    <b>${e.name}</b>
+                    <span>${e.age} سنة · ${e.salary.toLocaleString('en-US')} ر.س</span>
+                </div>
+                <span class="ri-badge ${deptClass[e.dept]}">${e.dept}</span>
+            `;
+        }
+
+        resultList.appendChild(item);
+    });
+}
+
+[qbWhere, qbOrder, qbSelect, qbTake].forEach(el => {
+    el.addEventListener('change', buildQuery);
+});
+
+buildQuery();
+
+/* ========== Quiz logic ========== */
+const quiz = document.getElementById('quiz');
+const quizResult = document.getElementById('quizResult');
+const qItems = quiz.querySelectorAll('.q-item');
+let answered = 0, correctCount = 0;
+
+qItems.forEach(item => {
+    const correct = item.dataset.answer;
+    const opts = item.querySelectorAll('.q-opt');
+    opts.forEach(opt => {
+        opt.addEventListener('click', () => {
+            if (item.dataset.done) return;
+            item.dataset.done = '1';
+            answered++;
+
+            opts.forEach(o => o.classList.add('disabled'));
+
+            if (opt.dataset.opt === correct) {
+                opt.classList.add('correct');
+                correctCount++;
+            } else {
+                opt.classList.add('wrong');
+                opts.forEach(o => { if (o.dataset.opt === correct) o.classList.add('correct'); });
+            }
+
+            if (answered === qItems.length) {
+                quizResult.classList.add('show');
+                if (correctCount === qItems.length) {
+                    quizResult.classList.add('pass');
+                    quizResult.innerHTML = `<i class="fas fa-trophy"></i> ممتاز! أجبت على جميع الأسئلة بشكل صحيح (${correctCount}/${qItems.length}). أنت جاهز للدرس التالي.`;
+                } else if (correctCount >= 2) {
+                    quizResult.classList.add('pass');
+                    quizResult.innerHTML = `<i class="fas fa-thumbs-up"></i> جيد جداً! نتيجتك ${correctCount}/${qItems.length}. راجع النقاط التي أخطأت فيها ثم تابع.`;
+                } else {
+                    quizResult.classList.add('fail');
+                    quizResult.innerHTML = `<i class="fas fa-book-open"></i> نتيجتك ${correctCount}/${qItems.length}. ننصح بإعادة قراءة الأقسام 3 و5 قبل المتابعة.`;
+                }
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

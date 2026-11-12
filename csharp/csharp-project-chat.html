@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشروع تطبيق دردشة (Chat App) | CodeWay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0a2540;
+            --primary-light: #1a3a5c;
+            --accent: #635bff;
+            --accent-hover: #4f46e5;
+            --accent-soft: #eef2ff;
+            --text-dark: #0a2540;
+            --text-body: #425466;
+            --text-muted: #8898aa;
+            --bg: #ffffff;
+            --bg-soft: #f7f9fc;
+            --border: #e6ebf1;
+            --success: #0e9f6e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --code-bg: #0a1929;
+            --chat: #10b981;
+            --chat-soft: #d1fae5;
+            --shadow-sm: 0 1px 3px rgba(10,37,64,.06), 0 1px 2px rgba(10,37,64,.04);
+            --shadow-md: 0 4px 12px rgba(10,37,64,.08), 0 2px 4px rgba(10,37,64,.04);
+            --shadow-lg: 0 20px 40px rgba(10,37,64,.1), 0 8px 16px rgba(10,37,64,.06);
+            --shadow-accent: 0 8px 24px rgba(99,91,255,.25);
+            --radius: 14px;
+            --radius-lg: 22px;
+            --transition: all .3s cubic-bezier(.4,0,.2,1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-body);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--chat), var(--accent));
+            z-index: 3000;
+            width: 0%;
+            transition: width .1s linear;
+            box-shadow: 0 0 10px rgba(16,185,129,.5);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--primary);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            transition: var(--transition);
+        }
+        .header.scrolled { box-shadow: 0 10px 30px rgba(10,37,64,.25); }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--chat), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.15rem;
+            box-shadow: 0 8px 24px rgba(16,185,129,.3);
+        }
+        .brand-text {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: .5px;
+        }
+        .brand-text span { color: #6ee7b7; }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-nav a {
+            color: rgba(255,255,255,.75);
+            text-decoration: none;
+            font-size: .92rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .header-nav a:hover, .header-nav a.active {
+            color: #fff;
+            background: rgba(255,255,255,.08);
+        }
+        .header-nav a.active {
+            background: rgba(16,185,129,.25);
+            box-shadow: inset 0 0 0 1px rgba(16,185,129,.4);
+        }
+        .header-cta { display: flex; align-items: center; gap: 10px; }
+        .btn-outline-light {
+            padding: 9px 18px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,.2);
+            background: transparent;
+            color: #fff;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.4);
+        }
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.2);
+            color: #fff;
+            width: 40px; height: 40px;
+            border-radius: 9px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+        .hero {
+            background: linear-gradient(180deg, var(--bg-soft) 0%, #fff 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 56px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -120px; left: -120px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(16,185,129,.08), transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; right: -100px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(99,91,255,.06), transparent 70%);
+            border-radius: 50%;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb i { font-size: .65rem; }
+        .breadcrumb .current { color: var(--text-dark); font-weight: 600; }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: var(--chat-soft);
+            color: var(--chat);
+            border-radius: 100px;
+            font-size: .82rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            border: 1px solid rgba(16,185,129,.2);
+        }
+        .hero-badge i { font-size: .75rem; }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.25;
+            margin-bottom: 16px;
+            letter-spacing: -.5px;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--chat), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-body);
+            max-width: 680px;
+            margin-bottom: 28px;
+            line-height: 1.85;
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            align-items: center;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .92rem;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .meta-item i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--chat-soft);
+            color: var(--chat);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+        }
+        .hero-side {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 220px;
+        }
+        .btn-primary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: var(--shadow-accent);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(99,91,255,.35);
+        }
+        .btn-secondary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+        }
+        .btn-secondary:hover {
+            border-color: var(--chat);
+            color: var(--chat);
+            background: var(--chat-soft);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 48px;
+            padding: 48px 0 80px;
+            align-items: start;
+        }
+        .sidebar {
+            position: sticky;
+            top: 96px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-left: 4px;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .toc-title {
+            font-size: .78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toc-list { list-style: none; border-right: 2px solid var(--border); }
+        .toc-list li a {
+            display: block;
+            padding: 9px 16px;
+            color: var(--text-body);
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 500;
+            border-right: 2px solid transparent;
+            margin-right: -2px;
+            transition: var(--transition);
+            border-radius: 0 8px 8px 0;
+        }
+        .toc-list li a:hover { color: var(--accent); background: var(--accent-soft); }
+        .toc-list li a.active {
+            color: var(--accent);
+            border-right-color: var(--accent);
+            background: var(--accent-soft);
+            font-weight: 700;
+        }
+
+        .content { min-width: 0; }
+        .content-section { margin-bottom: 56px; scroll-margin-top: 100px; }
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        .section-num {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--chat), var(--accent));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(16,185,129,.25);
+        }
+        .section-heading h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -.3px;
+        }
+        .content p {
+            font-size: 1.02rem;
+            margin-bottom: 18px;
+            color: var(--text-body);
+            line-height: 1.9;
+        }
+        .content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 32px 0 14px;
+        }
+        .content h4 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 24px 0 10px;
+        }
+        .content ul, .content ol {
+            margin: 0 0 20px 0;
+            padding-right: 22px;
+        }
+        .content li {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.85;
+        }
+        .content ul li::marker { color: var(--accent); }
+
+        .inline-code {
+            font-family: 'Fira Code', monospace;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: .88em;
+            font-weight: 500;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .callout {
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+            border: 1px solid;
+        }
+        .callout-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .callout-body h4 { margin: 0 0 6px !important; font-size: 1rem; }
+        .callout-body p { margin: 0 !important; font-size: .95rem !important; line-height: 1.75 !important; }
+        .callout.info { background: #eff6ff; border-color: #bfdbfe; }
+        .callout.info .callout-icon { background: #dbeafe; color: #2563eb; }
+        .callout.info h4 { color: #1e40af; }
+        .callout.warning { background: #fffbeb; border-color: #fde68a; }
+        .callout.warning .callout-icon { background: #fef3c7; color: #d97706; }
+        .callout.warning h4 { color: #92400e; }
+        .callout.success { background: #ecfdf5; border-color: #a7f3d0; }
+        .callout.success .callout-icon { background: #d1fae5; color: var(--success); }
+        .callout.success h4 { color: #065f46; }
+        .callout.danger { background: #fef2f2; border-color: #fecaca; }
+        .callout.danger .callout-icon { background: #fee2e2; color: var(--danger); }
+        .callout.danger h4 { color: #991b1b; }
+        .callout.chat { background: #f0fdf4; border-color: #bbf7d0; }
+        .callout.chat .callout-icon { background: #d1fae5; color: var(--chat); }
+        .callout.chat h4 { color: #065f46; }
+
+        .code-wrapper {
+            background: var(--code-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 22px 0;
+            border: 1px solid #1e3a5f;
+            box-shadow: var(--shadow-md);
+            direction: ltr;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 18px;
+            background: #0d2137;
+            border-bottom: 1px solid #1e3a5f;
+        }
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #93c5fd;
+            font-size: .8rem;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 11px; height: 11px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+        .code-copy {
+            background: rgba(255,255,255,.08);
+            border: none;
+            color: #cbd5e1;
+            font-size: .75rem;
+            padding: 5px 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .code-copy:hover { background: rgba(16,185,129,.3); color: #fff; }
+        .code-copy.copied { background: rgba(16,185,129,.3); color: #6ee7b7; }
+        .code-body { padding: 20px 22px; overflow-x: auto; }
+        .code-body pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: .875rem;
+            line-height: 1.75;
+            color: #e2e8f0;
+            white-space: pre;
+        }
+        .code-body::-webkit-scrollbar { height: 8px; }
+        .code-body::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+
+        .kw { color: #c792ea; }
+        .type { color: #82aaff; }
+        .str { color: #c3e88d; }
+        .num { color: #f78c6c; }
+        .cmt { color: #6a8299; font-style: italic; }
+        .fn { color: #ffcb6b; }
+        .prop { color: #89ddff; }
+        .op { color: #89ddff; }
+        .punc { color: #8fa5b8; }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 22px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .92rem;
+            min-width: 560px;
+        }
+        thead { background: var(--primary); }
+        thead th {
+            color: #fff;
+            padding: 14px 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: .88rem;
+        }
+        tbody td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-body);
+            line-height: 1.7;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:nth-child(even) { background: var(--bg-soft); }
+        tbody tr:hover { background: var(--accent-soft); }
+        tbody td strong { color: var(--text-dark); }
+        .badge-cell {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+        .badge-cell.green { background: #d1fae5; color: #065f46; }
+        .badge-cell.amber { background: #fef3c7; color: #92400e; }
+        .badge-cell.red { background: #fee2e2; color: #991b1b; }
+        .badge-cell.blue { background: #dbeafe; color: #1e40af; }
+
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+            margin: 22px 0;
+        }
+        .steps li {
+            counter-increment: step;
+            position: relative;
+            padding-right: 52px;
+            padding-bottom: 22px;
+            margin: 0 !important;
+        }
+        .steps li:last-child { padding-bottom: 0; }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            right: 0; top: 0;
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--chat-soft);
+            color: var(--chat);
+            border: 1.5px solid rgba(16,185,129,.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .9rem;
+        }
+        .steps li::after {
+            content: '';
+            position: absolute;
+            right: 16px; top: 38px;
+            width: 2px;
+            height: calc(100% - 30px);
+            background: var(--border);
+        }
+        .steps li:last-child::after { display: none; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            border-color: var(--chat);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .feature-card i {
+            width: 42px; height: 42px;
+            border-radius: 11px;
+            background: var(--chat-soft);
+            color: var(--chat);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+        }
+        .feature-card h4 { margin: 0 0 8px !important; font-size: 1rem; }
+        .feature-card p { margin: 0 !important; font-size: .88rem !important; color: var(--text-muted) !important; line-height: 1.7 !important; }
+
+        .note-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 28px 30px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .note-card::after {
+            content: '\f086';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: -10px; bottom: -30px;
+            font-size: 120px;
+            opacity: .04;
+            color: #fff;
+        }
+        .note-card h4 {
+            color: #6ee7b7 !important;
+            margin: 0 0 10px !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem !important;
+        }
+        .note-card p {
+            color: rgba(255,255,255,.85) !important;
+            margin: 0 !important;
+            font-size: .95rem !important;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ Chat Demo ============ */
+        .chat-demo {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            margin: 28px 0;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 480px;
+        }
+        .chat-sidebar {
+            background: var(--primary);
+            color: #fff;
+            padding: 18px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .chat-sidebar-title {
+            font-size: .78rem;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.5);
+            padding: 0 8px;
+            margin-bottom: 10px;
+        }
+        .chat-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+        .chat-user:hover {
+            background: rgba(255,255,255,.06);
+        }
+        .chat-user.active {
+            background: rgba(16,185,129,.18);
+            border-color: rgba(16,185,129,.35);
+        }
+        .chat-avatar {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .82rem;
+            color: #fff;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .chat-avatar.online::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            border: 2px solid var(--primary);
+        }
+        .chat-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .chat-user-name {
+            font-size: .88rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chat-user-status {
+            font-size: .72rem;
+            color: rgba(255,255,255,.55);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chat-main {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-soft);
+            min-width: 0;
+        }
+        .chat-header {
+            padding: 14px 20px;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chat-header-avatar {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #fff;
+            font-size: .88rem;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .chat-header-avatar.online::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 11px; height: 11px;
+            border-radius: 50%;
+            background: #22c55e;
+            border: 2px solid #fff;
+        }
+        .chat-header-info { flex: 1; min-width: 0; }
+        .chat-header-name {
+            font-size: .95rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+        .chat-header-status {
+            font-size: .75rem;
+            color: var(--chat);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .chat-header-status::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--chat);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .4; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 320px;
+        }
+        .chat-messages::-webkit-scrollbar { width: 6px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .msg {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: .9rem;
+            line-height: 1.6;
+            animation: msgIn .3s ease;
+            word-wrap: break-word;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .msg.them {
+            align-self: flex-start;
+            background: #fff;
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            border-top-right-radius: 4px;
+        }
+        .msg.me {
+            align-self: flex-end;
+            background: var(--chat);
+            color: #fff;
+            border-top-left-radius: 4px;
+        }
+        .msg-time {
+            font-size: .68rem;
+            opacity: .65;
+            margin-top: 4px;
+            display: block;
+        }
+        .msg.them .msg-time { color: var(--text-muted); }
+
+        .chat-typing {
+            align-self: flex-start;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            border-top-right-radius: 4px;
+            padding: 12px 16px;
+            display: none;
+            gap: 4px;
+        }
+        .chat-typing.show { display: flex; }
+        .chat-typing span {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            animation: typing 1.4s infinite;
+        }
+        .chat-typing span:nth-child(2) { animation-delay: .2s; }
+        .chat-typing span:nth-child(3) { animation-delay: .4s; }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: .4; }
+            30% { transform: translateY(-4px); opacity: 1; }
+        }
+
+        .chat-input-row {
+            padding: 14px 20px;
+            background: #fff;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input-row input {
+            flex: 1;
+            padding: 11px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 11px;
+            font-family: inherit;
+            font-size: .9rem;
+            color: var(--text-dark);
+            background: var(--bg-soft);
+            transition: var(--transition);
+            min-width: 0;
+        }
+        .chat-input-row input:focus {
+            outline: none;
+            border-color: var(--chat);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(16,185,129,.1);
+        }
+        .chat-send {
+            width: 44px; height: 44px;
+            border-radius: 11px;
+            border: none;
+            background: var(--chat);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(16,185,129,.3);
+        }
+        .chat-send:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16,185,129,.4);
+        }
+
+        .interactive-box {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .interactive-box::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--chat), var(--accent));
+        }
+        .interactive-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .interactive-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--chat-soft);
+            color: var(--chat);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .interactive-hint {
+            font-size: .9rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+        .task-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+        .task-box p { margin-bottom: 12px; font-size: .95rem; }
+        .task-options { display: grid; gap: 10px; }
+        .task-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            font-size: .93rem;
+            text-align: right;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .task-option:hover { border-color: var(--chat); background: var(--chat-soft); }
+        .task-option.correct { border-color: var(--success); background: #ecfdf5; color: #065f46; }
+        .task-option.correct .opt-marker { background: var(--success); color: #fff; border-color: var(--success); }
+        .task-option.wrong { border-color: var(--danger); background: #fef2f2; color: #991b1b; }
+        .task-option.wrong .opt-marker { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .opt-marker {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .task-feedback {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: .9rem;
+            font-weight: 600;
+            display: none;
+        }
+        .task-feedback.show { display: block; animation: fadeInUp .3s ease; }
+        .task-feedback.ok { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .task-feedback.no { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lesson-nav {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 56px;
+            padding-top: 36px;
+            border-top: 1px solid var(--border);
+        }
+        .lesson-nav a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 22px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: var(--transition);
+            background: #fff;
+        }
+        .lesson-nav a:hover {
+            border-color: var(--chat);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .lesson-nav a.next { justify-content: flex-end; text-align: left; }
+        .lesson-nav .nav-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: var(--chat-soft);
+            color: var(--chat);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: .9rem;
+        }
+        .lesson-nav .nav-label {
+            font-size: .75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .lesson-nav .nav-title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .footer {
+            background: var(--primary);
+            color: rgba(255,255,255,.7);
+            padding: 48px 0 28px;
+            margin-top: 40px;
+        }
+        .footer-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .footer-bottom {
+            padding-top: 28px;
+            border-top: 1px solid rgba(255,255,255,.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: .85rem;
+        }
+        .footer-bottom a { color: #6ee7b7; text-decoration: none; }
+        .footer-bottom a:hover { text-decoration: underline; }
+
+        .back-top {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(16px);
+            transition: var(--transition);
+            z-index: 900;
+        }
+        .back-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-top:hover { background: var(--chat); }
+
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; gap: 0; }
+            .sidebar {
+                position: static;
+                max-height: none;
+                margin-bottom: 32px;
+                padding: 20px;
+                background: var(--bg-soft);
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+            }
+            .toc-list { border-right: none; display: flex; flex-wrap: wrap; gap: 6px; }
+            .toc-list li a {
+                border-right: none;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                margin-right: 0;
+                padding: 7px 13px;
+                font-size: .85rem;
+                background: #fff;
+            }
+            .toc-list li a.active { border-color: var(--chat); }
+        }
+        @media (max-width: 768px) {
+            .header-nav, .header-cta .btn-outline-light { display: none; }
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .hero h1 { font-size: 1.9rem; }
+            .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+            .hero-side { flex-direction: row; flex-wrap: wrap; }
+            .hero-side .btn-primary, .hero-side .btn-secondary { flex: 1; min-width: 150px; }
+            .section-heading h2 { font-size: 1.35rem; }
+            .lesson-nav { grid-template-columns: 1fr; }
+            .content-section { margin-bottom: 40px; }
+            .container { padding: 0 18px; }
+            .header-inner { padding: 0 18px; }
+            .chat-demo { grid-template-columns: 1fr; }
+            .chat-sidebar {
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 12px;
+            }
+            .chat-sidebar-title { display: none; }
+            .chat-user { flex-shrink: 0; }
+            .chat-user-info { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="header" id="header">
+    <div class="header-inner">
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fas fa-code"></i></div>
+            <div class="brand-text">Code<span>Way</span></div>
+        </a>
+        <nav class="header-nav">
+            <a href="#">الرئيسية</a>
+            <a href="#">المسارات</a>
+            <a href="#" class="active">C#</a>
+            <a href="#">المدونة</a>
+            <a href="#">تواصل</a>
+        </nav>
+        <div class="header-cta">
+            <button class="btn-outline-light" onclick="alert('تم حفظ الدرس في قائمتك ✔')">
+                <i class="far fa-bookmark"></i> حفظ
+            </button>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">الرئيسية</a>
+            <i class="fas fa-chevron-left"></i>
+            <a href="#">مشاريع عملية</a>
+            <i class="fas fa-chevron-left"></i>
+            <span class="current">تطبيق دردشة</span>
+        </div>
+        <div class="hero-grid">
+            <div>
+                <span class="hero-badge">
+                    <i class="fas fa-comments"></i> الدرس السادس · مشروع عملي
+                </span>
+                <h1>بناء تطبيق <span class="highlight">دردشة في الوقت الفعلي</span> بـ C#</h1>
+                <p class="hero-desc">
+                    مشروع متقدم لبناء تطبيق دردشة حقيقي باستخدام TCP Sockets و Tasks.
+                    ستتعلم الاتصال بين العميل والخادم، بث الرسائل، إدارة الجلسات،
+                    والتعامل مع الانقطاعات — مع تطبيق دردشة حي تجربه الآن في متصفحك.
+                </p>
+                <div class="hero-meta">
+                    <span class="meta-item"><i class="far fa-clock"></i> 7 ساعات</span>
+                    <span class="meta-item"><i class="fas fa-signal"></i> متقدم</span>
+                    <span class="meta-item"><i class="fas fa-network-wired"></i> Sockets</span>
+                    <span class="meta-item"><i class="fas fa-rocket"></i> تطبيق حي</span>
+                </div>
+            </div>
+            <div class="hero-side">
+                <button class="btn-primary" onclick="document.getElementById('chat-demo').scrollIntoView()">
+                    <i class="fas fa-play"></i> جرّب الدردشة
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('sec-1').scrollIntoView()">
+                    <i class="fas fa-book-open"></i> ابدأ الشرح
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="main-layout">
+
+        <aside class="sidebar">
+            <div class="toc-title"><i class="fas fa-list-ul"></i> محتويات الدرس</div>
+            <ul class="toc-list" id="tocList">
+                <li><a href="#chat-demo" class="active">💬 جرّب الدردشة الحية</a></li>
+                <li><a href="#sec-1">1. نظرة عامة على المشروع</a></li>
+                <li><a href="#sec-2">2. كيف تعمل Sockets؟</a></li>
+                <li><a href="#sec-3">3. بروتوكول الرسائل</a></li>
+                <li><a href="#sec-4">4. الخادم (Server)</a></li>
+                <li><a href="#sec-5">5. العميل (Client)</a></li>
+                <li><a href="#sec-6">6. إدارة الجلسات</a></li>
+                <li><a href="#sec-7">7. معالجة الانقطاعات</a></li>
+                <li><a href="#sec-8">8. أفضل الممارسات</a></li>
+                <li><a href="#sec-9">9. تمارين تفاعلية</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+
+            <!-- ====== الدردشة الحية ====== -->
+            <section class="content-section" id="chat-demo">
+                <div class="section-heading">
+                    <div class="section-num"><i class="fas fa-rocket"></i></div>
+                    <h2>جرّب الدردشة الحية</h2>
+                </div>
+                <p>
+                    هذا تطبيق الدردشة الذي ستبنيه — يعمل بالكامل في متصفحك. اختر مستخدماً من القائمة
+                    الجانبية وابدأ محادثة. الردود تأتي تلقائياً لتحاكي اتصال Socket حقيقي.
+                </p>
+
+                <div class="chat-demo">
+                    <div class="chat-sidebar" id="chatSidebar">
+                        <div class="chat-sidebar-title">المحادثات</div>
+                        <!-- سيتم التعبئة عبر JS -->
+                    </div>
+
+                    <div class="chat-main">
+                        <div class="chat-header" id="chatHeader">
+                            <!-- سيتم التعبئة عبر JS -->
+                        </div>
+
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- سيتم التعبئة عبر JS -->
+                        </div>
+
+                        <div class="chat-input-row">
+                            <input type="text" id="chatInput" placeholder="اكتب رسالة..." maxlength="300">
+                            <button class="chat-send" id="chatSend" aria-label="إرسال">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout chat">
+                    <div class="callout-icon"><i class="fas fa-info-circle"></i></div>
+                    <div class="callout-body">
+                        <h4>ملاحظة</h4>
+                        <p>
+                            هذا عرض توضيحي يحاكي سلوك تطبيق Socket حقيقي. في الدرس سنبني الخادم والعميل
+                            بـ <span class="inline-code">TcpListener</span> و <span class="inline-code">TcpClient</span>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 1 ====== -->
+            <section class="content-section" id="sec-1">
+                <div class="section-heading">
+                    <div class="section-num">1</div>
+                    <h2>نظرة عامة على المشروع</h2>
+                </div>
+                <p>
+                    تطبيق الدردشة هو مشروع مثالي لتعلم <strong>الاتصال الشبكي في الوقت الفعلي</strong>.
+                    يجمع بين Sockets، Tasks، إدارة الحالة، ومعالجة الأخطاء المعقدة.
+                </p>
+
+                <h3>ما ستتعلمه</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-network-wired"></i>
+                        <h4>TCP Sockets</h4>
+                        <p>إنشاء اتصال مباشر بين العميل والخادم عبر TCP.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-tasks"></i>
+                        <h4>Tasks غير متزامنة</h4>
+                        <p>استقبال وإرسال الرسائل بالتوازي دون حجب.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-users"></i>
+                        <h4>إدارة الجلسات</h4>
+                        <p>تتبع المستخدمين المتصلين وبث الرسائل لهم.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-plug-circle-xmark"></i>
+                        <h4>معالجة الانقطاع</h4>
+                        <p>التعامل مع فقدان الاتصال وإعادة الاتصال.</p>
+                    </div>
+                </div>
+
+                <h3>المتطلبات الوظيفية</h3>
+                <ul>
+                    <li>خادم يستمع على منفذ محدد ويقبل اتصالات متعددة.</li>
+                    <li>عميل يتصل بالخادم ويرسل ويستقبل الرسائل.</li>
+                    <li>بث رسالة مستخدم لجميع المستخدمين الآخرين.</li>
+                    <li>إظهار إشعارات دخول/خروج المستخدمين.</li>
+                    <li>معالجة انقطاع الاتصال دون تعطل الخادم.</li>
+                </ul>
+
+                <div class="callout success">
+                    <div class="callout-icon"><i class="fas fa-check"></i></div>
+                    <div class="callout-body">
+                        <h4>لماذا هذا المشروع؟</h4>
+                        <p>
+                            لأنه يغطي العمق التقني الحقيقي: <strong>الاتصال الشبكي المتزامن</strong>.
+                            هذه المهارة أساسية لأي تطبيق حديث — من الألعاب إلى منصات التعاون.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 2 ====== -->
+            <section class="content-section" id="sec-2">
+                <div class="section-heading">
+                    <div class="section-num">2</div>
+                    <h2>كيف تعمل Sockets؟</h2>
+                </div>
+                <p>
+                    <strong>Socket</strong> هو نقطة نهاية للاتصال الشبكي. تخيله كهاتف: لكل طرف
+                    رقم (IP) ومنفذ (Port)، وبمجرد الاتصال يمكنكما تبادل الرسائل.
+                </p>
+
+                <h3>دورة حياة الاتصال</h3>
+                <ol class="steps">
+                    <li><strong>الخادم يستمع:</strong> ينشئ <span class="inline-code">TcpListener</span> ويربطه بمنفذ (مثل 5000).</li>
+                    <li><strong>العميل يتصل:</strong> ينشئ <span class="inline-code">TcpClient</span> ويتصل بـ IP الخادم والمنفذ.</li>
+                    <li><strong>الخادم يقبل:</strong> عند وصول طلب، يُنشئ Socket جديد لكل عميل.</li>
+                    <li><strong>تبادل البيانات:</strong> يُرسل ويستقبل عبر <span class="inline-code">NetworkStream</span>.</li>
+                    <li><strong>الإغلاق:</strong> عند الانتهاء، يُغلق الاتصال من الطرفين.</li>
+                </ol>
+
+                <h3>TCP مقابل UDP</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الخاصية</th>
+                                <th>TCP</th>
+                                <th>UDP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>الموثوقية</strong></td>
+                                <td><span class="badge-cell green">مضمونة</span></td>
+                                <td><span class="badge-cell amber">غير مضمونة</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>الترتيب</strong></td>
+                                <td><span class="badge-cell green">مضمون</span></td>
+                                <td><span class="badge-cell red">غير مضمون</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>السرعة</strong></td>
+                                <td><span class="badge-cell amber">أبطأ قليلاً</span></td>
+                                <td><span class="badge-cell green">أسرع</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>الاستخدام</strong></td>
+                                <td>دردشة، بريد، ويب</td>
+                                <td>ألعاب، بث فيديو</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout info">
+                    <div class="callout-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="callout-body">
+                        <h4>لماذا TCP للدردشة؟</h4>
+                        <p>
+                            لأننا نحتاج ضمان وصول الرسائل بالترتيب الصحيح. لا نريد أن تظهر رسالة
+                            "كيف حالك؟" قبل "مرحباً!".
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 3 ====== -->
+            <section class="content-section" id="sec-3">
+                <div class="section-heading">
+                    <div class="section-num">3</div>
+                    <h2>بروتوكول الرسائل</h2>
+                </div>
+                <p>
+                    TCP مجرد مجرى بايتات — لا يعرف أين تنتهي رسالة وتبدأ أخرى. نحتاج بروتوكولاً
+                    لتمييز حدود الرسائل. نستخدم <strong>رسائل محددة الطول</strong>: كل رسالة تبدأ بـ 4 بايتات
+                    تحدد طولها.
+                </p>
+
+                <h3>لماذا نحتاج طول الرسالة؟</h3>
+                <p>
+                    تخيل أن الخادم يستقبل: <span class="inline-code">"مرحباً كيف حالك"</span>.
+                    هل "مرحباً" رسالة و"كيف حالك" رسالة أخرى؟ أو كلاهما رسالة واحدة؟ بدون
+                    طول محدد، لا يمكننا التمييز.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Protocol/PacketHelper.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> System.Buffers.Binary;
+
+<span class="kw">namespace</span> ChatApp.Protocol;
+
+<span class="kw">public static class</span> <span class="type">PacketHelper</span>
+{
+    <span class="kw">public static async</span> <span class="type">Task</span> <span class="fn">SendAsync</span>(
+        <span class="type">Stream</span> stream,
+        <span class="kw">string</span> message,
+        <span class="type">CancellationToken</span> ct = <span class="kw">default</span>)
+    {
+        <span class="kw">var</span> body = <span class="type">System.Text.Encoding</span>.<span class="prop">UTF8</span>.<span class="fn">GetBytes</span>(message);
+        <span class="kw">var</span> header = <span class="kw">new byte</span>[<span class="num">4</span>];
+
+        <span class="cmt">// كتابة الطول كـ int32 بالترتيب الكبير</span>
+        <span class="type">BinaryPrimitives</span>.<span class="fn">WriteInt32BigEndian</span>(header, body.Length);
+
+        <span class="kw">await</span> stream.<span class="fn">WriteAsync</span>(header, ct);
+        <span class="kw">await</span> stream.<span class="fn">WriteAsync</span>(body, ct);
+        <span class="kw">await</span> stream.<span class="fn">FlushAsync</span>(ct);
+    }
+
+    <span class="kw">public static async</span> <span class="type">Task</span>&lt;<span class="kw">string</span>?&gt; <span class="fn">ReceiveAsync</span>(
+        <span class="type">Stream</span> stream,
+        <span class="type">CancellationToken</span> ct = <span class="kw">default</span>)
+    {
+        <span class="kw">var</span> header = <span class="kw">new byte</span>[<span class="num">4</span>];
+        <span class="kw">var</span> read = <span class="kw">await</span> stream.<span class="fn">ReadAsync</span>(header, ct);
+
+        <span class="kw">if</span> (read == <span class="num">0</span>) <span class="kw">return null</span>; <span class="cmt">// الاتصال أُغلق</span>
+
+        <span class="kw">var</span> length = <span class="type">BinaryPrimitives</span>.<span class="fn">ReadInt32BigEndian</span>(header);
+
+        <span class="kw">if</span> (length &lt;= <span class="num">0</span> || length &gt; <span class="num">1_000_000</span>)
+            <span class="kw">throw new</span> <span class="type">InvalidDataException</span>(<span class="str">"طول غير صالح"</span>);
+
+        <span class="kw">var</span> body = <span class="kw">new byte</span>[length];
+        <span class="kw">var</span> totalRead = <span class="num">0</span>;
+
+        <span class="kw">while</span> (totalRead &lt; length)
+        {
+            <span class="kw">var</span> n = <span class="kw">await</span> stream.<span class="fn">ReadAsync</span>(
+                body.<span class="fn">AsMemory</span>(totalRead), ct);
+
+            <span class="kw">if</span> (n == <span class="num">0</span>) <span class="kw">throw new</span> <span class="type">EndOfStreamException</span>();
+            totalRead += n;
+        }
+
+        <span class="kw">return</span> <span class="type">System.Text.Encoding</span>.<span class="prop">UTF8</span>.<span class="fn">GetString</span>(body);
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="callout-body">
+                        <h4>تحقق من الطول دائماً</h4>
+                        <p>
+                            لو أرسل عميل خبيث طولاً ضخماً (مثل 2GB)، فسيمتلئ ذاكرة الخادم.
+                            دائماً ضع حداً أقصى (مثلاً 1MB).
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 4 ====== -->
+            <section class="content-section" id="sec-4">
+                <div class="section-heading">
+                    <div class="section-num">4</div>
+                    <h2>الخادم (Server)</h2>
+                </div>
+                <p>
+                    الخادم يستمع للاتصالات، يقبل كل عميل في Task منفصل، ويبث الرسائل للجميع.
+                    نستخدم <span class="inline-code">ConcurrentDictionary</span> لتتبع العملاء بأمان.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Server/ChatServer.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> System.Collections.Concurrent;
+<span class="kw">using</span> System.Net;
+<span class="kw">using</span> System.Net.Sockets;
+<span class="kw">using</span> ChatApp.Protocol;
+
+<span class="kw">namespace</span> ChatApp.Server;
+
+<span class="kw">public class</span> <span class="type">ChatServer</span>
+{
+    <span class="kw">private readonly</span> <span class="type">TcpListener</span> _listener;
+    <span class="kw">private readonly</span> <span class="type">ConcurrentDictionary</span>&lt;<span class="type">Guid</span>, <span class="type">ClientConnection</span>&gt; _clients = <span class="kw">new</span>();
+    <span class="kw">private readonly</span> <span class="type">ILogger</span>&lt;<span class="type">ChatServer</span>&gt; _logger;
+
+    <span class="kw">public</span> <span class="fn">ChatServer</span>(<span class="type">ILogger</span>&lt;<span class="type">ChatServer</span>&gt; logger)
+    {
+        _logger = logger;
+        _listener = <span class="kw">new</span> <span class="type">TcpListener</span>(<span class="type">IPAddress</span>.<span class="prop">Any</span>, <span class="num">5000</span>);
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">StartAsync</span>(<span class="type">CancellationToken</span> ct)
+    {
+        _listener.<span class="fn">Start</span>();
+        _logger.<span class="fn">LogInformation</span>(<span class="str">"الخادم يعمل على المنفذ 5000"</span>);
+
+        <span class="kw">try</span>
+        {
+            <span class="kw">while</span> (!ct.IsCancellationRequested)
+            {
+                <span class="kw">var</span> tcpClient = <span class="kw">await</span> _listener.<span class="fn">AcceptTcpClientAsync</span>(ct);
+                _ = <span class="fn">HandleClientAsync</span>(tcpClient, ct);
+            }
+        }
+        <span class="kw">catch</span> (<span class="type">OperationCanceledException</span>) { }
+        <span class="kw">finally</span> { _listener.<span class="fn">Stop</span>(); }
+    }
+
+    <span class="kw">private async</span> <span class="type">Task</span> <span class="fn">HandleClientAsync</span>(<span class="type">TcpClient</span> tcpClient, <span class="type">CancellationToken</span> ct)
+    {
+        <span class="kw">var</span> id = <span class="type">Guid</span>.<span class="fn">NewGuid</span>();
+        <span class="kw">var</span> connection = <span class="kw">new</span> <span class="type">ClientConnection</span>(id, tcpClient);
+
+        _clients[id] = connection;
+        _logger.<span class="fn">LogInformation</span>(<span class="str">$"عميل جديد: {id}"</span>);
+
+        <span class="kw">try</span>
+        {
+            <span class="kw">var</span> stream = tcpClient.<span class="prop">GetStream</span>();
+
+            <span class="cmt">// استقبال اسم المستخدم أولاً</span>
+            <span class="kw">var</span> username = <span class="kw">await</span> <span class="type">PacketHelper</span>.<span class="fn">ReceiveAsync</span>(stream, ct);
+            <span class="kw">if</span> (<span class="kw">string</span>.<span class="fn">IsNullOrWhiteSpace</span>(username))
+            {
+                tcpClient.<span class="fn">Close</span>();
+                <span class="kw">return</span>;
+            }
+
+            connection.<span class="prop">Username</span> = username;
+            <span class="kw">await</span> <span class="fn">BroadcastAsync</span>(
+                <span class="str">$"🟢 {username} انضم إلى الدردشة"</span>, excludeId: id);
+
+            <span class="kw">while</span> (!ct.IsCancellationRequested)
+            {
+                <span class="kw">var</span> message = <span class="kw">await</span> <span class="type">PacketHelper</span>.<span class="fn">ReceiveAsync</span>(stream, ct);
+                <span class="kw">if</span> (message <span class="kw">is null</span>) <span class="kw">break</span>;
+
+                _logger.<span class="fn">LogInformation</span>(<span class="str">$"[{username}] {message}"</span>);
+                <span class="kw">await</span> <span class="fn">BroadcastAsync</span>(<span class="str">$"{username}: {message}"</span>, excludeId: id);
+            }
+        }
+        <span class="kw">catch</span> (<span class="type">Exception</span> ex)
+        {
+            _logger.<span class="fn">LogWarning</span>(ex, <span class="str">$"خطأ مع العميل {id}"</span>);
+        }
+        <span class="kw">finally</span>
+        {
+            _clients.<span class="fn">TryRemove</span>(id, <span class="kw">out</span> _);
+            tcpClient.<span class="fn">Close</span>();
+
+            <span class="kw">if</span> (!<span class="kw">string</span>.<span class="fn">IsNullOrEmpty</span>(connection.<span class="prop">Username</span>))
+            {
+                <span class="kw">await</span> <span class="fn">BroadcastAsync</span>(
+                    <span class="str">$"🔴 {connection.Username} غادر الدردشة"</span>, excludeId: id);
+            }
+        }
+    }
+
+    <span class="kw">private async</span> <span class="type">Task</span> <span class="fn">BroadcastAsync</span>(<span class="kw">string</span> message, <span class="type">Guid</span> excludeId)
+    {
+        <span class="kw">foreach</span> (<span class="kw">var</span> client <span class="kw">in</span> _clients.<span class="prop">Values</span>)
+        {
+            <span class="kw">if</span> (client.<span class="prop">Id</span> == excludeId) <span class="kw">continue</span>;
+
+            <span class="kw">try</span>
+            {
+                <span class="kw">await</span> client.<span class="fn">SendAsync</span>(message);
+            }
+            <span class="kw">catch</span>
+            {
+                _clients.<span class="fn">TryRemove</span>(client.<span class="prop">Id</span>, <span class="kw">out</span> _);
+            }
+        }
+    }
+}
+
+<span class="kw">public class</span> <span class="type">ClientConnection</span>
+{
+    <span class="kw">public</span> <span class="type">Guid</span> Id { <span class="kw">get</span>; }
+    <span class="kw">public string</span> Username { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+    <span class="kw">private readonly</span> <span class="type">TcpClient</span> _tcp;
+    <span class="kw">private readonly</span> <span class="type">SemaphoreSlim</span> _sendLock = <span class="kw">new</span>(<span class="num">1</span>);
+
+    <span class="kw">public</span> <span class="fn">ClientConnection</span>(<span class="type">Guid</span> id, <span class="type">TcpClient</span> tcp)
+    {
+        Id = id;
+        _tcp = tcp;
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">SendAsync</span>(<span class="kw">string</span> message)
+    {
+        <span class="kw">await</span> _sendLock.<span class="fn">WaitAsync</span>();
+        <span class="kw">try</span>
+        {
+            <span class="kw">await</span> <span class="type">PacketHelper</span>.<span class="fn">SendAsync</span>(_tcp.<span class="fn">GetStream</span>(), message);
+        }
+        <span class="kw">finally</span> { _sendLock.<span class="fn">Release</span>(); }
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout info">
+                    <div class="callout-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="callout-body">
+                        <h4>لماذا SemaphoreSlim في الإرسال؟</h4>
+                        <p>
+                            لأن الكتابة على نفس Stream من Tasks متعددة قد تسبب تشابك البيانات.
+                            الـ Semaphore يضمن أن رسالة واحدة تُكتب في كل مرة.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 5 ====== -->
+            <section class="content-section" id="sec-5">
+                <div class="section-heading">
+                    <div class="section-num">5</div>
+                    <h2>العميل (Client)</h2>
+                </div>
+                <p>
+                    العميل يتصل بالخادم، يرسل رسائل، ويستقبل رسائل في Task منفصل. هذا يسمح
+                    للمستخدم بالكتابة أثناء استقبال الرسائل في نفس الوقت.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Client/ChatClient.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> System.Net.Sockets;
+<span class="kw">using</span> ChatApp.Protocol;
+
+<span class="kw">namespace</span> ChatApp.Client;
+
+<span class="kw">public class</span> <span class="type">ChatClient</span> : <span class="type">IAsyncDisposable</span>
+{
+    <span class="kw">private</span> <span class="type">TcpClient</span>? _tcp;
+    <span class="kw">private</span> <span class="type">NetworkStream</span>? _stream;
+    <span class="kw">private</span> <span class="type">CancellationTokenSource</span>? _cts;
+
+    <span class="kw">public event</span> <span class="type">Action</span>&lt;<span class="kw">string</span>&gt;? MessageReceived;
+    <span class="kw">public event</span> <span class="type">Action</span>? Disconnected;
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">ConnectAsync</span>(
+        <span class="kw">string</span> host, <span class="kw">int</span> port, <span class="kw">string</span> username)
+    {
+        _tcp = <span class="kw">new</span> <span class="type">TcpClient</span>();
+        <span class="kw">await</span> _tcp.<span class="fn">ConnectAsync</span>(host, port);
+
+        _stream = _tcp.<span class="fn">GetStream</span>();
+        _cts = <span class="kw">new</span> <span class="type">CancellationTokenSource</span>();
+
+        <span class="cmt">// إرسال اسم المستخدم</span>
+        <span class="kw">await</span> <span class="type">PacketHelper</span>.<span class="fn">SendAsync</span>(_stream, username, _cts.Token);
+
+        <span class="cmt">// بدء الاستقبال في الخلفية</span>
+        _ = <span class="fn">ReceiveLoopAsync</span>(_cts.Token);
+    }
+
+    <span class="kw">private async</span> <span class="type">Task</span> <span class="fn">ReceiveLoopAsync</span>(<span class="type">CancellationToken</span> ct)
+    {
+        <span class="kw">try</span>
+        {
+            <span class="kw">while</span> (!ct.IsCancellationRequested)
+            {
+                <span class="kw">var</span> message = <span class="kw">await</span> <span class="type">PacketHelper</span>.<span class="fn">ReceiveAsync</span>(_stream!, ct);
+                <span class="kw">if</span> (message <span class="kw">is null</span>) <span class="kw">break</span>;
+
+                MessageReceived?.<span class="fn">Invoke</span>(message);
+            }
+        }
+        <span class="kw">catch</span> (<span class="type">OperationCanceledException</span>) { }
+        <span class="kw">catch</span> (<span class="type">Exception</span> ex)
+        {
+            <span class="cmt">// يمكن تسجيل الخطأ هنا</span>
+        }
+        <span class="kw">finally</span>
+        {
+            Disconnected?.<span class="fn">Invoke</span>();
+        }
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">SendAsync</span>(<span class="kw">string</span> message)
+    {
+        <span class="kw">if</span> (_stream <span class="kw">is null</span> || _cts <span class="kw">is null</span>)
+            <span class="kw">throw new</span> <span class="type">InvalidOperationException</span>(<span class="str">"غير متصل"</span>);
+
+        <span class="kw">await</span> <span class="type">PacketHelper</span>.<span class="fn">SendAsync</span>(_stream, message, _cts.Token);
+    }
+
+    <span class="kw">public async</span> <span class="type">ValueTask</span> <span class="fn">DisposeAsync</span>()
+    {
+        _cts?.<span class="fn">Cancel</span>();
+
+        <span class="kw">if</span> (_stream <span class="kw">is not null</span>) <span class="kw">await</span> _stream.<span class="fn">DisposeAsync</span>();
+
+        _tcp?.<span class="fn">Close</span>();
+        _cts?.<span class="fn">Dispose</span>();
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <h3>استخدام العميل في WPF</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> MainWindow.xaml.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public partial class</span> <span class="type">MainWindow</span> : <span class="type">Window</span>
+{
+    <span class="kw">private readonly</span> <span class="type">ChatClient</span> _client = <span class="kw">new</span>();
+
+    <span class="kw">public</span> <span class="fn">MainWindow</span>()
+    {
+        <span class="fn">InitializeComponent</span>();
+
+        _client.<span class="prop">MessageReceived</span> += msg =>
+        {
+            <span class="cmt">// تحديث الواجهة من Thread رئيسي</span>
+            <span class="type">Dispatcher</span>.<span class="fn">Invoke</span>(() =>
+                MessagesList.<span class="prop">Items</span>.<span class="fn">Add</span>(msg));
+        };
+
+        _client.<span class="prop">Disconnected</span> += () =>
+        {
+            <span class="type">Dispatcher</span>.<span class="fn">Invoke</span>(() =>
+                StatusText.<span class="prop">Text</span> = <span class="str">"انقطع الاتصال"</span>);
+        };
+    }
+
+    <span class="kw">private async void</span> <span class="fn">Connect_Click</span>(<span class="kw">object</span> sender, <span class="type">RoutedEventArgs</span> e)
+    {
+        <span class="kw">await</span> _client.<span class="fn">ConnectAsync</span>(<span class="str">"127.0.0.1"</span>, <span class="num">5000</span>, UsernameBox.<span class="prop">Text</span>);
+        StatusText.<span class="prop">Text</span> = <span class="str">"متصل ✓"</span>;
+    }
+
+    <span class="kw">private async void</span> <span class="fn">Send_Click</span>(<span class="kw">object</span> sender, <span class="type">RoutedEventArgs</span> e)
+    {
+        <span class="kw">if</span> (<span class="kw">string</span>.<span class="fn">IsNullOrWhiteSpace</span>(MessageBox.<span class="prop">Text</span>)) <span class="kw">return</span>;
+
+        <span class="kw">await</span> _client.<span class="fn">SendAsync</span>(MessageBox.<span class="prop">Text</span>);
+        MessageBox.<span class="prop">Text</span> = <span class="str">""</span>;
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="callout-body">
+                        <h4>تحديث الواجهة من Threads أخرى</h4>
+                        <p>
+                            عند استقبال رسالة من Socket، أنت في Thread خلفي. لا تحاول تحديث
+                            عناصر WPF مباشرة — استخدم <span class="inline-code">Dispatcher.Invoke</span>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 6 ====== -->
+            <section class="content-section" id="sec-6">
+                <div class="section-heading">
+                    <div class="section-num">6</div>
+                    <h2>إدارة الجلسات</h2>
+                </div>
+                <p>
+                    الخادم يحتاج لتتبع من هو متصل. نستخدم <span class="inline-code">ConcurrentDictionary</span>
+                    لأن العمليات تحدث من Tasks متعددة في نفس الوقت.
+                </p>
+
+                <h3>لماذا ConcurrentDictionary؟</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المجموعة</th>
+                                <th>الوصول المتزامن</th>
+                                <th>الاستخدام</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Dictionary</strong></td>
+                                <td><span class="badge-cell red">غير آمن</span></td>
+                                <td>Thread واحد فقط</td>
+                            </tr>
+                            <tr>
+                                <td><strong>ConcurrentDictionary</strong></td>
+                                <td><span class="badge-cell green">آمن</span></td>
+                                <td>عمليات متوازية عالية الأداء</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dictionary + lock</strong></td>
+                                <td><span class="badge-cell amber">آمن لكن أبطأ</span></td>
+                                <td>عمليات قليلة التزامن</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-icon"><i class="fas fa-check"></i></div>
+                    <div class="callout-body">
+                        <h4>ميزة الأداء</h4>
+                        <p>
+                            <span class="inline-code">ConcurrentDictionary</span> يستخدم تقنيات متقدمة
+                            (lock-free reads) تجعله أسرع بكثير من Dictionary مع lock عند التزامن العالي.
+                        </p>
+                    </div>
+                </div>
+
+                <h3>تخزين حالة كل عميل</h3>
+                <p>
+                    كل عميل له كائن <span class="inline-code">ClientConnection</span> يحتوي على:
+                </p>
+                <ul>
+                    <li><strong>Id:</strong> معرف فريد (Guid).</li>
+                    <li><strong>Username:</strong> اسم المستخدم الذي اختاره.</li>
+                    <li><strong>TcpClient:</strong> الاتصال الفعلي.</li>
+                    <li><strong>SemaphoreSlim:</strong> لضمان إرسال رسالة واحدة في كل مرة.</li>
+                </ul>
+            </section>
+
+            <!-- ====== 7 ====== -->
+            <section class="content-section" id="sec-7">
+                <div class="section-heading">
+                    <div class="section-num">7</div>
+                    <h2>معالجة الانقطاعات</h2>
+                </div>
+                <p>
+                    انقطاع الاتصال أمر حتمي — قد يغلق المستخدم التطبيق، أو تنقطع الشبكة، أو يسقط الخادم.
+                    تطبيق احترافي يتعامل مع كل هذه الحالات بسلاسة.
+                </p>
+
+                <h3>حالات الانقطاع</h3>
+                <ol class="steps">
+                    <li><strong>إغلاق نظيف:</strong> العميل يستدعي <span class="inline-code">Disconnect</span> → يرسل إشعاراً → يُغلق.</li>
+                    <li><strong>انقطاع مفاجئ:</strong> الشبكة تنقطع → <span class="inline-code">ReadAsync</span> يعيد 0 → نُغلق.</li>
+                    <li><strong>مهلة (Timeout):</strong> لا يصل شيء لفترة → نستخدم <span class="inline-code">CancellationToken</span> مع مهلة.</li>
+                    <li><strong>خطأ في الإرسال:</strong> Stream معطل → نحذف العميل من القائمة.</li>
+                </ol>
+
+                <h3>مهلة القراءة (Read Timeout)</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> مع مهلة</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">private async</span> <span class="type">Task</span>&lt;<span class="kw">string</span>?&gt; <span class="fn">ReceiveWithTimeoutAsync</span>(
+    <span class="type">NetworkStream</span> stream, <span class="type">TimeSpan</span> timeout)
+{
+    <span class="kw">using var</span> cts = <span class="kw">new</span> <span class="type">CancellationTokenSource</span>(timeout);
+
+    <span class="kw">try</span>
+    {
+        <span class="kw">return await</span> <span class="type">PacketHelper</span>.<span class="fn">ReceiveAsync</span>(stream, cts.Token);
+    }
+    <span class="kw">catch</span> (<span class="type">OperationCanceledException</span>)
+    {
+        <span class="cmt">// انتهت المهلة — العميل بطيء أو منقطع</span>
+        <span class="kw">return null</span>;
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <h3>إعادة الاتصال التلقائي</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Reconnect</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public async</span> <span class="type">Task</span> <span class="fn">ConnectWithRetryAsync</span>(
+    <span class="kw">string</span> host, <span class="kw">int</span> port, <span class="kw">string</span> username,
+    <span class="kw">int</span> maxAttempts = <span class="num">5</span>)
+{
+    <span class="kw">for</span> (<span class="kw">int</span> attempt = <span class="num">1</span>; attempt &lt;= maxAttempts; attempt++)
+    {
+        <span class="kw">try</span>
+        {
+            <span class="kw">await</span> <span class="fn">ConnectAsync</span>(host, port, username);
+            <span class="kw">return</span>;
+        }
+        <span class="kw">catch</span> (<span class="type">SocketException</span>)
+        {
+            <span class="kw">if</span> (attempt == maxAttempts) <span class="kw">throw</span>;
+
+            <span class="kw">var</span> delay = <span class="type">TimeSpan</span>.<span class="fn">FromSeconds</span>(<span class="type">Math</span>.<span class="fn">Pow</span>(<span class="num">2</span>, attempt));
+            <span class="kw">await</span> <span class="type">Task</span>.<span class="fn">Delay</span>(delay);
+        }
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout danger">
+                    <div class="callout-icon"><i class="fas fa-plug-circle-xmark"></i></div>
+                    <div class="callout-body">
+                        <h4>لا تترك الاتصالات الميتة</h4>
+                        <p>
+                            إذا لم تحذف العميل المنقطع من القائمة، ستتراكم الاتصالات الميتة
+                            وينفد ذاكرة الخادم تدريجياً.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 8 ====== -->
+            <section class="content-section" id="sec-8">
+                <div class="section-heading">
+                    <div class="section-num">8</div>
+                    <h2>أفضل الممارسات</h2>
+                </div>
+
+                <ul class="steps">
+                    <li><strong>استخدم async/await</strong> في كل عمليات الشبكة — لا تستخدم Blocking I/O.</li>
+                    <li><strong>مرّر CancellationToken</strong> لدعم إلغاء الاتصال عند الحاجة.</li>
+                    <li><strong>حدّد الطول الأقصى للرسالة</strong> لمنع هجمات DoS.</li>
+                    <li><strong>استخدم SemaphoreSlim</strong> لحماية الإرسال المتزامن.</li>
+                    <li><strong>تحقق من الإدخال</strong> — لا تثق بأي بيانات من العميل.</li>
+                    <li><strong>سجّل كل الأحداث</strong> لتتبع المشاكل.</li>
+                    <li><strong>اختبر الانقطاعات</strong> — اقطع الشبكة يدوياً وتحقق من السلوك.</li>
+                    <li><strong>استخدم TLS</strong> في الإنتاج (SslStream) لتشفير الاتصال.</li>
+                </ul>
+
+                <h3>أمان: تشفير الاتصال</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> TLS/SSL</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">var</span> sslStream = <span class="kw">new</span> <span class="type">SslStream</span>(tcpClient.<span class="fn">GetStream</span>());
+
+<span class="kw">await</span> sslStream.<span class="fn">AuthenticateAsServerAsync</span>(
+    serverCertificate,
+    clientCertificateRequired: <span class="kw">false</span>,
+    checkCertificateRevocation: <span class="kw">true</span>);
+
+<span class="cmt">// الآن كل البيانات مشفرة</span></pre>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h4><i class="fas fa-gem"></i> قاعدة ذهبية</h4>
+                    <p>
+                        الدردشة في الإنتاج تحتاج أكثر من مجرد Sockets — تحتاج TLS، مصادقة،
+                        تخزين رسائل، وحماية من الإساءة. لكن Sockets هي الأساس الذي يُبنى عليه كل شيء.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ====== 9 ====== -->
+            <section class="content-section" id="sec-9">
+                <div class="section-heading">
+                    <div class="section-num">9</div>
+                    <h2>تمارين تفاعلية</h2>
+                </div>
+                <p>اختبر فهمك للمشروع:</p>
+
+                <div class="interactive-box">
+                    <div class="interactive-title"><i class="fas fa-question-circle"></i> سؤال 1</div>
+                    <p class="interactive-hint">لماذا نستخدم 4 بايتات قبل كل رسالة في بروتوكول الدردشة؟</p>
+                    <div class="task-box" data-quiz="1">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> لتشفير الرسالة</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> لمعرفة أين تنتهي الرسالة وتبدأ الأخرى</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> لتسريع الإرسال</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> لضغط البيانات</button>
+                        </div>
+                        <div class="task-feedback" id="fb1"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 2</div>
+                    <p class="interactive-hint">أي مجموعة نستخدمها لتتبع العملاء المتصلين بأمان؟</p>
+                    <div class="task-box" data-quiz="2">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> Dictionary عادية</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> ConcurrentDictionary</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> List</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> Array</button>
+                        </div>
+                        <div class="task-feedback" id="fb2"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 3</div>
+                    <p class="interactive-hint">لماذا نستخدم SemaphoreSlim في ClientConnection؟</p>
+                    <div class="task-box" data-quiz="3">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> لتسريع الإرسال</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> لمنع تشابك البيانات عند الإرسال المتزامن</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> لتشفير الرسائل</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> لحفظ الرسائل مؤقتاً</button>
+                        </div>
+                        <div class="task-feedback" id="fb3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <nav class="lesson-nav">
+                <a href="#" class="prev">
+                    <div class="nav-icon"><i class="fas fa-arrow-right"></i></div>
+                    <div>
+                        <div class="nav-label">الدرس السابق</div>
+                        <div class="nav-title">تطبيق الطقس (Weather App)</div>
+                    </div>
+                </a>
+                <a href="#" class="next">
+                    <div>
+                        <div class="nav-label">الدرس التالي</div>
+                        <div class="nav-title">هندسة البرمجيات — مقدمة</div>
+                    </div>
+                    <div class="nav-icon"><i class="fas fa-arrow-left"></i></div>
+                </a>
+            </nav>
+
+        </main>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-bottom">
+            <span>© 2026 CodeWay — جميع الحقوق محفوظة.</span>
+            <span>صُمم بعناية لتعلم C# بالعربية · <a href="#">سياسة الخصوصية</a></span>
+        </div>
+    </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    /* ============ شريط التقدم ============ */
+    const progressBar = document.getElementById('progressBar');
+    const header = document.getElementById('header');
+    const backTop = document.getElementById('backTop');
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = (scrollTop / docHeight) * 100 + '%';
+        header.classList.toggle('scrolled', scrollTop > 20);
+        backTop.classList.toggle('show', scrollTop > 400);
+    });
+
+    /* ============ نسخ الكود ============ */
+    function copyCode(btn) {
+        const pre = btn.closest('.code-wrapper').querySelector('pre');
+        const text = pre.innerText;
+        const done = () => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1800);
+        };
+        navigator.clipboard.writeText(text).then(done).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            done();
+        });
+    }
+
+    /* ============ تطبيق الدردشة الحي ============ */
+    const users = [
+        { id: 1, name: 'أحمد محمد', color: '#6366f1', online: true, last: 'شكراً جزيلاً!', time: '10:32' },
+        { id: 2, name: 'سارة علي', color: '#ec4899', online: true, last: 'هل رأيت الدرس الجديد؟', time: '10:15' },
+        { id: 3, name: 'خالد حسن', color: '#f59e0b', online: false, last: 'إلى اللقاء غداً', time: 'أمس' },
+        { id: 4, name: 'منى إبراهيم', color: '#10b981', online: true, last: 'ممتاز جداً 👌', time: '09:45' },
+        { id: 5, name: 'عمر يوسف', color: '#8b5cf6', online: true, last: 'أرسل لي الملف لو سمحت', time: '09:12' }
+    ];
+
+    const conversations = {
+        1: [
+            { from: 'them', text: 'مرحباً! كيف حالك؟', time: '10:20' },
+            { from: 'me', text: 'بخير، شكراً! أنت كيف حالك؟', time: '10:22' },
+            { from: 'them', text: 'بأفضل حال. هل بدأت درس Sockets؟', time: '10:25' },
+            { from: 'me', text: 'نعم! المحتوى رائع جداً 🔥', time: '10:28' },
+            { from: 'them', text: 'شكراً جزيلاً!', time: '10:32' }
+        ],
+        2: [
+            { from: 'them', text: 'مرحباً سارة!', time: '09:50' },
+            { from: 'me', text: 'أهلاً! كيف يمكنني مساعدتك؟', time: '09:52' },
+            { from: 'them', text: 'هل رأيت الدرس الجديد؟', time: '10:15' }
+        ],
+        3: [
+            { from: 'them', text: 'تصبح على خير', time: 'أمس' },
+            { from: 'me', text: 'وأنت من أهله', time: 'أمس' },
+            { from: 'them', text: 'إلى اللقاء غداً', time: 'أمس' }
+        ],
+        4: [
+            { from: 'me', text: 'كيف كان مشروعك؟', time: '09:40' },
+            { from: 'them', text: 'ممتاز جداً 👌', time: '09:45' }
+        ],
+        5: [
+            { from: 'them', text: 'أرسل لي الملف لو سمحت', time: '09:12' }
+        ]
+    };
+
+    const autoReplies = [
+        'رائع! أخبرني المزيد 😊',
+        'تمام، فهمت.',
+        'هذا ممتاز!',
+        'شكراً على المشاركة 🙏',
+        'هل يمكنك توضيح أكثر؟',
+        'أوافقك الرأي تماماً.',
+        'سأراجع الدرس وأرد عليك.',
+        'مثير للاهتمام!',
+        'بالضبط!',
+        'حسناً، سأفعل ذلك.'
+    ];
+
+    const chatSidebar = document.getElementById('chatSidebar');
+    const chatHeader = document.getElementById('chatHeader');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+
+    let activeUserId = 1;
+
+    function getInitials(name) {
+        return name.split(' ').map(w => w[0]).slice(0, 2).join('');
+    }
+
+    function renderSidebar() {
+        let html = '<div class="chat-sidebar-title">المحادثات</div>';
+        users.forEach(u => {
+            html += `
+                <div class="chat-user ${u.id === activeUserId ? 'active' : ''}" data-user="${u.id}">
+                    <div class="chat-avatar ${u.online ? 'online' : ''}" style="background:${u.color}">
+                        ${getInitials(u.name)}
+                    </div>
+                    <div class="chat-user-info">
+                        <div class="chat-user-name">${u.name}</div>
+                        <div class="chat-user-status">${u.last}</div>
+                    </div>
+                </div>
+            `;
+        });
+        chatSidebar.innerHTML = html;
+
+        chatSidebar.querySelectorAll('.chat-user').forEach(el => {
+            el.addEventListener('click', () => {
+                activeUserId = Number(el.dataset.user);
+                renderAll();
+            });
+        });
+    }
+
+    function renderHeader() {
+        const user = users.find(u => u.id === activeUserId);
+        if (!user) return;
+        chatHeader.innerHTML = `
+            <div class="chat-header-avatar ${user.online ? 'online' : ''}" style="background:${user.color}">
+                ${getInitials(user.name)}
+            </div>
+            <div class="chat-header-info">
+                <div class="chat-header-name">${user.name}</div>
+                <div class="chat-header-status">${user.online ? 'متصل الآن' : 'غير متصل'}</div>
+            </div>
+        `;
+    }
+
+    function renderMessages() {
+        const conv = conversations[activeUserId] || [];
+        if (conv.length === 0) {
+            chatMessages.innerHTML = `
+                <div style="text-align:center;color:var(--text-muted);padding:30px 10px;font-size:.9rem">
+                    <i class="fas fa-comment-dots" style="font-size:2rem;display:block;margin-bottom:8px;color:var(--border)"></i>
+                    لا توجد رسائل بعد. ابدأ المحادثة!
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        conv.forEach(m => {
+            html += `
+                <div class="msg ${m.from}">
+                    ${escapeHtml(m.text)}
+                    <span class="msg-time">${m.time}</span>
+                </div>
+            `;
+        });
+        html += `
+            <div class="chat-typing" id="chatTyping">
+                <span></span><span></span><span></span>
+            </div>
+        `;
+        chatMessages.innerHTML = html;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function renderAll() {
+        renderSidebar();
+        renderHeader();
+        renderMessages();
+    }
+
+    function nowTime() {
+        const d = new Date();
+        return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+    }
+
+    function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) {
+            chatInput.focus();
+            return;
+        }
+
+        if (!conversations[activeUserId]) conversations[activeUserId] = [];
+        conversations[activeUserId].push({ from: 'me', text, time: nowTime() });
+        chatInput.value = '';
+        renderMessages();
+
+        // محاكاة رد تلقائي
+        const user = users.find(u => u.id === activeUserId);
+        if (user && user.online) {
+            const typing = document.getElementById('chatTyping');
+            if (typing) typing.classList.add('show');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            setTimeout(() => {
+                const reply = autoReplies[Math.floor(Math.random() * autoReplies.length)];
+                conversations[activeUserId].push({ from: 'them', text: reply, time: nowTime() });
+                // تحديث آخر رسالة في القائمة الجانبية
+                user.last = reply;
+                user.time = nowTime();
+                renderAll();
+            }, 1200 + Math.random() * 800);
+        }
+    }
+
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+    renderAll();
+
+    /* ============ التنقل النشط في TOC ============ */
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    const sections = document.querySelectorAll('.content-section');
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                tocLinks.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
+
+    /* ============ التمارين التفاعلية ============ */
+    document.querySelectorAll('.task-box').forEach(box => {
+        const quizId = box.dataset.quiz;
+        const fb = document.getElementById('fb' + quizId);
+        const options = box.querySelectorAll('.task-option');
+
+        options.forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (box.dataset.answered === 'true') return;
+                box.dataset.answered = 'true';
+
+                const isCorrect = opt.dataset.correct === 'true';
+                options.forEach(o => {
+                    if (o.dataset.correct === 'true') o.classList.add('correct');
+                    else if (o === opt) o.classList.add('wrong');
+                });
+
+                if (isCorrect) {
+                    fb.textContent = '✅ إجابة صحيحة! أحسنت.';
+                    fb.className = 'task-feedback show ok';
+                } else {
+                    fb.textContent = '❌ إجابة غير صحيحة. الإجابة الصحيحة مظللة بالأخضر.';
+                    fb.className = 'task-feedback show no';
+                }
+            });
+        });
+    });
+
+    /* ============ قائمة الجوال ============ */
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        const nav = document.querySelector('.header-nav');
+        if (!nav) return;
+        if (nav.style.display === 'flex') {
+            nav.style.display = '';
+        } else {
+            Object.assign(nav.style, {
+                display: 'flex',
+                position: 'absolute',
+                top: '72px',
+                right: '0',
+                left: '0',
+                background: 'var(--primary)',
+                flexDirection: 'column',
+                padding: '16px',
+                gap: '8px',
+                boxShadow: '0 10px 30px rgba(0,0,0,.3)',
+                zIndex: '999'
+            });
+        }
+    });
+
+    /* ============ ظهور الأقسام ============ */
+    const sectionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.05 });
+
+    sections.forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(20px)';
+        s.style.transition = 'opacity .6s ease, transform .6s ease';
+        sectionObserver.observe(s);
+    });
+</script>
+
+</body>
+</html>

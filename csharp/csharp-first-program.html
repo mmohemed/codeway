@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>تعلم C# | أول برنامج: Hello World</title>
+    <!-- Google Fonts: خطوط عصرية ومتناسقة -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (أيقونات حديثة) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js لتمييز الكود بشكل احترافي (نسخة خفيفة) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #eef2f5 100%);
+            font-family: 'Inter', 'Cairo', sans-serif;
+            color: #1a2c3e;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        /* حاوية رئيسية */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ترويسة جذابة */
+        .hero {
+            background: linear-gradient(135deg, #0b2b40 0%, #1b4f6e 100%);
+            border-radius: 2rem;
+            padding: 2.5rem 2rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "{}";
+            font-family: monospace;
+            font-size: 12rem;
+            font-weight: 800;
+            opacity: 0.07;
+            position: absolute;
+            bottom: -20px;
+            right: 10px;
+            pointer-events: none;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 2.7rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero h1 i {
+            background: #ffb347;
+            background: linear-gradient(135deg, #ffb347, #ff8c00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 2.2rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 80%;
+            font-weight: 400;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* بطاقات المحتوى الرئيسية */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 32px -12px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            padding: 1.5rem 1.8rem 0.5rem 1.8rem;
+            border-bottom: 2px solid #eef2f8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header i {
+            font-size: 2rem;
+            color: #2c7da0;
+        }
+
+        .card-header h2 {
+            font-size: 1.65rem;
+            font-weight: 600;
+            color: #0f2f3f;
+        }
+
+        .card-body {
+            padding: 1.5rem 1.8rem 1.8rem;
+        }
+
+        /* كود البرنامج */
+        .code-block {
+            background: #0f172a;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #334155;
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 6px 12px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+
+        .copy-btn:hover {
+            background: #4f5e77;
+        }
+
+        .note {
+            background: #eef6fc;
+            border-right: 5px solid #2c7da0;
+            padding: 1rem 1.2rem;
+            border-radius: 1rem;
+            margin: 1.2rem 0;
+            font-size: 0.95rem;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-list li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .step-number {
+            background: #1b4f6e;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .full-width-card {
+            grid-column: span 2;
+        }
+
+        /* جدول المكونات */
+        .component-table {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .comp-row {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.7rem;
+        }
+
+        .comp-term {
+            width: 130px;
+            font-weight: 700;
+            color: #1f5e7e;
+        }
+
+        .comp-desc {
+            flex: 1;
+            color: #2d3e4f;
+        }
+
+        @media (max-width: 850px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .full-width-card {
+                grid-column: span 1;
+            }
+            .hero p {
+                max-width: 100%;
+            }
+            .hero h1 {
+                font-size: 1.9rem;
+            }
+        }
+
+        /* زر تشغيل التجربة التفاعلية */
+        .interactive-area {
+            background: #fef9e6;
+            border-radius: 1.5rem;
+            padding: 1.8rem;
+            margin-top: 1rem;
+            border: 1px solid #ffdfa5;
+        }
+
+        .btn-run {
+            background: #1e6f5c;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .btn-run:hover {
+            background: #0f5545;
+            transform: scale(0.98);
+        }
+
+        .output-console {
+            background: #0a0f1c;
+            color: #bbf0e6;
+            font-family: monospace;
+            padding: 1.2rem;
+            border-radius: 1rem;
+            font-size: 1rem;
+            direction: ltr;
+            white-space: pre-wrap;
+            border-left: 6px solid #ffb347;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            font-size: 0.85rem;
+            color: #5e7a93;
+        }
+
+        a {
+            color: #2c7da0;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>
+            <i class="fas fa-code"></i> 
+            أول برنامج في C#
+        </h1>
+        <p>رحلة البداية الصحيحة مع لغة C# و .NET. تعلم كيفية كتابة برنامج "Hello World" خطوة بخطوة، وفهم كل جزء من الكود بطريقة مبسطة.</p>
+        <div class="badge-group">
+            <span class="badge"><i class="fab fa-microsoft"></i> .NET 8+</span>
+            <span class="badge"><i class="fas fa-terminal"></i> Console App</span>
+            <span class="badge"><i class="fas fa-graduation-cap"></i> للمبتدئين</span>
+        </div>
+    </div>
+
+    <!-- شبكة المحتوى الرئيسية -->
+    <div class="content-grid">
+        <!-- القسم الأيمن: شرح البرنامج + كود -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-file-code"></i>
+                <h2>برنامج Hello World</h2>
+            </div>
+            <div class="card-body">
+                <p>أول برنامج تقليدي في أي لغة برمجة. سيقوم البرنامج بطباعة جملة <strong>"Hello, World!"</strong> على وحدة التحكم. يمثل هذا الأساس لفهم تركيب البرنامج (Syntax) وكيفية تنفيذه.</p>
+                
+                <!-- كود C# مع تمييز ونسخ -->
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode()"><i class="far fa-copy"></i> نسخ الكود</button>
+                    <pre><code class="language-csharp" id="helloCode">using System;
+
+namespace MyFirstProgram
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("مرحباً بالعالم!");
+            Console.WriteLine("Hello, World!");
+        }
+    }
+}</code></pre>
+                </div>
+                <div class="note">
+                    <i class="fas fa-lightbulb" style="margin-left: 8px; color:#f5a623;"></i>
+                    <strong>ملاحظة:</strong> يمكنك تشغيل هذا الكود في أي بيئة تدعم C# مثل <strong>Visual Studio</strong> أو <strong>Visual Studio Code</strong> أو عبر منصة <strong>.NET Fiddle</strong>.
+                </div>
+            </div>
+        </div>
+
+        <!-- القسم الأيسر: شرح مكونات الكود -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-cogs"></i>
+                <h2>تحليل الكود</h2>
+            </div>
+            <div class="card-body">
+                <div class="component-table">
+                    <div class="comp-row"><span class="comp-term">using System;</span><span class="comp-desc">استيراد مساحة الأسماء System التي تحتوي على الفئات الأساسية مثل Console.</span></div>
+                    <div class="comp-row"><span class="comp-term">namespace</span><span class="comp-desc">تنظيم الكود في حاوية منطقية لتجنب تعارض الأسماء.</span></div>
+                    <div class="comp-row"><span class="comp-term">class Program</span><span class="comp-desc">كل شيء في C# داخل class. Program هو اسم الفئة الرئيسية.</span></div>
+                    <div class="comp-row"><span class="comp-term">static void Main</span><span class="comp-desc">نقطة دخول البرنامج. يتم تنفيذ الأوامر الموجودة داخله أولاً.</span></div>
+                    <div class="comp-row"><span class="comp-term">Console.WriteLine()</span><span class="comp-desc">دالة لطباعة النص مع سطر جديد في نافذة الطرفية.</span></div>
+                </div>
+                <div class="note" style="margin-top: 1.2rem;">
+                    <i class="fas fa-question-circle"></i> <strong>لماذا static و void؟</strong> static تعني أنه يمكن استدعاء الدالة دون إنشاء كائن، و void تعني أنها لا تُرجع قيمة. Main يجب أن تكون static لأن نظام التشغيل يستدعيها مباشرة.
+                </div>
+            </div>
+        </div>
+
+        <!-- الخطوات العملية لتشغيل أول برنامج - عرض موسع -->
+        <div class="card full-width-card">
+            <div class="card-header">
+                <i class="fas fa-list-ol"></i>
+                <h2>دليل خطوة بخطوة: إنشاء وتشغيل أول مشروع C#</h2>
+            </div>
+            <div class="card-body">
+                <ul class="step-list">
+                    <li><span class="step-number">1</span> <div><strong>تثبيت بيئة .NET SDK</strong> — قم بتحميل SDK من موقع Microsoft الرسمي (يتضمن مترجم C# وأدوات سطر الأوامر).</div></li>
+                    <li><span class="step-number">2</span> <div><strong>إنشاء مشروع جديد</strong> — افتح الطرفية (Terminal) واكتب الأمر: <code style="background:#eef2f5; padding:4px 8px; border-radius:8px;">dotnet new console -n FirstCSharpApp</code></div></li>
+                    <li><span class="step-number">3</span> <div><strong>الانتقال إلى المجلد</strong> — <code>cd FirstCSharpApp</code> سترى ملف <code>Program.cs</code> يحتوي على كود افتراضي.</div></li>
+                    <li><span class="step-number">4</span> <div><strong>كتابة الكود</strong> — استبدل المحتوى بكود "Hello World" الذي تعلمناه أعلاه باستخدام أي محرر نصوص.</div></li>
+                    <li><span class="step-number">5</span> <div><strong>تشغيل البرنامج</strong> — نفّذ الأمر <code>dotnet run</code> وستظهر رسالتك الترحيبية على الشاشة مباشرة! 🚀</div></li>
+                </ul>
+                <div class="note" style="background: #e0f2fe;">
+                    <i class="fab fa-windows"></i> <i class="fab fa-apple"></i> <i class="fab fa-linux"></i>  
+                    تعمل أوامر dotnet على جميع أنظمة التشغيل Windows, macOS, Linux.
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم المفاهيم الأساسية -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-brain"></i>
+                <h2>مفاهيم يجب معرفتها</h2>
+            </div>
+            <div class="card-body">
+                <p><i class="fas fa-check-circle" style="color:#2c7da0;"></i> &nbsp; <strong>مترجم C#</strong> : يقوم بتحويل الكود إلى لغة وسيطة (IL) ثم ينفذها CLR.</p>
+                <p><i class="fas fa-check-circle" style="color:#2c7da0;"></i> &nbsp; <strong>Console.WriteLine vs Console.Write</strong> : الأولى تضيف سطراً جديداً، الثانية تطبع بدون سطر.</p>
+                <p><i class="fas fa-check-circle" style="color:#2c7da0;"></i> &nbsp; <strong>علامة ; (الفاصلة المنقوطة)</strong> : تنتهي كل جملة في C# بفاصلة منقوطة.</p>
+                <p><i class="fas fa-check-circle" style="color:#2c7da0;"></i> &nbsp; <strong>الأقواس {} </strong> : تحدد نطاق الكود (code blocks) مثل الفئات والدوال.</p>
+                <div class="note" style="margin-top: 1rem;">
+                    <i class="fas fa-video"></i> تذكر: C# حساسة لحالة الأحرف (Case-Sensitive) — Console لا تساوي console.
+                </div>
+            </div>
+        </div>
+
+        <!-- تجربة تفاعلية (محاكاة تشغيل الكود) -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-laptop-code"></i>
+                <h2>جرب بنفسك (محاكاة)</h2>
+            </div>
+            <div class="card-body">
+                <p>اضغط على الزر أدناه لمحاكاة تشغيل الكود وعرض النتيجة كما لو كنت تستخدم الطرفية الحقيقية.</p>
+                <div class="interactive-area">
+                    <button class="btn-run" id="runSimulateBtn"><i class="fas fa-play"></i> تشغيل الكود</button>
+                    <div class="output-console" id="simulatedOutput">
+                        <span style="color:#7f8c8d;">// انقر على زر التشغيل لترى مخرجات برنامج Hello World</span>
+                    </div>
+                    <p style="font-size: 0.75rem; margin-top: 0.8rem;"><i class="fas fa-info-circle"></i> هذه محاكاة تعليمية توضح ما سيظهر عند تنفيذ البرنامج الحقيقي.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ملخص أخير وتحديات صغيرة -->
+    <div class="card" style="margin-top: 0.5rem;">
+        <div class="card-header">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h2>تحديات صغيرة لتعزيز الفهم</h2>
+        </div>
+        <div class="card-body">
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between;">
+                <div style="flex:1; min-width: 180px; background:#f8fafc; border-radius: 1rem; padding: 1rem;">
+                    <i class="fas fa-edit" style="font-size:1.6rem; color:#2c7da0;"></i>
+                    <p style="margin-top: 0.5rem;"><strong>📝 تحدِّي 1</strong><br>قم بتعديل النص المطبوع ليظهر اسمك بدلاً من "Hello, World!".</p>
+                </div>
+                <div style="flex:1; min-width: 180px; background:#f8fafc; border-radius: 1rem; padding: 1rem;">
+                    <i class="fas fa-plus-circle" style="font-size:1.6rem; color:#2c7da0;"></i>
+                    <p style="margin-top: 0.5rem;"><strong>➕ تحدِّي 2</strong><br>أضف سطر إضافي يطبع تاريخ اليوم باستخدام <code>DateTime.Now</code>.</p>
+                </div>
+                <div style="flex:1; min-width: 180px; background:#f8fafc; border-radius: 1rem; padding: 1rem;">
+                    <i class="fas fa-comment-dots" style="font-size:1.6rem; color:#2c7da0;"></i>
+                    <p style="margin-top: 0.5rem;"><strong>💬 تحدِّي 3</strong><br>استخدم <code>Console.Write()</code> بدلاً من WriteLine ولاحظ الفرق.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <i class="fas fa-globe"></i> تعلم الأساسيات بثقة — أول برنامج C# هو بوابتك لعالم تطوير التطبيقات، الألعاب، وتطبيقات الويب.  
+        <br>© 2025 | محتوى تعليمي شامل للمبتدئين
+    </footer>
+</div>
+
+<!-- Prism.js لتلوين الكود -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script>
+    // دالة نسخ الكود مع إشعار بسيط
+    function copyCode() {
+        const codeElement = document.getElementById('helloCode');
+        let codeText = codeElement.innerText;
+        // استخدام Clipboard API
+        navigator.clipboard.writeText(codeText).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+            }, 2000);
+        }).catch(err => {
+            alert("تعذر نسخ الكود يدوياً: " + err);
+        });
+    }
+
+    // محاكاة تشغيل الكود بشكل تفاعلي وتعليمي
+    const runBtn = document.getElementById('runSimulateBtn');
+    const outputDiv = document.getElementById('simulatedOutput');
+    
+    function simulateRun() {
+        // محاكاة خرج البرنامج الأصلي مع دعم اللغة العربية والإنجليزية
+        const simulatedText = `> dotnet run
+مرحباً بالعالم!
+Hello, World!
+
+تم تنفيذ البرنامج بنجاح. 🎉`;
+        outputDiv.innerHTML = `<span style="color:#f0f0f0;">${simulatedText.replace(/\n/g, '<br>')}</span>`;
+        // إضافة تأثير بسيط
+        outputDiv.style.transition = "0.1s";
+        outputDiv.style.borderLeftColor = "#6fcf97";
+        setTimeout(() => {
+            outputDiv.style.borderLeftColor = "#ffb347";
+        }, 800);
+    }
+    
+    runBtn.addEventListener('click', simulateRun);
+    
+    // إضافة تأثيرات إضافية للصفحة عند التحميل (جعل Prism يطبق التلوين على الكود)
+    document.addEventListener('DOMContentLoaded', () => {
+        Prism.highlightAll();
+        // عرض رسالة ترحيبية لطيفة في وحدة التحكم الحقيقية (للمطورين فقط)
+        console.log("صفحة تعليم C# الأولى - جاهزة للتعلم!");
+    });
+</script>
+</body>
+</html>

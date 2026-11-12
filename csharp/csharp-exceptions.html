@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C# | معالجة الاستثناءات (Exception Handling) - الدليل المتكامل | تصميم فخم</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #0f071a 0%, #080312 100%);
+            color: #f0ebff;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        .bg-exception {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(255, 80, 80, 0.08), transparent 75%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* hero section */
+        .hero-exc {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2.5rem 1.5rem;
+            background: rgba(30, 15, 45, 0.6);
+            backdrop-filter: blur(16px);
+            border-radius: 3rem;
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            box-shadow: 0 30px 45px -20px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero-exc h1 {
+            font-size: 3.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #ffb8b8, #ff6b6b);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+            margin-bottom: 0.8rem;
+        }
+
+        .hero-exc p {
+            font-size: 1.2rem;
+            color: #f5d5ff;
+            max-width: 850px;
+            margin: 0.8rem auto 0;
+            font-weight: 500;
+        }
+
+        .badge-exc {
+            background: linear-gradient(95deg, #3a1a2a, #1f0e1a);
+            padding: 0.4rem 1.8rem;
+            border-radius: 60px;
+            display: inline-block;
+            font-weight: 700;
+            border: 1px solid #ff6b6b60;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* cards */
+        .card-exc {
+            background: rgba(20, 12, 35, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 100, 100, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-exc:hover {
+            border-color: rgba(255, 100, 100, 0.6);
+            background: rgba(28, 18, 48, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid rgba(255, 107, 107, 0.5);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.6rem;
+        }
+
+        .card-header i {
+            font-size: 2.2rem;
+            color: #ff8a8a;
+            filter: drop-shadow(0 0 5px #ff5e5e);
+        }
+
+        .card-header h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 1.8rem;
+            margin: 1rem 0;
+        }
+
+        .exc-card {
+            background: rgba(0, 0, 20, 0.55);
+            border-radius: 1.6rem;
+            padding: 1.4rem;
+            border-left: 4px solid #ff7b7b;
+            transition: 0.2s;
+        }
+
+        .exc-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #ffc9c9;
+        }
+
+        .code-block {
+            border-radius: 1.2rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            font-size: 0.85rem;
+            border-radius: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .pill-exc {
+            background: #7a1a3a;
+            padding: 0.2rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #ffc0cb;
+            display: inline-block;
+        }
+
+        .exception-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .exception-table td, .exception-table th {
+            padding: 0.9rem;
+            border-bottom: 1px solid rgba(255, 107, 107, 0.3);
+            vertical-align: top;
+        }
+
+        .interactive-exc {
+            background: linear-gradient(145deg, #120a1f, #080312);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            margin: 1.5rem 0;
+            border: 1px solid #ff5e5e;
+        }
+
+        .btn-exc {
+            background: linear-gradient(95deg, #b91c1c, #7f1a1a);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 0.7rem 2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            margin-top: 0.8rem;
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-exc:hover {
+            background: linear-gradient(95deg, #dc2626, #991b1b);
+            transform: scale(0.97);
+        }
+
+        .btn-exc-secondary {
+            background: linear-gradient(95deg, #2d3748, #1a202c);
+            box-shadow: none;
+        }
+        .btn-exc-secondary:hover {
+            background: linear-gradient(95deg, #4a5568, #2d3748);
+        }
+
+        .demo-output {
+            background: #05020f;
+            padding: 1rem 1.2rem;
+            border-radius: 1.2rem;
+            font-family: 'Fira Code', monospace;
+            border-left: 3px solid #ff6b6b;
+            margin-top: 1rem;
+            color: #ffe0e0;
+            white-space: pre-wrap;
+        }
+
+        .warning-note {
+            background: #2a1515;
+            border-left: 4px solid #ff6b6b;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid #b91c1c;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 750px) {
+            .container { padding: 1rem; }
+            .hero-exc h1 { font-size: 2rem; }
+            .card-header h2 { font-size: 1.4rem; }
+        }
+
+        .glow-text {
+            text-shadow: 0 0 6px #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+<div class="bg-exception"></div>
+<div class="container">
+    <div class="hero-exc">
+        <div class="badge-exc"><i class="fas fa-shield-virus"></i>  EXCEPTION HANDLING | معالجة الاستثناءات</div>
+        <h1>⚠️ معالجة الاستثناءات <span style="background: linear-gradient(120deg,#ffb8b8,#ffffff); background-clip:text; -webkit-background-clip:text; color:transparent;">(Exception Handling)</span></h1>
+        <p>بناء تطبيقات قوية ومستقرة — تعلم كيفية التعامل مع الأخطاء في C# باستخدام try, catch, finally, throw.</p>
+    </div>
+
+    <!-- مفهوم الاستثناءات -->
+    <div class="card-exc">
+        <div class="card-header">
+            <i class="fas fa-bug"></i>
+            <h2>ما هي الاستثناءات (Exceptions)؟</h2>
+        </div>
+        <p style="font-size:1.05rem; margin-bottom: 1rem;">الاستثناءات هي أخطاء تحدث أثناء تنفيذ البرنامج (Runtime Errors)، مثل القسمة على صفر، أو محاولة الوصول إلى عنصر غير موجود في مصفوفة. معالجة الاستثناءات تسمح للبرنامج بالتعامل مع هذه الأخطاء بشكل أنيق دون انهيار مفاجئ.</p>
+        <div class="code-block">
+            <pre><code class="language-csharp">// بنية try-catch-finally الأساسية
+try
+{
+    // الكود الذي قد يسبب استثناء
+    int result = 10 / 0; // DivideByZeroException
+}
+catch (DivideByZeroException ex)
+{
+    Console.WriteLine($"خطأ: {ex.Message}");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"خطأ عام: {ex.Message}");
+}
+finally
+{
+    Console.WriteLine("يتم التنفيذ دائماً (لتنظيف الموارد)");
+}</code></pre>
+        </div>
+        <div class="warning-note">
+            <i class="fas fa-info-circle"></i> <strong>الخلاصة:</strong> try يحيط بالكود الخطير، catch يلتقط الاستثناءات، finally ينفذ دائماً (لإغلاق الملفات أو الاتصالات).
+        </div>
+    </div>
+
+    <!-- أنواع الاستثناءات الشائعة -->
+    <div class="card-exc">
+        <div class="card-header">
+            <i class="fas fa-list"></i>
+            <h2>أهم أنواع الاستثناءات في C#</h2>
+        </div>
+        <table class="exception-table">
+            <tr style="border-bottom: 2px solid #ff6b6b;">
+                <th>الاستثناء</th><th>الوصف</th><th>مثال</th>
+            </tr>
+            <tr><td class="pill-exc">DivideByZeroException</td><td>القسمة على صفر</td><td><code>int x = 5 / 0;</code></td></tr>
+            <tr><td class="pill-exc">NullReferenceException</td><td>محاولة استخدام مرجع null</td><td><code>string s = null; s.Length;</code></td></tr>
+            <tr><td class="pill-exc">IndexOutOfRangeException</td><td>الوصول إلى مؤشر خارج نطاق المصفوفة</td><td><code>int[] arr = {1,2}; arr[5]</code></td></tr>
+            <tr><td class="pill-exc">FormatException</td><td>تنسيق غير صحيح للتحويل</td><td><code>int.Parse("abc");</code></td></tr>
+            <tr><td class="pill-exc">ArgumentException</td><td>معامل غير صالح لدالة</td><td><code>throw new ArgumentException("خطأ");</code></td></tr>
+            <tr><td class="pill-exc">FileNotFoundException</td><td>الملف غير موجود</td><td><code>File.ReadAllText("missing.txt");</code></td></tr>
+        </table>
+    </div>
+
+    <!-- try-catch-finally بالتفصيل -->
+    <div class="card-exc">
+        <div class="card-header">
+            <i class="fas fa-code"></i>
+            <h2>كتلة try-catch-finally بالتفصيل</h2>
+        </div>
+        <div class="grid-2col">
+            <div class="exc-card">
+                <h3><i class="fas fa-play-circle"></i> try</h3>
+                <p>تحتوي على الكود الذي قد يرمي استثناء.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">try
+{
+    // كود محتمل الخطأ
+}</code></pre>
+                </div>
+            </div>
+            <div class="exc-card">
+                <h3><i class="fas fa-net"></i> catch</h3>
+                <p>تلتقط الاستثناءات. يمكن أن يكون عدة catch لأنواع مختلفة.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">catch (SpecificException ex)
+{
+    // معالجة نوع محدد
+}
+catch (Exception ex)
+{
+    // معالجة عامة
+}</code></pre>
+                </div>
+            </div>
+            <div class="exc-card">
+                <h3><i class="fas fa-check-circle"></i> finally</h3>
+                <p>ينفذ دائماً بغض النظر عن حدوث استثناء. يستخدم لتحرير الموارد.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">finally
+{
+    fileStream.Close();
+    // تنظيف الموارد
+}</code></pre>
+                </div>
+            </div>
+            <div class="exc-card">
+                <h3><i class="fas fa-rocket"></i> throw</h3>
+                <p>لرمي استثناء يدوياً.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">if (age < 0)
+    throw new ArgumentException("العمر لا يمكن أن يكون سالباً");</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- when - التصفية الشرطية -->
+    <div class="card-exc">
+        <div class="card-header">
+            <i class="fas fa-filter"></i>
+            <h2>التصفية الشرطية (Exception Filters) - when</h2>
+        </div>
+        <p>يمكن إضافة شرط <code>when</code> لالتقاط الاستثناء فقط عند تحقق شرط معين (C# 6+).</p>
+        <div class="code-block">
+            <pre><code class="language-csharp">try
+{
+    int value = GetValue();
+}
+catch (Exception ex) when (ex.Message.Contains("timeout"))
+{
+    Console.WriteLine("مهلة انتهت - أعد المحاولة");
+}
+catch (Exception ex) when (ex is ArgumentException)
+{
+    Console.WriteLine("خطأ في المعاملات");
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- checked و unchecked -->
+    <div class="card-exc">
+        <div class="card-header">
+            <i class="fas fa-calculator"></i>
+            <h2>التعامل مع overflow: checked و unchecked</h2>
+        </div>
+        <p>في العمليات الحسابية، يمكن أن يحدث تجاوز (overflow). <code>checked</code> يرمي <code>OverflowException</code>، بينما <code>unchecked</code> يتجاهل التجاوز.</p>
+        <div class="code-block">
+            <pre><code class="language-csharp">checked
+{
+    int max = int.MaxValue;
+    int overflow = max + 1; // يرمي OverflowException
+}
+
+unchecked
+{
+    int max = int.MaxValue;
+    int overflow = max + 1; // يلتف إلى قيمة سالبة (بدون استثناء)
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- finally وأهميته -->
+    <div class="card-exc">
+        <div class="card-header">
+            <i class="fas fa-broom"></i>
+            <h2>أهمية finally: تنظيف الموارد</h2>
+        </div>
+        <p>يستخدم <code>finally</code> عادةً لإغلاق الملفات، اتصالات قاعدة البيانات، أو تحرير الذاكرة غير المُدارة.</p>
+        <div class="code-block">
+            <pre><code class="language-csharp">StreamReader reader = null;
+try
+{
+    reader = new StreamReader("data.txt");
+    string content = reader.ReadToEnd();
+}
+catch (FileNotFoundException ex)
+{
+    Console.WriteLine("الملف غير موجود");
+}
+finally
+{
+    if (reader != null)
+        reader.Close(); // تنظيف المورد
+}
+
+// بديل أفضل: using statement (تطبيق IDisposable)
+using (var reader = new StreamReader("data.txt"))
+{
+    // يغلق تلقائياً حتى في حالة الاستثناء
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- مختبر تفاعلي -->
+    <div class="interactive-exc">
+        <h3 style="display: flex; gap: 0.8rem;"><i class="fas fa-flask"></i> 🧪 مختبر معالجة الاستثناءات التفاعلي</h3>
+        <p>جرب إدخال قيم تسبب استثناءات مختلفة وشاهد كيف تتعامل كتلة try-catch معها.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0;">
+            <div style="flex:1">
+                <label>العملية:</label>
+                <select id="exceptionType" style="width:100%; padding:10px; border-radius: 30px; background:#120a1f; color:white; border:1px solid #ff6b6b;">
+                    <option value="divide">القسمة (مقام = 0) → DivideByZeroException</option>
+                    <option value="nullRef">استخدام مرجع null → NullReferenceException</option>
+                    <option value="indexOut">الوصول لمؤشر خارج المصفوفة → IndexOutOfRangeException</option>
+                    <option value="format">تحويل نص غير رقمي → FormatException</option>
+                    <option value="custom">رمي استثناء مخصص (ArgumentException)</option>
+                    <option value="safe">عملية سليمة (بدون استثناء)</option>
+                </select>
+            </div>
+            <div style="flex:1" id="dynamicExcInput">
+                <!-- سيتم إضافة حقول ديناميكية حسب الحاجة -->
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn-exc" id="triggerExceptionBtn"><i class="fas fa-bug"></i>  تنفيذ ومحاولة المعالجة</button>
+            <button class="btn-exc btn-exc-secondary" id="resetOutputBtn"><i class="fas fa-undo-alt"></i>  إعادة تعيين</button>
+        </div>
+        <div class="demo-output" id="excDemoOutput">
+            // جرب تنفيذ عملية مختلفة لترى آلية try-catch-finally ...
+        </div>
+        <div class="warning-note" style="margin-top: 1rem; background:#1a0f1a;">
+            💡 <strong>ملاحظة:</strong> المحاكي يوضح تدفق try-catch-finally. في التطبيقات الحقيقية، الاستثناءات تمنع انهيار البرنامج.
+        </div>
+    </div>
+
+    <!-- أفضل الممارسات -->
+    <div class="card-exc">
+        <div class="card-header">
+            <i class="fas fa-crown"></i>
+            <h2>أفضل الممارسات في معالجة الاستثناءات</h2>
+        </div>
+        <ul style="list-style-type: none;">
+            <li style="margin-bottom: 0.9rem;">✅ <strong>التقط أكثر الاستثناءات تحديداً أولاً:</strong> ضع catch الخاصة بالأنواع المحددة قبل catch العام (Exception).</li>
+            <li style="margin-bottom: 0.9rem;">🚫 <strong>لا تبتلع الاستثناءات!</strong> تجنب catch الفارغ (catch {} ) دون تسجيل أو معالجة.</li>
+            <li style="margin-bottom: 0.9rem;">📝 <strong>سجل الاستثناءات (Logging):</strong> استخدم إطار عمل لتسجيل الأخطاء لفهم المشاكل.</li>
+            <li style="margin-bottom: 0.9rem;">🔁 <strong>استخدم finally أو using لتحرير الموارد:</strong> يضمن عدم تسرب الذاكرة أو الموارد.</li>
+            <li style="margin-bottom: 0.9rem;">💣 <strong>ارمي استثناءات ذات معنى:</strong> استخدم الأنواع المضمنة أو أنشئ استثناءات مخصصة مع رسائل واضحة.</li>
+            <li>⚡ <strong>لا تستخدم الاستثناءات للتحكم في التدفق:</strong> الاستثناءات مكلفة، استخدم الشروط للسيناريوهات المتوقعة.</li>
+        </ul>
+    </div>
+
+    <!-- إنشاء استثناءات مخصصة -->
+    <div class="card-exc">
+        <div class="card-header">
+            <i class="fas fa-plus-circle"></i>
+            <h2>إنشاء استثناءات مخصصة (Custom Exceptions)</h2>
+        </div>
+        <div class="code-block">
+            <pre><code class="language-csharp">public class InvalidAgeException : Exception
+{
+    public InvalidAgeException() { }
+    
+    public InvalidAgeException(string message) : base(message) { }
+    
+    public InvalidAgeException(string message, Exception inner) 
+        : base(message, inner) { }
+}
+
+// الاستخدام:
+public void SetAge(int age)
+{
+    if (age < 0 || age > 150)
+        throw new InvalidAgeException($"العمر {age} غير صالح");
+}</code></pre>
+        </div>
+        <div class="warning-note">
+            📌 <strong>نصيحة:</strong> قم بتوريث من <code>Exception</code> أو <code>ApplicationException</code>، ووفر ثلاثة منشئات كأفضل ممارسة.
+        </div>
+    </div>
+
+    <footer>
+        <i class="fas fa-shield-alt"></i>  معالجة الاستثناءات (Exception Handling) في C# | تصميم فاخر ومحتوى تعليمي شامل | برمج بثقة وأمان
+    </footer>
+</div>
+
+<script>
+    // مختبر معالجة الاستثناءات التفاعلي
+    const exceptionSelect = document.getElementById('exceptionType');
+    const dynamicDiv = document.getElementById('dynamicExcInput');
+    const triggerBtn = document.getElementById('triggerExceptionBtn');
+    const outputDiv = document.getElementById('excDemoOutput');
+    const resetBtn = document.getElementById('resetOutputBtn');
+    
+    function updateDynamicInput() {
+        const type = exceptionSelect.value;
+        if (type === 'divide') {
+            dynamicDiv.innerHTML = `<div><label>المقسوم عليه (سيتم جعله 0):</label><input type="number" id="divVal" value="0" disabled style="width:100%; background:#1a0f1a; border-radius:30px; padding:8px; color:gray;"></div>`;
+        } else if (type === 'nullRef') {
+            dynamicDiv.innerHTML = `<div><label>الكائن (سيتم تعيينه null):</label><input type="text" value="null" disabled style="width:100%; background:#1a0f1a; border-radius:30px; padding:8px;"></div>`;
+        } else if (type === 'indexOut') {
+            dynamicDiv.innerHTML = `<div><label>حجم المصفوفة 3، المؤشر المطلوب:</label><input type="number" id="indexVal" value="5" style="width:100%; background:#0f071a; border-radius:30px; padding:8px; color:white;"></div>`;
+        } else if (type === 'format') {
+            dynamicDiv.innerHTML = `<div><label>نص غير رقمي للتحويل:</label><input type="text" id="badNumber" value="ABC123" style="width:100%; background:#0f071a; border-radius:30px; padding:8px;"></div>`;
+        } else if (type === 'custom') {
+            dynamicDiv.innerHTML = `<div><label>عمر غير صالح (أدخل عدد سالب):</label><input type="number" id="ageValue" value="-5" style="width:100%; background:#0f071a; border-radius:30px; padding:8px;"></div>`;
+        } else if (type === 'safe') {
+            dynamicDiv.innerHTML = `<div><label>رقم عادي:</label><input type="number" id="safeVal" value="42" style="width:100%; background:#0f071a; border-radius:30px; padding:8px;"></div>`;
+        }
+    }
+    
+    function simulateExceptionHandling() {
+        const type = exceptionSelect.value;
+        let result = "";
+        let finallyExecuted = false;
+        
+        try {
+            if (type === 'divide') {
+                let denominator = 0;
+                let numerator = 100;
+                let division = numerator / denominator; // سيرمي استثناء في JS، لكننا نحاكي سلوك C#
+                // لمحاكاة الاستثناء:
+                if (denominator === 0) throw new Error("DivideByZeroException");
+                result = `النتيجة: ${division}`;
+            }
+            else if (type === 'nullRef') {
+                let obj = null;
+                let length = obj.length; // يرمي NullReferenceException
+                result = `الطول: ${length}`;
+            }
+            else if (type === 'indexOut') {
+                let arr = [10, 20, 30];
+                let idx = parseInt(document.getElementById('indexVal')?.value) || 5;
+                if (idx >= arr.length) throw new Error("IndexOutOfRangeException");
+                result = `العنصر: ${arr[idx]}`;
+            }
+            else if (type === 'format') {
+                let text = document.getElementById('badNumber')?.value || "ABC";
+                let num = parseInt(text);
+                if (isNaN(num)) throw new Error("FormatException: تنسيق غير صحيح");
+                result = `الرقم المحول: ${num}`;
+            }
+            else if (type === 'custom') {
+                let age = parseInt(document.getElementById('ageValue')?.value) || -5;
+                if (age < 0 || age > 150) throw new Error("InvalidAgeException: العمر غير صالح");
+                result = `العمر مقبول: ${age}`;
+            }
+            else if (type === 'safe') {
+                let val = parseInt(document.getElementById('safeVal')?.value) || 42;
+                result = `عملية ناجحة: القيمة = ${val}`;
+            }
+            
+            outputDiv.innerHTML = `✅ <strong>تم التنفيذ بنجاح (بدون استثناء)</strong><br>🔹 النتيجة: ${result}<br>📌 finally: تم التنفيذ (تنظيف الموارد افتراضياً)`;
+        }
+        catch (ex) {
+            let exceptionTypeName = "";
+            if (ex.message.includes("DivideByZero")) exceptionTypeName = "DivideByZeroException";
+            else if (ex.message.includes("NullReference")) exceptionTypeName = "NullReferenceException";
+            else if (ex.message.includes("IndexOutOfRange")) exceptionTypeName = "IndexOutOfRangeException";
+            else if (ex.message.includes("FormatException")) exceptionTypeName = "FormatException";
+            else if (ex.message.includes("InvalidAgeException")) exceptionTypeName = "InvalidAgeException (مخصص)";
+            else exceptionTypeName = "Exception";
+            
+            outputDiv.innerHTML = `⚠️ <strong>تم التقاط استثناء!</strong><br>🔸 نوع الاستثناء: ${exceptionTypeName}<br>🔸 الرسالة: ${ex.message}<br>📌 تم تنفيذ catch بنجاح، البرنامج لم ينهار.<br>🧹 finally: تم تنظيف الموارد (محاكاة)`;
+        }
+        finally {
+            // في المحاكاة نضيف رسالة توضيحية
+            if (!outputDiv.innerHTML.includes("finally:"))
+                outputDiv.innerHTML += "<br>🧹 finally: تم التنفيذ دائماً (لإغلاق الملفات أو الموارد).";
+        }
+    }
+    
+    function resetDisplay() {
+        outputDiv.innerHTML = "// تم إعادة التعيين. جرب تنفيذ عملية جديدة لرؤية آلية try-catch-finally ...";
+    }
+    
+    exceptionSelect.addEventListener('change', () => {
+        updateDynamicInput();
+        resetDisplay();
+    });
+    triggerBtn.addEventListener('click', simulateExceptionHandling);
+    resetBtn.addEventListener('click', resetDisplay);
+    updateDynamicInput();
+    resetDisplay();
+</script>
+</body>
+</html>

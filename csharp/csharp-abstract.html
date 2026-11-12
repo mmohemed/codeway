@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتقان التجريد في #C | الواجهات والفئات المجردة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0078d4;
+            --abstract-color: #d83b01;
+            --interface-color: #107c10;
+            --bg: #f3f2f1;
+            --card-bg: #ffffff;
+            --text: #323130;
+            --code-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            line-height: 1.8;
+        }
+
+        /* Header Section */
+        header {
+            background: linear-gradient(135deg, #004578, #0078d4);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: -60px auto 50px;
+            padding: 0 20px;
+        }
+
+        /* Navigation Cards */
+        .nav-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .tab-btn:hover { transform: translateY(-3px); border-color: var(--primary); }
+
+        /* Content Blocks */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--primary);
+        }
+
+        h2 { font-size: 2rem; color: #201f1e; margin-bottom: 25px; }
+        h3 { color: var(--primary); margin-top: 30px; }
+
+        /* Comparison Table */
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+        .comp-table th, .comp-table td {
+            padding: 15px;
+            border: 1px solid #edebe9;
+            text-align: right;
+        }
+        .comp-table th { background: #faf9f8; color: var(--primary); }
+
+        /* Code Styling */
+        .code-wrapper {
+            background: var(--code-bg);
+            border-radius: 8px;
+            margin: 20px 0;
+            direction: ltr;
+            position: relative;
+        }
+        .code-lang {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #444;
+            color: #ddd;
+            padding: 2px 10px;
+            font-size: 12px;
+            border-radius: 0 8px 0 8px;
+        }
+        pre {
+            padding: 25px;
+            color: #dcdcdc;
+            font-family: 'Fira Code', monospace;
+            overflow-x: auto;
+            margin: 0;
+        }
+        .keyword { color: #569cd6; }
+        .type { color: #4ec9b0; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+
+        /* Highlights */
+        .note {
+            background: #fff4ce;
+            border-right: 5px solid #ffb900;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        footer { text-align: center; padding: 50px; color: #605e5c; }
+
+        @media (max-width: 768px) {
+            .nav-tabs { flex-direction: column; }
+            .container { margin-top: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>عمارة البرمجيات: التجريد (Abstraction)</h1>
+    <p>دليل المحترفين للفئات المجردة والواجهات في لغة الـ #C</p>
+</header>
+
+<div class="container">
+    <div class="nav-tabs">
+        <div class="tab-btn">الفئات المجردة (Abstract)</div>
+        <div class="tab-btn">الواجهات (Interfaces)</div>
+        <div class="tab-btn">مقارنة شاملة</div>
+    </div>
+
+    <div class="card" style="border-top-color: var(--abstract-color);">
+        <h2>1. الفئات المجردة (Abstract Classes)</h2>
+        <p>الفئة المجردة هي فئة "غير مكتملة". نستخدمها عندما نريد تعريف مفهوم عام (مثل: "حيوان") لا نريد إنشاء كائنات منه مباشرة، بل نريد استخدامه كقاعدة للأصناف الأخرى (مثل: "كلب"، "قطة").</p>
+        
+        <h3>المميزات الأساسية:</h3>
+        <ul>
+            <li>يمكن أن تحتوي على دوال مكتملة (بها كود) ودوال مجردة (بدون كود).</li>
+            <li>يمكن أن تحتوي على حقول (Fields) ومتغيرات.</li>
+            <li>تسمح بتعريف "المشيدات" (Constructors).</li>
+        </ul>
+
+        <div class="code-wrapper">
+            <div class="code-lang">Abstract Example</div>
+<pre>
+<span class="keyword">public abstract class</span> <span class="type">Shape</span>
+{
+    <span class="comment">// خاصية عادية</span>
+    <span class="keyword">public string</span> Color { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+
+    <span class="comment">// دالة مجردة: يجب على الأبناء تنفيذها</span>
+    <span class="keyword">public abstract double</span> <span class="type">CalculateArea</span>();
+
+    <span class="comment">// دالة عادية: ترثها جميع الأشكال</span>
+    <span class="keyword">public void</span> <span class="type">DisplayColor</span>() => Console.WriteLine(<span class="string">$"الشكل لونه: {Color}"</span>);
+}
+
+<span class="keyword">public class</span> <span class="type">Square</span> : <span class="type">Shape</span>
+{
+    <span class="keyword">public double</span> Side { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public override double</span> <span class="type">CalculateArea</span>() => Side * Side;
+}
+</pre>
+        </div>
+    </div>
+
+    <div class="card" style="border-top-color: var(--interface-color);">
+        <h2>2. الواجهات (Interfaces)</h2>
+        <p>الواجهة هي "عقد" (Contract). هي لا تخبر الكلاس <b>من أنت</b> (كما تفعل الوراثة)، بل تخبره <b>ماذا تستطيع أن تفعل</b>. تسمح الـ #C للكلاس بتنفيذ أكثر من واجهة في نفس الوقت.</p>
+
+        
+
+        <div class="note">
+            <strong>قاعدة ذهبية:</strong> ابدأ بالواجهة إذا كنت تريد تعريف سلوك مشترك بين كلاسات غير مترابطة (مثل: ميزة "الطباعة" التي قد يحتاجها كلاس "فاتورة" وكلاس "تقرير").
+        </div>
+
+        <div class="code-wrapper">
+            <div class="code-lang">Interface Example</div>
+<pre>
+<span class="keyword">public interface</span> <span class="type">IPayable</span>
+{
+    <span class="comment">// في الواجهات، كل الدوال مجردة تلقائياً</span>
+    <span class="keyword">void</span> <span class="type">ProcessPayment</span>(<span class="keyword">decimal</span> amount);
+}
+
+<span class="keyword">public class</span> <span class="type">OnlineStore</span> : <span class="type">IPayable</span>
+{
+    <span class="keyword">public void</span> <span class="type">ProcessPayment</span>(<span class="keyword">decimal</span> amount)
+    {
+        Console.WriteLine(<span class="string">$"جاري معالجة دفع مبلغ {amount} عبر الإنترنت..."</span>);
+    }
+}
+</pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>3. متى نستخدم كل منهما؟ (المقارنة الحاسمة)</h2>
+        <table class="comp-table">
+            <thead>
+                <tr>
+                    <th>الميزة</th>
+                    <th>الفئة المجردة (Abstract)</th>
+                    <th>الواجهة (Interface)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>الوراثة المتعددة</td>
+                    <td>غير مدعومة (يرث من أب واحد).</td>
+                    <td>مدعومة (يمكن تنفيذ عدة واجهات).</td>
+                </tr>
+                <tr>
+                    <td>الحقول (Variables)</td>
+                    <td>يمكن أن تحتوي على متغيرات.</td>
+                    <td>لا تحتوي على متغيرات (فقط خصائص).</td>
+                </tr>
+                <tr>
+                    <td>التنفيذ (Logic)</td>
+                    <td>يمكن كتابة كود داخل بعض الدوال.</td>
+                    <td>(سابقاً) لا يمكن، (حالياً) تسمح بدوال افتراضية.</td>
+                </tr>
+                <tr>
+                    <td>الغرض</td>
+                    <td>لتعريف "نوع" أساسي مشترك.</td>
+                    <td>لتعريف "قدرات" أو سلوكيات مشتركة.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>مثال يجمع الاثنين معاً:</h3>
+        <p>تخيل نظام طيران؛ الطائرة هي "مركبة" (Abstract Class) وفي نفس الوقت هي "قابلة للطيران" (Interface).</p>
+
+        <div class="code-wrapper">
+<pre>
+<span class="keyword">public interface</span> <span class="type">IFlyable</span> { <span class="keyword">void</span> <span class="type">Fly</span>(); }
+
+<span class="keyword">public abstract class</span> <span class="type">Vehicle</span> { <span class="keyword">public string</span> EngineType { <span class="keyword">get</span>; <span class="keyword">set</span>; } }
+
+<span class="keyword">public class</span> <span class="type">Airplane</span> : <span class="type">Vehicle</span>, <span class="type">IFlyable</span>
+{
+    <span class="keyword">public void</span> <span class="type">Fly</span>() => Console.WriteLine(<span class="string">"الطائرة تقلع الآن..."</span>);
+}
+</pre>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>تم إعداد هذا الدليل لمساعدة المبرمجين العرب على احتراف هندسة البرمجيات بـ #C</p>
+    <p>&copy; 2026 - أكاديمية المبرمج المحترف</p>
+</footer>
+
+</body>
+</html>

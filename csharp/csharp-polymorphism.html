@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C# | تعدد الأشكال (Polymorphism) - الدليل المتكامل | تصميم فخم</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(ellipse at 0% 0%, #0a0a1a 0%, #03030c 100%);
+            color: #f0f3ff;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        .bg-polymorph {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(200, 80, 255, 0.08), transparent 75%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* hero section */
+        .hero-poly {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2.5rem 1.5rem;
+            background: rgba(15, 10, 35, 0.6);
+            backdrop-filter: blur(16px);
+            border-radius: 3rem;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            box-shadow: 0 30px 45px -20px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero-poly h1 {
+            font-size: 3.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #d8b4fe, #a855f7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+            margin-bottom: 0.8rem;
+        }
+
+        .hero-poly p {
+            font-size: 1.2rem;
+            color: #e2d5ff;
+            max-width: 850px;
+            margin: 0.8rem auto 0;
+            font-weight: 500;
+        }
+
+        .badge-poly {
+            background: linear-gradient(95deg, #2e1a4a, #1a0e2e);
+            padding: 0.4rem 1.8rem;
+            border-radius: 60px;
+            display: inline-block;
+            font-weight: 700;
+            border: 1px solid #a855f760;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* cards */
+        .card-poly {
+            background: rgba(12, 10, 30, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-poly:hover {
+            border-color: rgba(168, 85, 247, 0.6);
+            background: rgba(18, 15, 42, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid rgba(168, 85, 247, 0.5);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.6rem;
+        }
+
+        .card-header i {
+            font-size: 2.2rem;
+            color: #c084fc;
+            filter: drop-shadow(0 0 5px #a855f7);
+        }
+
+        .card-header h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 1.8rem;
+            margin: 1rem 0;
+        }
+
+        .poly-card {
+            background: rgba(0, 0, 20, 0.55);
+            border-radius: 1.6rem;
+            padding: 1.4rem;
+            border-left: 4px solid #c084fc;
+            transition: 0.2s;
+        }
+
+        .poly-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #e9d5ff;
+        }
+
+        .code-block {
+            border-radius: 1.2rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            font-size: 0.85rem;
+            border-radius: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .pill-poly {
+            background: #4c1d95;
+            padding: 0.2rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #e9d5ff;
+            display: inline-block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table td, .comparison-table th {
+            padding: 0.9rem;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+            vertical-align: top;
+        }
+
+        .interactive-poly {
+            background: linear-gradient(145deg, #0f0a1f, #07030f);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            margin: 1.5rem 0;
+            border: 1px solid #8b5cf6;
+        }
+
+        .btn-glow-poly {
+            background: linear-gradient(95deg, #6d28d9, #4c1d95);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 0.7rem 2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            margin-top: 0.8rem;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-glow-poly:hover {
+            background: linear-gradient(95deg, #7c3aed, #5b21b6);
+            transform: scale(0.97);
+        }
+
+        .demo-output {
+            background: #05020f;
+            padding: 1rem 1.2rem;
+            border-radius: 1.2rem;
+            font-family: 'Fira Code', monospace;
+            border-left: 3px solid #a855f7;
+            margin-top: 1rem;
+            color: #f3e8ff;
+        }
+
+        .note-tip {
+            background: #1e1535;
+            border-left: 4px solid #c084fc;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid #5b21b6;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 750px) {
+            .container { padding: 1rem; }
+            .hero-poly h1 { font-size: 2rem; }
+            .card-header h2 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-polymorph"></div>
+<div class="container">
+    <div class="hero-poly">
+        <div class="badge-poly"><i class="fas fa-shapes"></i>  POLYMORPHISM | تعدد الأشكال</div>
+        <h1>🎭 تعدد الأشكال <span style="background: linear-gradient(120deg,#d8b4fe,#ffffff); background-clip:text; -webkit-background-clip:text; color:transparent;">(Polymorphism)</span></h1>
+        <p>قدرة الكائنات على اتخاذ أشكال متعددة — virtual, override, abstract, interface — أساس المرونة والتوسع في البرمجة الكائنية.</p>
+    </div>
+
+    <!-- مفهوم تعدد الأشكال -->
+    <div class="card-poly">
+        <div class="card-header">
+            <i class="fas fa-mask"></i>
+            <h2>ما هو تعدد الأشكال؟</h2>
+        </div>
+        <p style="font-size:1.05rem; margin-bottom: 1rem;">تعدد الأشكال (Polymorphism) هو قدرة الكائنات من أنواع مختلفة على الاستجابة لنفس الدالة (method) بطريقة خاصة بكل نوع. ينقسم إلى نوعين رئيسيين: <strong>تعدد الأشكال في وقت التشغيل (Runtime Polymorphism)</strong> عبر الوراثة و <strong>تعدد الأشكال في وقت الترجمة (Compile-time Polymorphism)</strong> عبر التحميل الزائد (Overloading).</p>
+        <div class="code-block">
+            <pre><code class="language-csharp">// المفهوم الأساسي: الكائن يتصرف وفقاً لنوعه الحقيقي
+Animal myAnimal = new Dog();
+myAnimal.Speak();  // ينادي نسخة Dog من Speak (وليس Animal)
+
+Animal another = new Cat();
+another.Speak();   // ينادي نسخة Cat</code></pre>
+        </div>
+        <div class="note-tip">
+            <i class="fas fa-lightbulb"></i> <strong>الخلاصة:</strong> نفس الكود (استدعاء Speak) يعطي سلوكيات مختلفة حسب النوع الفعلي للكائن.
+        </div>
+    </div>
+
+    <!-- أنواع تعدد الأشكال -->
+    <div class="card-poly">
+        <div class="card-header">
+            <i class="fas fa-code-branch"></i>
+            <h2>أنواع تعدد الأشكال</h2>
+        </div>
+        <div class="grid-2col">
+            <div class="poly-card">
+                <h3><i class="fas fa-clock"></i> Runtime Polymorphism</h3>
+                <p>يتم تحديد الدالة المناسبة أثناء تنفيذ البرنامج باستخدام <span class="pill-poly">virtual</span> و <span class="pill-poly">override</span>.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public class Shape 
+{
+    public virtual void Draw() 
+    { Console.WriteLine("رسم شكل"); }
+}
+public class Circle : Shape 
+{
+    public override void Draw() 
+    { Console.WriteLine("رسم دائرة"); }
+}</code></pre>
+                </div>
+            </div>
+            <div class="poly-card">
+                <h3><i class="fas fa-calculator"></i> Compile-time Polymorphism</h3>
+                <p>التحميل الزائد للدوال (Method Overloading) — دوال بنفس الاسم ومعاملات مختلفة.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public class Calculator
+{
+    public int Add(int a, int b) => a + b;
+    public double Add(double a, double b) => a + b;
+    public int Add(int a, int b, int c) => a + b + c;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- virtual / override / new -->
+    <div class="card-poly">
+        <div class="card-header">
+            <i class="fas fa-code"></i>
+            <h2>virtual, override, new: أدوات تعدد الأشكال</h2>
+        </div>
+        <table class="comparison-table">
+            <tr style="border-bottom: 2px solid #a855f7;">
+                <th>الكلمة</th><th>الوصف</th><th>مثال</th>
+            </tr>
+            <tr><td class="pill-poly">virtual</td><td>تسمح للكلاس المشتق بإعادة تعريف الدالة.</td><td><code>public virtual void MakeSound()</code></td></tr>
+            <tr><td class="pill-poly">override</td><td>تعيد تعريف دالة virtual في الكلاس المشتق.</td><td><code>public override void MakeSound()</code></td></tr>
+            <tr><td class="pill-poly">new</td><td>تخفي دالة الكلاس الأساسي (وليس إعادة تعريف).</td><td><code>public new void MakeSound()</code></td></tr>
+        </table>
+        <div class="code-block" style="margin-top: 1rem;">
+            <pre><code class="language-csharp">public class Animal 
+{
+    public virtual void Speak() => Console.WriteLine("صوت حيوان");
+}
+public class Dog : Animal 
+{
+    public override void Speak() => Console.WriteLine("نباح: هو هو");
+}
+public class RobotDog : Dog 
+{
+    public new void Speak() => Console.WriteLine("صوت آلي"); // إخفاء
+}
+
+// الاستخدام:
+Animal a = new Dog();
+a.Speak();  // نباح: هو هو (override)
+Dog d = new RobotDog();
+d.Speak();  // نباح: هو هو (ليس صوت آلي، لأن new لا يعمل مع تعدد الأشكال)</code></pre>
+        </div>
+    </div>
+
+    <!-- Abstract Classes and Methods -->
+    <div class="card-poly">
+        <div class="card-header">
+            <i class="fas fa-draw-polygon"></i>
+            <h2>الكلاسات المجردة (Abstract) والدوال المجردة</h2>
+        </div>
+        <p>الكلاس المجرد لا يمكن إنشاء كائن منه، والدالة المجردة ليس لها جسم ويجب تنفيذها في الكلاسات المشتقة.</p>
+        <div class="code-block">
+            <pre><code class="language-csharp">public abstract class Vehicle
+{
+    public abstract void StartEngine(); // لا يوجد تنفيذ هنا
+    
+    public void Honk() // دالة عادية
+    {
+        Console.WriteLine("بوق بوق!");
+    }
+}
+
+public class Car : Vehicle
+{
+    public override void StartEngine()
+    {
+        Console.WriteLine("تشغيل محرك السيارة...");
+    }
+}
+
+// الاستخدام:
+Vehicle myCar = new Car();
+myCar.StartEngine(); // تشغيل محرك السيارة...</code></pre>
+        </div>
+        <div class="note-tip">
+            🧩 <strong>متى نستخدم abstract؟</strong> عندما يكون لدينا قالب عام لا يمكن إنشاء كائن منه مباشرة، ويجب على الكلاسات المشتقة توفير التنفيذ الخاص بها.
+        </div>
+    </div>
+
+    <!-- Interfaces (تعدد الأشكال عبر الواجهات) -->
+    <div class="card-poly">
+        <div class="card-header">
+            <i class="fas fa-plug"></i>
+            <h2>الواجهات (Interfaces) — تعدد أشكال مرن</h2>
+        </div>
+        <p>الواجهة تحدد عقداً (contract) من الدوال والخصائص دون تنفيذ، ويمكن للكلاسات تنفيذ واجهات متعددة.</p>
+        <div class="code-block">
+            <pre><code class="language-csharp">public interface IPlayable
+{
+    void Play();
+    void Pause();
+}
+
+public interface IRecordable
+{
+    void Record();
+}
+
+public class MusicPlayer : IPlayable, IRecordable
+{
+    public void Play() => Console.WriteLine("تشغيل الموسيقى");
+    public void Pause() => Console.WriteLine("إيقاف مؤقت");
+    public void Record() => Console.WriteLine("تسجيل الصوت");
+}
+
+// تعدد الأشكال عبر الواجهة
+IPlayable player = new MusicPlayer();
+player.Play();  // تشغيل الموسيقى
+// player.Record(); // غير متاح لأن الواجهة IPlayable لا تحتوي على Record</code></pre>
+        </div>
+    </div>
+
+    <!-- مثال حي تفاعلي (Polymorphism in Action) -->
+    <div class="interactive-poly">
+        <h3 style="display: flex; gap: 0.8rem;"><i class="fas fa-flask"></i> 🧪 معمـل تعدد الأشكال التفاعلي</h3>
+        <p>اختر نوع الكائن لترى كيف تستجيب الدوال <code>MakeSound()</code> بشكل مختلف باستخدام تعدد الأشكال (virtual/override).</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0;">
+            <div style="flex:1">
+                <label>نوع الحيوان:</label>
+                <select id="animalSelect" style="width:100%; padding:10px; border-radius: 30px; background:#0f0a1f; color:white; border:1px solid #a855f7;">
+                    <option value="animal">حيوان عادي (Animal)</option>
+                    <option value="dog">كلب (Dog) - override</option>
+                    <option value="cat">قطة (Cat) - override</option>
+                    <option value="robot">روبوت كلب (RobotDog) - new (إخفاء)</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-glow-poly" id="polymorphDemoBtn"><i class="fas fa-play"></i>  استدعاء MakeSound()</button>
+        <div class="demo-output" id="polymorphOutput">
+            // سيتم عرض سلوك تعدد الأشكال حسب النوع المختار ...
+        </div>
+        <div class="note-tip" style="margin-top: 1rem;">
+            💡 <strong>لاحظ:</strong> نفس المتغير من النوع Animal يمكن أن يشير إلى Dog أو Cat، وعند استدعاء MakeSound() يتم استدعاء النسخة المعدلة (override) — هذا هو جوهر تعدد الأشكال.
+        </div>
+    </div>
+
+    <!-- الفرق بين Overloading و Overriding -->
+    <div class="card-poly">
+        <div class="card-header">
+            <i class="fas fa-exchange-alt"></i>
+            <h2>مقارنة: Overloading vs Overriding</h2>
+        </div>
+        <table class="comparison-table">
+            <tr style="border-bottom: 2px solid #c084fc;">
+                <th>الميزة</th><th>Overloading (التحميل الزائد)</th><th>Overriding (إعادة التعريف)</th>
+            </tr>
+            <tr><td>الوقت</td><td>وقت الترجمة (compile-time)</td><td>وقت التشغيل (runtime)</td></tr>
+            <tr><td>العلاقة</td><td>دوال في نفس الكلاس</td><td>بين كلاس أساسي ومشتق</td></tr>
+            <tr><td>الكلمات المفتاحية</td><td>لا توجد كلمات خاصة</td><td>virtual / override</td></tr>
+            <tr><td>التوقيع (signature)</td><td>يجب أن يختلف (عدد/نوع المعاملات)</td><td>نفس التوقيع تماماً</td></tr>
+        </table>
+    </div>
+
+    <!-- أفضل الممارسات -->
+    <div class="card-poly">
+        <div class="card-header">
+            <i class="fas fa-gem"></i>
+            <h2>إرشادات ذهبية لتعدد الأشكال الاحترافي</h2>
+        </div>
+        <ul style="list-style-type: none;">
+            <li style="margin-bottom: 0.9rem;">🎯 <strong>استخدم virtual بحكمة:</strong> لا تجعل كل الدوال افتراضية إلا عند الحاجة الحقيقية للتوسع.</li>
+            <li style="margin-bottom: 0.9rem;">📐 <strong>مبدأ استبدال ليسكوف (LSP):</strong> الكلاسات المشتقة يجب أن تكون قابلة للاستبدال بالكلاس الأساسي دون تغيير سلوك البرنامج.</li>
+            <li style="margin-bottom: 0.9rem;">🔌 <strong>الواجهات (Interfaces) مرنة جداً:</strong> تسمح بتعدد الأشكال دون الحاجة إلى وراثة كاملة.</li>
+            <li style="margin-bottom: 0.9rem;">⚠️ <strong>تجنب استخدام new</strong> ما لم تكن تعرف تماماً ما تفعله (يخفي الدالة ولا يدعم تعدد الأشكال).</li>
+            <li>✅ <strong>استخدم abstract classes</strong> عندما تريد مشاركة كود أساسي مع إجبار المشتقات على تنفيذ دوال معينة.</li>
+        </ul>
+    </div>
+
+    <footer>
+        <i class="fas fa-shapes"></i>  تعدد الأشكال (Polymorphism) في C# | دليل شامل وتفاعلي | تصميم فاخر ومحتوى تعليمي متكامل
+    </footer>
+</div>
+
+<script>
+    // محاكاة تعدد الأشكال بشكل تفاعلي (محاكاة لأنماط C#)
+    // تعريف كلاسات افتراضية في JavaScript لمحاكاة السلوك
+    class Animal {
+        makeSound() {
+            return "🔊 حيوان: يصدر صوتاً عاماً (virtual)";
+        }
+    }
+    
+    class Dog extends Animal {
+        makeSound() {
+            return "🐕 كلب: نباح! هوو هوو (override)";
+        }
+    }
+    
+    class Cat extends Animal {
+        makeSound() {
+            return "🐈 قطة: مواء ~ مياو (override)";
+        }
+    }
+    
+    class RobotDog extends Dog {
+        // new behaviour - hiding (لكن في C# behaviour مختلف، هنا نوضح المفهوم)
+        makeSound() {
+            return "🤖 روبوت كلب: صوت آلي *بييب* (new - إخفاء، لكن عبر مرجع Animal سينادي نسخة Dog)";
+        }
+    }
+    
+    const selectEl = document.getElementById('animalSelect');
+    const demoBtn = document.getElementById('polymorphDemoBtn');
+    const outputEl = document.getElementById('polymorphOutput');
+    
+    function demonstratePolymorphism() {
+        const type = selectEl.value;
+        let animalRef;  // سيكون من النوع Animal (محاكاة)
+        let explanation = "";
+        
+        switch(type) {
+            case 'animal':
+                animalRef = new Animal();
+                explanation = "🔹 مرجع من نوع Animal يشير إلى كائن Animal";
+                break;
+            case 'dog':
+                animalRef = new Dog();
+                explanation = "🔹 مرجع من نوع Animal يشير إلى كائن Dog (override)";
+                break;
+            case 'cat':
+                animalRef = new Cat();
+                explanation = "🔹 مرجع من نوع Animal يشير إلى كائن Cat (override)";
+                break;
+            case 'robot':
+                animalRef = new RobotDog();
+                explanation = "🔹 مرجع من نوع Animal يشير إلى كائن RobotDog (باستخدام new) — سينادي النسخة من Dog لأن new لا يخفي عند الاستدلال عبر Animal";
+                // في C# الحقيقي: لو استخدمنا new في RobotDog واستدعينا عبر مرجع Animal سينادي نسخة Dog، أما عبر مرجع RobotDog فسينادي الجديدة.
+                // نصحح المحاكاة لتعكس السلوك الحقيقي:
+                if (type === 'robot') {
+                    // نوضح الفرق:
+                    outputEl.innerHTML = `${explanation}<br><br>🎭 <strong>نتيجة استدعاء MakeSound():</strong><br>🤖 عبر مرجع Animal: ${new Dog().makeSound()}<br><span style="opacity:0.8;">(لاحظ: new لا يؤثر عند الاستدلال عبر Animal، بل يظهر فقط عند استخدام مرجع RobotDog)</span><br><br>✨ السلوك الصحيح لتعدد الأشكال: الدوال المعرفة بـ override فقط هي التي تظهر تأثيرها عبر مرجع الكلاس الأساسي.`;
+                    return;
+                }
+                break;
+        }
+        
+        if (animalRef) {
+            const result = animalRef.makeSound();
+            outputEl.innerHTML = `${explanation}<br><br>🎭 <strong>نتيجة استدعاء makeSound():</strong><br>${result}<br><br>✨ يظهر تعدد الأشكال: نفس الاستدعاء أعطى سلوكاً مختلفاً حسب النوع الفعلي للكائن.`;
+        } else {
+            outputEl.innerHTML = "⚠️ خطأ في المحاكاة";
+        }
+    }
+    
+    demoBtn.addEventListener('click', demonstratePolymorphism);
+    // تشغيل أول مرة
+    demonstratePolymorphism();
+    
+    // تحديث تلقائي عند تغيير القائمة
+    selectEl.addEventListener('change', demonstratePolymorphism);
+</script>
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>تعلم C# | المصفوفات والمجاميع (Arrays & Summation)</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f3f6fb 0%, #e9eef4 100%);
+            font-family: 'Inter', 'Cairo', sans-serif;
+            color: #1e2f3e;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.8rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(125deg, #0b2b3b 0%, #1e5a6f 100%);
+            border-radius: 2rem;
+            padding: 2.5rem 2rem;
+            margin-bottom: 2.8rem;
+            color: white;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "[] ➕ ∑";
+            font-size: 6rem;
+            font-weight: 800;
+            opacity: 0.1;
+            position: absolute;
+            bottom: 0px;
+            left: 20px;
+            font-family: monospace;
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero h1 i {
+            background: linear-gradient(135deg, #ffd966, #ffaa33);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.92;
+            max-width: 75%;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Grid cards */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.25s ease, box-shadow 0.25s;
+            border: 1px solid rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 22px 35px -14px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            padding: 1.4rem 1.8rem 0.5rem 1.8rem;
+            border-bottom: 2px solid #eef2f8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header i {
+            font-size: 1.9rem;
+            color: #1e7e6c;
+        }
+
+        .card-header h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #1a4a5f;
+        }
+
+        .card-body {
+            padding: 1.5rem 1.8rem 1.8rem;
+        }
+
+        .code-block {
+            background: #0f172a;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1.2rem 0;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: #334155;
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #4f5e77;
+        }
+
+        .note {
+            background: #eefaf7;
+            border-right: 4px solid #1e7e6c;
+            padding: 0.9rem 1.2rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .methods-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.8rem;
+        }
+
+        .method-badge {
+            background: #eef2ff;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-family: monospace;
+            font-weight: 600;
+            color: #1e6f5c;
+        }
+
+        .interactive-box {
+            background: #fef6e0;
+            border-radius: 1.2rem;
+            padding: 1.3rem;
+            margin-top: 0.8rem;
+        }
+
+        .btn-run {
+            background: #1e7e6c;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0.5rem 0 1rem 0;
+        }
+
+        .btn-run:hover {
+            background: #0f5e50;
+            transform: scale(0.98);
+        }
+
+        .output-console {
+            background: #0e131f;
+            color: #ccf4e8;
+            font-family: monospace;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            border-left: 4px solid #f3b33d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px 8px;
+            text-align: right;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        @media (max-width: 880px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+            .hero p {
+                max-width: 100%;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            font-size: 0.85rem;
+            color: #5e7a93;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>
+            <i class="fas fa-layer-group"></i> 
+            المصفوفات والمجاميع في C#
+        </h1>
+        <p>تعلم كيفية تخزين مجموعات من البيانات باستخدام Arrays، ثم قم بجمعها، حساب متوسطها، والبحث فيها. أساسيات لا غنى عنها لأي مبرمج.</p>
+        <div class="badge-group">
+            <span class="badge"><i class="fas fa-table"></i> Single-Dimensional</span>
+            <span class="badge"><i class="fas fa-calculator"></i> Sum, Average, Max</span>
+            <span class="badge"><i class="fas fa-code"></i> foreach, for, LINQ</span>
+        </div>
+    </div>
+
+    <!-- الشبكة: تعريف المصفوفات + طرق إنشائها -->
+    <div class="grid-2col">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-cubes"></i>
+                <h2>ما هي المصفوفة (Array)؟</h2>
+            </div>
+            <div class="card-body">
+                <p>المصفوفة هي مجموعة من العناصر <strong>من نفس النوع</strong>، مخزنة في مواقع ذاكرة متتالية. يمكن الوصول إلى أي عنصر باستخدام <strong>الفهرس (index)</strong> الذي يبدأ من 0.</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyArrayDeclaration()"><i class="far fa-copy"></i> نسخ</button>
+                    <pre><code class="language-csharp" id="arrayDeclare">// طرق مختلفة لإنشاء مصفوفة
+int[] numbers = new int[5];        // مصفوفة من 5 أعداد (كلها 0)
+numbers[0] = 10;
+numbers[1] = 20;
+
+int[] scores = new int[] { 95, 82, 74, 88, 91 }; // تهيئة بالقيم
+string[] names = { "أحمد", "سارة", "محمد" };     // صيغة مختصرة
+
+// الوصول إلى العناصر
+Console.WriteLine(names[1]);  // الناتج: سارة</code></pre>
+                </div>
+                <div class="note">
+                    <i class="fas fa-info-circle"></i> حجم المصفوفة <strong>ثابت</strong> بعد إنشائها. يمكنك الحصول على الطول باستخدام خاصية <code>Length</code>.
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-arrow-right-arrow-left"></i>
+                <h2>التكرار على المصفوفات</h2>
+            </div>
+            <div class="card-body">
+                <p>استخدم <code>for</code> أو <code>foreach</code> لاجتياز جميع عناصر المصفوفة بسهولة.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">int[] grades = { 90, 85, 77, 92, 88 };
+
+// باستخدام for
+for (int i = 0; i < grades.Length; i++)
+{
+    Console.WriteLine($"العنصر {i}: {grades[i]}");
+}
+
+// باستخدام foreach (أسهل للقراءة)
+foreach (int grade in grades)
+{
+    Console.WriteLine($"الدرجة: {grade}");
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- المجاميع والعمليات الإحصائية -->
+    <div class="card full-width">
+        <div class="card-header">
+            <i class="fas fa-chart-line"></i>
+            <h2>حساب المجموع، المتوسط، أكبر وأصغر قيمة</h2>
+        </div>
+        <div class="card-body">
+            <div class="methods-grid">
+                <span class="method-badge">🔢 Sum (المجموع)</span>
+                <span class="method-badge">📊 Average (المتوسط)</span>
+                <span class="method-badge">📈 Max / Min</span>
+                <span class="method-badge">⚡ LINQ (طريقة مختصرة)</span>
+            </div>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copySumCode()"><i class="far fa-copy"></i> نسخ المثال</button>
+                <pre><code class="language-csharp" id="sumCode">int[] values = { 15, 27, 33, 42, 50 };
+
+// 1. حساب المجموع باستخدام حلقة
+int sum = 0;
+for (int i = 0; i < values.Length; i++)
+{
+    sum += values[i];
+}
+Console.WriteLine($"المجموع: {sum}");
+
+// 2. المتوسط الحسابي
+double average = (double)sum / values.Length;
+Console.WriteLine($"المتوسط: {average:F2}");
+
+// 3. أكبر وأصغر قيمة
+int max = values[0];
+int min = values[0];
+foreach (int num in values)
+{
+    if (num > max) max = num;
+    if (num < min) min = num;
+}
+Console.WriteLine($"الأكبر: {max}, الأصغر: {min}");
+
+// 4. باستخدام LINQ (سهل وسريع)
+using System.Linq;
+int sumLinq = values.Sum();
+double avgLinq = values.Average();
+int maxLinq = values.Max();
+Console.WriteLine($"LINQ → مجموع: {sumLinq}, متوسط: {avgLinq}");</code></pre>
+                </div>
+                <div class="note">
+                    <i class="fas fa-lightbulb"></i> <strong>نصيحة:</strong> استخدم <code>using System.Linq;</code> للاستفادة من دوال جاهزة مثل <code>Sum()</code> و <code>Average()</code> و <code>Max()</code>.
+                </div>
+        </div>
+    </div>
+
+    <!-- أمثلة عملية متنوعة -->
+    <div class="grid-2col">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chalkboard-user"></i>
+                <h2>مثال تطبيقي: درجات الطلاب</h2>
+            </div>
+            <div class="card-body">
+                <p>نفترض مصفوفة بدرجات 5 طلاب. نحسب المجموع والمتوسط ونطبع النتائج.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">double[] studentScores = { 88.5, 92.0, 76.5, 89.0, 95.5 };
+double total = 0;
+
+for (int i = 0; i < studentScores.Length; i++)
+{
+    total += studentScores[i];
+}
+
+double averageScore = total / studentScores.Length;
+Console.WriteLine($"مجموع الدرجات: {total}");
+Console.WriteLine($"متوسط الدرجات: {averageScore:F2}");
+
+// إيجاد أعلى درجة
+double highest = studentScores.Max();
+Console.WriteLine($"أعلى درجة: {highest}");</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-search"></i>
+                <h2>البحث في المصفوفة</h2>
+            </div>
+            <div class="card-body">
+                <p>البحث عن قيمة معينة داخل مصفوفة وإرجاع فهرسها أو رسالة بعدم وجودها.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">string[] fruits = { "تفاح", "موز", "برتقال", "عنب" };
+string searchItem = "موز";
+int index = -1;
+
+for (int i = 0; i < fruits.Length; i++)
+{
+    if (fruits[i] == searchItem)
+    {
+        index = i;
+        break;
+    }
+}
+
+if (index != -1)
+    Console.WriteLine($"تم العثور على '{searchItem}' في الفهرس {index}");
+else
+    Console.WriteLine($"'{searchItem}' غير موجود");</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مصفوفات متعددة الأبعاد وجمعها -->
+    <div class="card full-width">
+        <div class="card-header">
+            <i class="fas fa-border-all"></i>
+            <h2>المصفوفات ثنائية الأبعاد وجمع العناصر</h2>
+        </div>
+        <div class="card-body">
+            <p>المصفوفات ثنائية الأبعاد (Matrix) تشبه جدولاً له صفوف وأعمدة. يمكن حساب مجموع كل الصفوف أو كل عمود.</p>
+            <div class="code-block">
+                <pre><code class="language-csharp">// مصفوفة 3x2
+int[,] matrix = {
+    { 2, 4 },
+    { 6, 8 },
+    { 1, 3 }
+};
+
+int totalSum = 0;
+for (int row = 0; row < matrix.GetLength(0); row++)
+{
+    for (int col = 0; col < matrix.GetLength(1); col++)
+    {
+        totalSum += matrix[row, col];
+    }
+}
+Console.WriteLine($"مجموع جميع العناصر: {totalSum}");  // الناتج: 24
+
+// حساب مجموع كل صف
+for (int row = 0; row < matrix.GetLength(0); row++)
+{
+    int rowSum = 0;
+    for (int col = 0; col < matrix.GetLength(1); col++)
+        rowSum += matrix[row, col];
+    Console.WriteLine($"مجموع الصف {row + 1} = {rowSum}");
+}</code></pre>
+                </div>
+        </div>
+    </div>
+
+    <!-- تجربة تفاعلية محاكاة -->
+    <div class="card full-width">
+        <div class="card-header">
+            <i class="fas fa-laptop-code"></i>
+            <h2>جرب بنفسك: محاكاة جمع أرقام مصفوفة</h2>
+        </div>
+        <div class="card-body">
+            <p>الكود التالي يحسب مجموع عناصر مصفوفة <code>numbers</code>. اضغط على "تشغيل المحاكاة" لترى النتيجة خطوة بخطوة.</p>
+            <div class="code-block">
+                <pre><code class="language-csharp" id="demoArrayCode">int[] numbers = { 12, 45, 23, 67, 34, 19 };
+int total = 0;
+
+Console.WriteLine("عناصر المصفوفة:");
+foreach (int num in numbers)
+{
+    Console.Write(num + " ");
+    total += num;
+}
+Console.WriteLine($"\nالمجموع الكلي = {total}");
+Console.WriteLine($"المتوسط الحسابي = {(double)total / numbers.Length:F2}");</code></pre>
+            </div>
+            <div class="interactive-box">
+                <button class="btn-run" id="runArraySimulate"><i class="fas fa-play"></i> تشغيل المحاكاة</button>
+                <div class="output-console" id="arrayOutput">
+                    // انقر على الزر لترى مخرجات حساب المجموع والمتوسط
+                </div>
+                <p style="font-size:0.75rem; margin-top:0.8rem;"><i class="fas fa-mouse-pointer"></i> هذه محاكاة تعليمية تُظهر تنفيذ برنامج حقيقي يجمع أعداد مصفوفة.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدول مقارنة الطرق المختلفة -->
+    <div class="card full-width">
+        <div class="card-header">
+            <i class="fas fa-list-check"></i>
+            <h2>ملخص: أشهر دوال وخصائص المصفوفات</h2>
+        </div>
+        <div class="card-body">
+            <table>
+                <thead><tr><th>الخاصية / الدالة</th><th>الوصف</th><th>مثال</th></tr></thead>
+                <tbody>
+                    <tr><td>Length</td><td>عدد العناصر في المصفوفة</td><td><code>int size = arr.Length;</code></td></tr>
+                    <tr><td>Array.Sort()</td><td>ترتيب المصفوفة تصاعدياً</td><td><code>Array.Sort(numbers);</code></td></tr>
+                    <tr><td>Array.Reverse()</td><td>عكس ترتيب العناصر</td><td><code>Array.Reverse(names);</code></td></tr>
+                    <tr><td>Array.IndexOf()</td><td>إيجاد فهرس قيمة معينة</td><td><code>int idx = Array.IndexOf(arr, 42);</code></td></tr>
+                    <tr><td>Sum() (LINQ)</td><td>حساب مجموع العناصر (requires System.Linq)</td><td><code>int sum = arr.Sum();</code></td></tr>
+                    <tr><td>Average() (LINQ)</td><td>حساب متوسط العناصر</td><td><code>double avg = arr.Average();</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <i class="fas fa-database"></i> المصفوفات تمكنك من التعامل مع مجموعات كبيرة من البيانات بكفاءة. تذكر أن الممارسة المستمرة هي مفتاح الإتقان.
+        <br>© 2025 | دليل شامل للمصفوفات والمجاميع في C# | تصميم تعليمي حديث
+    </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script>
+    // نسخ كود تعريف المصفوفات
+    function copyArrayDeclaration() {
+        const codeElem = document.getElementById('arrayDeclare');
+        copyGeneric(codeElem.innerText, document.querySelectorAll('.copy-btn')[0]);
+    }
+    function copySumCode() {
+        const codeElem = document.getElementById('sumCode');
+        copyGeneric(codeElem.innerText, document.querySelectorAll('.copy-btn')[1]);
+    }
+    function copyGeneric(text, btnElement) {
+        navigator.clipboard.writeText(text).then(() => {
+            const original = btnElement.innerHTML;
+            btnElement.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+            setTimeout(() => { btnElement.innerHTML = original; }, 1600);
+        }).catch(() => alert("تعذر النسخ"));
+    }
+
+    // محاكاة تشغيل كود المصفوفات والمجموع
+    const runSimulateBtn = document.getElementById('runArraySimulate');
+    const outputArea = document.getElementById('arrayOutput');
+    
+    function simulateArraySum() {
+        const simulatedResult = `> تشغيل محاكي C# (Array & Sum)
+عناصر المصفوفة:
+12 45 23 67 34 19 
+المجموع الكلي = 200
+المتوسط الحسابي = 33.33
+
+✅ تم الحساب بنجاح باستخدام حلقة foreach.`;
+        outputArea.innerHTML = `<span style="color:#e2f0ec;">${simulatedResult.replace(/\n/g, '<br>')}</span>`;
+        outputArea.style.borderLeftColor = "#6fcf97";
+        setTimeout(() => { outputArea.style.borderLeftColor = "#f3b33d"; }, 800);
+    }
+    
+    runSimulateBtn.addEventListener('click', simulateArraySum);
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        Prism.highlightAll();
+        console.log("صفحة المصفوفات والمجاميع في C# جاهزة - ابدأ التعلّم!");
+    });
+</script>
+</body>
+</html>

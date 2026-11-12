@@ -1,0 +1,2450 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشروع تطبيق الطقس (Weather App) | CodeWay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0a2540;
+            --primary-light: #1a3a5c;
+            --accent: #635bff;
+            --accent-hover: #4f46e5;
+            --accent-soft: #eef2ff;
+            --text-dark: #0a2540;
+            --text-body: #425466;
+            --text-muted: #8898aa;
+            --bg: #ffffff;
+            --bg-soft: #f7f9fc;
+            --border: #e6ebf1;
+            --success: #0e9f6e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --code-bg: #0a1929;
+            --sky: #0ea5e9;
+            --sky-soft: #e0f2fe;
+            --shadow-sm: 0 1px 3px rgba(10,37,64,.06), 0 1px 2px rgba(10,37,64,.04);
+            --shadow-md: 0 4px 12px rgba(10,37,64,.08), 0 2px 4px rgba(10,37,64,.04);
+            --shadow-lg: 0 20px 40px rgba(10,37,64,.1), 0 8px 16px rgba(10,37,64,.06);
+            --shadow-accent: 0 8px 24px rgba(99,91,255,.25);
+            --radius: 14px;
+            --radius-lg: 22px;
+            --transition: all .3s cubic-bezier(.4,0,.2,1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-body);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--sky));
+            z-index: 3000;
+            width: 0%;
+            transition: width .1s linear;
+            box-shadow: 0 0 10px rgba(99,91,255,.5);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--primary);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            transition: var(--transition);
+        }
+        .header.scrolled { box-shadow: 0 10px 30px rgba(10,37,64,.25); }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--sky));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.15rem;
+            box-shadow: var(--shadow-accent);
+        }
+        .brand-text {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: .5px;
+        }
+        .brand-text span { color: #7dd3fc; }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-nav a {
+            color: rgba(255,255,255,.75);
+            text-decoration: none;
+            font-size: .92rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .header-nav a:hover, .header-nav a.active {
+            color: #fff;
+            background: rgba(255,255,255,.08);
+        }
+        .header-nav a.active {
+            background: rgba(99,91,255,.25);
+            box-shadow: inset 0 0 0 1px rgba(99,91,255,.4);
+        }
+        .header-cta { display: flex; align-items: center; gap: 10px; }
+        .btn-outline-light {
+            padding: 9px 18px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,.2);
+            background: transparent;
+            color: #fff;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.4);
+        }
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.2);
+            color: #fff;
+            width: 40px; height: 40px;
+            border-radius: 9px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(180deg, var(--bg-soft) 0%, #fff 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 56px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -120px; left: -120px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(14,165,233,.08), transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; right: -100px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(99,91,255,.06), transparent 70%);
+            border-radius: 50%;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb i { font-size: .65rem; }
+        .breadcrumb .current { color: var(--text-dark); font-weight: 600; }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: var(--sky-soft);
+            color: var(--sky);
+            border-radius: 100px;
+            font-size: .82rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            border: 1px solid rgba(14,165,233,.2);
+        }
+        .hero-badge i { font-size: .75rem; }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.25;
+            margin-bottom: 16px;
+            letter-spacing: -.5px;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--sky), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-body);
+            max-width: 680px;
+            margin-bottom: 28px;
+            line-height: 1.85;
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            align-items: center;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .92rem;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .meta-item i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--sky-soft);
+            color: var(--sky);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+        }
+        .hero-side {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 220px;
+        }
+        .btn-primary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: var(--shadow-accent);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(99,91,255,.35);
+        }
+        .btn-secondary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+        }
+        .btn-secondary:hover {
+            border-color: var(--sky);
+            color: var(--sky);
+            background: var(--sky-soft);
+        }
+
+        /* Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 48px;
+            padding: 48px 0 80px;
+            align-items: start;
+        }
+        .sidebar {
+            position: sticky;
+            top: 96px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-left: 4px;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .toc-title {
+            font-size: .78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toc-list { list-style: none; border-right: 2px solid var(--border); }
+        .toc-list li a {
+            display: block;
+            padding: 9px 16px;
+            color: var(--text-body);
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 500;
+            border-right: 2px solid transparent;
+            margin-right: -2px;
+            transition: var(--transition);
+            border-radius: 0 8px 8px 0;
+        }
+        .toc-list li a:hover { color: var(--accent); background: var(--accent-soft); }
+        .toc-list li a.active {
+            color: var(--accent);
+            border-right-color: var(--accent);
+            background: var(--accent-soft);
+            font-weight: 700;
+        }
+
+        .content { min-width: 0; }
+        .content-section { margin-bottom: 56px; scroll-margin-top: 100px; }
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        .section-num {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--sky), var(--accent));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(14,165,233,.25);
+        }
+        .section-heading h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -.3px;
+        }
+        .content p {
+            font-size: 1.02rem;
+            margin-bottom: 18px;
+            color: var(--text-body);
+            line-height: 1.9;
+        }
+        .content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 32px 0 14px;
+        }
+        .content h4 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 24px 0 10px;
+        }
+        .content ul, .content ol {
+            margin: 0 0 20px 0;
+            padding-right: 22px;
+        }
+        .content li {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.85;
+        }
+        .content ul li::marker { color: var(--accent); }
+
+        .inline-code {
+            font-family: 'Fira Code', monospace;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: .88em;
+            font-weight: 500;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* Callouts */
+        .callout {
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+            border: 1px solid;
+        }
+        .callout-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .callout-body h4 { margin: 0 0 6px !important; font-size: 1rem; }
+        .callout-body p { margin: 0 !important; font-size: .95rem !important; line-height: 1.75 !important; }
+        .callout.info { background: #eff6ff; border-color: #bfdbfe; }
+        .callout.info .callout-icon { background: #dbeafe; color: #2563eb; }
+        .callout.info h4 { color: #1e40af; }
+        .callout.warning { background: #fffbeb; border-color: #fde68a; }
+        .callout.warning .callout-icon { background: #fef3c7; color: #d97706; }
+        .callout.warning h4 { color: #92400e; }
+        .callout.success { background: #ecfdf5; border-color: #a7f3d0; }
+        .callout.success .callout-icon { background: #d1fae5; color: var(--success); }
+        .callout.success h4 { color: #065f46; }
+        .callout.danger { background: #fef2f2; border-color: #fecaca; }
+        .callout.danger .callout-icon { background: #fee2e2; color: var(--danger); }
+        .callout.danger h4 { color: #991b1b; }
+        .callout.sky { background: #f0f9ff; border-color: #bae6fd; }
+        .callout.sky .callout-icon { background: #e0f2fe; color: #0284c7; }
+        .callout.sky h4 { color: #075985; }
+
+        /* Code */
+        .code-wrapper {
+            background: var(--code-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 22px 0;
+            border: 1px solid #1e3a5f;
+            box-shadow: var(--shadow-md);
+            direction: ltr;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 18px;
+            background: #0d2137;
+            border-bottom: 1px solid #1e3a5f;
+        }
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #93c5fd;
+            font-size: .8rem;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 11px; height: 11px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+        .code-copy {
+            background: rgba(255,255,255,.08);
+            border: none;
+            color: #cbd5e1;
+            font-size: .75rem;
+            padding: 5px 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .code-copy:hover { background: rgba(99,91,255,.3); color: #fff; }
+        .code-copy.copied { background: rgba(14,159,110,.3); color: #6ee7b7; }
+        .code-body { padding: 20px 22px; overflow-x: auto; }
+        .code-body pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: .875rem;
+            line-height: 1.75;
+            color: #e2e8f0;
+            white-space: pre;
+        }
+        .code-body::-webkit-scrollbar { height: 8px; }
+        .code-body::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+
+        .kw { color: #c792ea; }
+        .type { color: #82aaff; }
+        .str { color: #c3e88d; }
+        .num { color: #f78c6c; }
+        .cmt { color: #6a8299; font-style: italic; }
+        .fn { color: #ffcb6b; }
+        .prop { color: #89ddff; }
+        .op { color: #89ddff; }
+        .punc { color: #8fa5b8; }
+        .json-key { color: #89ddff; }
+        .json-str { color: #c3e88d; }
+        .json-num { color: #f78c6c; }
+        .json-bool { color: #c792ea; }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 22px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .92rem;
+            min-width: 560px;
+        }
+        thead { background: var(--primary); }
+        thead th {
+            color: #fff;
+            padding: 14px 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: .88rem;
+        }
+        tbody td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-body);
+            line-height: 1.7;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:nth-child(even) { background: var(--bg-soft); }
+        tbody tr:hover { background: var(--accent-soft); }
+        tbody td strong { color: var(--text-dark); }
+        .badge-cell {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+        .badge-cell.green { background: #d1fae5; color: #065f46; }
+        .badge-cell.amber { background: #fef3c7; color: #92400e; }
+        .badge-cell.red { background: #fee2e2; color: #991b1b; }
+        .badge-cell.blue { background: #dbeafe; color: #1e40af; }
+
+        /* Steps */
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+            margin: 22px 0;
+        }
+        .steps li {
+            counter-increment: step;
+            position: relative;
+            padding-right: 52px;
+            padding-bottom: 22px;
+            margin: 0 !important;
+        }
+        .steps li:last-child { padding-bottom: 0; }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            right: 0; top: 0;
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--sky-soft);
+            color: var(--sky);
+            border: 1.5px solid rgba(14,165,233,.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .9rem;
+        }
+        .steps li::after {
+            content: '';
+            position: absolute;
+            right: 16px; top: 38px;
+            width: 2px;
+            height: calc(100% - 30px);
+            background: var(--border);
+        }
+        .steps li:last-child::after { display: none; }
+
+        /* Feature cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            border-color: var(--sky);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .feature-card i {
+            width: 42px; height: 42px;
+            border-radius: 11px;
+            background: var(--sky-soft);
+            color: var(--sky);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+        }
+        .feature-card h4 { margin: 0 0 8px !important; font-size: 1rem; }
+        .feature-card p { margin: 0 !important; font-size: .88rem !important; color: var(--text-muted) !important; line-height: 1.7 !important; }
+
+        .note-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 28px 30px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .note-card::after {
+            content: '\f0eb';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: -10px; bottom: -30px;
+            font-size: 120px;
+            opacity: .04;
+            color: #fff;
+        }
+        .note-card h4 {
+            color: #7dd3fc !important;
+            margin: 0 0 10px !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem !important;
+        }
+        .note-card p {
+            color: rgba(255,255,255,.85) !important;
+            margin: 0 !important;
+            font-size: .95rem !important;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ Weather App Demo ============ */
+        .weather-demo {
+            background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #8b5cf6 100%);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 20px 50px rgba(99,91,255,.3);
+            overflow: hidden;
+            margin: 28px 0;
+            color: #fff;
+            position: relative;
+        }
+        .weather-demo::before {
+            content: '';
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%);
+            border-radius: 50%;
+        }
+        .weather-demo::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -80px;
+            width: 250px; height: 250px;
+            background: radial-gradient(circle, rgba(255,255,255,.1), transparent 70%);
+            border-radius: 50%;
+        }
+        .weather-header {
+            padding: 24px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
+        }
+        .weather-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+        .weather-title i { color: #fde047; font-size: 1.3rem; }
+
+        .weather-search {
+            display: flex;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .weather-search input {
+            padding: 11px 16px;
+            border-radius: 11px;
+            border: 1px solid rgba(255,255,255,.3);
+            background: rgba(255,255,255,.15);
+            color: #fff;
+            font-family: inherit;
+            font-size: .9rem;
+            width: 200px;
+            transition: var(--transition);
+        }
+        .weather-search input::placeholder { color: rgba(255,255,255,.7); }
+        .weather-search input:focus {
+            outline: none;
+            border-color: #fff;
+            background: rgba(255,255,255,.25);
+        }
+        .weather-search button {
+            padding: 11px 18px;
+            border-radius: 11px;
+            border: none;
+            background: #fff;
+            color: var(--accent);
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .weather-search button:hover {
+            background: #fef3c7;
+            transform: translateY(-2px);
+        }
+
+        .weather-body {
+            padding: 12px 28px 32px;
+            position: relative;
+            z-index: 1;
+        }
+        .weather-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .weather-city {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .weather-desc {
+            font-size: .95rem;
+            color: rgba(255,255,255,.8);
+            margin-bottom: 16px;
+        }
+        .weather-temp {
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 1;
+            display: flex;
+            align-items: flex-start;
+            gap: 4px;
+        }
+        .weather-temp .unit {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-top: 10px;
+            color: rgba(255,255,255,.8);
+        }
+        .weather-feels {
+            font-size: .9rem;
+            color: rgba(255,255,255,.8);
+            margin-top: 6px;
+        }
+        .weather-icon {
+            text-align: center;
+            font-size: 7rem;
+            color: #fde047;
+            filter: drop-shadow(0 8px 20px rgba(0,0,0,.2));
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .weather-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+        }
+        .weather-stat {
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+        .weather-stat:hover {
+            background: rgba(255,255,255,.2);
+            transform: translateY(-3px);
+        }
+        .weather-stat i {
+            font-size: 1.1rem;
+            color: #fde047;
+            margin-bottom: 6px;
+        }
+        .weather-stat .label {
+            font-size: .75rem;
+            color: rgba(255,255,255,.75);
+            margin-bottom: 2px;
+        }
+        .weather-stat .value {
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
+
+        .weather-loading {
+            text-align: center;
+            padding: 40px;
+            font-size: .95rem;
+            color: rgba(255,255,255,.85);
+        }
+        .weather-loading i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .weather-forecast {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,.2);
+        }
+        .forecast-title {
+            font-size: .85rem;
+            font-weight: 700;
+            color: rgba(255,255,255,.8);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+        }
+        .forecast-day {
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .forecast-day:hover {
+            background: rgba(255,255,255,.2);
+        }
+        .forecast-day .day {
+            font-size: .75rem;
+            color: rgba(255,255,255,.8);
+            margin-bottom: 4px;
+        }
+        .forecast-day .icon {
+            font-size: 1.5rem;
+            color: #fde047;
+            margin: 4px 0;
+        }
+        .forecast-day .temp {
+            font-size: .95rem;
+            font-weight: 800;
+        }
+        .forecast-day .temp span {
+            font-size: .75rem;
+            color: rgba(255,255,255,.6);
+            font-weight: 500;
+        }
+
+        /* ============ API Structure Demo ============ */
+        .api-structure {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        .api-structure-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+        }
+        .api-structure-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--sky-soft);
+            color: var(--sky);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .endpoint {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: .85rem;
+            direction: ltr;
+            transition: var(--transition);
+        }
+        .endpoint:hover { border-color: var(--sky); background: var(--sky-soft); }
+        .method {
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: .72rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .method.get { background: #0e9f6e; }
+        .method.post { background: #f59e0b; }
+        .endpoint .path { color: var(--text-dark); font-weight: 600; }
+        .endpoint .desc { color: var(--text-muted); margin-left: auto; font-size: .8rem; font-family: 'Tajawal', sans-serif; direction: rtl; }
+
+        /* Interactive Quiz */
+        .interactive-box {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .interactive-box::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--sky), var(--accent));
+        }
+        .interactive-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .interactive-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--sky-soft);
+            color: var(--sky);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .interactive-hint {
+            font-size: .9rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+        .task-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+        .task-box p { margin-bottom: 12px; font-size: .95rem; }
+        .task-options { display: grid; gap: 10px; }
+        .task-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            font-size: .93rem;
+            text-align: right;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .task-option:hover { border-color: var(--sky); background: var(--sky-soft); }
+        .task-option.correct { border-color: var(--success); background: #ecfdf5; color: #065f46; }
+        .task-option.correct .opt-marker { background: var(--success); color: #fff; border-color: var(--success); }
+        .task-option.wrong { border-color: var(--danger); background: #fef2f2; color: #991b1b; }
+        .task-option.wrong .opt-marker { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .opt-marker {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .task-feedback {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: .9rem;
+            font-weight: 600;
+            display: none;
+        }
+        .task-feedback.show { display: block; animation: fadeInUp .3s ease; }
+        .task-feedback.ok { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .task-feedback.no { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Lesson nav */
+        .lesson-nav {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 56px;
+            padding-top: 36px;
+            border-top: 1px solid var(--border);
+        }
+        .lesson-nav a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 22px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: var(--transition);
+            background: #fff;
+        }
+        .lesson-nav a:hover {
+            border-color: var(--sky);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .lesson-nav a.next { justify-content: flex-end; text-align: left; }
+        .lesson-nav .nav-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: var(--sky-soft);
+            color: var(--sky);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: .9rem;
+        }
+        .lesson-nav .nav-label {
+            font-size: .75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .lesson-nav .nav-title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary);
+            color: rgba(255,255,255,.7);
+            padding: 48px 0 28px;
+            margin-top: 40px;
+        }
+        .footer-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .footer-bottom {
+            padding-top: 28px;
+            border-top: 1px solid rgba(255,255,255,.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: .85rem;
+        }
+        .footer-bottom a { color: #7dd3fc; text-decoration: none; }
+        .footer-bottom a:hover { text-decoration: underline; }
+
+        .back-top {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(16px);
+            transition: var(--transition);
+            z-index: 900;
+        }
+        .back-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-top:hover { background: var(--accent); }
+
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; gap: 0; }
+            .sidebar {
+                position: static;
+                max-height: none;
+                margin-bottom: 32px;
+                padding: 20px;
+                background: var(--bg-soft);
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+            }
+            .toc-list { border-right: none; display: flex; flex-wrap: wrap; gap: 6px; }
+            .toc-list li a {
+                border-right: none;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                margin-right: 0;
+                padding: 7px 13px;
+                font-size: .85rem;
+                background: #fff;
+            }
+            .toc-list li a.active { border-color: var(--sky); }
+        }
+        @media (max-width: 768px) {
+            .header-nav, .header-cta .btn-outline-light { display: none; }
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .hero h1 { font-size: 1.9rem; }
+            .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+            .hero-side { flex-direction: row; flex-wrap: wrap; }
+            .hero-side .btn-primary, .hero-side .btn-secondary { flex: 1; min-width: 150px; }
+            .section-heading h2 { font-size: 1.35rem; }
+            .lesson-nav { grid-template-columns: 1fr; }
+            .content-section { margin-bottom: 40px; }
+            .container { padding: 0 18px; }
+            .header-inner { padding: 0 18px; }
+            .weather-main { grid-template-columns: 1fr; gap: 16px; }
+            .weather-temp { font-size: 3.5rem; }
+            .weather-icon { font-size: 5rem; }
+            .weather-search input { width: 140px; }
+            .weather-header { padding: 20px; }
+            .weather-body { padding: 8px 20px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="header" id="header">
+    <div class="header-inner">
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fas fa-code"></i></div>
+            <div class="brand-text">Code<span>Way</span></div>
+        </a>
+        <nav class="header-nav">
+            <a href="#">الرئيسية</a>
+            <a href="#">المسارات</a>
+            <a href="#" class="active">C#</a>
+            <a href="#">المدونة</a>
+            <a href="#">تواصل</a>
+        </nav>
+        <div class="header-cta">
+            <button class="btn-outline-light" onclick="alert('تم حفظ الدرس في قائمتك ✔')">
+                <i class="far fa-bookmark"></i> حفظ
+            </button>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">الرئيسية</a>
+            <i class="fas fa-chevron-left"></i>
+            <a href="#">مشاريع عملية</a>
+            <i class="fas fa-chevron-left"></i>
+            <span class="current">تطبيق الطقس</span>
+        </div>
+        <div class="hero-grid">
+            <div>
+                <span class="hero-badge">
+                    <i class="fas fa-cloud-sun"></i> الدرس الخامس · مشروع عملي
+                </span>
+                <h1>بناء تطبيق <span class="highlight">الطقس (Weather App)</span> بـ C#</h1>
+                <p class="hero-desc">
+                    مشروع احترافي يستهلك واجهة برمجية حقيقية (OpenWeatherMap API)،
+                    يعرض حالة الطقس الحالية والتوقعات، ويتعامل مع الأخطاء والتحميل بذكاء.
+                    ستتعلم الاتصال بالشبكة، تحليل JSON، العمارة النظيفة، وتصميم واجهة جذابة.
+                </p>
+                <div class="hero-meta">
+                    <span class="meta-item"><i class="far fa-clock"></i> 6 ساعات</span>
+                    <span class="meta-item"><i class="fas fa-signal"></i> متقدم</span>
+                    <span class="meta-item"><i class="fas fa-cloud"></i> API حقيقي</span>
+                    <span class="meta-item"><i class="fas fa-rocket"></i> تطبيق حي</span>
+                </div>
+            </div>
+            <div class="hero-side">
+                <button class="btn-primary" onclick="document.getElementById('weather-demo').scrollIntoView()">
+                    <i class="fas fa-play"></i> جرّب التطبيق
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('sec-1').scrollIntoView()">
+                    <i class="fas fa-book-open"></i> ابدأ الشرح
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="main-layout">
+
+        <aside class="sidebar">
+            <div class="toc-title"><i class="fas fa-list-ul"></i> محتويات الدرس</div>
+            <ul class="toc-list" id="tocList">
+                <li><a href="#weather-demo" class="active">🌤️ جرّب التطبيق الحي</a></li>
+                <li><a href="#sec-1">1. نظرة عامة على المشروع</a></li>
+                <li><a href="#sec-2">2. ما هو الـ API؟</a></li>
+                <li><a href="#sec-3">3. اختيار الـ OpenWeatherMap</a></li>
+                <li><a href="#sec-4">4. نموذج البيانات (Models)</a></li>
+                <li><a href="#sec-5">5. خدمة الطقس (Service)</a></li>
+                <li><a href="#sec-6">6. واجهة المستخدم (UI)</a></li>
+                <li><a href="#sec-7">7. معالجة الأخطاء والتحميل</a></li>
+                <li><a href="#sec-8">8. أفضل الممارسات</a></li>
+                <li><a href="#sec-9">9. تمارين تفاعلية</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+
+            <!-- ====== التطبيق الحي ====== -->
+            <section class="content-section" id="weather-demo">
+                <div class="section-heading">
+                    <div class="section-num"><i class="fas fa-rocket"></i></div>
+                    <h2>جرّب التطبيق الحي</h2>
+                </div>
+                <p>
+                    هذا تطبيق الطقس الذي ستبنيه — يعمل بالكامل في متصفحك مع بيانات محاكاة
+                    تحاكي ردود OpenWeatherMap API. جرّب البحث عن مدينة مختلفة!
+                </p>
+
+                <div class="weather-demo">
+                    <div class="weather-header">
+                        <div class="weather-title">
+                            <i class="fas fa-cloud-sun"></i> تطبيق الطقس
+                        </div>
+                        <div class="weather-search">
+                            <input type="text" id="weatherCity" placeholder="اكتب اسم مدينة..." value="الرياض">
+                            <button id="weatherSearchBtn">
+                                <i class="fas fa-search"></i> بحث
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="weather-body" id="weatherBody">
+                        <!-- سيتم التعبئة عبر JS -->
+                    </div>
+                </div>
+
+                <div class="callout sky">
+                    <div class="callout-icon"><i class="fas fa-info-circle"></i></div>
+                    <div class="callout-body">
+                        <h4>ملاحظة</h4>
+                        <p>
+                            هذا التطبيق يستخدم بيانات محاكاة (Mock Data) لضمان العمل بدون مفتاح API.
+                            في الدرس سنستخدم OpenWeatherMap API الحقيقي بنفس بنية الاستجابة.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 1 ====== -->
+            <section class="content-section" id="sec-1">
+                <div class="section-heading">
+                    <div class="section-num">1</div>
+                    <h2>نظرة عامة على المشروع</h2>
+                </div>
+                <p>
+                    تطبيق الطقس هو مشروع مثالي لتعلم <strong>استهلاك الـ APIs الخارجية</strong> في C#.
+                    يجمع بين الاتصال بالشبكة، تحليل JSON، معالجة الأخطاء، وتصميم واجهة مستخدم جذابة.
+                </p>
+
+                <h3>ما ستتعلمه</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-network-wired"></i>
+                        <h4>الاتصال بالـ API</h4>
+                        <p>استخدام HttpClient لجلب البيانات من OpenWeatherMap.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-code"></i>
+                        <h4>تحليل JSON</h4>
+                        <p>قراءة استجابة JSON وتحويلها إلى نماذج C#.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <h4>معالجة الأخطاء</h4>
+                        <p>التعامل مع انقطاع الشبكة ومفاتيح API خاطئة.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-palette"></i>
+                        <h4>واجهة جذابة</h4>
+                        <p>تصميم حديث يعكس حالة الطقس بألوان وأيقونات.</p>
+                    </div>
+                </div>
+
+                <h3>المتطلبات الوظيفية</h3>
+                <ul>
+                    <li>البحث عن طقس أي مدينة بالاسم.</li>
+                    <li>عرض درجة الحرارة، الوصف، الرطوبة، الرياح، والضغط.</li>
+                    <li>عرض توقعات 5 أيام قادمة.</li>
+                    <li>معالجة حالات التحميل والأخطاء.</li>
+                    <li>حفظ آخر مدينة بحث عنها المستخدم.</li>
+                </ul>
+
+                <div class="callout success">
+                    <div class="callout-icon"><i class="fas fa-check"></i></div>
+                    <div class="callout-body">
+                        <h4>لماذا هذا المشروع؟</h4>
+                        <p>
+                            لأنه يغطي أهم مهارة في تطوير التطبيقات الحديثة: <strong>الاتصال بالعالم الخارجي</strong>.
+                            كل تطبيق حقيقي اليوم يستهلك APIs.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 2 ====== -->
+            <section class="content-section" id="sec-2">
+                <div class="section-heading">
+                    <div class="section-num">2</div>
+                    <h2>ما هو الـ API؟</h2>
+                </div>
+                <p>
+                    <strong>API (Application Programming Interface)</strong> هو وسيط يسمح لتطبيقك
+                    بالتواصل مع خدمة خارجية. تخيله كقائمة طعام في مطعم: أنت تطلب (Request)،
+                    المطبخ يحضّر (Processing)، ثم يصلك الطبق (Response).
+                </p>
+
+                <h3>دورة حياة طلب HTTP</h3>
+                <ol class="steps">
+                    <li><strong>إنشاء الطلب:</strong> يحدد تطبيقك الـ URL، الطريقة (GET عادة)، والترويسات (Headers).</li>
+                    <li><strong>الإرسال:</strong> يرسل HttpClient الطلب إلى خادم API عبر HTTPS.</li>
+                    <li><strong>المعالجة:</strong> يتحقق الخادم من الطلب ويجلب البيانات.</li>
+                    <li><strong>الاستجابة:</strong> يعيد الخادم كود الحالة (200, 404, 500) وبيانات JSON.</li>
+                    <li><strong>التحليل:</strong> يحوّل تطبيقك JSON إلى نماذج C# ويستخدمها.</li>
+                </ol>
+
+                <h3>أكواد حالة شائعة</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الكود</th>
+                                <th>المعنى</th>
+                                <th>ماذا تفعل؟</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge-cell green">200 OK</span></td>
+                                <td>نجح الطلب</td>
+                                <td>حلّل البيانات واعرضها</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-cell amber">404 Not Found</span></td>
+                                <td>المورد غير موجود</td>
+                                <td>اعرض "المدينة غير موجودة"</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-cell amber">401 Unauthorized</span></td>
+                                <td>مفتاح API خاطئ</td>
+                                <td>تحقق من الإعدادات</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-cell amber">429 Too Many Requests</span></td>
+                                <td>تجاوزت الحد المسموح</td>
+                                <td>انتظر ثم أعد المحاولة</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-cell red">500 Server Error</span></td>
+                                <td>خطأ في الخادم</td>
+                                <td>أعد المحاولة لاحقاً</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="callout-body">
+                        <h4>دائماً تحقق من الحالة</h4>
+                        <p>
+                            لا تفترض أن كل طلب سينجح. استدعِ <span class="inline-code">EnsureSuccessStatusCode()</span>
+                            بعد كل استجابة أو تحقق يدوياً.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 3 ====== -->
+            <section class="content-section" id="sec-3">
+                <div class="section-heading">
+                    <div class="section-num">3</div>
+                    <h2>اختيار الـ OpenWeatherMap</h2>
+                </div>
+                <p>
+                    سنستخدم <strong>OpenWeatherMap API</strong> لأنه:
+                </p>
+                <ul>
+                    <li>مجاني للاستخدام الشخصي (60 طلب/دقيقة).</li>
+                    <li>يوفر بيانات حالية + توقعات 5 أيام.</li>
+                    <li>يدعم اللغة العربية (<span class="inline-code">lang=ar</span>).</li>
+                    <li>توثيقه ممتاز وسهل البدء.</li>
+                </ul>
+
+                <h3>الـ Endpoints التي سنستخدمها</h3>
+                <div class="api-structure">
+                    <div class="api-structure-title">
+                        <i class="fas fa-link"></i> OpenWeatherMap API Endpoints
+                    </div>
+                    <div class="endpoint">
+                        <span class="method get">GET</span>
+                        <span class="path">/data/2.5/weather?q={city}&appid={key}&units=metric&lang=ar</span>
+                        <span class="desc">الطقس الحالي</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method get">GET</span>
+                        <span class="path">/data/2.5/forecast?q={city}&appid={key}&units=metric&lang=ar</span>
+                        <span class="desc">توقعات 5 أيام</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method get">GET</span>
+                        <span class="path">/geo/1.0/direct?q={city}&limit=5&appid={key}</span>
+                        <span class="desc">إحداثيات المدينة</span>
+                    </div>
+                </div>
+
+                <h3>الحصول على مفتاح API</h3>
+                <ol class="steps">
+                    <li>سجّل في <span class="inline-code">openweathermap.org</span> مجاناً.</li>
+                    <li>اذهب إلى <strong>API Keys</strong> في لوحة التحكم.</li>
+                    <li>انسخ المفتاح (يبدأ العمل بعد ~10 دقائق).</li>
+                    <li>احفظه في متغير بيئة أو ملف <span class="inline-code">appsettings.json</span>.</li>
+                </ol>
+
+                <div class="callout danger">
+                    <div class="callout-icon"><i class="fas fa-key"></i></div>
+                    <div class="callout-body">
+                        <h4>لا تضع المفتاح في الكود!</h4>
+                        <p>
+                            استخدم متغيرات البيئة أو <span class="inline-code">appsettings.json</span> غير المرفوع
+                            إلى Git. رفع المفتاح للـ GitHub يعني تسريبه للعالم.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 4 ====== -->
+            <section class="content-section" id="sec-4">
+                <div class="section-heading">
+                    <div class="section-num">4</div>
+                    <h2>نموذج البيانات (Models)</h2>
+                </div>
+                <p>
+                    نحوّل استجابة JSON إلى كلاسات C# باستخدام <span class="inline-code">System.Text.Json</span>.
+                    نستخدم <span class="inline-code">JsonPropertyName</span> لربط الحقول.
+                </p>
+
+                <h3>الاستجابة الفعلية من OpenWeatherMap</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Weather Response JSON</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre>{
+  <span class="json-key">"coord"</span>: { <span class="json-key">"lon"</span>: <span class="json-num">46.72</span>, <span class="json-key">"lat"</span>: <span class="json-num">24.69</span> },
+  <span class="json-key">"weather"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-num">800</span>,
+      <span class="json-key">"main"</span>: <span class="json-str">"Clear"</span>,
+      <span class="json-key">"description"</span>: <span class="json-str">"سماء صافية"</span>,
+      <span class="json-key">"icon"</span>: <span class="json-str">"01d"</span>
+    }
+  ],
+  <span class="json-key">"main"</span>: {
+    <span class="json-key">"temp"</span>: <span class="json-num">32.5</span>,
+    <span class="json-key">"feels_like"</span>: <span class="json-num">34.2</span>,
+    <span class="json-key">"humidity"</span>: <span class="json-num">25</span>,
+    <span class="json-key">"pressure"</span>: <span class="json-num">1013</span>
+  },
+  <span class="json-key">"wind"</span>: { <span class="json-key">"speed"</span>: <span class="json-num">5.2</span>, <span class="json-key">"deg"</span>: <span class="json-num">180</span> },
+  <span class="json-key">"name"</span>: <span class="json-str">"الرياض"</span>,
+  <span class="json-key">"cod"</span>: <span class="json-num">200</span>
+}</pre>
+                    </div>
+                </div>
+
+                <h3>كلاسات C# المقابلة</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Models/WeatherResponse.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> System.Text.Json.Serialization;
+
+<span class="kw">namespace</span> WeatherApp.Models;
+
+<span class="kw">public class</span> <span class="type">WeatherResponse</span>
+{
+    [<span class="type">JsonPropertyName</span>(<span class="str">"name"</span>)]
+    <span class="kw">public string</span> CityName { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+
+    [<span class="type">JsonPropertyName</span>(<span class="str">"main"</span>)]
+    <span class="kw">public</span> <span class="type">MainInfo</span> Main { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+
+    [<span class="type">JsonPropertyName</span>(<span class="str">"weather"</span>)]
+    <span class="kw">public</span> <span class="type">List</span>&lt;<span class="type">WeatherInfo</span>&gt; Weather { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+
+    [<span class="type">JsonPropertyName</span>(<span class="str">"wind"</span>)]
+    <span class="kw">public</span> <span class="type">WindInfo</span> Wind { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+
+    [<span class="type">JsonPropertyName</span>(<span class="str">"cod"</span>)]
+    <span class="kw">public int</span> Code { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="kw">public class</span> <span class="type">MainInfo</span>
+{
+    [<span class="type">JsonPropertyName</span>(<span class="str">"temp"</span>)]
+    <span class="kw">public double</span> Temperature { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    [<span class="type">JsonPropertyName</span>(<span class="str">"feels_like"</span>)]
+    <span class="kw">public double</span> FeelsLike { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    [<span class="type">JsonPropertyName</span>(<span class="str">"humidity"</span>)]
+    <span class="kw">public int</span> Humidity { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    [<span class="type">JsonPropertyName</span>(<span class="str">"pressure"</span>)]
+    <span class="kw">public int</span> Pressure { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="kw">public class</span> <span class="type">WeatherInfo</span>
+{
+    [<span class="type">JsonPropertyName</span>(<span class="str">"main"</span>)]
+    <span class="kw">public string</span> Main { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+
+    [<span class="type">JsonPropertyName</span>(<span class="str">"description"</span>)]
+    <span class="kw">public string</span> Description { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+
+    [<span class="type">JsonPropertyName</span>(<span class="str">"icon"</span>)]
+    <span class="kw">public string</span> Icon { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+}
+
+<span class="kw">public class</span> <span class="type">WindInfo</span>
+{
+    [<span class="type">JsonPropertyName</span>(<span class="str">"speed"</span>)]
+    <span class="kw">public double</span> Speed { <span class="kw">get</span>; <span class="kw">set</span>; }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout info">
+                    <div class="callout-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="callout-body">
+                        <h4>لماذا JsonPropertyName؟</h4>
+                        <p>
+                            لأن أسماء الحقول في JSON تختلف عن أسماء خصائص C# (مثل <span class="inline-code">feels_like</span>
+                            مقابل <span class="inline-code">FeelsLike</span>). هذا الوسم يربط بينهما تلقائياً.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="callout sky">
+                    <div class="callout-icon"><i class="fas fa-magic"></i></div>
+                    <div class="callout-body">
+                        <h4>نصيحة احترافية</h4>
+                        <p>
+                            استخدم أداة <strong>json2csharp.com</strong> أو ميزة <strong>Paste JSON as Classes</strong>
+                            في Visual Studio لتوليد الكلاسات تلقائياً من أي JSON.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 5 ====== -->
+            <section class="content-section" id="sec-5">
+                <div class="section-heading">
+                    <div class="section-num">5</div>
+                    <h2>خدمة الطقس (Service)</h2>
+                </div>
+                <p>
+                    خدمة الطقس هي المسؤولة عن الاتصال بالـ API. نحقن <span class="inline-code">HttpClient</span>
+                    عبر <span class="inline-code">IHttpClientFactory</span> — أفضل ممارسة في .NET.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Services/WeatherService.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> System.Net.Http.Json;
+<span class="kw">using</span> WeatherApp.Models;
+
+<span class="kw">namespace</span> WeatherApp.Services;
+
+<span class="kw">public class</span> <span class="type">WeatherService</span>
+{
+    <span class="kw">private readonly</span> <span class="type">HttpClient</span> _http;
+    <span class="kw">private readonly string</span> _apiKey;
+
+    <span class="kw">public</span> <span class="fn">WeatherService</span>(<span class="type">HttpClient</span> http, <span class="type">IConfiguration</span> config)
+    {
+        _http = http;
+        _apiKey = config[<span class="str">"OpenWeather:ApiKey"</span>]
+            ?? <span class="kw">throw new</span> <span class="type">InvalidOperationException</span>(<span class="str">"API key missing"</span>);
+
+        _http.BaseAddress = <span class="kw">new</span> <span class="type">Uri</span>(<span class="str">"https://api.openweathermap.org/"</span>);
+        _http.Timeout = <span class="type">TimeSpan</span>.<span class="fn">FromSeconds</span>(<span class="num">10</span>);
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">WeatherResponse</span>&gt; <span class="fn">GetWeatherAsync</span>(
+        <span class="kw">string</span> city,
+        <span class="type">CancellationToken</span> ct = <span class="kw">default</span>)
+    {
+        <span class="kw">var</span> url = <span class="str">$"data/2.5/weather?q={Uri.EscapeDataString(city)}"</span>
+                + <span class="str">$"&appid={_apiKey}&units=metric&lang=ar"</span>;
+
+        <span class="kw">var</span> response = <span class="kw">await</span> _http.<span class="fn">GetAsync</span>(url, ct);
+
+        <span class="kw">if</span> (!response.IsSuccessStatusCode)
+        {
+            <span class="kw">if</span> (response.StatusCode == <span class="type">HttpStatusCode</span>.<span class="prop">NotFound</span>)
+                <span class="kw">throw new</span> <span class="type">Exception</span>(<span class="str">"المدينة غير موجودة"</span>);
+
+            <span class="kw">throw new</span> <span class="type">HttpRequestException</span>(
+                <span class="str">$"فشل الاتصال: {response.StatusCode}"</span>);
+        }
+
+        <span class="kw">var</span> data = <span class="kw">await</span> response.Content
+            .<span class="fn">ReadFromJsonAsync</span>&lt;<span class="type">WeatherResponse</span>&gt;(cancellationToken: ct);
+
+        <span class="kw">return</span> data ?? <span class="kw">throw new</span> <span class="type">Exception</span>(<span class="str">"استجابة فارغة"</span>);
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <h3>تسجيل الخدمة في DI</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Program.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">var</span> builder = <span class="type">WebApplication</span>.<span class="fn">CreateBuilder</span>(args);
+
+builder.Services.<span class="fn">AddHttpClient</span>&lt;<span class="type">WeatherService</span>&gt;();
+builder.Services.<span class="fn">AddScoped</span>&lt;<span class="type">WeatherService</span>&gt;();
+
+<span class="kw">var</span> app = builder.<span class="fn">Build</span>();
+app.<span class="fn">Run</span>();</pre>
+                    </div>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-icon"><i class="fas fa-check"></i></div>
+                    <div class="callout-body">
+                        <h4>مزايا IHttpClientFactory</h4>
+                        <p>
+                            يدير دورة حياة HttpClient تلقائياً، يمنع مشكلة "استنفاد المقابس" (Socket Exhaustion)،
+                            ويدعم إعادة المحاولة (Retry) عبر Polly.
+                        </p>
+                    </div>
+                </div>
+
+                <h3>مثال استخدام في ViewModel</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> ViewModels/WeatherViewModel.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">WeatherViewModel</span> : <span class="type">ObservableObject</span>
+{
+    <span class="kw">private readonly</span> <span class="type">WeatherService</span> _service;
+    <span class="kw">private string</span> _city = <span class="str">"الرياض"</span>;
+    <span class="kw">private</span> <span class="type">WeatherResponse</span>? _weather;
+    <span class="kw">private bool</span> _isLoading;
+    <span class="kw">private string</span>? _error;
+
+    <span class="kw">public string</span> City
+    {
+        <span class="kw">get</span> => _city;
+        <span class="kw">set</span> => <span class="fn">SetProperty</span>(<span class="kw">ref</span> _city, value);
+    }
+
+    <span class="kw">public</span> <span class="type">WeatherResponse</span>? Weather
+    {
+        <span class="kw">get</span> => _weather;
+        <span class="kw">set</span> => <span class="fn">SetProperty</span>(<span class="kw">ref</span> _weather, value);
+    }
+
+    <span class="kw">public bool</span> IsLoading
+    {
+        <span class="kw">get</span> => _isLoading;
+        <span class="kw">set</span> => <span class="fn">SetProperty</span>(<span class="kw">ref</span> _isLoading, value);
+    }
+
+    <span class="kw">public string</span>? Error
+    {
+        <span class="kw">get</span> => _error;
+        <span class="kw">set</span> => <span class="fn">SetProperty</span>(<span class="kw">ref</span> _error, value);
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">SearchAsync</span>()
+    {
+        IsLoading = <span class="kw">true</span>;
+        Error = <span class="kw">null</span>;
+
+        <span class="kw">try</span>
+        {
+            Weather = <span class="kw">await</span> _service.<span class="fn">GetWeatherAsync</span>(City);
+        }
+        <span class="kw">catch</span> (<span class="type">Exception</span> ex)
+        {
+            Error = ex.Message;
+            Weather = <span class="kw">null</span>;
+        }
+        <span class="kw">finally</span>
+        {
+            IsLoading = <span class="kw">false</span>;
+        }
+    }
+}</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 6 ====== -->
+            <section class="content-section" id="sec-6">
+                <div class="section-heading">
+                    <div class="section-num">6</div>
+                    <h2>واجهة المستخدم (UI)</h2>
+                </div>
+                <p>
+                    نصمم واجهة WPF جميلة تعرض بيانات الطقس بأيقونات وألوان ديناميكية. يمكن أن
+                    تتغير الخلفية حسب حالة الطقس (مشمس، ممطر، غائم...).
+                </p>
+
+                <h3>دالة تحديد أيقونة الطقس</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Helpers/WeatherIconHelper.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public static class</span> <span class="type">WeatherIconHelper</span>
+{
+    <span class="kw">public static string</span> <span class="fn">GetIcon</span>(<span class="kw">string</span> iconCode) => iconCode <span class="kw">switch</span>
+    {
+        <span class="str">"01d"</span> => <span class="str">"\u2600"</span>,   <span class="cmt">// ☀ مشمس</span>
+        <span class="str">"01n"</span> => <span class="str">"\u263D"</span>,   <span class="cmt">// ☽ صافٍ ليلاً</span>
+        <span class="str">"02d"</span> => <span class="str">"\u26C5"</span>,   <span class="cmt">// ⛅ غائم جزئياً</span>
+        <span class="str">"03d"</span> => <span class="str">"\u2601"</span>,   <span class="cmt">// ☁ غائم</span>
+        <span class="str">"09d"</span> => <span class="str">"\u2614"</span>,   <span class="cmt">// ☔ مطر خفيف</span>
+        <span class="str">"10d"</span> => <span class="str">"\u2614"</span>,   <span class="cmt">// ☔ مطر</span>
+        <span class="str">"11d"</span> => <span class="str">"\u26A1"</span>,   <span class="cmt">// ⚡ عاصفة</span>
+        <span class="str">"13d"</span> => <span class="str">"\u2744"</span>,   <span class="cmt">// ❄ ثلج</span>
+        <span class="str">"50d"</span> => <span class="str">"\u224B"</span>,   <span class="cmt">// ≋ ضباب</span>
+        _      => <span class="str">"\u2601"</span>
+    };
+}</pre>
+                    </div>
+                </div>
+
+                <h3>XAML مختصر</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Views/WeatherView.xaml</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="punc">&lt;</span><span class="type">Grid</span> <span class="prop">Background</span>=<span class="str">"#0EA5E9"</span><span class="punc">&gt;</span>
+    <span class="punc">&lt;</span><span class="type">StackPanel</span> <span class="prop">Margin</span>=<span class="str">"32"</span> <span class="prop">Spacing</span>=<span class="str">"20"</span><span class="punc">&gt;</span>
+
+        <span class="punc">&lt;</span><span class="type">StackPanel</span> <span class="prop">Orientation</span>=<span class="str">"Horizontal"</span> <span class="prop">Spacing</span>=<span class="str">"10"</span><span class="punc">&gt;</span>
+            <span class="punc">&lt;</span><span class="type">TextBox</span> <span class="prop">Text</span>=<span class="str">"{Binding City, UpdateSourceTrigger=PropertyChanged}"</span>
+                     <span class="prop">Width</span>=<span class="str">"280"</span> <span class="prop">Padding</span>=<span class="str">"12"</span> <span class="prop">FontSize</span>=<span class="str">"16"</span><span class="punc">/&gt;</span>
+            <span class="punc">&lt;</span><span class="type">Button</span> <span class="prop">Content</span>=<span class="str">"بحث"</span> <span class="prop">Command</span>=<span class="str">"{Binding SearchCommand}"</span>
+                    <span class="prop">Padding</span>=<span class="str">"24,12"</span> <span class="prop">FontSize</span>=<span class="str">"16"</span><span class="punc">/&gt;</span>
+        <span class="punc">&lt;/</span><span class="type">StackPanel</span><span class="punc">&gt;</span>
+
+        <span class="punc">&lt;</span><span class="type">ProgressBar</span> <span class="prop">IsIndeterminate</span>=<span class="str">"True"</span>
+                     <span class="prop">Visibility</span>=<span class="str">"{Binding IsLoading, Converter={StaticResource BoolToVis}}"</span><span class="punc">/&gt;</span>
+
+        <span class="punc">&lt;</span><span class="type">TextBlock</span> <span class="prop">Text</span>=<span class="str">"{Binding Error}"</span> <span class="prop">Foreground</span>=<span class="str">"#FEE2E2"</span><span class="punc">/&gt;</span>
+
+        <span class="punc">&lt;</span><span class="type">StackPanel</span> <span class="prop">DataContext</span>=<span class="str">"{Binding Weather}"</span>
+                    <span class="prop">Visibility</span>=<span class="str">"{Binding Converter={StaticResource NullToVis}}"</span><span class="punc">&gt;</span>
+
+            <span class="punc">&lt;</span><span class="type">TextBlock</span> <span class="prop">Text</span>=<span class="str">"{Binding CityName}"</span>
+                       <span class="prop">FontSize</span>=<span class="str">"28"</span> <span class="prop">Foreground</span>=<span class="str">"White"</span><span class="punc">/&gt;</span>
+
+            <span class="punc">&lt;</span><span class="type">TextBlock</span> <span class="prop">Text</span>=<span class="str">"{Binding Main.Temperature, StringFormat={}{0:F1}°C}"</span>
+                       <span class="prop">FontSize</span>=<span class="str">"72"</span> <span class="prop">FontWeight</span>=<span class="str">"Bold"</span>
+                       <span class="prop">Foreground</span>=<span class="str">"White"</span><span class="punc">/&gt;</span>
+
+            <span class="punc">&lt;</span><span class="type">TextBlock</span> <span class="prop">Text</span>=<span class="str">"{Binding Weather[0].Description}"</span>
+                       <span class="prop">FontSize</span>=<span class="str">"20"</span> <span class="prop">Foreground</span>=<span class="str">"#DBEAFE"</span><span class="punc">/&gt;</span>
+
+            <span class="punc">&lt;</span><span class="type">StackPanel</span> <span class="prop">Orientation</span>=<span class="str">"Horizontal"</span> <span class="prop">Spacing</span>=<span class="str">"30"</span> <span class="prop">Margin</span>=<span class="str">"0,20,0,0"</span><span class="punc">&gt;</span>
+                <span class="punc">&lt;</span><span class="type">StackPanel</span><span class="punc">&gt;</span>
+                    <span class="punc">&lt;</span><span class="type">TextBlock</span> <span class="prop">Text</span>=<span class="str">"الرطوبة"</span> <span class="prop">Foreground</span>=<span class="str">"#DBEAFE"</span><span class="punc">/&gt;</span>
+                    <span class="punc">&lt;</span><span class="type">TextBlock</span> <span class="prop">Text</span>=<span class="str">"{Binding Main.Humidity, StringFormat={}{0}%}"</span>
+                               <span class="prop">FontSize</span>=<span class="str">"22"</span> <span class="prop">Foreground</span>=<span class="str">"White"</span> <span class="prop">FontWeight</span>=<span class="str">"Bold"</span><span class="punc">/&gt;</span>
+                <span class="punc">&lt;/</span><span class="type">StackPanel</span><span class="punc">&gt;</span>
+                <span class="punc">&lt;</span><span class="type">StackPanel</span><span class="punc">&gt;</span>
+                    <span class="punc">&lt;</span><span class="type">TextBlock</span> <span class="prop">Text</span>=<span class="str">"الرياح"</span> <span class="prop">Foreground</span>=<span class="str">"#DBEAFE"</span><span class="punc">/&gt;</span>
+                    <span class="punc">&lt;</span><span class="type">TextBlock</span> <span class="prop">Text</span>=<span class="str">"{Binding Wind.Speed, StringFormat={}{0} م/ث}"</span>
+                               <span class="prop">FontSize</span>=<span class="str">"22"</span> <span class="prop">Foreground</span>=<span class="str">"White"</span> <span class="prop">FontWeight</span>=<span class="str">"Bold"</span><span class="punc">/&gt;</span>
+                <span class="punc">&lt;/</span><span class="type">StackPanel</span><span class="punc">&gt;</span>
+            <span class="punc">&lt;/</span><span class="type">StackPanel</span><span class="punc">&gt;</span>
+        <span class="punc">&lt;/</span><span class="type">StackPanel</span><span class="punc">&gt;</span>
+    <span class="punc">&lt;/</span><span class="type">StackPanel</span><span class="punc">&gt;</span>
+<span class="punc">&lt;/</span><span class="type">Grid</span><span class="punc">&gt;</span></pre>
+                    </div>
+                </div>
+
+                <div class="callout info">
+                    <div class="callout-icon"><i class="fas fa-palette"></i></div>
+                    <div class="callout-body">
+                        <h4>خلفية ديناميكية</h4>
+                        <p>
+                            يمكنك ربط <span class="inline-code">Background</span> بالحالة الجوية: أزرق فاتح للمشمس،
+                            رمادي للغائم، أزرق داكن للمطر. استخدم <span class="inline-code">IValueConverter</span>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 7 ====== -->
+            <section class="content-section" id="sec-7">
+                <div class="section-heading">
+                    <div class="section-num">7</div>
+                    <h2>معالجة الأخطاء والتحميل</h2>
+                </div>
+                <p>
+                    تطبيق احترافي لا يتعطل عند فشل الشبكة. نعالج 3 حالات: التحميل، النجاح، الخطأ.
+                </p>
+
+                <h3>سير العمل</h3>
+                <ol class="steps">
+                    <li><strong>المستخدم يضغط بحث:</strong> نتحقق من أن المدينة غير فارغة.</li>
+                    <li><strong>بدء التحميل:</strong> نعرض مؤشر دوّار ونعطّل زر البحث.</li>
+                    <li><strong>الاتصال بالـ API:</strong> نستخدم <span class="inline-code">try/catch</span> ونمرر <span class="inline-code">CancellationToken</span>.</li>
+                    <li><strong>الاستجابة:</strong> نتحقق من الحالة، نحلل JSON، ونحدّث الواجهة.</li>
+                    <li><strong>الخطأ:</strong> نعرض رسالة واضحة بالعربية ونسجل التفاصيل في الـ log.</li>
+                    <li><strong>إنهاء التحميل:</strong> نخفي المؤشر ونعيد تفعيل الزر في <span class="inline-code">finally</span>.</li>
+                </ol>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> معالجة شاملة للأخطاء</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public async</span> <span class="type">Task</span> <span class="fn">SearchAsync</span>(<span class="type">CancellationToken</span> ct = <span class="kw">default</span>)
+{
+    <span class="kw">if</span> (<span class="kw">string</span>.<span class="fn">IsNullOrWhiteSpace</span>(City))
+    {
+        Error = <span class="str">"الرجاء إدخال اسم مدينة"</span>;
+        <span class="kw">return</span>;
+    }
+
+    IsLoading = <span class="kw">true</span>;
+    Error = <span class="kw">null</span>;
+
+    <span class="kw">try</span>
+    {
+        Weather = <span class="kw">await</span> _service.<span class="fn">GetWeatherAsync</span>(City, ct);
+
+        <span class="cmt">// حفظ آخر مدينة</span>
+        <span class="type">Preferences</span>.<span class="fn">Set</span>(<span class="str">"last_city"</span>, City);
+    }
+    <span class="kw">catch</span> (<span class="type">OperationCanceledException</span>)
+    {
+        <span class="cmt">// تجاهل — المستخدم ألغى الطلب</span>
+    }
+    <span class="kw">catch</span> (<span class="type">HttpRequestException</span>)
+    {
+        Error = <span class="str">"تعذّر الاتصال بالإنترنت. تحقق من اتصالك."</span>;
+    }
+    <span class="kw">catch</span> (<span class="type">Exception</span> ex)
+    {
+        Error = ex.Message;
+        <span class="type">Debug</span>.<span class="fn">WriteLine</span>(<span class="str">$"خطأ: {ex}"</span>);
+    }
+    <span class="kw">finally</span>
+    {
+        IsLoading = <span class="kw">false</span>;
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout danger">
+                    <div class="callout-icon"><i class="fas fa-bug"></i></div>
+                    <div class="callout-body">
+                        <h4>لا تبتلع الاستثناءات</h4>
+                        <p>
+                            <span class="inline-code">catch (Exception) { }</span> بدون عرض أو تسجيل
+                            يجعل تصحيح الأخطاء مستحيلاً. دائماً سجّل التفاصيل.
+                        </p>
+                    </div>
+                </div>
+
+                <h3>إعادة المحاولة بـ Polly</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Program.cs — Retry Policy</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre>builder.Services
+    .<span class="fn">AddHttpClient</span>&lt;<span class="type">WeatherService</span>&gt;()
+    .<span class="fn">AddTransientHttpErrorPolicy</span>(p => p
+        .<span class="fn">WaitAndRetryAsync</span>(<span class="num">3</span>, retry =>
+            <span class="type">TimeSpan</span>.<span class="fn">FromSeconds</span>(<span class="type">Math</span>.<span class="fn">Pow</span>(<span class="num">2</span>, retry))));</pre>
+                    </div>
+                </div>
+
+                <p>
+                    هذه السياسة تعيد المحاولة 3 مرات بفاصل متزايد (2, 4, 8 ثوانٍ) عند فشل الشبكة
+                    أو ردّ الخادم بـ 5xx — مما يحسن موثوقية التطبيق.
+                </p>
+            </section>
+
+            <!-- ====== 8 ====== -->
+            <section class="content-section" id="sec-8">
+                <div class="section-heading">
+                    <div class="section-num">8</div>
+                    <h2>أفضل الممارسات</h2>
+                </div>
+
+                <ul class="steps">
+                    <li><strong>استخدم IHttpClientFactory:</strong> لا تنشئ HttpClient يدوياً في كل مرة.</li>
+                    <li><strong>مرّر CancellationToken:</strong> لدعم إلغاء الطلبات الطويلة.</li>
+                    <li><strong>لا تضع مفاتيح API في الكود:</strong> استخدم متغيرات البيئة أو User Secrets.</li>
+                    <li><strong>عيّن Timeout:</strong> لا تنتظر للأبد — 10 ثوانٍ كافية لمعظم الطلبات.</li>
+                    <li><strong>خزّن مؤقتاً (Cache):</strong> لا تطلب نفس المدينة مرتين خلال دقيقة.</li>
+                    <li><strong>تحقق من الاستجابة:</strong> استخدم <span class="inline-code">EnsureSuccessStatusCode</span> أو تحقق يدوياً.</li>
+                    <li><strong>اعرض حالة التحميل:</strong> المستخدم يجب أن يعرف أن التطبيق يعمل.</li>
+                    <li><strong>سجّل الأخطاء:</strong> استخدم ILogger لتتبع المشاكل في الإنتاج.</li>
+                </ul>
+
+                <h3>مثال: تخزين مؤقت بسيط</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> MemoryCache</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">WeatherResponse</span>&gt; <span class="fn">GetWeatherAsync</span>(<span class="kw">string</span> city)
+{
+    <span class="kw">var</span> cacheKey = <span class="str">$"weather_{city.ToLower()}"</span>;
+
+    <span class="kw">if</span> (_cache.<span class="fn">TryGetValue</span>(cacheKey, <span class="kw">out</span> <span class="type">WeatherResponse</span>? cached))
+        <span class="kw">return</span> cached!;
+
+    <span class="kw">var</span> fresh = <span class="kw">await</span> <span class="fn">FetchFromApiAsync</span>(city);
+
+    _cache.<span class="fn">Set</span>(cacheKey, fresh, <span class="type">TimeSpan</span>.<span class="fn">FromMinutes</span>(<span class="num">10</span>));
+
+    <span class="kw">return</span> fresh;
+}</pre>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h4><i class="fas fa-gem"></i> قاعدة ذهبية</h4>
+                    <p>
+                        أي تطبيق يستهلك API خارجي يجب أن يكون <strong>مقاوماً للفشل</strong>.
+                        الشبكة قد تنقطع، الخادم قد يسقط، والمفتاح قد ينتهي — تطبيقك يجب أن يستمر بالعمل.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ====== 9 ====== -->
+            <section class="content-section" id="sec-9">
+                <div class="section-heading">
+                    <div class="section-num">9</div>
+                    <h2>تمارين تفاعلية</h2>
+                </div>
+                <p>اختبر فهمك للمشروع:</p>
+
+                <div class="interactive-box">
+                    <div class="interactive-title"><i class="fas fa-question-circle"></i> سؤال 1</div>
+                    <p class="interactive-hint">ما أفضل طريقة لاستخدام HttpClient في .NET؟</p>
+                    <div class="task-box" data-quiz="1">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> إنشاء new HttpClient() في كل طلب</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> استخدام IHttpClientFactory</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> استخدام WebClient</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> استخدام HttpWebRequest</button>
+                        </div>
+                        <div class="task-feedback" id="fb1"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 2</div>
+                    <p class="interactive-hint">ماذا يعني كود الحالة 404؟</p>
+                    <div class="task-box" data-quiz="2">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> خطأ في الخادم</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">B</span> مفتاح API خاطئ</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">C</span> المورد غير موجود (المدينة غير موجودة)</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> نجاح الطلب</button>
+                        </div>
+                        <div class="task-feedback" id="fb2"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 3</div>
+                    <p class="interactive-hint">لماذا نستخدم JsonPropertyName؟</p>
+                    <div class="task-box" data-quiz="3">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> لتسريع التحليل</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> لربط أسماء JSON بخصائص C# عند اختلافها</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> لتشفير البيانات</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> لضغط JSON</button>
+                        </div>
+                        <div class="task-feedback" id="fb3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <nav class="lesson-nav">
+                <a href="#" class="prev">
+                    <div class="nav-icon"><i class="fas fa-arrow-right"></i></div>
+                    <div>
+                        <div class="nav-label">الدرس السابق</div>
+                        <div class="nav-title">تطبيق المهام (To-Do List)</div>
+                    </div>
+                </a>
+                <a href="#" class="next">
+                    <div>
+                        <div class="nav-label">الدرس التالي</div>
+                        <div class="nav-title">تطبيق دردشة بـ Sockets</div>
+                    </div>
+                    <div class="nav-icon"><i class="fas fa-arrow-left"></i></div>
+                </a>
+            </nav>
+
+        </main>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-bottom">
+            <span>© 2026 CodeWay — جميع الحقوق محفوظة.</span>
+            <span>صُمم بعناية لتعلم C# بالعربية · <a href="#">سياسة الخصوصية</a></span>
+        </div>
+    </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    /* ============ شريط التقدم ============ */
+    const progressBar = document.getElementById('progressBar');
+    const header = document.getElementById('header');
+    const backTop = document.getElementById('backTop');
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = (scrollTop / docHeight) * 100 + '%';
+        header.classList.toggle('scrolled', scrollTop > 20);
+        backTop.classList.toggle('show', scrollTop > 400);
+    });
+
+    /* ============ نسخ الكود ============ */
+    function copyCode(btn) {
+        const pre = btn.closest('.code-wrapper').querySelector('pre');
+        const text = pre.innerText;
+        const done = () => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1800);
+        };
+        navigator.clipboard.writeText(text).then(done).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            done();
+        });
+    }
+
+    /* ============ تطبيق الطقس الحي ============ */
+    const mockWeatherData = {
+        'الرياض': {
+            temp: 32.5, feels: 34.2, humidity: 25, pressure: 1013,
+            wind: 5.2, desc: 'سماء صافية', icon: 'sun', iconClass: 'fa-sun',
+            forecast: [
+                { day: 'اليوم', icon: 'fa-sun', min: 24, max: 33 },
+                { day: 'غداً', icon: 'fa-cloud-sun', min: 23, max: 31 },
+                { day: 'الأربعاء', icon: 'fa-cloud', min: 22, max: 29 },
+                { day: 'الخميس', icon: 'fa-cloud-rain', min: 21, max: 27 },
+                { day: 'الجمعة', icon: 'fa-sun', min: 23, max: 32 }
+            ]
+        },
+        'القاهرة': {
+            temp: 28.1, feels: 29.5, humidity: 45, pressure: 1015,
+            wind: 3.8, desc: 'غائم جزئياً', icon: 'cloud-sun', iconClass: 'fa-cloud-sun',
+            forecast: [
+                { day: 'اليوم', icon: 'fa-cloud-sun', min: 20, max: 29 },
+                { day: 'غداً', icon: 'fa-sun', min: 19, max: 30 },
+                { day: 'الأربعاء', icon: 'fa-cloud', min: 18, max: 27 },
+                { day: 'الخميس', icon: 'fa-cloud-rain', min: 17, max: 25 },
+                { day: 'الجمعة', icon: 'fa-sun', min: 19, max: 28 }
+            ]
+        },
+        'دبي': {
+            temp: 36.8, feels: 40.1, humidity: 55, pressure: 1010,
+            wind: 4.5, desc: 'مشمس حار', icon: 'sun', iconClass: 'fa-sun',
+            forecast: [
+                { day: 'اليوم', icon: 'fa-sun', min: 28, max: 37 },
+                { day: 'غداً', icon: 'fa-sun', min: 28, max: 38 },
+                { day: 'الأربعاء', icon: 'fa-cloud-sun', min: 27, max: 36 },
+                { day: 'الخميس', icon: 'fa-sun', min: 28, max: 37 },
+                { day: 'الجمعة', icon: 'fa-sun', min: 28, max: 38 }
+            ]
+        },
+        'لندن': {
+            temp: 15.2, feels: 13.8, humidity: 78, pressure: 1008,
+            wind: 7.1, desc: 'مطر خفيف', icon: 'cloud-rain', iconClass: 'fa-cloud-rain',
+            forecast: [
+                { day: 'اليوم', icon: 'fa-cloud-rain', min: 11, max: 16 },
+                { day: 'غداً', icon: 'fa-cloud', min: 10, max: 15 },
+                { day: 'الأربعاء', icon: 'fa-cloud-sun', min: 11, max: 17 },
+                { day: 'الخميس', icon: 'fa-cloud-rain', min: 10, max: 14 },
+                { day: 'الجمعة', icon: 'fa-cloud-sun', min: 12, max: 18 }
+            ]
+        },
+        'طوكيو': {
+            temp: 22.4, feels: 22.0, humidity: 60, pressure: 1012,
+            wind: 3.2, desc: 'غائم', icon: 'cloud', iconClass: 'fa-cloud',
+            forecast: [
+                { day: 'اليوم', icon: 'fa-cloud', min: 16, max: 23 },
+                { day: 'غداً', icon: 'fa-cloud-sun', min: 15, max: 24 },
+                { day: 'الأربعاء', icon: 'fa-sun', min: 16, max: 25 },
+                { day: 'الخميس', icon: 'fa-cloud', min: 15, max: 22 },
+                { day: 'الجمعة', icon: 'fa-cloud-rain', min: 14, max: 20 }
+            ]
+        }
+    };
+
+    const weatherBody = document.getElementById('weatherBody');
+    const weatherCity = document.getElementById('weatherCity');
+    const weatherSearchBtn = document.getElementById('weatherSearchBtn');
+
+    function findCity(query) {
+        if (!query) return null;
+        const normalized = query.trim();
+        for (const [name, data] of Object.entries(mockWeatherData)) {
+            if (name === normalized || name.includes(normalized) || normalized.includes(name)) {
+                return { name, data };
+            }
+        }
+        return null;
+    }
+
+    function renderLoading(cityName) {
+        weatherBody.innerHTML = `
+            <div class="weather-loading">
+                <i class="fas fa-spinner"></i>
+                جارٍ جلب بيانات الطقس لـ "${cityName}"...
+            </div>`;
+    }
+
+    function renderError(message) {
+        weatherBody.innerHTML = `
+            <div class="weather-loading" style="color:#fee2e2">
+                <i class="fas fa-exclamation-circle" style="animation:none"></i>
+                ${message}
+                <div style="margin-top:14px;font-size:.85rem;opacity:.8">جرّب: الرياض، القاهرة، دبي، لندن، طوكيو</div>
+            </div>`;
+    }
+
+    function renderWeather(cityName, data) {
+        const forecastHtml = data.forecast.map(f => `
+            <div class="forecast-day">
+                <div class="day">${f.day}</div>
+                <div class="icon"><i class="fas ${f.icon}"></i></div>
+                <div class="temp">${f.max}° <span>/ ${f.min}°</span></div>
+            </div>
+        `).join('');
+
+        weatherBody.innerHTML = `
+            <div class="weather-main">
+                <div>
+                    <div class="weather-city">${cityName}</div>
+                    <div class="weather-desc">${data.desc}</div>
+                    <div class="weather-temp">
+                        ${data.temp.toFixed(1)}<span class="unit">°C</span>
+                    </div>
+                    <div class="weather-feels">يشعر بها كأنها ${data.feels.toFixed(1)}°C</div>
+                </div>
+                <div class="weather-icon">
+                    <i class="fas ${data.iconClass}"></i>
+                </div>
+            </div>
+
+            <div class="weather-stats">
+                <div class="weather-stat">
+                    <i class="fas fa-droplet"></i>
+                    <div class="label">الرطوبة</div>
+                    <div class="value">${data.humidity}%</div>
+                </div>
+                <div class="weather-stat">
+                    <i class="fas fa-wind"></i>
+                    <div class="label">الرياح</div>
+                    <div class="value">${data.wind} م/ث</div>
+                </div>
+                <div class="weather-stat">
+                    <i class="fas fa-gauge-high"></i>
+                    <div class="label">الضغط</div>
+                    <div class="value">${data.pressure}</div>
+                </div>
+                <div class="weather-stat">
+                    <i class="fas fa-temperature-half"></i>
+                    <div class="label">الإحساس</div>
+                    <div class="value">${data.feels.toFixed(1)}°</div>
+                </div>
+            </div>
+
+            <div class="weather-forecast">
+                <div class="forecast-title">
+                    <i class="fas fa-calendar-week"></i> توقعات 5 أيام
+                </div>
+                <div class="forecast-grid">${forecastHtml}</div>
+            </div>
+        `;
+    }
+
+    function searchWeather() {
+        const query = weatherCity.value.trim();
+        if (!query) {
+            weatherCity.focus();
+            weatherCity.style.borderColor = '#fecaca';
+            setTimeout(() => weatherCity.style.borderColor = '', 800);
+            return;
+        }
+
+        renderLoading(query);
+
+        setTimeout(() => {
+            const found = findCity(query);
+            if (found) {
+                renderWeather(found.name, found.data);
+            } else {
+                renderError(`لم يتم العثور على مدينة باسم "${query}"`);
+            }
+        }, 700);
+    }
+
+    weatherSearchBtn.addEventListener('click', searchWeather);
+    weatherCity.addEventListener('keydown', e => { if (e.key === 'Enter') searchWeather(); });
+
+    // تحميل الرياض افتراضياً
+    renderWeather('الرياض', mockWeatherData['الرياض']);
+
+    /* ============ التنقل النشط في TOC ============ */
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    const sections = document.querySelectorAll('.content-section');
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                tocLinks.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
+
+    /* ============ التمارين التفاعلية ============ */
+    document.querySelectorAll('.task-box').forEach(box => {
+        const quizId = box.dataset.quiz;
+        const fb = document.getElementById('fb' + quizId);
+        const options = box.querySelectorAll('.task-option');
+
+        options.forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (box.dataset.answered === 'true') return;
+                box.dataset.answered = 'true';
+
+                const isCorrect = opt.dataset.correct === 'true';
+                options.forEach(o => {
+                    if (o.dataset.correct === 'true') o.classList.add('correct');
+                    else if (o === opt) o.classList.add('wrong');
+                });
+
+                if (isCorrect) {
+                    fb.textContent = '✅ إجابة صحيحة! أحسنت.';
+                    fb.className = 'task-feedback show ok';
+                } else {
+                    fb.textContent = '❌ إجابة غير صحيحة. الإجابة الصحيحة مظللة بالأخضر.';
+                    fb.className = 'task-feedback show no';
+                }
+            });
+        });
+    });
+
+    /* ============ قائمة الجوال ============ */
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        const nav = document.querySelector('.header-nav');
+        if (!nav) return;
+        if (nav.style.display === 'flex') {
+            nav.style.display = '';
+        } else {
+            Object.assign(nav.style, {
+                display: 'flex',
+                position: 'absolute',
+                top: '72px',
+                right: '0',
+                left: '0',
+                background: 'var(--primary)',
+                flexDirection: 'column',
+                padding: '16px',
+                gap: '8px',
+                boxShadow: '0 10px 30px rgba(0,0,0,.3)',
+                zIndex: '999'
+            });
+        }
+    });
+
+    /* ============ ظهور الأقسام ============ */
+    const sectionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.05 });
+
+    sections.forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(20px)';
+        s.style.transition = 'opacity .6s ease, transform .6s ease';
+        sectionObserver.observe(s);
+    });
+</script>
+
+</body>
+</html>

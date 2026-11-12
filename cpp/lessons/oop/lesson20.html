@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>++C الصديقات (Friend Functions) في لغة | شرح شامل ومتكامل</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(145deg, #0f2a3b, #1c3e58);
+            color: #e6f3ff;
+            line-height: 1.7;
+            padding: 2rem 1.8rem;
+            direction: rtl;
+        }
+
+        .wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الحاوية الرئيسية */
+        .glass-panel {
+            background: rgba(22, 48, 70, 0.8);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-radius: 5rem;
+            box-shadow: 0 45px 90px -20px #000000, 0 0 0 2px rgba(100, 180, 255, 0.2);
+            padding: 3.2rem 3.8rem;
+            border: 1px solid rgba(70, 150, 220, 0.4);
+        }
+
+        /* الرأس */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #b8dcff, #ddf0ff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero h1 i {
+            background: #2f7ac8;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 130px;
+            font-size: 2.8rem;
+            -webkit-text-fill-color: white;
+            box-shadow: 0 18px 35px #0a1e32;
+        }
+
+        .hero-sub {
+            font-size: 1.8rem;
+            font-weight: 500;
+            background: #1f5785cc;
+            padding: 0.9rem 3.5rem;
+            border-radius: 90px;
+            display: inline-block;
+            margin-top: 1.6rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid #5aa3ff;
+            color: #ffffff;
+        }
+
+        /* بطاقات مفاهيمية */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.2rem;
+            margin: 4rem 0;
+        }
+
+        .concept-card {
+            background: rgba(25, 60, 90, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 3rem;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border: 1px solid #3f8ed6;
+            transition: 0.3s;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-10px);
+            background: #1d5a8ce0;
+            border-color: #7ab6ff;
+        }
+
+        .concept-icon {
+            background: #3282d3;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            margin: 0 auto 1.5rem;
+            color: white;
+        }
+
+        .concept-card h3 {
+            font-size: 2.2rem;
+            color: #c6e4ff;
+            margin-bottom: 1rem;
+        }
+
+        .concept-card p {
+            font-size: 1.2rem;
+            color: #d0eaff;
+        }
+
+        @media (max-width: 800px) {
+            .concept-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 500px) {
+            .concept-grid { grid-template-columns: 1fr; }
+        }
+
+        /* عناوين رئيسية */
+        .main-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 4rem 0 2.5rem 0;
+            position: relative;
+            display: inline-block;
+            color: #d6ecff;
+        }
+        .main-title:after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            right: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #3f8ad6, #70b0f0, #b5daff);
+            border-radius: 10px;
+        }
+
+        .sub-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 3rem 0 2rem 0;
+            color: #c2e2ff;
+            border-right: 12px solid #4d9eec;
+            padding-right: 2rem;
+        }
+
+        /* كتلة الكود */
+        .code-box {
+            background: #0b1f30;
+            border-radius: 3.2rem;
+            padding: 2.5rem;
+            margin: 2.8rem 0;
+            box-shadow: 0 30px 45px -18px #000000, inset 0 1px 12px #4180c7;
+            border: 1px solid #3070aa;
+        }
+
+        .code-box pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+            color: #e2eef9;
+        }
+
+        /* بطاقات مميزة */
+        .highlight-box {
+            background: linear-gradient(115deg, #154e7a, #1f66a0);
+            color: white;
+            border-radius: 3.2rem;
+            padding: 2.5rem 3.2rem;
+            margin: 3rem 0;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            box-shadow: 0 28px 45px -15px #000000b3;
+        }
+
+        .highlight-box i {
+            font-size: 3.5rem;
+            color: #ffde9e;
+        }
+
+        .highlight-box p {
+            font-size: 1.35rem;
+            font-weight: 500;
+        }
+
+        .note-box {
+            background: #1c3348;
+            border-right: 12px solid #e68a2e;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #ffdeb4;
+        }
+
+        .note-box i {
+            font-size: 3rem;
+            color: #f39c12;
+        }
+
+        .warning-box {
+            background: #2a1f1f;
+            border-right: 12px solid #e64545;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #ffb4b4;
+        }
+
+        .warning-box i {
+            font-size: 3rem;
+            color: #ff6b6b;
+        }
+
+        /* جدول مقارنة */
+        .elegant-table {
+            background: #123a58ef;
+            backdrop-filter: blur(6px);
+            border-radius: 3.5rem;
+            overflow: hidden;
+            margin: 3.2rem 0;
+            border: 1px solid #4080c0;
+        }
+
+        .elegant-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.25rem;
+            color: #e1f0ff;
+        }
+
+        .elegant-table th {
+            background: #1f62a0;
+            color: white;
+            font-weight: 700;
+            padding: 1.6rem 1.2rem;
+            font-size: 1.6rem;
+        }
+
+        .elegant-table td {
+            padding: 1.6rem 1.8rem;
+            border-bottom: 1px solid #2c70b0;
+            color: #d4ecff;
+        }
+
+        .elegant-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .elegant-table td:first-child {
+            background: #154d78;
+            font-weight: 700;
+            width: 30%;
+        }
+
+        /* تذييل */
+        .page-footer {
+            margin-top: 5.5rem;
+            padding-top: 3rem;
+            border-top: 5px solid #2f7cc9;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #b9dbff;
+            font-size: 1.25rem;
+        }
+
+        .footer-badge {
+            background: #1f68a8;
+            color: white;
+            padding: 0.6rem 2.2rem;
+            border-radius: 70px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .glass-panel { padding: 2rem; }
+            .hero h1 { font-size: 2.8rem; }
+            .main-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="glass-panel">
+
+        <!-- الرأس -->
+        <div class="hero">
+            <h1>
+                <i class="fas fa-handshake"></i>
+                الصديقات (Friend Functions)
+                <i class="fas fa-user-friends"></i>
+            </h1>
+            <div class="hero-sub">
+                <i class="fas fa-key"></i> Friend Functions & Friend Classes – كسر التغليف بحذر
+            </div>
+        </div>
+
+        <!-- مقدمة -->
+        <p style="font-size:1.4rem; text-align:center; margin-bottom:2rem;">في البرمجة كائنية التوجه، التغليف (Encapsulation) يمنع الوصول المباشر للبيانات الخاصة. ولكن أحياناً نحتاج لدالة خارجية أو صنف آخر للوصول إلى الأعضاء الخاصة. هنا يأتي دور <strong>الصديقات (Friends)</strong>.</p>
+
+        <!-- بطاقات مفاهيمية -->
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="concept-icon"><i class="fas fa-user-plus"></i></div>
+                <h3>دالة صديقة</h3>
+                <p>دالة غير عضو في الصنف، ولكنها مصرح لها بالوصول إلى جميع أعضائه (حتى الخاصة والمحمية).</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon"><i class="fas fa-users"></i></div>
+                <h3>صنف صديق</h3>
+                <p>صنف كامل يصبح صديقاً، فتصبح جميع دوال الأعضاء فيه قادرة على الوصول للبيانات الخاصة للصنف الآخر.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <h3>استثناء للتغليف</h3>
+                <p>الصديقات تكسر التغليف بشكل مقصود ومنضبط. يجب استخدامها بحذر وفقط عند الضرورة.</p>
+            </div>
+        </div>
+
+        <!-- أولاً: الدوال الصديقة -->
+        <h2 class="main-title"><i class="fas fa-user-plus"></i> أولاً: الدوال الصديقة (Friend Functions)</h2>
+        <p>الدالة الصديقة هي دالة عادية (ليست عضواً في الصنف) يتم التصريح عنها داخل الصنف باستخدام الكلمة المفتاحية <code>friend</code>. يمكن أن تكون:</p>
+        <ul style="font-size:1.2rem; margin-right:2rem;">
+            <li>دالة عادية (غير تابعة لأي صنف).</li>
+            <li>دالة عضو في صنف آخر.</li>
+        </ul>
+
+        <!-- مثال 1: دالة صديقة عادية -->
+        <h3 class="sub-title"><i class="fas fa-1"></i> مثال: دالة صديقة عادية</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+class Rectangle {
+private:
+    double width, height;
+
+public:
+    Rectangle(double w, double h) : width(w), height(h) {}
+
+    // التصريح بدالة صديقة
+    friend double calculateArea(const Rectangle& rect);
+};
+
+// تعريف الدالة الصديقة (يمكنها الوصول للأعضاء الخاصة)
+double calculateArea(const Rectangle& rect) {
+    return rect.width * rect.height;  // وصول مباشر للخاصية
+}
+
+int main() {
+    Rectangle r(5, 3);
+    cout &lt;&lt; "مساحة المستطيل: " &lt;&lt; calculateArea(r) &lt;&lt; endl; // 15
+    return 0;
+}</code></pre>
+        </div>
+        <div class="note-box">
+            <i class="fas fa-lightbulb"></i>
+            <div><strong>ملاحظة:</strong> الدالة الصديقة ليست عضواً في الصنف، لذلك تُستدعى بدون استخدام عامل النقطة (.)، ويجب تمرير كائن من الصنف كمعامل إذا أردت الوصول لأعضائه.</div>
+        </div>
+
+        <!-- مثال 2: دالة عضو في صنف آخر كصديقة -->
+        <h3 class="sub-title"><i class="fas fa-2"></i> مثال: دالة عضو من صنف آخر كصديقة</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">class B;  // تعريف مسبق
+
+class A {
+private:
+    int secretA;
+public:
+    A(int val) : secretA(val) {}
+
+    // التصريح بأن دالة displayB من الصنف B هي صديقة
+    friend void B::displayB(const A& a); // يحتاج تعريف كامل لـ B
+};
+
+class B {
+private:
+    int secretB;
+public:
+    B(int val) : secretB(val) {}
+
+    void displayB(const A& a) {
+        cout &lt;&lt; "secretA = " &lt;&lt; a.secretA &lt;&lt; endl; // وصول للخاصية الخاصة
+        cout &lt;&lt; "secretB = " &lt;&lt; secretB &lt;&lt; endl;
+    }
+};
+
+int main() {
+    A objA(42);
+    B objB(99);
+    objB.displayB(objA); // تعمل بنجاح
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- ثانياً: الأصناف الصديقة -->
+        <h2 class="main-title"><i class="fas fa-users"></i> ثانياً: الأصناف الصديقة (Friend Classes)</h2>
+        <p>عندما يكون صنف كامل صديقاً لصنف آخر، فإن جميع دوال الأعضاء في الصنف الصديق تصبح قادرة على الوصول إلى الأعضاء الخاصة والمحمية للصنف الآخر.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">class Employee {
+private:
+    string name;
+    double salary;
+
+public:
+    Employee(string n, double s) : name(n), salary(s) {}
+
+    // جعل صنف Manager صديقاً كاملاً
+    friend class Manager;
+};
+
+class Manager {
+public:
+    void showEmployeeData(const Employee& emp) {
+        cout &lt;&lt; "اسم الموظف: " &lt;&lt; emp.name &lt;&lt; endl;
+        cout &lt;&lt; "راتب الموظف: " &lt;&lt; emp.salary &lt;&lt; endl; // وصول للخاص
+    }
+
+    void giveRaise(Employee& emp, double amount) {
+        emp.salary += amount; // تعديل الخاصية الخاصة
+    }
+};
+
+int main() {
+    Employee emp("أحمد", 5000);
+    Manager mgr;
+    mgr.showEmployeeData(emp);
+    mgr.giveRaise(emp, 1000);
+    mgr.showEmployeeData(emp);
+    return 0;
+}</code></pre>
+        </div>
+        <div class="highlight-box">
+            <i class="fas fa-shield"></i>
+            <p><strong>تذكير:</strong> الصداقة ليست متبادلة. إذا جعلت A صديقاً لـ B، فليس بالضرورة أن B صديق لـ A. الصداقة لا تُورث.</p>
+        </div>
+
+        <!-- خصائص ومميزات -->
+        <h2 class="main-title"><i class="fas fa-list"></i> خصائص ومميزات الصديقات</h2>
+        <div class="elegant-table">
+            <table>
+                <tr><th>الخاصية</th><th>الوصف</th></tr>
+                <tr><td>ليست عضواً</td><td>الدالة الصديقة ليست عضواً في الصنف، ولا تملك مؤشر this.</td></tr>
+                <tr><td>لا تتأثر بمعدلات الوصول</td><td>يمكن وضع التصريح friend في أي قسم (public, private, protected) والنتيجة واحدة.</td></tr>
+                <tr><td>غير متبادلة</td><td>إذا كانت A صديقة لـ B، فليس بالضرورة أن B صديقة لـ A.</td></tr>
+                <tr><td>غير متوارثة</td><td>الصداقة لا تورث. إذا كان الصنف الأساسي صديقاً لصنف آخر، فالأصناف المشتقة ليست أصدقاء تلقائياً.</td></tr>
+                <tr><td>لا يمكن إلغاؤها</td><td>بمجرد تعريف صديق، يبقى صديقاً. لا توجد آلية لإلغاء الصداقة.</td></tr>
+            </table>
+        </div>
+
+        <!-- حالات استخدام شائعة -->
+        <h2 class="main-title"><i class="fas fa-tools"></i> حالات استخدام شائعة للصديقات</h2>
+
+        <!-- 1. تحميل العوامل (Operator Overloading) -->
+        <h3 class="sub-title"><i class="fas fa-calculator"></i> 1. تحميل العوامل الثنائية (مثل << و >></h3>
+        <p>عند تحميل عامل الإخراج <code>&lt;&lt;</code> أو الإدخال <code>&gt;&gt;</code>، غالباً ما تكون هناك حاجة لجعلها دوالاً صديقة لأن المعامل الأيسر هو كائن من نوع <code>ostream</code> أو <code>istream</code> وليس كائن من الصنف.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">class Point {
+private:
+    int x, y;
+public:
+    Point(int xv = 0, int yv = 0) : x(xv), y(yv) {}
+
+    // جعل الدالة operator<< صديقة
+    friend ostream& operator<<(ostream& os, const Point& p);
+};
+
+ostream& operator<<(ostream& os, const Point& p) {
+    os &lt;&lt; "(" &lt;&lt; p.x &lt;&lt; ", " &lt;&lt; p.y &lt;&lt; ")";
+    return os;
+}
+
+int main() {
+    Point p1(3, 4);
+    cout &lt;&lt; "نقطة: " &lt;&lt; p1 &lt;&lt; endl; // نقطة: (3, 4)
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 2. دوال مساعدة تحتاج وصول خاص -->
+        <h3 class="sub-title"><i class="fas fa-wrench"></i> 2. دوال مساعدة تحتاج لبيانات داخلية</h3>
+        <p>مثل دوال المقارنة المعقدة، أو دوال الرسم، أو دوال التسلسل (serialization).</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">class Matrix {
+private:
+    int data[3][3];
+public:
+    // دالة صديقة لطباعة المصفوفة بشكل جميل
+    friend void prettyPrint(const Matrix& m);
+};
+
+void prettyPrint(const Matrix& m) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout &lt;&lt; m.data[i][j] &lt;&lt; "\t";
+        }
+        cout &lt;&lt; endl;
+    }
+}</code></pre>
+        </div>
+
+        <!-- مقارنة: Friend vs Member Function -->
+        <h2 class="sub-title"><i class="fas fa-balance-scale"></i> متى نستخدم دالة صديقة بدلاً من دالة عضو؟</h2>
+        <div class="elegant-table">
+            <table>
+                <tr><th>الموقف</th><th>الأفضلية</th></tr>
+                <tr><td>الدالة تحتاج للوصول للبيانات الخاصة ولكن المعامل الأول ليس كائن من الصنف</td><td>دالة صديقة (مثل operator<<)</td></tr>
+                <tr><td>الدالة تحتاج للعمل مع كائنين من نوعين مختلفين</td><td>دالة صديقة غالباً</td></tr>
+                <tr><td>الدالة تعمل بشكل أساسي على كائن واحد من الصنف</td><td>دالة عضو</td></tr>
+                <tr><td>الدالة تحتاج لتعدد الأشكال (polymorphism)</td><td>دالة عضو افتراضية</td></tr>
+            </table>
+        </div>
+
+        <!-- تطبيقات عملية -->
+        <h2 class="sub-title"><i class="fas fa-flask"></i> تطبيقات عملية</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2.2rem; margin: 3rem 0;">
+            <div style="flex: 1 1 300px; background: #144b70; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-vector-square"></i> مسافة بين نقطتين</h4>
+                <pre style="background:#0b1f2e; color:#daf0ff; padding:1.2rem; border-radius:2rem; direction:ltr;">class Point {
+private:
+    double x, y;
+public:
+    Point(double xv, double yv) : x(xv), y(yv) {}
+    friend double distance(const Point& a, const Point& b);
+};
+
+double distance(const Point& a, const Point& b) {
+    double dx = a.x - b.x;
+    double dy = a.y - b.y;
+    return sqrt(dx*dx + dy*dy);
+}</pre>
+            </div>
+            <div style="flex: 1 1 300px; background: #144b70; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas-regular fa-file-lines"></i> مقارنة معقدة</h4>
+                <pre style="background:#0b1f2e; color:#daf0ff; padding:1.2rem; border-radius:2rem; direction:ltr;">class Student {
+private:
+    string name;
+    double gpa;
+public:
+    Student(string n, double g) : name(n), gpa(g) {}
+    friend bool isExcellent(const Student& s);
+};
+
+bool isExcellent(const Student& s) {
+    return s.gpa >= 3.5;
+}</pre>
+            </div>
+        </div>
+
+        <!-- تمرين شامل -->
+        <div style="background: #1b5580; border-radius: 3.5rem; padding: 2.8rem; margin: 3.5rem 0;">
+            <h3 style="font-size: 2.4rem; color: #ffffff;"><i class="fas fa-pen"></i> تمرين: صمم صنف Complex (عدد مركب) يحتوي على real و imag. اجعل الدالة operator+ (لجمع عددين مركبين) صديقة للصنف، واكتب برنامجاً يختبر عملها.</h3>
+            <details style="margin-top:2rem; background: #10344f; border-radius: 2.5rem; padding: 1.8rem;">
+                <summary style="color:#aad0ff;"><i class="fas fa-lightbulb"></i> عرض الحل</summary>
+                <pre style="direction:ltr; background:#0b1f30; color:#fff; padding:1.5rem;">#include &lt;iostream&gt;
+using namespace std;
+
+class Complex {
+private:
+    double real, imag;
+public:
+    Complex(double r = 0, double i = 0) : real(r), imag(i) {}
+
+    // إعلان الأصدقاء
+    friend Complex operator+(const Complex& c1, const Complex& c2);
+    friend ostream& operator<<(ostream& os, const Complex& c);
+};
+
+// تعريف operator+ كدالة صديقة
+Complex operator+(const Complex& c1, const Complex& c2) {
+    return Complex(c1.real + c2.real, c1.imag + c2.imag);
+}
+
+ostream& operator<<(ostream& os, const Complex& c) {
+    os &lt;&lt; c.real &lt;&lt; (c.imag >= 0 ? " + " : " - ") &lt;&lt; abs(c.imag) &lt;&lt; "i";
+    return os;
+}
+
+int main() {
+    Complex c1(3, 4), c2(1, 2);
+    Complex c3 = c1 + c2;
+    cout &lt;&lt; c1 &lt;&lt; " + " &lt;&lt; c2 &lt;&lt; " = " &lt;&lt; c3 &lt;&lt; endl;
+    return 0;
+}</pre>
+            </details>
+        </div>
+
+        <!-- خاتمة وأفضل الممارسات -->
+        <div style="background: #124066; border-radius: 3.5rem; padding: 2.8rem; margin-top: 3.5rem;">
+            <i class="fas fa-crown" style="font-size: 3rem; float: right; margin-left: 2rem; color:#ffd966;"></i>
+            <h3 style="font-size:2.5rem; margin-bottom:1.5rem; color:#ffffff;">أفضل الممارسات مع الصديقات</h3>
+            <ul style="list-style: none; columns: 2; column-gap: 3rem; font-size:1.3rem; color:#d0ebff;">
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> استخدم الصديقات فقط عند الضرورة القصوى.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> لا تجعل صنفاً كاملاً صديقاً إلا إذا كان عدد الدوال التي تحتاج للوصول كبيراً.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> تذكر أن الصداقة غير متبادلة وغير متوارثة.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> استخدم الصديقات بشكل مكثف مع تحميل العوامل (خاصة << و >>).</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> حافظ على التغليف قدر الإمكان، والصديقات هي استثناء.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> وثّق استخدام الصديقات في الكود لتوضيح سبب كسر التغليف.</li>
+            </ul>
+        </div>
+
+        <!-- تذييل -->
+        <div class="page-footer">
+            <span class="footer-badge"><i class="fas fa-copyright"></i> ++C Friends</span>
+            <span><i class="fas fa-handshake"></i> Friend Functions & Classes</span>
+            <span><i class="fas fa-check-double"></i> استخدام بحذر</span>
+        </div>
+
+    </div> <!-- glass-panel -->
+</div> <!-- wrapper -->
+<script>Prism.highlightAll();</script>
+</body>
+</html>

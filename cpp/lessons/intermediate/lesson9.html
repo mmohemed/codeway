@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>++C المصفوفات في لغة | شرح شامل ومتكامل</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #eef5fc 0%, #deeefa 100%);
+            color: #1c2e44;
+            line-height: 1.7;
+            padding: 2rem 1.5rem;
+            direction: rtl;
+        }
+
+        .wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الحاوية الرئيسية */
+        .main-container {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 4rem;
+            box-shadow: 0 35px 70px -20px #0a2b44, 0 0 0 1px rgba(255,255,255,0.7);
+            padding: 3rem 3.2rem;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        /* الرأس العلمي */
+        .hero {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .hero h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #164863, #1c5a7c, #26749e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero h1 i {
+            background: #1b4f72;
+            color: white;
+            padding: 0.5rem 1.4rem;
+            border-radius: 100px;
+            font-size: 2.4rem;
+            -webkit-text-fill-color: white;
+            box-shadow: 0 12px 25px #0c334b;
+        }
+
+        .hero-sub {
+            font-size: 1.5rem;
+            font-weight: 500;
+            background: #d2e6ffcc;
+            padding: 0.7rem 2.8rem;
+            border-radius: 70px;
+            display: inline-block;
+            margin-top: 1.3rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid white;
+        }
+
+        /* بطاقات تعريفية */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2.2rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .intro-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 2.8rem;
+            padding: 2rem 2rem;
+            border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: 0 15px 35px -10px #305e81;
+            transition: 0.25s;
+        }
+
+        .intro-card:hover {
+            background: #ffffffde;
+            transform: translateY(-6px);
+            border-color: #609ac7;
+        }
+
+        .intro-icon {
+            background: #1b4f6e;
+            width: 75px;
+            height: 75px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .intro-card h3 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #0f3e5c;
+            margin-bottom: 0.9rem;
+        }
+
+        .intro-card p {
+            font-size: 1.15rem;
+            color: #1f405e;
+        }
+
+        /* عناوين رئيسية */
+        .chapter-title {
+            font-size: 2.9rem;
+            font-weight: 700;
+            margin: 3.5rem 0 2rem 0;
+            position: relative;
+            display: inline-block;
+        }
+        .chapter-title:after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            right: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #1f587b, #5993c1, #b9d9fc);
+            border-radius: 8px;
+        }
+
+        .section-header {
+            font-size: 2.3rem;
+            font-weight: 600;
+            margin: 2.8rem 0 1.6rem 0;
+            color: #124768;
+            border-right: 9px solid #1c6c9c;
+            padding-right: 1.6rem;
+        }
+
+        /* كتلة الأكواد */
+        .code-block {
+            background: #142836;
+            border-radius: 2.5rem;
+            padding: 2rem;
+            margin: 2.2rem 0;
+            box-shadow: 0 25px 35px -12px #021a29, inset 0 1px 8px #7b9ebd;
+            border: 1px solid #3f6990;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+        }
+
+        /* جدول متقدم */
+        .advanced-table {
+            background: #ffffffde;
+            backdrop-filter: blur(6px);
+            border-radius: 2.8rem;
+            overflow: hidden;
+            margin: 3rem 0;
+            border: 1px solid #bcd3ed;
+        }
+
+        .advanced-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.15rem;
+        }
+
+        .advanced-table th {
+            background: #1b4b6e;
+            color: white;
+            font-weight: 700;
+            padding: 1.3rem 1rem;
+            font-size: 1.4rem;
+        }
+
+        .advanced-table td {
+            padding: 1.4rem 1.2rem;
+            border-bottom: 1px solid #b0cde4;
+            color: #12324b;
+        }
+
+        .advanced-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .advanced-table td:first-child {
+            background: #e4f0fc;
+            font-weight: 700;
+            width: 30%;
+        }
+
+        /* بطاقات ملونة */
+        .highlight-card {
+            background: linear-gradient(115deg, #1b3b54, #235e86);
+            color: white;
+            border-radius: 2.5rem;
+            padding: 2rem 2.5rem;
+            margin: 2.5rem 0;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            box-shadow: 0 20px 35px #0b2f47;
+        }
+
+        .highlight-card i {
+            font-size: 3rem;
+            color: #ffd58c;
+        }
+
+        .highlight-card p {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .warning-note {
+            background: #fff2df;
+            border-right: 8px solid #cc7f2a;
+            border-radius: 2.2rem;
+            padding: 1.5rem 2.2rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .warning-note i {
+            font-size: 2.5rem;
+            color: #b16010;
+        }
+
+        /* تذييل الصفحة */
+        .document-footer {
+            margin-top: 5rem;
+            padding-top: 2.5rem;
+            border-top: 3px solid #b0ceea;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #1f4868;
+            font-size: 1.15rem;
+        }
+
+        .footer-badge {
+            background: #1b4b6e;
+            color: white;
+            padding: 0.5rem 1.8rem;
+            border-radius: 50px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .main-container { padding: 1.8rem; }
+            .hero h1 { font-size: 2.5rem; }
+            .chapter-title { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="main-container">
+
+        <!-- الرأس -->
+        <div class="hero">
+            <h1>
+                <i class="fas fa-th"></i>
+                المصفوفات في لغة ++C
+                <i class="fas fa-ellipsis-h"></i>
+            </h1>
+            <div class="hero-sub">
+                <i class="fas fa-layer-group"></i> هياكل بيانات متجانسة – تخزين متسلسل
+            </div>
+        </div>
+
+        <!-- بطاقات تمهيدية -->
+        <div class="intro-grid">
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-cubes"></i></div>
+                <h3>مجموعة متجانسة</h3>
+                <p>المصفوفة هي مجموعة من العناصر من نفس النوع، تُخزن في مواقع متتالية في الذاكرة.</p>
+            </div>
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-hashtag"></i></div>
+                <h3>الوصول بالمؤشر</h3>
+                <p>يمكن الوصول إلى أي عنصر باستخدام الفهرس (index) الذي يبدأ من 0.</p>
+            </div>
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-database"></i></div>
+                <h3>كفاءة عالية</h3>
+                <p>توفر المصفوفات وصولاً سريعاً (O(1)) للعناصر، وتستخدم في بناء هياكل بيانات أكثر تعقيداً.</p>
+            </div>
+        </div>
+
+        <!-- 1. تعريف المصفوفة وتهيئتها -->
+        <h2 class="chapter-title"><i class="fas fa-pencil-ruler"></i> 1. تعريف وتهيئة المصفوفات</h2>
+        <p style="font-size:1.25rem;">يتم تعريف المصفوفة بتحديد نوع العناصر واسمها وحجمها (عدد العناصر). يمكن تهيئتها عند التعريف أو لاحقاً.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">// تعريف مصفوفة بدون تهيئة (قيم عشوائية)
+int numbers[5];
+
+// تعريف مع تهيئة كاملة
+int scores[5] = {90, 85, 88, 92, 79};
+
+// تعريف مع تهيئة جزئية (الباقي يُصفر)
+int ages[10] = {22, 25, 30}; // ages[0]=22, ages[1]=25, ages[2]=30, الباقي 0
+
+// تعريف بدون تحديد الحجم (يُستنتج من عدد العناصر)
+int values[] = {1, 2, 3, 4, 5}; // الحجم 5
+
+// مصفوفة من الأحرف (string على الطريقة القديمة)
+char name[] = "Ahmed"; // تحتوي على 6 عناصر (آخرها '\0')</code></pre>
+        </div>
+        <div class="warning-note">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div><strong>تحذير:</strong> الوصول إلى خارج حدود المصفوفة (out of bounds) لا ينتج عنه خطأ في وقت الترجمة، لكنه يؤدي إلى سلوك غير متوقع (undefined behavior).</div>
+        </div>
+
+        <!-- 2. الوصول إلى العناصر وتعديلها -->
+        <h2 class="chapter-title"><i class="fas fa-hand-pointer"></i> 2. الوصول إلى عناصر المصفوفة</h2>
+        <p>يتم الوصول باستخدام اسم المصفوفة متبوعاً بفهرس بين قوسين معقوفين <code>[]</code>. الفهرس يبدأ من 0.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">int arr[] = {10, 20, 30, 40};
+cout &lt;&lt; "العنصر الأول: " &lt;&lt; arr[0];   // 10
+cout &lt;&lt; "العنصر الأخير: " &lt;&lt; arr[3];  // 40
+
+// تعديل قيمة عنصر
+arr[2] = 100;  // الآن المصفوفة: {10, 20, 100, 40}
+
+// إدخال قيم من المستخدم
+for(int i = 0; i < 4; i++) {
+    cout &lt;&lt; "أدخل قيمة للعنصر " &lt;&lt; i &lt;&lt; ": ";
+    cin &gt;&gt; arr[i];
+}</code></pre>
+        </div>
+
+        <!-- 3. التكرار على المصفوفة -->
+        <h2 class="chapter-title"><i class="fas fa-sync-alt"></i> 3. التكرار على عناصر المصفوفة</h2>
+        <p>بالتزامن مع حلقات التكرار، تصبح المصفوفات أداة قوية لمعالجة مجموعات البيانات.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">int grades[] = {95, 87, 78, 92, 84};
+int sum = 0;
+int size = sizeof(grades) / sizeof(grades[0]); // حساب عدد العناصر
+
+// باستخدام for التقليدية
+for(int i = 0; i < size; i++) {
+    sum += grades[i];
+}
+cout &lt;&lt; "المجموع = " &lt;&lt; sum &lt;&lt; endl;
+
+// باستخدام range-based for (C++11)
+int max = grades[0];
+for(int x : grades) {
+    if(x > max) max = x;
+}
+cout &lt;&lt; "أعلى درجة: " &lt;&lt; max;</code></pre>
+        </div>
+
+        <!-- 4. المصفوفات ثنائية الأبعاد -->
+        <h2 class="chapter-title"><i class="fas fa-table"></i> 4. المصفوفات ثنائية الأبعاد (المصفوفات)</h2>
+        <p>تستخدم لتمثيل جداول، مصفوفات رياضية، صور، وغيرها. تحتاج إلى مؤشرين (صف، عمود).</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">// تعريف مصفوفة 3x4 (3 صفوف، 4 أعمدة)
+int matrix[3][4] = {
+    {1, 2, 3, 4},
+    {5, 6, 7, 8},
+    {9, 10, 11, 12}
+};
+
+// الوصول إلى عنصر في الصف 1 والعمود 2 (يبدأ العد من 0)
+cout &lt;&lt; matrix[1][2]; // يطبع 7
+
+// التكرار على جميع العناصر
+for(int i = 0; i < 3; i++) {
+    for(int j = 0; j < 4; j++) {
+        cout &lt;&lt; matrix[i][j] &lt;&lt; "\t";
+    }
+    cout &lt;&lt; endl;
+}</code></pre>
+        </div>
+
+        <!-- بطاقة: تمرير المصفوفات للدوال -->
+        <div class="highlight-card">
+            <i class="fas fa-share-alt"></i>
+            <p><strong>تمرير المصفوفات إلى الدوال:</strong> عند تمرير مصفوفة لدالة، يتم تمرير مؤشر إلى أول عنصر. تحتاج الدالة أيضاً إلى معرفة حجم المصفوفة (غالباً ما يُمرر كمعامل إضافي).</p>
+        </div>
+
+        <!-- 5. مصفوفات الأحرف والسلاسل النصية -->
+        <h2 class="chapter-title"><i class="fas fa-font"></i> 5. مصفوفات الأحرف (C-strings)</h2>
+        <p>في لغة ++C، يمكن تمثيل السلاسل النصية باستخدام مصفوفة من المحارف تنتهي بالحرف الفارغ <code>'\0'</code>.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">// تهيئة سلسلة نصية
+char greeting[] = "مرحبا"; // الحجم 6 (5 أحرف + '\0')
+
+// قراءة سلسلة من المستخدم
+char name[50];
+cout &lt;&lt; "أدخل اسمك: ";
+cin.getline(name, 50); // لقراءة جملة كاملة
+
+// دوال مفيدة من <cstring>
+#include &lt;cstring&gt;
+int len = strlen(name);          // طول السلسلة
+strcpy(greeting, "أهلاً");       // نسخ
+if(strcmp(name, "Ali") == 0) {   // مقارنة
+    cout &lt;&lt; "مرحباً علي";
+}</code></pre>
+        </div>
+
+        <!-- جدول مقارنة: مصفوفة ثابتة vs ديناميكية -->
+        <h2 class="section-header"><i class="fas fa-balance-scale"></i> مصفوفات ثابتة vs ديناميكية</h2>
+        <div class="advanced-table">
+            <table>
+                <tr><th>الخاصية</th><th>مصفوفة ثابتة (static)</th><th>مصفوفة ديناميكية (new/delete)</th></tr>
+                <tr><td>الحجم</td><td>يُحدد في وقت الترجمة (ثابت)</td><td>يُحدد في وقت التشغيل (متغير)</td></tr>
+                <tr><td>التخزين</td><td>على المكدس (stack)</td><td>على الكومة (heap)</td></tr>
+                <tr><td>تحرير الذاكرة</td><td>تلقائي عند الخروج من النطاق</td><td>يجب تحريرها يدوياً باستخدام <code>delete[]</code></td></tr>
+                <tr><td>مثال</td><td><code>int arr[10];</code></td><td><code>int* arr = new int[n];</code></td></tr>
+            </table>
+        </div>
+
+        <!-- 6. المصفوفات الديناميكية -->
+        <h2 class="chapter-title"><i class="fas fa-dharmachakra"></i> 6. المصفوفات الديناميكية (باستخدام new)</h2>
+        <p>عندما لا يكون حجم المصفوفة معروفاً مسبقاً، نستخدم الذاكرة الديناميكية.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">int size;
+cout &lt;&lt; "أدخل حجم المصفوفة: ";
+cin &gt;&gt; size;
+
+// إنشاء مصفوفة ديناميكية
+int* dynamicArray = new int[size];
+
+// استخدام المصفوفة
+for(int i = 0; i < size; i++) {
+    dynamicArray[i] = i * 10;
+}
+
+// لا تنسَ تحرير الذاكرة بعد الانتهاء
+delete[] dynamicArray;</code></pre>
+        </div>
+
+        <!-- بطاقة أفضل الممارسات -->
+        <div class="highlight-card" style="background: #175d87;">
+            <i class="fas fa-check-circle"></i>
+            <p><strong>أفضل الممارسات:</strong> تأكد من عدم تجاوز حدود المصفوفة. استخدم <code>std::array</code> أو <code>std::vector</code> من المكتبة القياسية للسلامة والمرونة.</p>
+        </div>
+
+        <!-- 7. مقدمة إلى std::array و std::vector -->
+        <h2 class="chapter-title"><i class="fas fa-shield-alt"></i> 7. بدائل أكثر أماناً (std::array و std::vector)</h2>
+        <p>توفر المكتبة القياسية حاويات أفضل من المصفوفات التقليدية.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">#include &lt;array&gt;
+#include &lt;vector&gt;
+
+// std::array (حجم ثابت، لكن بطرق أكثر أماناً)
+array&lt;int, 5&gt; arr = {1, 2, 3, 4, 5};
+cout &lt;&lt; arr.at(2); // at() تفحص الحدود
+
+// std::vector (حجم ديناميكي، قابل للتغير)
+vector&lt;int&gt; vec;
+vec.push_back(10);
+vec.push_back(20);
+vec.push_back(30);
+
+for(int i = 0; i < vec.size(); i++) {
+    cout &lt;&lt; vec[i] &lt;&lt; " ";
+}</code></pre>
+        </div>
+
+        <!-- تطبيقات عملية -->
+        <h2 class="section-header"><i class="fas fa-flask"></i> تطبيقات عملية مع المصفوفات</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2rem; margin: 2.5rem 0;">
+            <div style="flex: 1 1 280px; background: #e7f2fd; border-radius: 2.2rem; padding: 1.8rem;">
+                <h4><i class="fas fa-sort-amount-down"></i> ترتيب مصفوفة</h4>
+                <pre style="background:#142f40; color:#e0f0ff; padding:1rem; border-radius:1.5rem; direction:ltr;">// Bubble sort بسيط
+int arr[] = {64, 34, 25, 12};
+int n = 4;
+for(int i=0; i<n-1; i++)
+  for(int j=0; j<n-i-1; j++)
+    if(arr[j] > arr[j+1])
+      swap(arr[j], arr[j+1]);</pre>
+            </div>
+            <div style="flex: 1 1 280px; background: #e7f2fd; border-radius: 2.2rem; padding: 1.8rem;">
+                <h4><i class="fas fa-search"></i> بحث خطي</h4>
+                <pre style="background:#142f40; color:#e0f0ff; padding:1rem; border-radius:1.5rem; direction:ltr;">int search(int arr[], int n, int key) {
+  for(int i=0; i<n; i++)
+    if(arr[i] == key) return i;
+  return -1;
+}</pre>
+            </div>
+        </div>
+
+        <!-- تمرين تفاعلي -->
+        <div style="background: #c8e0f5; border-radius: 2.5rem; padding: 2.2rem; margin: 3rem 0;">
+            <h3 style="font-size: 2rem; color: #0a3a57;"><i class="fas fa-laptop-code"></i> تمرين: اكتب برنامجاً يقرأ 10 أعداد في مصفوفة، ثم يطبعها معكوسة.</h3>
+            <details style="margin-top:1.5rem; background: white; border-radius: 2rem; padding: 1.3rem;">
+                <summary><i class="fas fa-lightbulb"></i> عرض حل مقترح</summary>
+                <pre style="direction:ltr; background:#142836; color:#fff; padding:1.2rem;">#include &lt;iostream&gt;
+using namespace std;
+int main() {
+    int arr[10];
+    cout &lt;&lt; "أدخل 10 أعداد:\n";
+    for(int i = 0; i < 10; i++) {
+        cin &gt;&gt; arr[i];
+    }
+    cout &lt;&lt; "الأعداد بالعكس:\n";
+    for(int i = 9; i >= 0; i--) {
+        cout &lt;&lt; arr[i] &lt;&lt; " ";
+    }
+    return 0;
+}</pre>
+            </details>
+        </div>
+
+        <!-- خاتمة -->
+        <div style="background: #0f3d5a; color: white; border-radius: 2.5rem; padding: 2.2rem; margin-top: 3rem;">
+            <i class="fas fa-gem" style="font-size: 2.5rem; float: right; margin-left: 1.5rem;"></i>
+            <h3 style="font-size:2rem; margin-bottom:1rem;">خلاصة</h3>
+            <p style="font-size:1.2rem;">المصفوفات هي لبنة أساسية في البرمجة. تتيح تخزين وتنظيم البيانات بكفاءة. مع الممارسة، ستتمكن من استخدامها بطلاقة في مشاريعك.</p>
+        </div>
+
+        <!-- تذييل -->
+        <div class="document-footer">
+            <span class="footer-badge"><i class="fas fa-copyright"></i> ++C Standard</span>
+            <span><i class="fas fa-code-branch"></i> الإصدار 4.0 – المصفوفات</span>
+            <span><i class="fas fa-check-circle"></i> جميع الأمثلة مجربة</span>
+        </div>
+
+    </div> <!-- main-container -->
+</div> <!-- wrapper -->
+
+<script>Prism.highlightAll();</script>
+</body>
+</html>

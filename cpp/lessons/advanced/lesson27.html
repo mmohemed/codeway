@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeWay | تطور لغة C++ (C++11/14/17/20)</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js لتلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0f1e 0%, #1a1f35 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(145deg, #0b1120cc 0%, #1e2740cc 100%);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 5%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border: 2px solid #ffd700;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .header-content {
+            text-align: center;
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-content h1 span {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* عنوان الصفحة */
+        .page-header {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* الجدول الزمني */
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin: 4rem 0;
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, #ffaa00, #ffd700, transparent);
+            transform: translateY(-50%);
+        }
+
+        .timeline-item {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 2px solid #ffd700;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            position: relative;
+            z-index: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .timeline-item h3 {
+            color: #ffd700;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .timeline-item p {
+            color: #b0b0b0;
+            margin: 0.5rem 0 0;
+        }
+
+        /* أقسام الشرح */
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 30px;
+            padding: 3rem;
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, transparent);
+        }
+
+        .section h3 {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin: 2rem 0 1rem;
+        }
+
+        .section p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* صناديق الكود */
+        .code-box {
+            background: #1a1f2e;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .code-header span {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .version-badge {
+            background: #ffd700;
+            color: #0a0f1e;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+        }
+
+        pre {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            background: transparent !important;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 1rem !important;
+        }
+
+        /* شرح الكود */
+        .code-explanation {
+            background: rgba(255, 215, 0, 0.03);
+            border-right: 3px solid #ffd700;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .code-explanation p {
+            margin: 0.5rem 0;
+        }
+
+        .code-explanation i {
+            color: #ffd700;
+            margin-left: 0.5rem;
+        }
+
+        /* بطاقات المفاهيم */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .version-tag {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        /* جدول مقارنة الإصدارات */
+        .version-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .version-table th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .version-table td {
+            padding: 1rem;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .version-table tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        /* صندوق النتائج */
+        .result-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .result-box h4 {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            color: #ffffff;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        /* أزرار التنقل */
+        .lesson-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+        }
+
+        .nav-lesson-btn {
+            background: transparent;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-lesson-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+            transform: translateX(-5px);
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            background: linear-gradient(145deg, #0b1120cc, #1a1f35cc);
+            backdrop-filter: blur(10px);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: #b0b0b0;
+            text-decoration: none;
+            display: block;
+            margin: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffd700;
+        }
+
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0f1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffaa00;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .section {
+                padding: 2rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-content {
+                margin: 0.5rem 0;
+            }
+
+            .timeline {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .timeline::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CodeWay</a>
+            <div class="header-content">
+                <h1>شرح <span>C++11/14/17/20</span> الميزات الحديثة</h1>
+            </div>
+            <div style="width: 100px;"></div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- رأس الصفحة -->
+        <div class="page-header">
+            <h1>تطور لغة C++ عبر الإصدارات</h1>
+            <p>دليل شامل للميزات الجديدة في C++11, C++14, C++17, C++20 مع أمثلة عملية</p>
+        </div>
+
+        <!-- الجدول الزمني للإصدارات -->
+        <div class="timeline">
+            <div class="timeline-item" onclick="document.getElementById('cpp11').scrollIntoView({behavior: 'smooth'})">
+                <h3>C++11</h3>
+                <p>2011 - ثورة حقيقية</p>
+            </div>
+            <div class="timeline-item" onclick="document.getElementById('cpp14').scrollIntoView({behavior: 'smooth'})">
+                <h3>C++14</h3>
+                <p>2014 - تحسينات</p>
+            </div>
+            <div class="timeline-item" onclick="document.getElementById('cpp17').scrollIntoView({behavior: 'smooth'})">
+                <h3>C++17</h3>
+                <p>2017 - ميزات جديدة</p>
+            </div>
+            <div class="timeline-item" onclick="document.getElementById('cpp20').scrollIntoView({behavior: 'smooth'})">
+                <h3>C++20</h3>
+                <p>2020 - الأحدث</p>
+            </div>
+        </div>
+
+        <!-- جدول المحتويات -->
+        <div class="table-of-contents">
+            <h2><i class="fas fa-list"></i> محتويات الدرس</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <i class="fas fa-history"></i>
+                    <a href="#cpp11">C++11 - الثورة الحديثة</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-chart-line"></i>
+                    <a href="#cpp14">C++14 - التحسينات</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-star"></i>
+                    <a href="#cpp17">C++17 - الميزات الجديدة</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-rocket"></i>
+                    <a href="#cpp20">C++20 - المستقبل</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-tasks"></i>
+                    <a href="#exercises">تمارين تطبيقية</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- C++11 -->
+        <section id="cpp11" class="section">
+            <h2>C++11: الثورة الحديثة</h2>
+            <p>كان C++11 نقلة نوعية في تاريخ اللغة، حيث أضاف ميزات غيرت طريقة كتابة الكود بشكل جذري.</p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-code"></i>
+                    <h3>auto وتحديد النوع التلقائي</h3>
+                    <p>تحديد نوع المتغير تلقائياً من قيمة التهيئة</p>
+                    <div class="version-tag">C++11</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-arrow-right"></i>
+                    <h3>Range-based for loop</h3>
+                    <p>حلقة for مبسطة للمصفوفات والحاويات</p>
+                    <div class="version-tag">C++11</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-box"></i>
+                    <h3>nullptr</h3>
+                    <p>مؤشر فارغ آمن بدلاً من NULL</p>
+                    <div class="version-tag">C++11</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-lambda"></i>
+                    <h3>Lambda expressions</h3>
+                    <p>دوال مجهولة محلية</p>
+                    <div class="version-tag">C++11</div>
+                </div>
+            </div>
+
+            <h3>auto وتحديد النوع التلقائي</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> auto <span class="version-badge">C++11</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;map&gt;
+using namespace std;
+
+int main() {
+    // auto يحدد النوع تلقائياً
+    auto i = 42;           // int
+    auto d = 3.14;        // double
+    auto s = "Hello";     // const char*
+    
+    // مع الحاويات
+    vector&lt;int&gt; vec = {1, 2, 3, 4, 5};
+    auto it = vec.begin(); // vector&lt;int&gt;::iterator
+    
+    // مع الخرائط
+    map&lt;string, int&gt; scores;
+    scores["Ahmed"] = 95;
+    
+    for (const auto&amp; pair : scores) {
+        cout &lt;&lt; pair.first &lt;&lt; ": " &lt;&lt; pair.second &lt;&lt; endl;
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <h3>Range-based for loop</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> Range-based for <span class="version-badge">C++11</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+    // مصفوفة عادية
+    int arr[] = {1, 2, 3, 4, 5};
+    for (int x : arr) {
+        cout &lt;&lt; x &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    // vector
+    vector&lt;string&gt; names = {"Ahmed", "Sara", "Mohamed"};
+    for (const string&amp; name : names) {
+        cout &lt;&lt; name &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    // تعديل العناصر
+    vector&lt;int&gt; numbers = {10, 20, 30};
+    for (int&amp; n : numbers) {
+        n *= 2;
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <h3>nullptr</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> nullptr <span class="version-badge">C++11</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+void func(int) {
+    cout &lt;&lt; "دالة تستقبل int" &lt;&lt; endl;
+}
+
+void func(char*) {
+    cout &lt;&lt; "دالة تستقبل مؤشر" &lt;&lt; endl;
+}
+
+int main() {
+    // NULL يمكن أن يسبب مشاكل
+    // func(NULL); // قد يسبب غموض
+    
+    // nullptr آمن تماماً
+    func(nullptr); // يستدعي func(char*)
+    
+    int* p1 = nullptr;
+    char* p2 = nullptr;
+    
+    if (p1 == nullptr) {
+        cout &lt;&lt; "p1 مؤشر فارغ" &lt;&lt; endl;
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <h3>Lambda expressions</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> Lambda <span class="version-badge">C++11</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; numbers = {5, 2, 8, 1, 9, 3};
+    
+    // ترتيب باستخدام lambda
+    sort(numbers.begin(), numbers.end(), 
+         [](int a, int b) { return a > b; });
+    
+    // طباعة باستخدام lambda
+    for_each(numbers.begin(), numbers.end(),
+             [](int n) { cout &lt;&lt; n &lt;&lt; " "; });
+    cout &lt;&lt; endl;
+    
+    // lambda مع التقاط المتغيرات
+    int threshold = 5;
+    auto count = count_if(numbers.begin(), numbers.end(),
+                          [threshold](int n) { return n > threshold; });
+    
+    cout &lt;&lt; "الأرقام أكبر من " &lt;&lt; threshold &lt;&lt; ": " &lt;&lt; count &lt;&lt; endl;
+    
+    // lambda مع تعديل المتغيرات الملتقطة
+    int sum = 0;
+    for_each(numbers.begin(), numbers.end(),
+             [&sum](int n) { sum += n; });
+    cout &lt;&lt; "المجموع: " &lt;&lt; sum &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-link"></i>
+                    <h3>move semantics</h3>
+                    <p>نقل الموارد بدلاً من نسخها لتحسين الأداء</p>
+                    <div class="version-tag">C++11</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>smart pointers</h3>
+                    <p>unique_ptr, shared_ptr, weak_ptr</p>
+                    <div class="version-tag">C++11</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>chrono library</h3>
+                    <p>مكتبة للتعامل مع الوقت</p>
+                    <div class="version-tag">C++11</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-thread"></i>
+                    <h3>thread library</h3>
+                    <p>دعم متعدد الخيوط</p>
+                    <div class="version-tag">C++11</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- C++14 -->
+        <section id="cpp14" class="section">
+            <h2>C++14: التحسينات والتوسعات</h2>
+            <p>C++14 جاء بتحسينات على الميزات الموجودة دون إضافات ثورية.</p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-code"></i>
+                    <h3>Generic lambdas</h3>
+                    <p>lambda مع auto في المعاملات</p>
+                    <div class="version-tag">C++14</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-return"></i>
+                    <h3>auto للدوال</h3>
+                    <p>استنتاج نوع الإرجاع للدوال</p>
+                    <div class="version-tag">C++14</div>
+                </div>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> Generic lambdas <span class="version-badge">C++14</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    // C++11: lambda مع أنواع محددة
+    auto add11 = [](int a, int b) { return a + b; };
+    
+    // C++14: lambda مع auto
+    auto add14 = [](auto a, auto b) { return a + b; };
+    
+    cout &lt;&lt; add14(5, 3) &lt;&lt; endl;        // int
+    cout &lt;&lt; add14(3.14, 2.86) &lt;&lt; endl;  // double
+    cout &lt;&lt; add14(string("Hello "), "World") &lt;&lt; endl;
+    
+    // مع خوارزميات STL
+    vector&lt;int&gt; v1 = {1, 2, 3};
+    vector&lt;double&gt; v2 = {1.5, 2.5, 3.5};
+    
+    auto print = [](const auto&amp; container) {
+        for (const auto&amp; item : container) {
+            cout &lt;&lt; item &lt;&lt; " ";
+        }
+        cout &lt;&lt; endl;
+    };
+    
+    print(v1);
+    print(v2);
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> استنتاج نوع الإرجاع <span class="version-badge">C++14</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+// C++14: auto لنوع الإرجاع
+auto createVector() {
+    return vector&lt;int&gt;{1, 2, 3, 4, 5};
+}
+
+auto multiply(auto a, auto b) {
+    return a * b;
+}
+
+int main() {
+    auto vec = createVector();
+    for (auto x : vec) cout &lt;&lt; x &lt;&lt; " ";
+    cout &lt;&lt; endl;
+    
+    cout &lt;&lt; multiply(5, 3) &lt;&lt; endl;
+    cout &lt;&lt; multiply(3.14, 2.0) &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- C++17 -->
+        <section id="cpp17" class="section">
+            <h2>C++17: ميزات جديدة قوية</h2>
+            <p>أضاف C++17 ميزات جديدة مهمة ووسع المكتبة القياسية.</p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-cubes"></i>
+                    <h3>Structured bindings</h3>
+                    <p>تفكيك الهياكل والمصفوفات</p>
+                    <div class="version-tag">C++17</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-code-branch"></i>
+                    <h3>if/switch with initialization</h3>
+                    <p>تهيئة متغير داخل الشرط</p>
+                    <div class="version-tag">C++17</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-file"></i>
+                    <h3>filesystem library</h3>
+                    <p>مكتبة للتعامل مع الملفات</p>
+                    <div class="version-tag">C++17</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-union"></i>
+                    <h3>std::variant</h3>
+                    <p>union آمن النوع</p>
+                    <div class="version-tag">C++17</div>
+                </div>
+            </div>
+
+            <h3>Structured bindings</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> Structured bindings <span class="version-badge">C++17</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;map&gt;
+#include &lt;tuple&gt;
+using namespace std;
+
+int main() {
+    // مع المصفوفات
+    int arr[] = {1, 2, 3};
+    auto [x, y, z] = arr;
+    cout &lt;&lt; x &lt;&lt; ", " &lt;&lt; y &lt;&lt; ", " &lt;&lt; z &lt;&lt; endl;
+    
+    // مع map
+    map&lt;string, int&gt; scores;
+    scores["Ahmed"] = 95;
+    scores["Sara"] = 92;
+    
+    for (const auto&amp; [name, score] : scores) {
+        cout &lt;&lt; name &lt;&lt; ": " &lt;&lt; score &lt;&lt; endl;
+    }
+    
+    // مع tuple
+    auto getPerson() {
+        return make_tuple("Ahmed", 25, 175.5);
+    }
+    
+    auto [name, age, height] = getPerson();
+    cout &lt;&lt; name &lt;&lt; ", " &lt;&lt; age &lt;&lt; ", " &lt;&lt; height &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <h3>if/switch with initialization</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> if with init <span class="version-badge">C++17</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;map&gt;
+using namespace std;
+
+int main() {
+    map&lt;string, int&gt; scores = {
+        {"Ahmed", 95},
+        {"Sara", 92},
+        {"Mohamed", 88}
+    };
+    
+    // C++17: تهيئة داخل if
+    if (auto it = scores.find("Ahmed"); it != scores.end()) {
+        cout &lt;&lt; "وجدت: " &lt;&lt; it->first &lt;&lt; ": " &lt;&lt; it->second &lt;&lt; endl;
+    } else {
+        cout &lt;&lt; "لم يتم العثور" &lt;&lt; endl;
+    }
+    
+    // مع switch
+    switch (int x = 5; x) {
+        case 1: cout &lt;&lt; "واحد" &lt;&lt; endl; break;
+        case 5: cout &lt;&lt; "خمسة" &lt;&lt; endl; break;
+        default: cout &lt;&lt; "غير معروف" &lt;&lt; endl;
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <h3>std::variant</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> variant <span class="version-badge">C++17</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;variant&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    variant&lt;int, double, string&gt; v;
+    
+    v = 42;
+    cout &lt;&lt; "int: " &lt;&lt; get&lt;int&gt;(v) &lt;&lt; endl;
+    
+    v = 3.14;
+    cout &lt;&lt; "double: " &lt;&lt; get&lt;double&gt;(v) &lt;&lt; endl;
+    
+    v = "Hello";
+    cout &lt;&lt; "string: " &lt;&lt; get&lt;string&gt;(v) &lt;&lt; endl;
+    
+    // زيارة آمنة
+    auto visitor = [](auto&amp;&amp; arg) {
+        using T = decay_t&lt;decltype(arg)&gt;;
+        if constexpr (is_same_v&lt;T, int&gt;)
+            cout &lt;&lt; "int: " &lt;&lt; arg &lt;&lt; endl;
+        else if constexpr (is_same_v&lt;T, double&gt;)
+            cout &lt;&lt; "double: " &lt;&lt; arg &lt;&lt; endl;
+        else if constexpr (is_same_v&lt;T, string&gt;)
+            cout &lt;&lt; "string: " &lt;&lt; arg &lt;&lt; endl;
+    };
+    
+    v = 100;
+    visit(visitor, v);
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- C++20 -->
+        <section id="cpp20" class="section">
+            <h2>C++20: المستقبل وصل</h2>
+            <p>C++20 يعد أكبر تحديث منذ C++11، مع ميزات ثورية جديدة.</p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-calendar"></i>
+                    <h3>Concepts</h3>
+                    <p>قيود على أنواع القوالب</p>
+                    <div class="version-tag">C++20</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-infinity"></i>
+                    <h3>Ranges</h3>
+                    <p>معالجة متسلسلة للبيانات</p>
+                    <div class="version-tag">C++20</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-coins"></i>
+                    <h3>Coroutines</h3>
+                    <p>دوال يمكن إيقافها واستئنافها</p>
+                    <div class="version-tag">C++20</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>std::chrono updates</h3>
+                    <p>التقويم والمناطق الزمنية</p>
+                    <div class="version-tag">C++20</div>
+                </div>
+            </div>
+
+            <h3>Concepts</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> Concepts <span class="version-badge">C++20</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;concepts&gt;
+using namespace std;
+
+// تعريف concept
+template&lt;typename T&gt;
+concept Numeric = is_arithmetic_v&lt;T&gt;;
+
+template&lt;typename T&gt;
+concept Container = requires(T t) {
+    t.begin();
+    t.end();
+    t.size();
+};
+
+// استخدام concept في القالب
+template&lt;Numeric T&gt;
+T add(T a, T b) {
+    return a + b;
+}
+
+template&lt;Container C&gt;
+void printContainer(const C&amp; c) {
+    for (const auto&amp; item : c) {
+        cout &lt;&lt; item &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+}
+
+int main() {
+    cout &lt;&lt; add(5, 3) &lt;&lt; endl;
+    cout &lt;&lt; add(3.14, 2.86) &lt;&lt; endl;
+    // cout &lt;&lt; add("Hello", "World") &lt;&lt; endl; // خطأ! ليس Numeric
+    
+    vector&lt;int&gt; vec = {1, 2, 3, 4, 5};
+    printContainer(vec);
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <h3>Ranges</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> Ranges <span class="version-badge">C++20</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;ranges&gt;
+#include &lt;algorithm&gt;
+using namespace std;
+namespace views = ranges::views;
+
+int main() {
+    vector&lt;int&gt; numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    
+    // معالجة متسلسلة
+    auto result = numbers 
+        | views::filter([](int n) { return n % 2 == 0; })
+        | views::transform([](int n) { return n * n; });
+    
+    for (int n : result) {
+        cout &lt;&lt; n &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    // أخذ أول 5 أرقام فردية
+    auto odds = numbers 
+        | views::filter([](int n) { return n % 2 == 1; })
+        | views::take(5);
+    
+    for (int n : odds) {
+        cout &lt;&lt; n &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="result-box">
+                <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                <div class="result-value">
+                    4 16 36 64 100<br>
+                    1 3 5 7 9
+                </div>
+            </div>
+
+            <h3>Coroutines (مثال مبسط)</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> Coroutines <span class="version-badge">C++20</span></span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;coroutine&gt;
+#include &lt;memory&gt;
+using namespace std;
+
+template&lt;typename T&gt;
+struct Generator {
+    struct promise_type {
+        T current_value;
+        
+        auto get_return_object() {
+            return Generator{handle_type::from_promise(*this)};
+        }
+        
+        auto initial_suspend() { return suspend_always{}; }
+        auto final_suspend() noexcept { return suspend_always{}; }
+        
+        void unhandled_exception() { exit(1); }
+        
+        auto yield_value(T value) {
+            current_value = value;
+            return suspend_always{};
+        }
+        
+        void return_void() {}
+    };
+    
+    using handle_type = coroutine_handle&lt;promise_type&gt;;
+    
+    handle_type coro;
+    
+    Generator(handle_type h) : coro(h) {}
+    ~Generator() { if (coro) coro.destroy(); }
+    
+    bool next() {
+        coro.resume();
+        return !coro.done();
+    }
+    
+    T value() { return coro.promise().current_value; }
+};
+
+Generator&lt;int&gt; range(int start, int end) {
+    for (int i = start; i <= end; ++i) {
+        co_yield i;
+    }
+}
+
+int main() {
+    auto gen = range(1, 5);
+    
+    while (gen.next()) {
+        cout &lt;&lt; gen.value() &lt;&lt; " ";
+    }
+    cout &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>Calendar & time zones</h3>
+                    <p>دعم متقدم للتواريخ والمناطق الزمنية</p>
+                    <div class="version-tag">C++20</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-spa"></i>
+                    <h3>std::format</h3>
+                    <p>تنسيق نصوص مثل Python</p>
+                    <div class="version-tag">C++20</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- جدول مقارنة الميزات -->
+        <section class="section">
+            <h2>مقارنة سريعة للإصدارات</h2>
+            
+            <table class="version-table">
+                <tr>
+                    <th>الميزة</th>
+                    <th>C++11</th>
+                    <th>C++14</th>
+                    <th>C++17</th>
+                    <th>C++20</th>
+                </tr>
+                <tr>
+                    <td>auto</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td>Lambda expressions</td>
+                    <td>✅</td>
+                    <td>✅ (generic)</td>
+                    <td>✅ (constexpr)</td>
+                    <td>✅ (templates)</td>
+                </tr>
+                <tr>
+                    <td>Smart pointers</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td>Concurrency</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅ (coroutines)</td>
+                </tr>
+                <tr>
+                    <td>Structured bindings</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td>if with init</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td>Concepts</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td>Ranges</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- تمارين وتطبيقات -->
+        <section id="exercises" class="section">
+            <h2>تمارين وتطبيقات عملية</h2>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 1: تحديث كود قديم لـ C++17</h3>
+                <p>قم بتحديث الكود التالي لاستخدام ميزات C++17:</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> قبل التحديث</span>
+                    </div>
+                    <pre><code class="language-cpp">// كود قديم
+#include &lt;iostream&gt;
+#include &lt;map&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    map&lt;string, int&gt; scores;
+    scores["Ahmed"] = 95;
+    scores["Sara"] = 92;
+    
+    for (auto it = scores.begin(); it != scores.end(); ++it) {
+        cout &lt;&lt; it->first &lt;&lt; ": " &lt;&lt; it->second &lt;&lt; endl;
+    }
+    
+    return 0;
+}</code></pre>
+                </div>
+
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> بعد التحديث (C++17)</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;map&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    map&lt;string, int&gt; scores{
+        {"Ahmed", 95},
+        {"Sara", 92},
+        {"Mohamed", 88}
+    };
+    
+    // Structured bindings
+    for (const auto&amp; [name, score] : scores) {
+        cout &lt;&lt; name &lt;&lt; ": " &lt;&lt; score &lt;&lt; endl;
+    }
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 2: استخدام Ranges في C++20</h3>
+                <p>استخدم Ranges لمعالجة قائمة أرقام:</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;ranges&gt;
+#include &lt;algorithm&gt;
+#include &lt;numeric&gt;
+using namespace std;
+namespace views = ranges::views;
+
+int main() {
+    vector&lt;int&gt; numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    
+    // أخذ الأرقام الزوجية، تربيعها، ثم أخذ أول 3
+    auto result = numbers 
+        | views::filter([](int n) { return n % 2 == 0; })
+        | views::transform([](int n) { return n * n; })
+        | views::take(3);
+    
+    // حساب مجموع النتائج
+    int sum = accumulate(result.begin(), result.end(), 0);
+    
+    cout &lt;&lt; "النتائج: ";
+    for (int n : result) cout &lt;&lt; n &lt;&lt; " ";
+    cout &lt;&lt; "\nالمجموع: " &lt;&lt; sum &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+
+                <div class="result-box">
+                    <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                    <div class="result-value">
+                        النتائج: 4 16 36<br>
+                        المجموع: 56
+                    </div>
+                </div>
+            </div>
+
+            <!-- تمرين تفاعلي -->
+            <div class="exercise-box">
+                <h3><i class="fas fa-laptop-code"></i> جرب بنفسك</h3>
+                <p>اختر الإصدار وجرب الميزات المختلفة:</p>
+                
+                <select id="versionSelect" class="exercise-input">
+                    <option value="cpp11">C++11 - auto, nullptr, lambda</option>
+                    <option value="cpp14">C++14 - generic lambdas</option>
+                    <option value="cpp17">C++17 - structured bindings</option>
+                    <option value="cpp20">C++20 - ranges</option>
+                </select>
+                
+                <button class="exercise-btn" onclick="testVersion()">تشغيل المثال</button>
+                
+                <div id="output" class="exercise-output">
+                    النتائج ستظهر هنا...
+                </div>
+            </div>
+        </section>
+
+        <!-- أزرار التنقل بين الدروس -->
+        <div class="lesson-navigation">
+            <a href="lesson-concurrency.html" class="nav-lesson-btn">
+                <i class="fas fa-arrow-right"></i> الدرس السابق: البرمجة المتزامنة
+            </a>
+            <a href="index.html" class="nav-lesson-btn">
+                العودة للرئيسية <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CodeWay</h3>
+                <p>منصة عربية متكاملة لتعليم البرمجة</p>
+            </div>
+            <div class="footer-section">
+                <h3>روابط مفيدة</h3>
+                <a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> الدروس</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> المشاريع</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> عن المنصة</a>
+            </div>
+            <div class="footer-section">
+                <h3>تابعنا</h3>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+                <a href="#"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem; color: #808080;">
+            <p>© 2024 CodeWay - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+
+    <script>
+        // شريط التقدم
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress").style.width = scrolled + "%";
+        };
+
+        // نسخ الكود
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = "تم النسخ!";
+                setTimeout(() => {
+                    button.textContent = "نسخ";
+                }, 2000);
+            });
+        }
+
+        // التمرين التفاعلي
+        function testVersion() {
+            const version = document.getElementById('versionSelect').value;
+            let output = document.getElementById('output');
+            
+            switch(version) {
+                case 'cpp11':
+                    output.innerHTML = `
+                        <i class="fas fa-code" style="color: #ffd700;"></i> <strong>C++11 - auto و lambda:</strong><br>
+                        <br>
+                        <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                            auto x = 42; // int<br>
+                            auto y = 3.14; // double<br>
+                            <br>
+                            auto sum = [](auto a, auto b) { return a + b; };<br>
+                            int result1 = sum(5, 3);      // 8<br>
+                            double result2 = sum(2.5, 3.7); // 6.2<br>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'cpp14':
+                    output.innerHTML = `
+                        <i class="fas fa-code" style="color: #ffd700;"></i> <strong>C++14 - Generic Lambdas:</strong><br>
+                        <br>
+                        <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                            auto print = [](const auto& item) {<br>
+                            &nbsp;&nbsp;cout << item << endl;<br>
+                            };<br>
+                            <br>
+                            print(42);        // int<br>
+                            print(3.14);      // double<br>
+                            print("Hello");    // const char*<br>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'cpp17':
+                    output.innerHTML = `
+                        <i class="fas fa-code" style="color: #ffd700;"></i> <strong>C++17 - Structured Bindings:</strong><br>
+                        <br>
+                        <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                            map<string, int> scores{{"Ahmed",95}, {"Sara",92}};<br>
+                            <br>
+                            for (const auto& [name, score] : scores) {<br>
+                            &nbsp;&nbsp;cout << name << ": " << score << endl;<br>
+                            }<br>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'cpp20':
+                    output.innerHTML = `
+                        <i class="fas fa-code" style="color: #ffd700;"></i> <strong>C++20 - Ranges:</strong><br>
+                        <br>
+                        <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 10px;">
+                            vector<int> nums = {1,2,3,4,5,6,7,8,9,10};<br>
+                            <br>
+                            auto result = nums<br>
+                            &nbsp;&nbsp;| views::filter([](int n) { return n % 2 == 0; })<br>
+                            &nbsp;&nbsp;| views::transform([](int n) { return n * n; })<br>
+                            &nbsp;&nbsp;| views::take(3);<br>
+                            <br>
+                            // النتيجة: 4, 16, 36<br>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            output.innerHTML += `<br><i class="fas fa-check-circle" style="color: #00ff00;"></i> تم تنفيذ مثال ${version}!`;
+        }
+
+        // تمرير سلس للروابط الداخلية
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

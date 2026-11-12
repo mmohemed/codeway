@@ -1,0 +1,2250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشروع تطبيق المهام (To-Do List) | CodeWay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0a2540;
+            --primary-light: #1a3a5c;
+            --accent: #635bff;
+            --accent-hover: #4f46e5;
+            --accent-soft: #eef2ff;
+            --text-dark: #0a2540;
+            --text-body: #425466;
+            --text-muted: #8898aa;
+            --bg: #ffffff;
+            --bg-soft: #f7f9fc;
+            --border: #e6ebf1;
+            --success: #0e9f6e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --code-bg: #0a1929;
+            --shadow-sm: 0 1px 3px rgba(10,37,64,.06), 0 1px 2px rgba(10,37,64,.04);
+            --shadow-md: 0 4px 12px rgba(10,37,64,.08), 0 2px 4px rgba(10,37,64,.04);
+            --shadow-lg: 0 20px 40px rgba(10,37,64,.1), 0 8px 16px rgba(10,37,64,.06);
+            --shadow-accent: 0 8px 24px rgba(99,91,255,.25);
+            --radius: 14px;
+            --radius-lg: 22px;
+            --transition: all .3s cubic-bezier(.4,0,.2,1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-body);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* شريط التقدم */
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), #a78bfa);
+            z-index: 3000;
+            width: 0%;
+            transition: width .1s linear;
+            box-shadow: 0 0 10px rgba(99,91,255,.5);
+        }
+
+        /* الهيدر */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--primary);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            transition: var(--transition);
+        }
+        .header.scrolled { box-shadow: 0 10px 30px rgba(10,37,64,.25); }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.15rem;
+            box-shadow: var(--shadow-accent);
+        }
+        .brand-text {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: .5px;
+        }
+        .brand-text span { color: #a78bfa; }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-nav a {
+            color: rgba(255,255,255,.75);
+            text-decoration: none;
+            font-size: .92rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .header-nav a:hover, .header-nav a.active {
+            color: #fff;
+            background: rgba(255,255,255,.08);
+        }
+        .header-nav a.active {
+            background: rgba(99,91,255,.25);
+            box-shadow: inset 0 0 0 1px rgba(99,91,255,.4);
+        }
+        .header-cta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-outline-light {
+            padding: 9px 18px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,.2);
+            background: transparent;
+            color: #fff;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.4);
+        }
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.2);
+            color: #fff;
+            width: 40px; height: 40px;
+            border-radius: 9px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(180deg, var(--bg-soft) 0%, #fff 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 56px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -120px; left: -120px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(99,91,255,.06), transparent 70%);
+            border-radius: 50%;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb i { font-size: .65rem; }
+        .breadcrumb .current { color: var(--text-dark); font-weight: 600; }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-radius: 100px;
+            font-size: .82rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            border: 1px solid rgba(99,91,255,.15);
+        }
+        .hero-badge i { font-size: .75rem; }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.25;
+            margin-bottom: 16px;
+            letter-spacing: -.5px;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-body);
+            max-width: 680px;
+            margin-bottom: 28px;
+            line-height: 1.85;
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            align-items: center;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .92rem;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .meta-item i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+        }
+        .hero-side {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 220px;
+        }
+        .btn-primary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: var(--shadow-accent);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(99,91,255,.35);
+        }
+        .btn-secondary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+        }
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        /* التخطيط */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 48px;
+            padding: 48px 0 80px;
+            align-items: start;
+        }
+        .sidebar {
+            position: sticky;
+            top: 96px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-left: 4px;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .toc-title {
+            font-size: .78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toc-list {
+            list-style: none;
+            border-right: 2px solid var(--border);
+        }
+        .toc-list li a {
+            display: block;
+            padding: 9px 16px;
+            color: var(--text-body);
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 500;
+            border-right: 2px solid transparent;
+            margin-right: -2px;
+            transition: var(--transition);
+            border-radius: 0 8px 8px 0;
+        }
+        .toc-list li a:hover {
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+        .toc-list li a.active {
+            color: var(--accent);
+            border-right-color: var(--accent);
+            background: var(--accent-soft);
+            font-weight: 700;
+        }
+
+        .content { min-width: 0; }
+        .content-section {
+            margin-bottom: 56px;
+            scroll-margin-top: 100px;
+        }
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        .section-num {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-accent);
+        }
+        .section-heading h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -.3px;
+        }
+        .content p {
+            font-size: 1.02rem;
+            margin-bottom: 18px;
+            color: var(--text-body);
+            line-height: 1.9;
+        }
+        .content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 32px 0 14px;
+        }
+        .content h4 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 24px 0 10px;
+        }
+        .content ul, .content ol {
+            margin: 0 0 20px 0;
+            padding-right: 22px;
+        }
+        .content li {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.85;
+        }
+        .content ul li::marker { color: var(--accent); }
+
+        .inline-code {
+            font-family: 'Fira Code', monospace;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: .88em;
+            font-weight: 500;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* Callouts */
+        .callout {
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+            border: 1px solid;
+        }
+        .callout-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .callout-body h4 {
+            margin: 0 0 6px !important;
+            font-size: 1rem;
+        }
+        .callout-body p {
+            margin: 0 !important;
+            font-size: .95rem !important;
+            line-height: 1.75 !important;
+        }
+        .callout.info { background: #eff6ff; border-color: #bfdbfe; }
+        .callout.info .callout-icon { background: #dbeafe; color: #2563eb; }
+        .callout.info h4 { color: #1e40af; }
+        .callout.warning { background: #fffbeb; border-color: #fde68a; }
+        .callout.warning .callout-icon { background: #fef3c7; color: #d97706; }
+        .callout.warning h4 { color: #92400e; }
+        .callout.success { background: #ecfdf5; border-color: #a7f3d0; }
+        .callout.success .callout-icon { background: #d1fae5; color: var(--success); }
+        .callout.success h4 { color: #065f46; }
+        .callout.danger { background: #fef2f2; border-color: #fecaca; }
+        .callout.danger .callout-icon { background: #fee2e2; color: var(--danger); }
+        .callout.danger h4 { color: #991b1b; }
+
+        /* الكود */
+        .code-wrapper {
+            background: var(--code-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 22px 0;
+            border: 1px solid #1e3a5f;
+            box-shadow: var(--shadow-md);
+            direction: ltr;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 18px;
+            background: #0d2137;
+            border-bottom: 1px solid #1e3a5f;
+        }
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #93c5fd;
+            font-size: .8rem;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 11px; height: 11px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+        .code-copy {
+            background: rgba(255,255,255,.08);
+            border: none;
+            color: #cbd5e1;
+            font-size: .75rem;
+            padding: 5px 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .code-copy:hover { background: rgba(99,91,255,.3); color: #fff; }
+        .code-copy.copied { background: rgba(14,159,110,.3); color: #6ee7b7; }
+        .code-body {
+            padding: 20px 22px;
+            overflow-x: auto;
+        }
+        .code-body pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: .875rem;
+            line-height: 1.75;
+            color: #e2e8f0;
+            white-space: pre;
+        }
+        .code-body::-webkit-scrollbar { height: 8px; }
+        .code-body::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+
+        .kw { color: #c792ea; }
+        .type { color: #82aaff; }
+        .str { color: #c3e88d; }
+        .num { color: #f78c6c; }
+        .cmt { color: #6a8299; font-style: italic; }
+        .fn { color: #ffcb6b; }
+        .prop { color: #89ddff; }
+        .op { color: #89ddff; }
+        .punc { color: #8fa5b8; }
+
+        /* جدول */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 22px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .92rem;
+            min-width: 560px;
+        }
+        thead { background: var(--primary); }
+        thead th {
+            color: #fff;
+            padding: 14px 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: .88rem;
+        }
+        tbody td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-body);
+            line-height: 1.7;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:nth-child(even) { background: var(--bg-soft); }
+        tbody tr:hover { background: var(--accent-soft); }
+        tbody td strong { color: var(--text-dark); }
+
+        /* خطوات */
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+            margin: 22px 0;
+        }
+        .steps li {
+            counter-increment: step;
+            position: relative;
+            padding-right: 52px;
+            padding-bottom: 22px;
+            margin: 0 !important;
+        }
+        .steps li:last-child { padding-bottom: 0; }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            right: 0; top: 0;
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1.5px solid rgba(99,91,255,.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .9rem;
+        }
+        .steps li::after {
+            content: '';
+            position: absolute;
+            right: 16px; top: 38px;
+            width: 2px;
+            height: calc(100% - 30px);
+            background: var(--border);
+        }
+        .steps li:last-child::after { display: none; }
+
+        /* بطاقات */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .feature-card i {
+            width: 42px; height: 42px;
+            border-radius: 11px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+        }
+        .feature-card h4 { margin: 0 0 8px !important; font-size: 1rem; }
+        .feature-card p { margin: 0 !important; font-size: .88rem !important; color: var(--text-muted) !important; line-height: 1.7 !important; }
+
+        .note-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 28px 30px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .note-card::after {
+            content: '\f0eb';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: -10px; bottom: -30px;
+            font-size: 120px;
+            opacity: .04;
+            color: #fff;
+        }
+        .note-card h4 {
+            color: #a78bfa !important;
+            margin: 0 0 10px !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem !important;
+        }
+        .note-card p {
+            color: rgba(255,255,255,.85) !important;
+            margin: 0 !important;
+            font-size: .95rem !important;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ نموذج التطبيق الحي ============ */
+        .app-demo {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            margin: 28px 0;
+        }
+        .app-demo-header {
+            background: var(--primary);
+            color: #fff;
+            padding: 16px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .app-demo-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .app-demo-title i { color: #a78bfa; }
+        .app-demo-stats {
+            display: flex;
+            gap: 16px;
+            font-size: .82rem;
+            color: rgba(255,255,255,.8);
+        }
+        .app-demo-stats span { display: flex; align-items: center; gap: 5px; }
+        .app-demo-stats strong { color: #a78bfa; }
+
+        .app-demo-body { padding: 24px; }
+
+        .todo-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .todo-input-row input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+            padding: 13px 18px;
+            border: 1.5px solid var(--border);
+            border-radius: 11px;
+            font-family: inherit;
+            font-size: .95rem;
+            color: var(--text-dark);
+            transition: var(--transition);
+            background: var(--bg-soft);
+        }
+        .todo-input-row input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(99,91,255,.1);
+        }
+        .todo-input-row select {
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 11px;
+            font-family: inherit;
+            font-size: .9rem;
+            color: var(--text-dark);
+            background: var(--bg-soft);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .todo-input-row select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .todo-add-btn {
+            padding: 13px 24px;
+            border-radius: 11px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-accent);
+            white-space: nowrap;
+        }
+        .todo-add-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .todo-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .todo-filter {
+            padding: 7px 16px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-body);
+            font-family: inherit;
+            font-size: .82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .todo-filter:hover { border-color: var(--accent); color: var(--accent); }
+        .todo-filter.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .todo-list { list-style: none; padding: 0; margin: 0; }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            background: #fff;
+            transition: var(--transition);
+            animation: slideIn .3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .todo-item:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-sm);
+        }
+        .todo-item.done {
+            opacity: .6;
+            background: var(--bg-soft);
+        }
+        .todo-item.done .todo-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+        .todo-check {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+            font-size: .7rem;
+            color: transparent;
+        }
+        .todo-check:hover { border-color: var(--accent); }
+        .todo-check.checked {
+            background: var(--success);
+            border-color: var(--success);
+            color: #fff;
+        }
+        .todo-text {
+            flex: 1;
+            font-size: .95rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            word-break: break-word;
+        }
+        .todo-priority {
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: .72rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .todo-priority.high { background: #fee2e2; color: #991b1b; }
+        .todo-priority.medium { background: #fef3c7; color: #92400e; }
+        .todo-priority.low { background: #d1fae5; color: #065f46; }
+        .todo-delete {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+            flex-shrink: 0;
+        }
+        .todo-delete:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .todo-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .todo-empty i {
+            font-size: 3rem;
+            color: var(--border);
+            margin-bottom: 14px;
+            display: block;
+        }
+        .todo-empty p { margin: 0; font-size: .95rem; }
+
+        .app-demo-footer {
+            padding: 14px 24px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-soft);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: .82rem;
+            color: var(--text-muted);
+        }
+        .clear-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 7px 14px;
+            border-radius: 8px;
+            color: var(--text-body);
+            font-family: inherit;
+            font-size: .82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .clear-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: #fef2f2;
+        }
+
+        /* تنقل الدرس */
+        .lesson-nav {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 56px;
+            padding-top: 36px;
+            border-top: 1px solid var(--border);
+        }
+        .lesson-nav a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 22px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: var(--transition);
+            background: #fff;
+        }
+        .lesson-nav a:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .lesson-nav a.next { justify-content: flex-end; text-align: left; }
+        .lesson-nav .nav-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: .9rem;
+        }
+        .lesson-nav .nav-label {
+            font-size: .75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .lesson-nav .nav-title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* الفوتر */
+        .footer {
+            background: var(--primary);
+            color: rgba(255,255,255,.7);
+            padding: 48px 0 28px;
+            margin-top: 40px;
+        }
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .footer-bottom {
+            padding-top: 28px;
+            border-top: 1px solid rgba(255,255,255,.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: .85rem;
+        }
+        .footer-bottom a { color: #a78bfa; text-decoration: none; }
+        .footer-bottom a:hover { text-decoration: underline; }
+
+        .back-top {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(16px);
+            transition: var(--transition);
+            z-index: 900;
+        }
+        .back-top.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .back-top:hover { background: var(--accent); }
+
+        /* استجابة */
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; gap: 0; }
+            .sidebar {
+                position: static;
+                max-height: none;
+                margin-bottom: 32px;
+                padding: 20px;
+                background: var(--bg-soft);
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+            }
+            .toc-list { border-right: none; display: flex; flex-wrap: wrap; gap: 6px; }
+            .toc-list li a {
+                border-right: none;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                margin-right: 0;
+                padding: 7px 13px;
+                font-size: .85rem;
+                background: #fff;
+            }
+            .toc-list li a.active { border-color: var(--accent); }
+        }
+        @media (max-width: 768px) {
+            .header-nav, .header-cta .btn-outline-light { display: none; }
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .hero h1 { font-size: 1.9rem; }
+            .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+            .hero-side { flex-direction: row; flex-wrap: wrap; }
+            .hero-side .btn-primary, .hero-side .btn-secondary { flex: 1; min-width: 150px; }
+            .section-heading h2 { font-size: 1.35rem; }
+            .lesson-nav { grid-template-columns: 1fr; }
+            .content-section { margin-bottom: 40px; }
+            .container { padding: 0 18px; }
+            .header-inner { padding: 0 18px; }
+            .app-demo-stats { font-size: .75rem; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="header" id="header">
+    <div class="header-inner">
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fas fa-code"></i></div>
+            <div class="brand-text">Code<span>Way</span></div>
+        </a>
+        <nav class="header-nav">
+            <a href="#">الرئيسية</a>
+            <a href="#">المسارات</a>
+            <a href="#" class="active">C#</a>
+            <a href="#">المدونة</a>
+            <a href="#">تواصل</a>
+        </nav>
+        <div class="header-cta">
+            <button class="btn-outline-light" onclick="alert('تم حفظ الدرس في قائمتك ✔')">
+                <i class="far fa-bookmark"></i> حفظ
+            </button>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">الرئيسية</a>
+            <i class="fas fa-chevron-left"></i>
+            <a href="#">مشاريع عملية</a>
+            <i class="fas fa-chevron-left"></i>
+            <span class="current">تطبيق المهام</span>
+        </div>
+        <div class="hero-grid">
+            <div>
+                <span class="hero-badge">
+                    <i class="fas fa-check-square"></i> الدرس الرابع · مشروع عملي
+                </span>
+                <h1>بناء تطبيق <span class="highlight">المهام (To-Do List)</span> بـ C#</h1>
+                <p class="hero-desc">
+                    مشروع متكامل لبناء تطبيق إدارة مهام بواجهة حديثة وحفظ محلي.
+                    ستتعلم العمارة النظيفة، نمط Repository، حفظ البيانات في JSON،
+                    وتصميم واجهة مستخدم تفاعلية — مع تطبيق حي تجربه فوراً في متصفحك.
+                </p>
+                <div class="hero-meta">
+                    <span class="meta-item"><i class="far fa-clock"></i> 5 ساعات</span>
+                    <span class="meta-item"><i class="fas fa-signal"></i> متوسط</span>
+                    <span class="meta-item"><i class="fas fa-file-code"></i> 8 ملفات</span>
+                    <span class="meta-item"><i class="fas fa-rocket"></i> تطبيق حي</span>
+                </div>
+            </div>
+            <div class="hero-side">
+                <button class="btn-primary" onclick="document.getElementById('app-demo').scrollIntoView()">
+                    <i class="fas fa-play"></i> جرّب التطبيق
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('sec-1').scrollIntoView()">
+                    <i class="fas fa-book-open"></i> ابدأ الشرح
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="main-layout">
+
+        <!-- الشريط الجانبي -->
+        <aside class="sidebar">
+            <div class="toc-title"><i class="fas fa-list-ul"></i> محتويات الدرس</div>
+            <ul class="toc-list" id="tocList">
+                <li><a href="#app-demo" class="active">🚀 جرّب التطبيق الحي</a></li>
+                <li><a href="#sec-1">1. نظرة عامة على المشروع</a></li>
+                <li><a href="#sec-2">2. هيكل المشروع</a></li>
+                <li><a href="#sec-3">3. نموذج البيانات (Model)</a></li>
+                <li><a href="#sec-4">4. المستودع (Repository)</a></li>
+                <li><a href="#sec-5">5. منطق الأعمال (Service)</a></li>
+                <li><a href="#sec-6">6. واجهة المستخدم (UI)</a></li>
+                <li><a href="#sec-7">7. حفظ البيانات (JSON)</a></li>
+                <li><a href="#sec-8">8. أفضل الممارسات</a></li>
+                <li><a href="#sec-9">9. تمارين تفاعلية</a></li>
+            </ul>
+        </aside>
+
+        <!-- المحتوى -->
+        <main class="content">
+
+            <!-- ====== التطبيق الحي ====== -->
+            <section class="content-section" id="app-demo">
+                <div class="section-heading">
+                    <div class="section-num"><i class="fas fa-rocket"></i></div>
+                    <h2>جرّب التطبيق الحي</h2>
+                </div>
+                <p>
+                    هذا تطبيق المهام الذي ستبنيه — يعمل بالكامل في متصفحك. أضف مهام، حدد أولوياتها،
+                    أكملها، احذفها، أو فلترها. لاحظ كيف تبقى الواجهة سريعة الاستجابة (وهذا هو هدف المشروع).
+                </p>
+
+                <div class="app-demo">
+                    <div class="app-demo-header">
+                        <div class="app-demo-title">
+                            <i class="fas fa-list-check"></i> مدير المهام
+                        </div>
+                        <div class="app-demo-stats">
+                            <span><i class="fas fa-layer-group"></i> الكل: <strong id="statTotal">0</strong></span>
+                            <span><i class="fas fa-hourglass-half"></i> متبقية: <strong id="statActive">0</strong></span>
+                            <span><i class="fas fa-check-double"></i> مكتملة: <strong id="statDone">0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="app-demo-body">
+                        <div class="todo-input-row">
+                            <input type="text" id="todoInput" placeholder="ما المهمة التي تريد إنجازها؟" maxlength="120">
+                            <select id="todoPriority">
+                                <option value="low">منخفضة</option>
+                                <option value="medium" selected>متوسطة</option>
+                                <option value="high">عالية</option>
+                            </select>
+                            <button class="todo-add-btn" id="todoAddBtn">
+                                <i class="fas fa-plus"></i> إضافة
+                            </button>
+                        </div>
+
+                        <div class="todo-filters">
+                            <button class="todo-filter active" data-filter="all">الكل</button>
+                            <button class="todo-filter" data-filter="active">متبقية</button>
+                            <button class="todo-filter" data-filter="done">مكتملة</button>
+                            <button class="todo-filter" data-filter="high">عالية الأولوية</button>
+                        </div>
+
+                        <ul class="todo-list" id="todoList"></ul>
+                    </div>
+
+                    <div class="app-demo-footer">
+                        <span id="todoStatus">لا توجد مهام بعد</span>
+                        <button class="clear-btn" id="clearCompleted">
+                            <i class="fas fa-broom"></i> مسح المكتملة
+                        </button>
+                    </div>
+                </div>
+
+                <div class="callout info">
+                    <div class="callout-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="callout-body">
+                        <h4>ملاحظة</h4>
+                        <p>
+                            هذا التطبيق مبني بتقنيات الويب لتجربته مباشرة. في الدرس سنبني نفس التطبيق بـ C# وWPF
+                            (أو Blazor)، لكن المفاهيم والمنطق متطابقة تماماً.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 1 ====== -->
+            <section class="content-section" id="sec-1">
+                <div class="section-heading">
+                    <div class="section-num">1</div>
+                    <h2>نظرة عامة على المشروع</h2>
+                </div>
+                <p>
+                    تطبيق المهام (To-Do List) هو مشروع مثالي لتعلم C# في سياق عملي حقيقي. رغم بساطته الظاهرة،
+                    فهو يغطي مفاهيم أساسية: نمذجة البيانات، فصل المسؤوليات، حفظ البيانات، وواجهة تفاعلية.
+                </p>
+
+                <h3>ما ستتعلمه</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-cubes"></i>
+                        <h4>العمارة النظيفة</h4>
+                        <p>فصل Model عن Repository عن Service عن UI.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-database"></i>
+                        <h4>حفظ البيانات</h4>
+                        <p>القراءة والكتابة في ملف JSON محلي.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-palette"></i>
+                        <h4>واجهة حديثة</h4>
+                        <p>تصميم تفاعلي باستخدام WPF أو Blazor.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shield-halved"></i>
+                        <h4>أمان الكود</h4>
+                        <p>معالجة الأخطاء، التحقق، والاختبار.</p>
+                    </div>
+                </div>
+
+                <h3>المتطلبات الوظيفية</h3>
+                <ul>
+                    <li>إضافة مهمة جديدة مع عنوان وأولوية.</li>
+                    <li>عرض قائمة المهام مرتبة حسب الأولوية.</li>
+                    <li>تحديد مهمة كمكتملة أو إعادتها كمتبقية.</li>
+                    <li>حذف مهمة.</li>
+                    <li>فلترة المهام (الكل / متبقية / مكتملة).</li>
+                    <li>حفظ المهام محلياً بحيث تبقى بعد إغلاق التطبيق.</li>
+                </ul>
+
+                <div class="callout success">
+                    <div class="callout-icon"><i class="fas fa-check"></i></div>
+                    <div class="callout-body">
+                        <h4>لماذا هذا المشروع؟</h4>
+                        <p>
+                            لأنه صغير بما يكفي للفهم الكامل، وكبير بما يكفي لتغطية مفاهيم هندسة البرمجيات
+                            التي ستحتاجها في أي تطبيق حقيقي.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 2 ====== -->
+            <section class="content-section" id="sec-2">
+                <div class="section-heading">
+                    <div class="section-num">2</div>
+                    <h2>هيكل المشروع</h2>
+                </div>
+                <p>
+                    سنستخدم عمارة بسيطة من 4 طبقات. هذا الفصل يجعل الكود قابلاً للصيانة والاختبار
+                    ويقلل الترابط بين الأجزاء.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> هيكل المجلدات</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre>TodoApp/
+│
+├── Models/
+│   └── TodoItem.cs            <span class="cmt">// نموذج البيانات</span>
+│
+├── Repositories/
+│   ├── ITodoRepository.cs     <span class="cmt">// الواجهة</span>
+│   └── JsonTodoRepository.cs  <span class="cmt">// تنفيذ JSON</span>
+│
+├── Services/
+│   └── TodoService.cs         <span class="cmt">// منطق الأعمال</span>
+│
+├── ViewModels/
+│   └── MainViewModel.cs       <span class="cmt">// حالة الواجهة</span>
+│
+├── Views/
+│   └── MainWindow.xaml        <span class="cmt">// واجهة WPF</span>
+│
+└── Program.cs                 <span class="cmt">// نقطة الدخول</span></pre>
+                    </div>
+                </div>
+
+                <h3>لماذا هذا الفصل؟</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الطبقة</th>
+                                <th>المسؤولية</th>
+                                <th>مثال</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Models</strong></td>
+                                <td>تمثيل البيانات فقط</td>
+                                <td><span class="inline-code">TodoItem</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Repositories</strong></td>
+                                <td>الوصول للبيانات (JSON/DB)</td>
+                                <td><span class="inline-code">JsonTodoRepository</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Services</strong></td>
+                                <td>منطق الأعمال والتحقق</td>
+                                <td><span class="inline-code">TodoService</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Views</strong></td>
+                                <td>العرض والتفاعل فقط</td>
+                                <td><span class="inline-code">MainWindow.xaml</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ====== 3 ====== -->
+            <section class="content-section" id="sec-3">
+                <div class="section-heading">
+                    <div class="section-num">3</div>
+                    <h2>نموذج البيانات (Model)</h2>
+                </div>
+                <p>
+                    نبدأ بأبسط جزء: كلاس يمثل المهمة. نستخدم <span class="inline-code">record</span>
+                    لأنها مثالية لنماذج البيانات غير القابلة للتغيير بعد الإنشاء.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Models/TodoItem.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">namespace</span> TodoApp.Models;
+
+<span class="kw">public enum</span> <span class="type">Priority</span>
+{
+    Low,
+    Medium,
+    High
+}
+
+<span class="kw">public record</span> <span class="type">TodoItem</span>
+{
+    <span class="kw">public</span> <span class="type">Guid</span> Id { <span class="kw">get</span>; <span class="kw">init</span>; } = <span class="type">Guid</span>.<span class="fn">NewGuid</span>();
+    <span class="kw">public string</span> Title { <span class="kw">get</span>; <span class="kw">init</span>; } = <span class="kw">string</span>.<span class="prop">Empty</span>;
+    <span class="kw">public</span> <span class="type">Priority</span> Priority { <span class="kw">get</span>; <span class="kw">init</span>; } = <span class="type">Priority</span>.<span class="prop">Medium</span>;
+    <span class="kw">public bool</span> IsDone { <span class="kw">get</span>; <span class="kw">init</span>; }
+    <span class="kw">public</span> <span class="type">DateTime</span> CreatedAt { <span class="kw">get</span>; <span class="kw">init</span>; } = <span class="type">DateTime</span>.<span class="prop">Now</span>;
+
+    <span class="cmt">// نسخة معدّلة — لأن record غير قابلة للتغيير</span>
+    <span class="kw">public</span> <span class="type">TodoItem</span> <span class="fn">WithDone</span>(<span class="kw">bool</span> done) => <span class="kw">this</span> <span class="kw">with</span> { IsDone = done };
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout info">
+                    <div class="callout-icon"><i class="fas fa-info-circle"></i></div>
+                    <div class="callout-body">
+                        <h4>لماذا record؟</h4>
+                        <p>
+                            <span class="inline-code">record</span> في C# 9+ توفر مقارنة قيمة تلقائية،
+                            وخصائص <span class="inline-code">init</span> فقط، وعبارة <span class="inline-code">with</span>
+                            لإنشاء نسخ معدّلة — مثالية لنماذج البيانات.
+                        </p>
+                    </div>
+                </div>
+
+                <h3>التحقق من الصحة</h3>
+                <p>
+                    نضيف دالة تحقق بسيطة قبل حفظ المهمة، لمنع إضافة مهام فارغة.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Models/TodoItem.cs (إضافة)</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public static</span> <span class="type">TodoItem</span> <span class="fn">Create</span>(<span class="kw">string</span> title, <span class="type">Priority</span> priority)
+{
+    <span class="kw">if</span> (<span class="kw">string</span>.<span class="fn">IsNullOrWhiteSpace</span>(title))
+        <span class="kw">throw new</span> <span class="type">ArgumentException</span>(<span class="str">"العنوان مطلوب"</span>);
+
+    <span class="kw">return new</span> <span class="type">TodoItem</span>
+    {
+        Title = title.<span class="fn">Trim</span>(),
+        Priority = priority
+    };
+}</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 4 ====== -->
+            <section class="content-section" id="sec-4">
+                <div class="section-heading">
+                    <div class="section-num">4</div>
+                    <h2>المستودع (Repository)</h2>
+                </div>
+                <p>
+                    المستودع هو المسؤول الوحيد عن الوصول للبيانات. نبدأ بواجهة، ثم نُنفّذها بحفظ JSON.
+                    هذا يسمح لنا لاحقاً بالتبديل إلى قاعدة بيانات دون تغيير باقي الكود.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Repositories/ITodoRepository.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> TodoApp.Models;
+
+<span class="kw">namespace</span> TodoApp.Repositories;
+
+<span class="kw">public interface</span> <span class="type">ITodoRepository</span>
+{
+    <span class="type">Task</span>&lt;<span class="type">IReadOnlyList</span>&lt;<span class="type">TodoItem</span>&gt;&gt; <span class="fn">GetAllAsync</span>();
+    <span class="type">Task</span> <span class="fn">AddAsync</span>(<span class="type">TodoItem</span> item);
+    <span class="type">Task</span> <span class="fn">UpdateAsync</span>(<span class="type">TodoItem</span> item);
+    <span class="type">Task</span> <span class="fn">DeleteAsync</span>(<span class="type">Guid</span> id);
+}</pre>
+                    </div>
+                </div>
+
+                <h3>تنفيذ JSON</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Repositories/JsonTodoRepository.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> System.Text.Json;
+<span class="kw">using</span> TodoApp.Models;
+
+<span class="kw">namespace</span> TodoApp.Repositories;
+
+<span class="kw">public class</span> <span class="type">JsonTodoRepository</span> : <span class="type">ITodoRepository</span>
+{
+    <span class="kw">private readonly string</span> _filePath;
+    <span class="kw">private readonly</span> <span class="type">SemaphoreSlim</span> _lock = <span class="kw">new</span>(<span class="num">1</span>, <span class="num">1</span>);
+    <span class="kw">private</span> <span class="type">List</span>&lt;<span class="type">TodoItem</span>&gt;? _cache;
+
+    <span class="kw">private static readonly</span> <span class="type">JsonSerializerOptions</span> JsonOpts = <span class="kw">new</span>()
+    {
+        WriteIndented = <span class="kw">true</span>,
+        PropertyNamingPolicy = <span class="type">JsonNamingPolicy</span>.<span class="prop">CamelCase</span>
+    };
+
+    <span class="kw">public</span> <span class="fn">JsonTodoRepository</span>(<span class="kw">string</span> filePath)
+    {
+        _filePath = filePath;
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">IReadOnlyList</span>&lt;<span class="type">TodoItem</span>&gt;&gt; <span class="fn">GetAllAsync</span>()
+    {
+        <span class="kw">await</span> <span class="fn">EnsureLoadedAsync</span>();
+        <span class="kw">return</span> _cache!;
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">AddAsync</span>(<span class="type">TodoItem</span> item)
+    {
+        <span class="kw">await</span> <span class="fn">EnsureLoadedAsync</span>();
+        _cache!.<span class="fn">Add</span>(item);
+        <span class="kw">await</span> <span class="fn">SaveAsync</span>();
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">UpdateAsync</span>(<span class="type">TodoItem</span> item)
+    {
+        <span class="kw">await</span> <span class="fn">EnsureLoadedAsync</span>();
+        <span class="kw">var</span> index = _cache!.<span class="fn">FindIndex</span>(x => x.Id == item.Id);
+        <span class="kw">if</span> (index >= <span class="num">0</span>)
+        {
+            _cache[index] = item;
+            <span class="kw">await</span> <span class="fn">SaveAsync</span>();
+        }
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">DeleteAsync</span>(<span class="type">Guid</span> id)
+    {
+        <span class="kw">await</span> <span class="fn">EnsureLoadedAsync</span>();
+        _cache!.<span class="fn">RemoveAll</span>(x => x.Id == id);
+        <span class="kw">await</span> <span class="fn">SaveAsync</span>();
+    }
+
+    <span class="kw">private async</span> <span class="type">Task</span> <span class="fn">EnsureLoadedAsync</span>()
+    {
+        <span class="kw">if</span> (_cache <span class="kw">is not null</span>) <span class="kw">return</span>;
+
+        <span class="kw">await</span> _lock.<span class="fn">WaitAsync</span>();
+        <span class="kw">try</span>
+        {
+            <span class="kw">if</span> (_cache <span class="kw">is not null</span>) <span class="kw">return</span>;
+
+            <span class="kw">if</span> (!<span class="type">File</span>.<span class="fn">Exists</span>(_filePath))
+            {
+                _cache = <span class="kw">new</span> <span class="type">List</span>&lt;<span class="type">TodoItem</span>&gt;();
+                <span class="kw">return</span>;
+            }
+
+            <span class="kw">var</span> json = <span class="kw">await</span> <span class="type">File</span>.<span class="fn">ReadAllTextAsync</span>(_filePath);
+            _cache = <span class="type">JsonSerializer</span>.<span class="fn">Deserialize</span>&lt;<span class="type">List</span>&lt;<span class="type">TodoItem</span>&gt;&gt;(json, JsonOpts)
+                     ?? <span class="kw">new</span> <span class="type">List</span>&lt;<span class="type">TodoItem</span>&gt;();
+        }
+        <span class="kw">finally</span> { _lock.<span class="fn">Release</span>(); }
+    }
+
+    <span class="kw">private async</span> <span class="type">Task</span> <span class="fn">SaveAsync</span>()
+    {
+        <span class="kw">var</span> json = <span class="type">JsonSerializer</span>.<span class="fn">Serialize</span>(_cache, JsonOpts);
+        <span class="kw">await</span> <span class="type">File</span>.<span class="fn">WriteAllTextAsync</span>(_filePath, json);
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="callout-body">
+                        <h4>لاحظ الـ SemaphoreSlim</h4>
+                        <p>
+                            نستخدمه لمنع وصول متزامن إلى الملف عند وجود عمليات متعددة في نفس الوقت.
+                            هذا مبدأ أساسي في كتابة كود آمن للخيوط (thread-safe).
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 5 ====== -->
+            <section class="content-section" id="sec-5">
+                <div class="section-heading">
+                    <div class="section-num">5</div>
+                    <h2>منطق الأعمال (Service)</h2>
+                </div>
+                <p>
+                    طبقة الخدمة تحتوي على القواعد التجارية: التحقق، الترتيب، الفلترة. لا تعرف شيئاً عن
+                    الواجهة أو التخزين — تعتمد فقط على الواجهة <span class="inline-code">ITodoRepository</span>.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Services/TodoService.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> TodoApp.Models;
+<span class="kw">using</span> TodoApp.Repositories;
+
+<span class="kw">namespace</span> TodoApp.Services;
+
+<span class="kw">public class</span> <span class="type">TodoService</span>
+{
+    <span class="kw">private readonly</span> <span class="type">ITodoRepository</span> _repo;
+
+    <span class="kw">public</span> <span class="fn">TodoService</span>(<span class="type">ITodoRepository</span> repo) => _repo = repo;
+
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">IReadOnlyList</span>&lt;<span class="type">TodoItem</span>&gt;&gt; <span class="fn">GetSortedAsync</span>()
+    {
+        <span class="kw">var</span> items = <span class="kw">await</span> _repo.<span class="fn">GetAllAsync</span>();
+        <span class="kw">return</span> items
+            .<span class="fn">OrderBy</span>(x => x.IsDone)
+            .<span class="fn">ThenByDescending</span>(x => x.Priority)
+            .<span class="fn">ThenBy</span>(x => x.CreatedAt)
+            .<span class="fn">ToList</span>();
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">AddAsync</span>(<span class="kw">string</span> title, <span class="type">Priority</span> priority)
+    {
+        <span class="kw">var</span> item = <span class="type">TodoItem</span>.<span class="fn">Create</span>(title, priority);
+        <span class="kw">await</span> _repo.<span class="fn">AddAsync</span>(item);
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">ToggleAsync</span>(<span class="type">TodoItem</span> item)
+    {
+        <span class="kw">var</span> updated = item.<span class="fn">WithDone</span>(!item.IsDone);
+        <span class="kw">await</span> _repo.<span class="fn">UpdateAsync</span>(updated);
+    }
+
+    <span class="kw">public</span> <span class="type">Task</span> <span class="fn">DeleteAsync</span>(<span class="type">Guid</span> id) => _repo.<span class="fn">DeleteAsync</span>(id);
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-icon"><i class="fas fa-check"></i></div>
+                    <div class="callout-body">
+                        <h4>سهولة الاختبار</h4>
+                        <p>
+                            لأن <span class="inline-code">TodoService</span> تعتمد على واجهة، يمكننا اختبارها
+                            بسهولة عبر Mock Repository بدون لمس الملفات الفعلية.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 6 ====== -->
+            <section class="content-section" id="sec-6">
+                <div class="section-heading">
+                    <div class="section-num">6</div>
+                    <h2>واجهة المستخدم (UI)</h2>
+                </div>
+                <p>
+                    نستخدم <strong>WPF + MVVM</strong> لفصل الواجهة عن المنطق. الـ ViewModel يحتوي
+                    على حالة الواجهة والأوامر، والـ View يحتوي فقط على التصميم.
+                </p>
+
+                <h3>MainViewModel</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> ViewModels/MainViewModel.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> System.Collections.ObjectModel;
+<span class="kw">using</span> System.Windows.Input;
+<span class="kw">using</span> TodoApp.Models;
+<span class="kw">using</span> TodoApp.Services;
+
+<span class="kw">namespace</span> TodoApp.ViewModels;
+
+<span class="kw">public class</span> <span class="type">MainViewModel</span> : <span class="type">ObservableObject</span>
+{
+    <span class="kw">private readonly</span> <span class="type">TodoService</span> _service;
+
+    <span class="kw">public</span> <span class="type">ObservableCollection</span>&lt;<span class="type">TodoItem</span>&gt; Items { get; } = <span class="kw">new</span>();
+
+    <span class="kw">private string</span> _newTitle = <span class="str">""</span>;
+    <span class="kw">public string</span> NewTitle
+    {
+        <span class="kw">get</span> => _newTitle;
+        <span class="kw">set</span> => <span class="fn">SetProperty</span>(<span class="kw">ref</span> _newTitle, value);
+    }
+
+    <span class="kw">public</span> <span class="type">ICommand</span> AddCommand { <span class="kw">get</span>; }
+    <span class="kw">public</span> <span class="type">ICommand</span> ToggleCommand { <span class="kw">get</span>; }
+    <span class="kw">public</span> <span class="type">ICommand</span> DeleteCommand { <span class="kw">get</span>; }
+
+    <span class="kw">public</span> <span class="fn">MainViewModel</span>(<span class="type">TodoService</span> service)
+    {
+        _service = service;
+        AddCommand = <span class="kw">new</span> <span class="type">RelayCommand</span>(<span class="kw">async</span> _ => <span class="kw">await</span> <span class="fn">AddAsync</span>());
+        ToggleCommand = <span class="kw">new</span> <span class="type">RelayCommand</span>(<span class="kw">async</span> p => <span class="kw">await</span> <span class="fn">ToggleAsync</span>((<span class="type">TodoItem</span>)p));
+        DeleteCommand = <span class="kw">new</span> <span class="type">RelayCommand</span>(<span class="kw">async</span> p => <span class="kw">await</span> <span class="fn">DeleteAsync</span>((<span class="type">TodoItem</span>)p));
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">LoadAsync</span>()
+    {
+        Items.<span class="fn">Clear</span>();
+        <span class="kw">foreach</span> (<span class="kw">var</span> item <span class="kw">in await</span> _service.<span class="fn">GetSortedAsync</span>())
+            Items.<span class="fn">Add</span>(item);
+    }
+
+    <span class="kw">private async</span> <span class="type">Task</span> <span class="fn">AddAsync</span>()
+    {
+        <span class="kw">if</span> (<span class="kw">string</span>.<span class="fn">IsNullOrWhiteSpace</span>(NewTitle)) <span class="kw">return</span>;
+
+        <span class="kw">await</span> _service.<span class="fn">AddAsync</span>(NewTitle, Priority.Medium);
+        NewTitle = <span class="str">""</span>;
+        <span class="kw">await</span> <span class="fn">LoadAsync</span>();
+    }
+
+    <span class="kw">private async</span> <span class="type">Task</span> <span class="fn">ToggleAsync</span>(<span class="type">TodoItem</span> item)
+    {
+        <span class="kw">await</span> _service.<span class="fn">ToggleAsync</span>(item);
+        <span class="kw">await</span> <span class="fn">LoadAsync</span>();
+    }
+
+    <span class="kw">private async</span> <span class="type">Task</span> <span class="fn">DeleteAsync</span>(<span class="type">TodoItem</span> item)
+    {
+        <span class="kw">await</span> _service.<span class="fn">DeleteAsync</span>(item.Id);
+        <span class="kw">await</span> <span class="fn">LoadAsync</span>();
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <h3>MainWindow.xaml (مختصر)</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Views/MainWindow.xaml</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="punc">&lt;</span><span class="type">Window</span> <span class="prop">x:Class</span>=<span class="str">"TodoApp.Views.MainWindow"</span>
+        <span class="prop">Title</span>=<span class="str">"مدير المهام"</span> <span class="prop">Height</span>=<span class="str">"600"</span> <span class="prop">Width</span>=<span class="str">"500"</span><span class="punc">&gt;</span>
+    <span class="punc">&lt;</span><span class="type">Grid</span> <span class="prop">Margin</span>=<span class="str">"20"</span><span class="punc">&gt;</span>
+        <span class="punc">&lt;</span><span class="type">Grid.RowDefinitions</span><span class="punc">&gt;</span>
+            <span class="punc">&lt;</span><span class="type">RowDefinition</span> <span class="prop">Height</span>=<span class="str">"Auto"</span><span class="punc">/&gt;</span>
+            <span class="punc">&lt;</span><span class="type">RowDefinition</span> <span class="prop">Height</span>=<span class="str">"*"</span><span class="punc">/&gt;</span>
+        <span class="punc">&lt;/</span><span class="type">Grid.RowDefinitions</span><span class="punc">&gt;</span>
+
+        <span class="punc">&lt;</span><span class="type">StackPanel</span> <span class="prop">Orientation</span>=<span class="str">"Horizontal"</span><span class="punc">&gt;</span>
+            <span class="punc">&lt;</span><span class="type">TextBox</span> <span class="prop">Text</span>=<span class="str">"{Binding NewTitle, UpdateSourceTrigger=PropertyChanged}"</span>
+                     <span class="prop">Width</span>=<span class="str">"300"</span> <span class="prop">Padding</span>=<span class="str">"10"</span><span class="punc">/&gt;</span>
+            <span class="punc">&lt;</span><span class="type">Button</span> <span class="prop">Content</span>=<span class="str">"إضافة"</span> <span class="prop">Command</span>=<span class="str">"{Binding AddCommand}"</span>
+                    <span class="prop">Margin</span>=<span class="str">"10,0,0,0"</span> <span class="prop">Padding</span>=<span class="str">"20,10"</span><span class="punc">/&gt;</span>
+        <span class="punc">&lt;/</span><span class="type">StackPanel</span><span class="punc">&gt;</span>
+
+        <span class="punc">&lt;</span><span class="type">ListBox</span> <span class="prop">Grid.Row</span>=<span class="str">"1"</span> <span class="prop">ItemsSource</span>=<span class="str">"{Binding Items}"</span> <span class="prop">Margin</span>=<span class="str">"0,20,0,0"</span><span class="punc">&gt;</span>
+            <span class="punc">&lt;</span><span class="type">ListBox.ItemTemplate</span><span class="punc">&gt;</span>
+                <span class="punc">&lt;</span><span class="type">DataTemplate</span><span class="punc">&gt;</span>
+                    <span class="punc">&lt;</span><span class="type">Border</span> <span class="prop">Padding</span>=<span class="str">"12"</span> <span class="prop">Margin</span>=<span class="str">"0,4"</span> <span class="prop">CornerRadius</span>=<span class="str">"8"</span>
+                            <span class="prop">Background</span>=<span class="str">"#F5F7FA"</span><span class="punc">&gt;</span>
+                        <span class="punc">&lt;</span><span class="type">Grid</span><span class="punc">&gt;</span>
+                            <span class="punc">&lt;</span><span class="type">Grid.ColumnDefinitions</span><span class="punc">&gt;</span>
+                                <span class="punc">&lt;</span><span class="type">ColumnDefinition</span> <span class="prop">Width</span>=<span class="str">"Auto"</span><span class="punc">/&gt;</span>
+                                <span class="punc">&lt;</span><span class="type">ColumnDefinition</span> <span class="prop">Width</span>=<span class="str">"*"</span><span class="punc">/&gt;</span>
+                                <span class="punc">&lt;</span><span class="type">ColumnDefinition</span> <span class="prop">Width</span>=<span class="str">"Auto"</span><span class="punc">/&gt;</span>
+                            <span class="punc">&lt;/</span><span class="type">Grid.ColumnDefinitions</span><span class="punc">&gt;</span>
+
+                            <span class="punc">&lt;</span><span class="type">CheckBox</span> <span class="prop">IsChecked</span>=<span class="str">"{Binding IsDone}"</span>
+                                      <span class="prop">Command</span>=<span class="str">"{Binding DataContext.ToggleCommand,</span>
+                                                <span class="prop">RelativeSource={RelativeSource AncestorType=ListBox}}"</span>
+                                      <span class="prop">CommandParameter</span>=<span class="str">"{Binding}"</span><span class="punc">/&gt;</span>
+
+                            <span class="punc">&lt;</span><span class="type">TextBlock</span> <span class="prop">Grid.Column</span>=<span class="str">"1"</span> <span class="prop">Text</span>=<span class="str">"{Binding Title}"</span>
+                                       <span class="prop">Margin</span>=<span class="str">"10,0"</span> <span class="prop">VerticalAlignment</span>=<span class="str">"Center"</span><span class="punc">/&gt;</span>
+
+                            <span class="punc">&lt;</span><span class="type">Button</span> <span class="prop">Grid.Column</span>=<span class="str">"2"</span> <span class="prop">Content</span>=<span class="str">"🗑"</span>
+                                    <span class="prop">Command</span>=<span class="str">"{Binding DataContext.DeleteCommand,</span>
+                                              <span class="prop">RelativeSource={RelativeSource AncestorType=ListBox}}"</span>
+                                    <span class="prop">CommandParameter</span>=<span class="str">"{Binding}"</span><span class="punc">/&gt;</span>
+                        <span class="punc">&lt;/</span><span class="type">Grid</span><span class="punc">&gt;</span>
+                    <span class="punc">&lt;/</span><span class="type">Border</span><span class="punc">&gt;</span>
+                <span class="punc">&lt;/</span><span class="type">DataTemplate</span><span class="punc">&gt;</span>
+            <span class="punc">&lt;/</span><span class="type">ListBox.ItemTemplate</span><span class="punc">&gt;</span>
+        <span class="punc">&lt;/</span><span class="type">ListBox</span><span class="punc">&gt;</span>
+    <span class="punc">&lt;/</span><span class="type">Grid</span><span class="punc">&gt;</span>
+<span class="punc">&lt;/</span><span class="type">Window</span><span class="punc">&gt;</span></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 7 ====== -->
+            <section class="content-section" id="sec-7">
+                <div class="section-heading">
+                    <div class="section-num">7</div>
+                    <h2>حفظ البيانات (JSON)</h2>
+                </div>
+                <p>
+                    نستخدم <span class="inline-code">System.Text.Json</span> (مدمج في .NET) لحفظ واسترجاع
+                    المهام. الملف يُخزّن في مجلد التطبيق المحلي لضمان الوصول الآمن.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Program.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> TodoApp.Repositories;
+<span class="kw">using</span> TodoApp.Services;
+
+<span class="kw">var</span> appData = <span class="type">Environment</span>.<span class="fn">GetFolderPath</span>(
+    <span class="type">Environment</span>.<span class="type">SpecialFolder</span>.<span class="prop">LocalApplicationData</span>);
+
+<span class="kw">var</span> todoDir = <span class="type">Path</span>.<span class="fn">Combine</span>(appData, <span class="str">"CodeWay"</span>, <span class="str">"TodoApp"</span>);
+<span class="type">Directory</span>.<span class="fn">CreateDirectory</span>(todoDir);
+
+<span class="kw">var</span> filePath = <span class="type">Path</span>.<span class="fn">Combine</span>(todoDir, <span class="str">"todos.json"</span>);
+
+<span class="kw">var</span> repo = <span class="kw">new</span> <span class="type">JsonTodoRepository</span>(filePath);
+<span class="kw">var</span> service = <span class="kw">new</span> <span class="type">TodoService</span>(repo);
+<span class="kw">var</span> vm = <span class="kw">new</span> <span class="type">MainViewModel</span>(service);
+
+<span class="kw">await</span> vm.<span class="fn">LoadAsync</span>();</pre>
+                    </div>
+                </div>
+
+                <h3>شكل ملف todos.json</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> todos.json</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre>[
+  {
+    <span class="str">"id"</span>: <span class="str">"8f3e2a1b-..."</span>,
+    <span class="str">"title"</span>: <span class="str">"إكمال درس C#"</span>,
+    <span class="str">"priority"</span>: <span class="num">2</span>,
+    <span class="str">"isDone"</span>: <span class="kw">false</span>,
+    <span class="str">"createdAt"</span>: <span class="str">"2026-10-28T10:30:00"</span>
+  },
+  {
+    <span class="str">"id"</span>: <span class="str">"2c4d5e6f-..."</span>,
+    <span class="str">"title"</span>: <span class="str">"مراجعة الكود"</span>,
+    <span class="str">"priority"</span>: <span class="num">1</span>,
+    <span class="str">"isDone"</span>: <span class="kw">true</span>,
+    <span class="str">"createdAt"</span>: <span class="str">"2026-10-27T14:15:00"</span>
+  }
+]</pre>
+                    </div>
+                </div>
+
+                <div class="callout info">
+                    <div class="callout-icon"><i class="fas fa-info-circle"></i></div>
+                    <div class="callout-body">
+                        <h4>لماذا LocalApplicationData؟</h4>
+                        <p>
+                            لأنها المكان القياسي في Windows لحفظ بيانات المستخدم. لا تتطلب صلاحيات إدارية،
+                            وتبقى آمنة حتى بعد إعادة التشغيل.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 8 ====== -->
+            <section class="content-section" id="sec-8">
+                <div class="section-heading">
+                    <div class="section-num">8</div>
+                    <h2>أفضل الممارسات</h2>
+                </div>
+
+                <ul class="steps">
+                    <li><strong>فصل المسؤوليات:</strong> كل طبقة تعرف فقط ما تحتاجه. Model لا يعرف Repository، والـ UI لا يعرف JSON.</li>
+                    <li><strong>استخدم async/await</strong> في كل عمليات I/O — لحفظ الملفات دون تجميد الواجهة.</li>
+                    <li><strong>تحقق من الصحة مبكراً</strong> في طبقة الخدمة، قبل الوصول للتخزين.</li>
+                    <li><strong>استخدم CancellationToken</strong> للعمليات الطويلة لدعم الإلغاء.</li>
+                    <li><strong>اكتب اختبارات وحدة</strong> للـ Service عبر Mock Repository.</li>
+                    <li><strong>تعامل مع الاستثناءات</strong> بلطف وأظهر رسائل واضحة للمستخدم.</li>
+                </ul>
+
+                <h3>مثال: اختبار وحدة</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Tests/TodoServiceTests.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">TodoServiceTests</span>
+{
+    [<span class="type">Fact</span>]
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">AddAsync_ValidTitle_AddsItem</span>()
+    {
+        <span class="cmt">// Arrange</span>
+        <span class="kw">var</span> repo = <span class="kw">new</span> <span class="type">Mock</span>&lt;<span class="type">ITodoRepository</span>&gt;();
+        <span class="kw">var</span> service = <span class="kw">new</span> <span class="type">TodoService</span>(repo.<span class="prop">Object</span>);
+
+        <span class="cmt">// Act</span>
+        <span class="kw">await</span> service.<span class="fn">AddAsync</span>(<span class="str">"مهمة جديدة"</span>, <span class="type">Priority</span>.<span class="prop">High</span>);
+
+        <span class="cmt">// Assert</span>
+        repo.<span class="fn">Verify</span>(r => r.<span class="fn">AddAsync</span>(
+            <span class="type">It</span>.<span class="fn">Is</span>&lt;<span class="type">TodoItem</span>&gt;(i =>
+                i.Title == <span class="str">"مهمة جديدة"</span> &&
+                i.Priority == <span class="type">Priority</span>.<span class="prop">High</span>)),
+            <span class="type">Times</span>.<span class="fn">Once</span>());
+    }
+}</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 9 ====== -->
+            <section class="content-section" id="sec-9">
+                <div class="section-heading">
+                    <div class="section-num">9</div>
+                    <h2>تمارين تفاعلية</h2>
+                </div>
+                <p>اختبر فهمك للمشروع:</p>
+
+                <div class="interactive-box">
+                    <div class="interactive-title"><i class="fas fa-question-circle"></i> سؤال 1</div>
+                    <p class="interactive-hint">أي طبقة مسؤولة عن قراءة وكتابة ملف JSON؟</p>
+                    <div class="task-box" data-quiz="1">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> Model</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> Repository</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> ViewModel</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> View</button>
+                        </div>
+                        <div class="task-feedback" id="fb1"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 2</div>
+                    <p class="interactive-hint">لماذا نستخدم SemaphoreSlim في المستودع؟</p>
+                    <div class="task-box" data-quiz="2">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> لتسريع القراءة</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> لمنع الوصول المتزامن للملف</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> لتشفير الملف</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> لضغط البيانات</button>
+                        </div>
+                        <div class="task-feedback" id="fb2"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 3</div>
+                    <p class="interactive-hint">ما نوع العمارة المستخدمة في هذا المشروع؟</p>
+                    <div class="task-box" data-quiz="3">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> Monolithic</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> Layered + MVVM</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> Microservices</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> Serverless</button>
+                        </div>
+                        <div class="task-feedback" id="fb3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <nav class="lesson-nav">
+                <a href="#" class="prev">
+                    <div class="nav-icon"><i class="fas fa-arrow-right"></i></div>
+                    <div>
+                        <div class="nav-label">الدرس السابق</div>
+                        <div class="nav-title">تطبيق الطقس بـ API</div>
+                    </div>
+                </a>
+                <a href="#" class="next">
+                    <div>
+                        <div class="nav-label">الدرس التالي</div>
+                        <div class="nav-title">تطبيق دردشة بـ Sockets</div>
+                    </div>
+                    <div class="nav-icon"><i class="fas fa-arrow-left"></i></div>
+                </a>
+            </nav>
+
+        </main>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-bottom">
+            <span>© 2026 CodeWay — جميع الحقوق محفوظة.</span>
+            <span>صُمم بعناية لتعلم C# بالعربية · <a href="#">سياسة الخصوصية</a></span>
+        </div>
+    </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    /* ============ شريط التقدم ============ */
+    const progressBar = document.getElementById('progressBar');
+    const header = document.getElementById('header');
+    const backTop = document.getElementById('backTop');
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = (scrollTop / docHeight) * 100 + '%';
+        header.classList.toggle('scrolled', scrollTop > 20);
+        backTop.classList.toggle('show', scrollTop > 400);
+    });
+
+    /* ============ نسخ الكود ============ */
+    function copyCode(btn) {
+        const pre = btn.closest('.code-wrapper').querySelector('pre');
+        const text = pre.innerText;
+        const done = () => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1800);
+        };
+        navigator.clipboard.writeText(text).then(done).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            done();
+        });
+    }
+
+    /* ============ التطبيق الحي ============ */
+    const todoState = {
+        items: [
+            { id: 1, title: 'قراءة الدرس الرابع كاملاً', priority: 'high', done: false },
+            { id: 2, title: 'تجربة التطبيق الحي', priority: 'medium', done: true },
+            { id: 3, title: 'بناء نسخة WPF محلياً', priority: 'low', done: false }
+        ],
+        filter: 'all',
+        nextId: 4
+    };
+
+    const todoList = document.getElementById('todoList');
+    const todoInput = document.getElementById('todoInput');
+    const todoPriority = document.getElementById('todoPriority');
+    const todoAddBtn = document.getElementById('todoAddBtn');
+    const statTotal = document.getElementById('statTotal');
+    const statActive = document.getElementById('statActive');
+    const statDone = document.getElementById('statDone');
+    const todoStatus = document.getElementById('todoStatus');
+    const clearCompleted = document.getElementById('clearCompleted');
+
+    const priorityLabels = { low: 'منخفضة', medium: 'متوسطة', high: 'عالية' };
+
+    function renderTodos() {
+        let items = todoState.items;
+        if (todoState.filter === 'active') items = items.filter(i => !i.done);
+        else if (todoState.filter === 'done') items = items.filter(i => i.done);
+        else if (todoState.filter === 'high') items = items.filter(i => i.priority === 'high');
+
+        const sorted = [...items].sort((a, b) => {
+            if (a.done !== b.done) return a.done ? 1 : -1;
+            const p = { high: 0, medium: 1, low: 2 };
+            return p[a.priority] - p[b.priority];
+        });
+
+        todoList.innerHTML = '';
+
+        if (sorted.length === 0) {
+            todoList.innerHTML = `
+                <li class="todo-empty">
+                    <i class="fas fa-inbox"></i>
+                    <p>لا توجد مهام في هذا التصنيف</p>
+                </li>`;
+        } else {
+            sorted.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'todo-item' + (item.done ? ' done' : '');
+                li.innerHTML = `
+                    <button class="todo-check ${item.done ? 'checked' : ''}" data-action="toggle" data-id="${item.id}">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <span class="todo-text">${escapeHtml(item.title)}</span>
+                    <span class="todo-priority ${item.priority}">${priorityLabels[item.priority]}</span>
+                    <button class="todo-delete" data-action="delete" data-id="${item.id}">
+                        <i class="fas fa-trash-can"></i>
+                    </button>
+                `;
+                todoList.appendChild(li);
+            });
+        }
+
+        const total = todoState.items.length;
+        const done = todoState.items.filter(i => i.done).length;
+        const active = total - done;
+        statTotal.textContent = total;
+        statActive.textContent = active;
+        statDone.textContent = done;
+        todoStatus.textContent = total === 0
+            ? 'لا توجد مهام بعد'
+            : `عرض ${sorted.length} من ${total} مهمة`;
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function addTodo() {
+        const title = todoInput.value.trim();
+        if (!title) {
+            todoInput.focus();
+            todoInput.style.borderColor = 'var(--danger)';
+            setTimeout(() => todoInput.style.borderColor = '', 800);
+            return;
+        }
+        todoState.items.push({
+            id: todoState.nextId++,
+            title,
+            priority: todoPriority.value,
+            done: false
+        });
+        todoInput.value = '';
+        todoInput.focus();
+        renderTodos();
+    }
+
+    todoAddBtn.addEventListener('click', addTodo);
+    todoInput.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
+
+    todoList.addEventListener('click', e => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const id = Number(btn.dataset.id);
+        if (btn.dataset.action === 'toggle') {
+            const item = todoState.items.find(i => i.id === id);
+            if (item) item.done = !item.done;
+        } else if (btn.dataset.action === 'delete') {
+            todoState.items = todoState.items.filter(i => i.id !== id);
+        }
+        renderTodos();
+    });
+
+    document.querySelectorAll('.todo-filter').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.todo-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            todoState.filter = btn.dataset.filter;
+            renderTodos();
+        });
+    });
+
+    clearCompleted.addEventListener('click', () => {
+        todoState.items = todoState.items.filter(i => !i.done);
+        renderTodos();
+    });
+
+    renderTodos();
+
+    /* ============ التنقل النشط في TOC ============ */
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    const sections = document.querySelectorAll('.content-section');
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                tocLinks.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
+
+    /* ============ التنبيهات ============ */
+    document.querySelectorAll('.task-box').forEach(box => {
+        const quizId = box.dataset.quiz;
+        const fb = document.getElementById('fb' + quizId);
+        const options = box.querySelectorAll('.task-option');
+
+        options.forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (box.dataset.answered === 'true') return;
+                box.dataset.answered = 'true';
+
+                const isCorrect = opt.dataset.correct === 'true';
+                options.forEach(o => {
+                    if (o.dataset.correct === 'true') o.classList.add('correct');
+                    else if (o === opt) o.classList.add('wrong');
+                });
+
+                if (isCorrect) {
+                    fb.textContent = '✅ إجابة صحيحة! أحسنت.';
+                    fb.className = 'task-feedback show ok';
+                } else {
+                    fb.textContent = '❌ إجابة غير صحيحة. الإجابة الصحيحة مظللة بالأخضر.';
+                    fb.className = 'task-feedback show no';
+                }
+            });
+        });
+    });
+
+    /* ============ قائمة الجوال ============ */
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        const nav = document.querySelector('.header-nav');
+        if (!nav) return;
+        if (nav.style.display === 'flex') {
+            nav.style.display = '';
+        } else {
+            Object.assign(nav.style, {
+                display: 'flex',
+                position: 'absolute',
+                top: '72px',
+                right: '0',
+                left: '0',
+                background: 'var(--primary)',
+                flexDirection: 'column',
+                padding: '16px',
+                gap: '8px',
+                boxShadow: '0 10px 30px rgba(0,0,0,.3)',
+                zIndex: '999'
+            });
+        }
+    });
+
+    /* ============ ظهور الأقسام ============ */
+    const sectionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.05 });
+
+    sections.forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(20px)';
+        s.style.transition = 'opacity .6s ease, transform .6s ease';
+        sectionObserver.observe(s);
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>++C القالبات (Templates) في لغة | شرح شامل ومتكامل</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(145deg, #0d2638, #1a3d57);
+            color: #e6f3ff;
+            line-height: 1.7;
+            padding: 2rem 1.8rem;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الحاوية الرئيسية */
+        .glass-panel {
+            background: rgba(20, 48, 70, 0.85);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-radius: 5rem;
+            box-shadow: 0 45px 90px -20px #000000, 0 0 0 2px rgba(100, 180, 255, 0.25);
+            padding: 3.2rem 3.8rem;
+            border: 1px solid rgba(70, 150, 220, 0.5);
+        }
+
+        /* الرأس */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #b8dcff, #ddf0ff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero h1 i {
+            background: #2f7ac8;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 130px;
+            font-size: 2.8rem;
+            -webkit-text-fill-color: white;
+            box-shadow: 0 18px 35px #0a1e32;
+        }
+
+        .hero-sub {
+            font-size: 1.8rem;
+            font-weight: 500;
+            background: #1f5785cc;
+            padding: 0.9rem 3.5rem;
+            border-radius: 90px;
+            display: inline-block;
+            margin-top: 1.6rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid #5aa3ff;
+            color: #ffffff;
+        }
+
+        /* بطاقات تمهيدية */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.2rem;
+            margin: 4rem 0;
+        }
+
+        .intro-card {
+            background: rgba(25, 60, 90, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 3rem;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border: 1px solid #3f8ed6;
+            transition: 0.3s;
+        }
+
+        .intro-card:hover {
+            transform: translateY(-10px);
+            background: #1d5a8ce0;
+            border-color: #7ab6ff;
+        }
+
+        .intro-icon {
+            background: #3282d3;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            margin: 0 auto 1.5rem;
+            color: white;
+        }
+
+        .intro-card h3 {
+            font-size: 2.2rem;
+            color: #c6e4ff;
+            margin-bottom: 1rem;
+        }
+
+        .intro-card p {
+            font-size: 1.2rem;
+            color: #d0eaff;
+        }
+
+        @media (max-width: 800px) {
+            .intro-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 500px) {
+            .intro-grid { grid-template-columns: 1fr; }
+        }
+
+        /* عناوين رئيسية */
+        .main-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 4rem 0 2.5rem 0;
+            position: relative;
+            display: inline-block;
+            color: #d6ecff;
+        }
+        .main-title:after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            right: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #3f8ad6, #70b0f0, #b5daff);
+            border-radius: 10px;
+        }
+
+        .sub-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 3rem 0 2rem 0;
+            color: #c2e2ff;
+            border-right: 12px solid #4d9eec;
+            padding-right: 2rem;
+        }
+
+        /* كتلة الكود */
+        .code-box {
+            background: #0b1f30;
+            border-radius: 3.2rem;
+            padding: 2.5rem;
+            margin: 2.8rem 0;
+            box-shadow: 0 30px 45px -18px #000000, inset 0 1px 12px #4180c7;
+            border: 1px solid #3070aa;
+        }
+
+        .code-box pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+            color: #e2eef9;
+        }
+
+        /* بطاقات مميزة */
+        .highlight-box {
+            background: linear-gradient(115deg, #154e7a, #1f66a0);
+            color: white;
+            border-radius: 3.2rem;
+            padding: 2.5rem 3.2rem;
+            margin: 3rem 0;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            box-shadow: 0 28px 45px -15px #000000b3;
+        }
+
+        .highlight-box i {
+            font-size: 3.5rem;
+            color: #ffde9e;
+        }
+
+        .highlight-box p {
+            font-size: 1.35rem;
+            font-weight: 500;
+        }
+
+        .note-box {
+            background: #1c3348;
+            border-right: 12px solid #e68a2e;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #ffdeb4;
+        }
+
+        .note-box i {
+            font-size: 3rem;
+            color: #f39c12;
+        }
+
+        .warning-box {
+            background: #2a1f1f;
+            border-right: 12px solid #e64545;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #ffb4b4;
+        }
+
+        .warning-box i {
+            font-size: 3rem;
+            color: #ff6b6b;
+        }
+
+        /* جدول أنيق */
+        .elegant-table {
+            background: #123a58ef;
+            backdrop-filter: blur(6px);
+            border-radius: 3.5rem;
+            overflow: hidden;
+            margin: 3.2rem 0;
+            border: 1px solid #4080c0;
+        }
+
+        .elegant-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.25rem;
+            color: #e1f0ff;
+        }
+
+        .elegant-table th {
+            background: #1f62a0;
+            color: white;
+            font-weight: 700;
+            padding: 1.6rem 1.2rem;
+            font-size: 1.6rem;
+        }
+
+        .elegant-table td {
+            padding: 1.6rem 1.8rem;
+            border-bottom: 1px solid #2c70b0;
+            color: #d4ecff;
+        }
+
+        .elegant-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .elegant-table td:first-child {
+            background: #154d78;
+            font-weight: 700;
+            width: 30%;
+        }
+
+        /* تذييل */
+        .page-footer {
+            margin-top: 5.5rem;
+            padding-top: 3rem;
+            border-top: 5px solid #2f7cc9;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #b9dbff;
+            font-size: 1.25rem;
+        }
+
+        .footer-badge {
+            background: #1f68a8;
+            color: white;
+            padding: 0.6rem 2.2rem;
+            border-radius: 70px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .glass-panel { padding: 2rem; }
+            .hero h1 { font-size: 2.8rem; }
+            .main-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="glass-panel">
+
+        <!-- الرأس -->
+        <div class="hero">
+            <h1>
+                <i class="fas fa-cubes"></i>
+                القالبات (Templates)
+                <i class="fas fa-code"></i>
+            </h1>
+            <div class="hero-sub">
+                <i class="fas fa-magic"></i> البرمجة العامة (Generic Programming) – اكتب مرة واحدة .. استخدم مع أي نوع
+            </div>
+        </div>
+
+        <!-- مقدمة -->
+        <p style="font-size:1.4rem; text-align:center; margin-bottom:2rem;">القالبات (Templates) هي أساس <strong>البرمجة العامة (Generic Programming)</strong> في ++C. تتيح لك كتابة دوال وأصناف تعمل مع أي نوع بيانات دون تكرار الكود. القالبات هي السبب وراء المكتبة القياسية (STL) بكاملها.</p>
+
+        <!-- بطاقات تمهيدية -->
+        <div class="intro-grid">
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-function"></i></div>
+                <h3>قالب دالة</h3>
+                <p>دالة واحدة تعمل مع أنواع متعددة (int, double, string, ...) دون إعادة كتابتها.</p>
+            </div>
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-cube"></i></div>
+                <h3>قالب صنف</h3>
+                <p>صنف واحد يمكن استخدامه لإنشاء كائنات من أي نوع (مثل vector&lt;int&gt;، vector&lt;string&gt;).</p>
+            </div>
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-microchip"></i></div>
+                <h3>metaprogramming</h3>
+                <p>القالبات تمكن من البرمجة أثناء الترجمة (Template Metaprogramming) لحسابات فائقة الكفاءة.</p>
+            </div>
+        </div>
+
+        <!-- أولاً: قوالب الدوال -->
+        <h2 class="main-title"><i class="fas fa-function"></i> أولاً: قوالب الدوال (Function Templates)</h2>
+        <p>قالب الدالة يسمح لك بكتابة دالة واحدة تعمل مع أي نوع. يتم تحديد النوع عبر معامل القالب (template parameter).</p>
+
+        <!-- مثال أساسي -->
+        <h3 class="sub-title"><i class="fas fa-1"></i> مثال: دالة swap عامة</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// تعريف قالب دالة
+template &lt;typename T&gt;
+void mySwap(T& a, T& b) {
+    T temp = a;
+    a = b;
+    b = temp;
+}
+
+int main() {
+    int x = 5, y = 10;
+    mySwap(x, y);  // T يُستنتج تلقائياً كـ int
+    cout &lt;&lt; "x = " &lt;&lt; x &lt;&lt; ", y = " &lt;&lt; y &lt;&lt; endl; // x=10, y=5
+
+    double d1 = 1.5, d2 = 3.7;
+    mySwap(d1, d2);  // T يُستنتج كـ double
+    cout &lt;&lt; "d1 = " &lt;&lt; d1 &lt;&lt; ", d2 = " &lt;&lt; d2 &lt;&lt; endl;
+
+    string s1 = "Ahmed", s2 = "Sara";
+    mySwap(s1, s2);  // T يُستنتج كـ string
+    cout &lt;&lt; "s1 = " &lt;&lt; s1 &lt;&lt; ", s2 = " &lt;&lt; s2 &lt;&lt; endl;
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- مثال مع نوعين مختلفين -->
+        <h3 class="sub-title"><i class="fas fa-2"></i> استخدام عدة معاملات قالب</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// قالب مع نوعين مختلفين
+template &lt;typename T1, typename T2&gt;
+void printPair(T1 a, T2 b) {
+    cout &lt;&lt; "(" &lt;&lt; a &lt;&lt; ", " &lt;&lt; b &lt;&lt; ")" &lt;&lt; endl;
+}
+
+int main() {
+    printPair(5, 3.14);          // T1=int, T2=double
+    printPair("Ahmed", 25);       // T1=const char*, T2=int
+    printPair(true, "نعم");       // T1=bool, T2=const char*
+    return 0;
+}</code></pre>
+        </div>
+
+        <div class="highlight-box">
+            <i class="fas fa-lightbulb"></i>
+            <p><strong>استنتاج الأنواع:</strong> المترجم يستنتج أنواع معاملات القالب من المعاملات الفعلية التي ترسلها للدالة. يمكن أيضاً تحديد الأنواع صراحةً: <code>mySwap&lt;int&gt;(x, y);</code></p>
+        </div>
+
+        <!-- ثانياً: قوالب الأصناف -->
+        <h2 class="main-title"><i class="fas fa-cube"></i> ثانياً: قوالب الأصناف (Class Templates)</h2>
+        <p>قالب الصنف يسمح لك بإنشاء أصناف عامة تعمل مع أي نوع. مثال كلاسيكي: حاوية بسيطة (Box) تخزن قيمة من أي نوع.</p>
+
+        <!-- مثال: صندوق عام -->
+        <h3 class="sub-title"><i class="fas fa-box"></i> مثال: صنف Box&lt;T&gt;</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// تعريف قالب صنف
+template &lt;typename T&gt;
+class Box {
+private:
+    T content;
+public:
+    Box(T value) : content(value) {}
+
+    void set(T value) {
+        content = value;
+    }
+
+    T get() const {
+        return content;
+    }
+
+    void print() const {
+        cout &lt;&lt; "الصندوق يحوي: " &lt;&lt; content &lt;&lt; endl;
+    }
+};
+
+int main() {
+    Box&lt;int&gt; intBox(123);          // صندوق للأعداد
+    intBox.print();
+
+    Box&lt;string&gt; stringBox("مرحبا"); // صندوق للنصوص
+    stringBox.print();
+
+    Box&lt;double&gt; doubleBox(3.14);
+    doubleBox.print();
+
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- مثال مع عدة معاملات -->
+        <h3 class="sub-title"><i class="fas fa-3"></i> صنف مع عدة أنواع</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">template &lt;typename T1, typename T2&gt;
+class Pair {
+private:
+    T1 first;
+    T2 second;
+public:
+    Pair(T1 f, T2 s) : first(f), second(s) {}
+
+    T1 getFirst() const { return first; }
+    T2 getSecond() const { return second; }
+
+    void display() const {
+        cout &lt;&lt; "[" &lt;&lt; first &lt;&lt; ", " &lt;&lt; second &lt;&lt; "]" &lt;&lt; endl;
+    }
+};
+
+int main() {
+    Pair&lt;int, string&gt; student(12345, "أحمد");
+    student.display();
+
+    Pair&lt;string, double&gt; product("حاسوب", 2500.75);
+    product.display();
+
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- قوالب مع قيم افتراضية -->
+        <h3 class="sub-title"><i class="fas fa-sliders"></i> قيم افتراضية لمعاملات القالب</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+template &lt;typename T = int&gt;  // نوع افتراضي: int
+class Container {
+private:
+    T value;
+public:
+    Container(T v) : value(v) {}
+    T get() const { return value; }
+};
+
+int main() {
+    Container&lt;&gt; defaultContainer(100);     // يستخدم int
+    Container&lt;double&gt; doubleContainer(3.14); // يستخدم double
+
+    cout &lt;&lt; defaultContainer.get() &lt;&lt; endl;   // 100
+    cout &lt;&lt; doubleContainer.get() &lt;&lt; endl;    // 3.14
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- معاملات قالب غير نوعية -->
+        <h2 class="main-title"><i class="fas fa-hashtag"></i> معاملات قالب غير نوعية (Non-type Template Parameters)</h2>
+        <p>يمكن أن تكون معاملات القالب قيماً ثابتة (أعداد، مؤشرات، مراجع) وليس فقط أنواعاً. هذا يسمح بإنشاء أصناف ودوال تعتمد على قيم ثابتة وقت الترجمة.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// قالب صفيف حجمه ثابت
+template &lt;typename T, int Size&gt;
+class FixedArray {
+private:
+    T arr[Size];
+public:
+    T& operator[](int index) {
+        return arr[index];
+    }
+
+    int size() const { return Size; }
+};
+
+int main() {
+    FixedArray&lt;int, 5&gt; numbers;  // مصفوفة من 5 أعداد
+    for (int i = 0; i < numbers.size(); i++) {
+        numbers[i] = i * 10;
+    }
+
+    FixedArray&lt;string, 3&gt; names;
+    names[0] = "أحمد";
+    names[1] = "فاطمة";
+    names[2] = "سعيد";
+
+    for (int i = 0; i < 3; i++) {
+        cout &lt;&lt; names[i] &lt;&lt; " ";
+    }
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- تخصص القوالب -->
+        <h2 class="main-title"><i class="fas fa-cut"></i> تخصص القوالب (Template Specialization)</h2>
+        <p>أحياناً نريد سلوكاً مختلفاً لنوع معين. هنا يأتي دور التخصص (specialization). يمكننا تخصيص القالب لأنواع محددة.</p>
+
+        <h3 class="sub-title">تخصص كامل (Full Specialization)</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// قالب عام
+template &lt;typename T&gt;
+class Printer {
+public:
+    void print(T value) {
+        cout &lt;&lt; "القيمة: " &lt;&lt; value &lt;&lt; endl;
+    }
+};
+
+// تخصص كامل للنوع bool
+template &lt;&gt;
+class Printer&lt;bool&gt; {
+public:
+    void print(bool value) {
+        cout &lt;&lt; "القيمة المنطقية: " &lt;&lt; (value ? "صحيح" : "خاطئ") &lt;&lt; endl;
+    }
+};
+
+// تخصص كامل للنوع char
+template &lt;&gt;
+class Printer&lt;char&gt; {
+public:
+    void print(char value) {
+        cout &lt;&lt; "الحرف: '" &lt;&lt; value &lt;&lt; "' - رمز ASCII: " &lt;&lt; (int)value &lt;&lt; endl;
+    }
+};
+
+int main() {
+    Printer&lt;int&gt; p1;
+    p1.print(100);
+
+    Printer&lt;bool&gt; p2;
+    p2.print(true);
+
+    Printer&lt;char&gt; p3;
+    p3.print('A');
+
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- جدول مفاهيم متقدمة -->
+        <h2 class="sub-title"><i class="fas fa-microscope"></i> مفاهيم متقدمة</h2>
+        <div class="elegant-table">
+            <table>
+                <tr><th>المفهوم</th><th>الوصف</th></tr>
+                <tr><td>تخصص جزئي (Partial Specialization)</td><td>تخصيص قالب لأنماط معينة من الأنواع (مثلاً: T* للمؤشرات).</td></tr>
+                <tr><td>قالب القوالب (Template Template Parameters)</td><td>معامل قالب يكون هو نفسه قالباً.</td></tr>
+                <tr><td>Variadic Templates</td><td>قوالب تقبل عدداً متغيراً من المعاملات (C++11).</td></tr>
+                <tr><td>SFINAE</td><td>آلية تسمح باختيار أفضل قالب مناسب دون أخطاء.</td></tr>
+                <tr><td>Concepts (C++20)</td><td>تقييد الأنواع التي يمكن استخدامها مع القالب.</td></tr>
+            </table>
+        </div>
+
+        <!-- تطبيقات عملية -->
+        <h2 class="sub-title"><i class="fas fa-flask"></i> تطبيقات عملية</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2.2rem; margin: 3rem 0;">
+            <div style="flex: 1 1 300px; background: #144b70; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-chart-line"></i> دالة max عامة</h4>
+                <pre style="background:#0b1f2e; color:#daf0ff; padding:1.2rem; border-radius:2rem; direction:ltr;">template &lt;typename T&gt;
+T max(T a, T b) {
+    return (a > b) ? a : b;
+}
+
+// استخدام
+int imax = max(10, 20);
+double dmax = max(3.14, 2.71);</pre>
+            </div>
+            <div style="flex: 1 1 300px; background: #144b70; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-list"></i> قائمة مرتبطة عامة</h4>
+                <pre style="background:#0b1f2e; color:#daf0ff; padding:1.2rem; border-radius:2rem; direction:ltr;">template &lt;typename T&gt;
+class Node {
+public:
+    T data;
+    Node* next;
+    Node(T val) : data(val), next(nullptr) {}
+};
+
+// يمكن إنشاء Node&lt;int&gt;، Node&lt;string&gt;...</pre>
+            </div>
+        </div>
+
+        <!-- تمرين شامل -->
+        <div style="background: #1b5580; border-radius: 3.5rem; padding: 2.8rem; margin: 3.5rem 0;">
+            <h3 style="font-size: 2.4rem; color: #ffffff;"><i class="fas fa-pen"></i> تمرين: اكتب قالب دالة findMax تأخذ مصفوفة (array) وحجمها وتعيد أكبر عنصر. ثم اختبرها مع أنواع مختلفة (int, double, string).</h3>
+            <details style="margin-top:2rem; background: #10344f; border-radius: 2.5rem; padding: 1.8rem;">
+                <summary style="color:#aad0ff;"><i class="fas fa-lightbulb"></i> عرض الحل</summary>
+                <pre style="direction:ltr; background:#0b1f30; color:#fff; padding:1.5rem;">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+template &lt;typename T&gt;
+T findMax(T arr[], int size) {
+    T maxVal = arr[0];
+    for (int i = 1; i < size; i++) {
+        if (arr[i] > maxVal) {
+            maxVal = arr[i];
+        }
+    }
+    return maxVal;
+}
+
+int main() {
+    int intArr[] = {5, 2, 9, 1, 7};
+    double dblArr[] = {3.14, 2.71, 1.618, 0.99};
+    string strArr[] = {"Ahmed", "Sara", "Mohamed", "Fatima"};
+
+    cout &lt;&lt; "أكبر int: " &lt;&lt; findMax(intArr, 5) &lt;&lt; endl;
+    cout &lt;&lt; "أكبر double: " &lt;&lt; findMax(dblArr, 4) &lt;&lt; endl;
+    cout &lt;&lt; "أكبر string: " &lt;&lt; findMax(strArr, 4) &lt;&lt; endl;
+
+    return 0;
+}</pre>
+            </details>
+        </div>
+
+        <!-- خاتمة وأفضل الممارسات -->
+        <div style="background: #124066; border-radius: 3.5rem; padding: 2.8rem; margin-top: 3.5rem;">
+            <i class="fas fa-crown" style="font-size: 3rem; float: right; margin-left: 2rem; color:#ffd966;"></i>
+            <h3 style="font-size:2.5rem; margin-bottom:1.5rem; color:#ffffff;">أفضل الممارسات مع القوالب</h3>
+            <ul style="list-style: none; columns: 2; column-gap: 3rem; font-size:1.3rem; color:#d0ebff;">
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> ضع تعريف القوالب بالكامل في ملفات الرأس (.h أو .hpp).</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> استخدم <code>typename</code> أو <code>class</code> بالتبادل لمعاملات النوع.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> استخدم <code>const T&</code> بدلاً من <code>T</code> للأنواع الكبيرة تجنباً للنسخ.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> افهم أخطاء القوالب (قد تكون طويلة ومعقدة).</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> استخدم Concepts (C++20) لتقييد الأنواع إذا أمكن.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> القوالب تولد كوداً مستقلاً لكل نوع، لذا استخدمها بحكمة لتجنب تضخم الكود.</li>
+            </ul>
+        </div>
+
+        <!-- تذييل -->
+        <div class="page-footer">
+            <span class="footer-badge"><i class="fas fa-copyright"></i> ++C Templates</span>
+            <span><i class="fas fa-cubes"></i> البرمجة العامة (Generic Programming)</span>
+            <span><i class="fas fa-check-double"></i> Function & Class Templates</span>
+        </div>
+
+    </div> <!-- glass-panel -->
+</div> <!-- container -->
+<script>Prism.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeWay | الدوال في C++</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js لتلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0f1e 0%, #1a1f35 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(145deg, #0b1120cc 0%, #1e2740cc 100%);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 5%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border: 2px solid #ffd700;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .header-content {
+            text-align: center;
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-content h1 span {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* عنوان الصفحة */
+        .page-header {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* جدول المحتويات */
+        .table-of-contents {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .table-of-contents h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: rgba(255, 215, 0, 0.15);
+            transform: translateX(-5px);
+        }
+
+        .toc-item i {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .toc-item a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .toc-item:hover a {
+            color: #ffd700;
+        }
+
+        /* أقسام الشرح */
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 30px;
+            padding: 3rem;
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, transparent);
+        }
+
+        .section h3 {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin: 2rem 0 1rem;
+        }
+
+        .section p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* صناديق الكود */
+        .code-box {
+            background: #1a1f2e;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .code-header span {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+        }
+
+        pre {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            background: transparent !important;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 1rem !important;
+        }
+
+        /* شرح الكود */
+        .code-explanation {
+            background: rgba(255, 215, 0, 0.03);
+            border-right: 3px solid #ffd700;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .code-explanation p {
+            margin: 0.5rem 0;
+        }
+
+        .code-explanation i {
+            color: #ffd700;
+            margin-left: 0.5rem;
+        }
+
+        /* بطاقات الدوال */
+        .functions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .function-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .function-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .function-card i {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .function-card h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .function-syntax {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-family: 'Fira Code', monospace;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        /* جدول مقارنة */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        /* صندوق النتائج */
+        .result-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .result-box h4 {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            color: #ffffff;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        /* التمارين التفاعلية */
+        .exercise-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .exercise-box h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .exercise-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            color: #e0e0e0;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .exercise-btn {
+            background: #ffd700;
+            color: #0a0f1e;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0;
+        }
+
+        .exercise-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .exercise-output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace;
+            min-height: 60px;
+        }
+
+        /* أزرار التنقل */
+        .lesson-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+        }
+
+        .nav-lesson-btn {
+            background: transparent;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-lesson-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+            transform: translateX(-5px);
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            background: linear-gradient(145deg, #0b1120cc, #1a1f35cc);
+            backdrop-filter: blur(10px);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: #b0b0b0;
+            text-decoration: none;
+            display: block;
+            margin: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffd700;
+        }
+
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0f1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffaa00;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .section {
+                padding: 2rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-content {
+                margin: 0.5rem 0;
+            }
+
+            .functions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CodeWay</a>
+            <div class="header-content">
+                <h1>شرح <span>الدوال (Functions)</span> في C++</h1>
+            </div>
+            <div style="width: 100px;"></div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- رأس الصفحة -->
+        <div class="page-header">
+            <h1>الدوال في C++</h1>
+            <p>تعلم كيفية تنظيم الكود وإعادة استخدامه باستخدام الدوال في لغة C++ مع شرح مفصل وأمثلة عملية</p>
+        </div>
+
+        <!-- جدول المحتويات -->
+        <div class="table-of-contents">
+            <h2><i class="fas fa-list"></i> محتويات الدرس</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <i class="fas fa-info-circle"></i>
+                    <a href="#intro">مقدمة عن الدوال</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-cube"></i>
+                    <a href="#syntax">تركيب الدالة</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-arrow-left"></i>
+                    <a href="#parameters">المعاملات Parameters</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-undo-alt"></i>
+                    <a href="#return">قيمة الإرجاع Return</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-copy"></i>
+                    <a href="#overloading">تحميل الدوال Overloading</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-box"></i>
+                    <a href="#scope">النطاق Scope</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-tasks"></i>
+                    <a href="#exercises">تمارين وتطبيقات</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم المقدمة -->
+        <section id="intro" class="section">
+            <h2>ما هي الدوال؟</h2>
+            <p>الدوال (Functions) هي كتل برمجية مستقلة تقوم بمهمة محددة. تساعد الدوال في تنظيم الكود، إعادة استخدامه، وتقسيم البرنامج إلى أجزاء صغيرة يسهل إدارتها وصيانتها.</p>
+            
+            <div class="functions-grid">
+                <div class="function-card">
+                    <i class="fas fa-code-branch"></i>
+                    <h3>تقسيم البرنامج</h3>
+                    <p>تساعد في تقسيم البرامج المعقدة إلى أجزاء صغيرة ومستقلة</p>
+                </div>
+                <div class="function-card">
+                    <i class="fas fa-recycle"></i>
+                    <h3>إعادة الاستخدام</h3>
+                    <p>يمكن استدعاء الدالة عدة مرات دون الحاجة لإعادة كتابة الكود</p>
+                </div>
+                <div class="function-card">
+                    <i class="fas fa-wrench"></i>
+                    <h3>سهولة الصيانة</h3>
+                    <p>تسهل عملية تعديل وتصحيح الأخطاء في البرنامج</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم تركيب الدالة -->
+        <section id="syntax" class="section">
+            <h2>تركيب الدالة (Function Syntax)</h2>
+            <p>تتكون الدالة في C++ من عدة أجزاء أساسية:</p>
+
+            <div class="function-syntax">
+                <span style="color: #ffd700;">نوع_البيانات</span> <span style="color: #98fb98;">اسم_الدالة</span>(<span style="color: #87ceeb;">المعاملات</span>) {<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;// جسم الدالة<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #ffd700;">return</span> قيمة;<br>
+                }
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 1: دالة بسيطة</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// تعريف دالة تطبع رسالة ترحيب
+void printWelcome() {
+    cout &lt;&lt; "مرحباً بك في برنامج تعلم الدوال!" &lt;&lt; endl;
+    cout &lt;&lt; "هذه دالة بسيطة لا تأخذ معاملات ولا ترجع قيمة" &lt;&lt; endl;
+}
+
+int main() {
+    // استدعاء الدالة
+    printWelcome();
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-explanation">
+                <p><i class="fas fa-check-circle"></i> <strong>شرح الأجزاء:</strong></p>
+                <p><strong>void</strong>: نوع البيانات (لا ترجع قيمة)</p>
+                <p><strong>printWelcome</strong>: اسم الدالة</p>
+                <p><strong>()</strong>: لا تأخذ معاملات</p>
+                <p><strong>{}</strong>: جسم الدالة يحتوي على الأوامر</p>
+            </div>
+        </section>
+
+        <!-- قسم المعاملات -->
+        <section id="parameters" class="section">
+            <h2>المعاملات (Parameters)</h2>
+            <p>المعاملات هي قيم نمررها للدالة لتستخدمها في عملياتها.</p>
+
+            <h3>أنواع تمرير المعاملات:</h3>
+            
+            <table class="comparison-table">
+                <tr>
+                    <th>النوع</th>
+                    <th>الوصف</th>
+                    <th>مثال</th>
+                </tr>
+                <tr>
+                    <td>تمرير بالقيمة (Pass by Value)</td>
+                    <td>يتم نسخ القيمة، والتغييرات لا تؤثر على الأصل</td>
+                    <td>void func(int x)</td>
+                </tr>
+                <tr>
+                    <td>تمرير بمرجع (Pass by Reference)</td>
+                    <td>يتم تمرير العنوان، والتغييرات تؤثر على الأصل</td>
+                    <td>void func(int &x)</td>
+                </tr>
+                <tr>
+                    <td>تمرير بمرجع ثابت (Const Reference)</td>
+                    <td>للقراءة فقط، لا يمكن التعديل</td>
+                    <td>void func(const int &x)</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 2: دوال بمعاملات مختلفة</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// دالة تجمع رقمين (تمرير بالقيمة)
+int add(int a, int b) {
+    return a + b;
+}
+
+// دالة تضاعف القيمة (تمرير بمرجع)
+void doubleValue(int &x) {
+    x *= 2;
+}
+
+// دالة تطبع قيمة (تمرير بمرجع ثابت)
+void printValue(const int &x) {
+    cout &lt;&lt; "القيمة: " &lt;&lt; x &lt;&lt; endl;
+    // x += 5; // هذا سيعطي خطأ لأن x ثابت
+}
+
+int main() {
+    int num1 = 10, num2 = 20;
+    
+    // استدعاء دالة الجمع
+    int sum = add(num1, num2);
+    cout &lt;&lt; "مجموع " &lt;&lt; num1 &lt;&lt; " و " &lt;&lt; num2 &lt;&lt; " = " &lt;&lt; sum &lt;&lt; endl;
+    
+    // استدعاء دالة المضاعفة
+    cout &lt;&lt; "قبل المضاعفة: " &lt;&lt; num1 &lt;&lt; endl;
+    doubleValue(num1);
+    cout &lt;&lt; "بعد المضاعفة: " &lt;&lt; num1 &lt;&lt; endl;
+    
+    // استدعاء دالة الطباعة
+    printValue(num2);
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="result-box">
+                <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                <div class="result-value">
+                    مجموع 10 و 20 = 30<br>
+                    قبل المضاعفة: 10<br>
+                    بعد المضاعفة: 20<br>
+                    القيمة: 20
+                </div>
+            </div>
+
+            <h3>المعاملات الافتراضية (Default Parameters)</h3>
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 3: معاملات افتراضية</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// دالة بمعاملات افتراضية
+void displayInfo(string name, int age = 0, string country = "غير محدد") {
+    cout &lt;&lt; "الاسم: " &lt;&lt; name &lt;&lt; endl;
+    cout &lt;&lt; "العمر: " &lt;&lt; age &lt;&lt; endl;
+    cout &lt;&lt; "البلد: " &lt;&lt; country &lt;&lt; endl;
+    cout &lt;&lt; "-------------------" &lt;&lt; endl;
+}
+
+int main() {
+    displayInfo("أحمد", 25, "مصر");
+    displayInfo("سارة", 22);        // ستستخدم القيمة الافتراضية للبلد
+    displayInfo("محمد");             // ستستخدم القيم الافتراضية للعمر والبلد
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم قيمة الإرجاع -->
+        <section id="return" class="section">
+            <h2>قيمة الإرجاع (Return Value)</h2>
+            <p>يمكن للدوال إرجاع قيم باستخدام الكلمة المفتاحية return.</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 4: دوال تُرجع قيماً مختلفة</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// دالة تُرجع مجموع رقمين
+int getSum(int a, int b) {
+    return a + b;
+}
+
+// دالة تُرجع أكبر رقمين
+int getMax(int a, int b) {
+    if (a > b)
+        return a;
+    else
+        return b;
+}
+
+// دالة تُرجع قيمة مطلقة
+double absolute(double x) {
+    if (x < 0)
+        return -x;
+    return x;
+}
+
+// دالة تُرجع true إذا كان الرقم زوجياً
+bool isEven(int num) {
+    return num % 2 == 0;
+}
+
+int main() {
+    int x = 15, y = 20;
+    
+    cout &lt;&lt; "مجموع " &lt;&lt; x &lt;&lt; " و " &lt;&lt; y &lt;&lt; " = " &lt;&lt; getSum(x, y) &lt;&lt; endl;
+    cout &lt;&lt; "أكبر رقم: " &lt;&lt; getMax(x, y) &lt;&lt; endl;
+    cout &lt;&lt; "القيمة المطلقة لـ -7.5 = " &lt;&lt; absolute(-7.5) &lt;&lt; endl;
+    cout &lt;&lt; "هل الرقم 8 زوجي؟ " &lt;&lt; boolalpha &lt;&lt; isEven(8) &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم تحميل الدوال -->
+        <section id="overloading" class="section">
+            <h2>تحميل الدوال (Function Overloading)</h2>
+            <p>يمكن تعريف عدة دوال بنفس الاسم ولكن بمعاملات مختلفة (عدداً أو نوعاً).</p>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 5: تحميل الدوال</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// دالة لجمع رقمين صحيحين
+int add(int a, int b) {
+    cout &lt;&lt; "جمع أعداد صحيحة: ";
+    return a + b;
+}
+
+// دالة لجمع ثلاثة أرقام صحيحة
+int add(int a, int b, int c) {
+    cout &lt;&lt; "جمع ثلاثة أعداد: ";
+    return a + b + c;
+}
+
+// دالة لجمع رقمين عشريين
+double add(double a, double b) {
+    cout &lt;&lt; "جمع أعداد عشرية: ";
+    return a + b;
+}
+
+// دالة لدمج سلسلتين نصيتين
+string add(string a, string b) {
+    cout &lt;&lt; "دمج نصوص: ";
+    return a + " " + b;
+}
+
+int main() {
+    cout &lt;&lt; add(5, 3) &lt;&lt; endl;
+    cout &lt;&lt; add(5, 3, 2) &lt;&lt; endl;
+    cout &lt;&lt; add(5.5, 3.7) &lt;&lt; endl;
+    cout &lt;&lt; add("Hello", "World") &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="result-box">
+                <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                <div class="result-value">
+                    جمع أعداد صحيحة: 8<br>
+                    جمع ثلاثة أعداد: 10<br>
+                    جمع أعداد عشرية: 9.2<br>
+                    دمج نصوص: Hello World
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم النطاق -->
+        <section id="scope" class="section">
+            <h2>النطاق (Scope)</h2>
+            <p>النطاق يحدد أين يمكن الوصول إلى المتغيرات في البرنامج.</p>
+
+            <table class="comparison-table">
+                <tr>
+                    <th>النوع</th>
+                    <th>الوصف</th>
+                    <th>النطاق</th>
+                </tr>
+                <tr>
+                    <td>متغير محلي (Local)</td>
+                    <td>معرف داخل دالة</td>
+                    <td>داخل الدالة فقط</td>
+                </tr>
+                <tr>
+                    <td>متغير عام (Global)</td>
+                    <td>معرف خارج جميع الدوال</td>
+                    <td>جميع أنحاء البرنامج</td>
+                </tr>
+                <tr>
+                    <td>متغير ثابت (Static)</td>
+                    <td>يحتفظ بقيمته بين استدعاءات الدالة</td>
+                    <td>داخل الدالة ولكن قيمته محفوظة</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 6: النطاق في الدوال</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+// متغير عام
+int globalVar = 100;
+
+void demonstrateScope() {
+    // متغير محلي
+    int localVar = 50;
+    
+    // متغير ثابت - يحتفظ بقيمته
+    static int staticVar = 0;
+    staticVar++;
+    
+    cout &lt;&lt; "المتغير العام: " &lt;&lt; globalVar &lt;&lt; endl;
+    cout &lt;&lt; "المتغير المحلي: " &lt;&lt; localVar &lt;&lt; endl;
+    cout &lt;&lt; "المتغير الثابت: " &lt;&lt; staticVar &lt;&lt; endl;
+    cout &lt;&lt; "-------------------" &lt;&lt; endl;
+}
+
+int main() {
+    demonstrateScope();  // staticVar = 1
+    demonstrateScope();  // staticVar = 2
+    demonstrateScope();  // staticVar = 3
+    
+    // cout << localVar; // خطأ - لا يمكن الوصول لمتغير محلي خارج الدالة
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- تمارين وتطبيقات -->
+        <section id="exercises" class="section">
+            <h2>تمارين وتطبيقات عملية</h2>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 1: آلة حاسبة متقدمة</h3>
+                <p>قم بإنشاء دوال لعملية آلة حاسبة متكاملة:</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;iomanip&gt;
+using namespace std;
+
+// دوال العمليات الحسابية
+double add(double a, double b) { return a + b; }
+double subtract(double a, double b) { return a - b; }
+double multiply(double a, double b) { return a * b; }
+double divide(double a, double b) { 
+    if (b != 0) return a / b;
+    else return 0;
+}
+int modulus(int a, int b) {
+    if (b != 0) return a % b;
+    else return 0;
+}
+
+// دالة عرض القائمة
+void showMenu() {
+    cout &lt;&lt; "\n=== الآلة الحاسبة ===\n";
+    cout &lt;&lt; "1. جمع\n";
+    cout &lt;&lt; "2. طرح\n";
+    cout &lt;&lt; "3. ضرب\n";
+    cout &lt;&lt; "4. قسمة\n";
+    cout &lt;&lt; "5. باقي القسمة\n";
+    cout &lt;&lt; "0. خروج\n";
+    cout &lt;&lt; "اختيارك: ";
+}
+
+int main() {
+    int choice;
+    double num1, num2;
+    
+    do {
+        showMenu();
+        cin >> choice;
+        
+        if (choice == 0) break;
+        
+        cout &lt;&lt; "أدخل الرقم الأول: ";
+        cin >> num1;
+        cout &lt;&lt; "أدخل الرقم الثاني: ";
+        cin >> num2;
+        
+        cout &lt;&lt; fixed &lt;&lt; setprecision(2);
+        cout &lt;&lt; "\nالنتيجة: ";
+        
+        switch(choice) {
+            case 1:
+                cout &lt;&lt; add(num1, num2) &lt;&lt; endl;
+                break;
+            case 2:
+                cout &lt;&lt; subtract(num1, num2) &lt;&lt; endl;
+                break;
+            case 3:
+                cout &lt;&lt; multiply(num1, num2) &lt;&lt; endl;
+                break;
+            case 4:
+                if (num2 != 0)
+                    cout &lt;&lt; divide(num1, num2) &lt;&lt; endl;
+                else
+                    cout &lt;&lt; "خطأ: القسمة على صفر" &lt;&lt; endl;
+                break;
+            case 5:
+                if ((int)num2 != 0)
+                    cout &lt;&lt; modulus((int)num1, (int)num2) &lt;&lt; endl;
+                else
+                    cout &lt;&lt; "خطأ: القسمة على صفر" &lt;&lt; endl;
+                break;
+            default:
+                cout &lt;&lt; "اختيار غير صحيح" &lt;&lt; endl;
+        }
+        cout &lt;&lt; "-------------------" &lt;&lt; endl;
+        
+    } while (choice != 0);
+    
+    cout &lt;&lt; "شكراً لاستخدام الآلة الحاسبة!" &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 2: دوال رياضية</h3>
+                <p>قم بإنشاء دوال لحساب العوامل الرياضية المختلفة:</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cmath&gt;
+using namespace std;
+
+// دالة حساب المضروب (Factorial)
+long long factorial(int n) {
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
+}
+
+// دالة التحقق من أولية الرقم
+bool isPrime(int n) {
+    if (n <= 1) return false;
+    for (int i = 2; i <= sqrt(n); i++) {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
+
+// دالة حساب الأس
+double power(double base, int exponent) {
+    double result = 1;
+    for (int i = 0; i < abs(exponent); i++) {
+        result *= base;
+    }
+    if (exponent < 0) return 1 / result;
+    return result;
+}
+
+// دالة مجموع الأرقام
+int sumOfDigits(int n) {
+    int sum = 0;
+    n = abs(n);
+    while (n > 0) {
+        sum += n % 10;
+        n /= 10;
+    }
+    return sum;
+}
+
+int main() {
+    int num;
+    
+    cout &lt;&lt; "أدخل رقماً: ";
+    cin >> num;
+    
+    cout &lt;&lt; "المضروب: " &lt;&lt; factorial(num) &lt;&lt; endl;
+    cout &lt;&lt; "هل الرقم أولي؟ " &lt;&lt; boolalpha &lt;&lt; isPrime(num) &lt;&lt; endl;
+    cout &lt;&lt; "2^" &lt;&lt; num &lt;&lt; " = " &lt;&lt; power(2, num) &lt;&lt; endl;
+    cout &lt;&lt; "مجموع أرقام " &lt;&lt; num &lt;&lt; " = " &lt;&lt; sumOfDigits(num) &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- تمرين تفاعلي -->
+            <div class="exercise-box">
+                <h3><i class="fas fa-laptop-code"></i> جرب بنفسك</h3>
+                <p>أدخل رقمين وجرب عمليات الدوال المختلفة:</p>
+                
+                <input type="number" id="num1" class="exercise-input" placeholder="أدخل الرقم الأول" value="5">
+                <input type="number" id="num2" class="exercise-input" placeholder="أدخل الرقم الثاني" value="3">
+                
+                <button class="exercise-btn" onclick="testFunctions()">تشغيل الدوال</button>
+                
+                <div id="output" class="exercise-output">
+                    النتائج ستظهر هنا...
+                </div>
+            </div>
+        </section>
+
+        <!-- أزرار التنقل بين الدروس -->
+        <div class="lesson-navigation">
+            <a href="lesson-operators.html" class="nav-lesson-btn">
+                <i class="fas fa-arrow-right"></i> الدرس السابق: العوامل الحسابية والمنطقية
+            </a>
+            <a href="lesson-arrays.html" class="nav-lesson-btn">
+                الدرس التالي: المصفوفات <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CodeWay</h3>
+                <p>منصة عربية متكاملة لتعليم البرمجة</p>
+            </div>
+            <div class="footer-section">
+                <h3>روابط مفيدة</h3>
+                <a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> الدروس</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> المشاريع</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> عن المنصة</a>
+            </div>
+            <div class="footer-section">
+                <h3>تابعنا</h3>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+                <a href="#"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem; color: #808080;">
+            <p>© 2024 CodeWay - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+
+    <script>
+        // شريط التقدم
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress").style.width = scrolled + "%";
+        };
+
+        // نسخ الكود
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = "تم النسخ!";
+                setTimeout(() => {
+                    button.textContent = "نسخ";
+                }, 2000);
+            });
+        }
+
+        // التمرين التفاعلي
+        function testFunctions() {
+            const num1 = parseFloat(document.getElementById('num1').value);
+            const num2 = parseFloat(document.getElementById('num2').value);
+            const output = document.getElementById('output');
+            
+            if (isNaN(num1) || isNaN(num2)) {
+                output.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #ff4444;"></i> الرجاء إدخال أرقام صحيحة';
+                return;
+            }
+            
+            // دوال للاختبار
+            const add = (a, b) => a + b;
+            const subtract = (a, b) => a - b;
+            const multiply = (a, b) => a * b;
+            const divide = (a, b) => b !== 0 ? (a / b).toFixed(2) : 'غير معرف';
+            const power = (a, b) => Math.pow(a, b);
+            const max = (a, b) => Math.max(a, b);
+            const min = (a, b) => Math.min(a, b);
+            
+            output.innerHTML = `
+                <i class="fas fa-calculator" style="color: #ffd700;"></i> <strong>نتائج الدوال:</strong><br>
+                <br>
+                <i class="fas fa-plus-circle" style="color: #ffd700;"></i> الجمع: ${num1} + ${num2} = ${add(num1, num2)}<br>
+                <i class="fas fa-minus-circle" style="color: #ffd700;"></i> الطرح: ${num1} - ${num2} = ${subtract(num1, num2)}<br>
+                <i class="fas fa-times-circle" style="color: #ffd700;"></i> الضرب: ${num1} × ${num2} = ${multiply(num1, num2)}<br>
+                <i class="fas fa-divide-circle" style="color: #ffd700;"></i> القسمة: ${num1} ÷ ${num2} = ${divide(num1, num2)}<br>
+                <i class="fas fa-arrow-up" style="color: #ffd700;"></i> الأس: ${num1}^${num2} = ${power(num1, num2)}<br>
+                <i class="fas fa-arrow-up" style="color: #ffd700;"></i> ${num2}^${num1} = ${power(num2, num1)}<br>
+                <i class="fas fa-maximize" style="color: #ffd700;"></i> القيمة العظمى: ${max(num1, num2)}<br>
+                <i class="fas fa-minimize" style="color: #ffd700;"></i> القيمة الصغرى: ${min(num1, num2)}<br>
+                <hr style="border-color: #ffd700; margin: 10px 0;">
+                <i class="fas fa-check-circle" style="color: #00ff00;"></i> تم تنفيذ الدوال بنجاح!
+            `;
+        }
+
+        // تمرير سلس للروابط الداخلية
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

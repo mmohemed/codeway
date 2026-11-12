@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>++C الهياكل (Structures) في لغة | شرح شامل ومتكامل</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(145deg, #f0f9ff, #e6f2fc);
+            color: #153448;
+            line-height: 1.7;
+            padding: 2rem 1.8rem;
+            direction: rtl;
+        }
+
+        .page {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الحاوية الرئيسية بتأثير زجاجي */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-radius: 5rem;
+            box-shadow: 0 45px 90px -25px #0a3552, 0 0 0 2px rgba(255,255,255,0.9);
+            padding: 3.2rem 3.8rem;
+            border: 1px solid rgba(255,255,255,0.9);
+        }
+
+        /* الرأس */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 4.2rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #144a6f, #1f6190, #2f7eb8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero h1 i {
+            background: #1d5a86;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 130px;
+            font-size: 2.8rem;
+            -webkit-text-fill-color: white;
+            box-shadow: 0 18px 35px #0c3f62;
+        }
+
+        .hero-sub {
+            font-size: 1.7rem;
+            font-weight: 500;
+            background: #ddedffcc;
+            padding: 0.9rem 3.2rem;
+            border-radius: 90px;
+            display: inline-block;
+            margin-top: 1.6rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid white;
+        }
+
+        /* شبكة تمهيدية */
+        .grid-intro {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .grid-item {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 3.2rem;
+            padding: 2.3rem 2.2rem;
+            border: 1px solid rgba(255,255,255,0.95);
+            box-shadow: 0 20px 40px -15px #2b608a;
+            transition: 0.3s;
+        }
+
+        .grid-item:hover {
+            background: #fffffff0;
+            transform: translateY(-8px);
+            border-color: #7fb4e0;
+        }
+
+        .item-icon {
+            background: #1f5a85;
+            width: 85px;
+            height: 85px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            color: white;
+            margin-bottom: 1.7rem;
+        }
+
+        .grid-item h3 {
+            font-size: 2.3rem;
+            font-weight: 700;
+            color: #124d75;
+            margin-bottom: 1.2rem;
+        }
+
+        .grid-item p {
+            font-size: 1.25rem;
+            color: #235f88;
+        }
+
+        /* عناوين رئيسية */
+        .main-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 4rem 0 2.5rem 0;
+            position: relative;
+            display: inline-block;
+        }
+        .main-title:after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            right: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #1f6da3, #68abe0, #cae1ff);
+            border-radius: 10px;
+        }
+
+        .sub-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 3rem 0 2rem 0;
+            color: #0f5480;
+            border-right: 12px solid #267bb3;
+            padding-right: 2rem;
+        }
+
+        /* كتلة الكود */
+        .code-box {
+            background: #1d3347;
+            border-radius: 3.2rem;
+            padding: 2.5rem;
+            margin: 2.8rem 0;
+            box-shadow: 0 30px 45px -18px #0a2638, inset 0 1px 12px #a6c9f0;
+            border: 1px solid #4788bb;
+        }
+
+        .code-box pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+        }
+
+        /* بطاقات مميزة */
+        .highlight-box {
+            background: linear-gradient(115deg, #1a4b70, #1f6493);
+            color: white;
+            border-radius: 3.2rem;
+            padding: 2.5rem 3.2rem;
+            margin: 3rem 0;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            box-shadow: 0 28px 45px -15px #13456b;
+        }
+
+        .highlight-box i {
+            font-size: 3.5rem;
+            color: #ffe29c;
+        }
+
+        .highlight-box p {
+            font-size: 1.35rem;
+            font-weight: 500;
+        }
+
+        .warning-box {
+            background: #fef0e0;
+            border-right: 12px solid #e09437;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+        }
+
+        .warning-box i {
+            font-size: 3rem;
+            color: #c87d1e;
+        }
+
+        /* جدول أنيق */
+        .elegant-table {
+            background: #ffffffef;
+            backdrop-filter: blur(6px);
+            border-radius: 3.5rem;
+            overflow: hidden;
+            margin: 3.2rem 0;
+            border: 1px solid #c4dcf7;
+        }
+
+        .elegant-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.25rem;
+        }
+
+        .elegant-table th {
+            background: #1f5f8f;
+            color: white;
+            font-weight: 700;
+            padding: 1.6rem 1.2rem;
+            font-size: 1.6rem;
+        }
+
+        .elegant-table td {
+            padding: 1.6rem 1.8rem;
+            border-bottom: 1px solid #bed8f5;
+            color: #154a70;
+        }
+
+        .elegant-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .elegant-table td:first-child {
+            background: #e6f2ff;
+            font-weight: 700;
+            width: 35%;
+        }
+
+        /* تذييل */
+        .page-footer {
+            margin-top: 5.5rem;
+            padding-top: 3rem;
+            border-top: 5px solid #c8dfff;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #1f608b;
+            font-size: 1.25rem;
+        }
+
+        .footer-badge {
+            background: #1f608b;
+            color: white;
+            padding: 0.6rem 2.2rem;
+            border-radius: 70px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .glass-panel { padding: 2rem; }
+            .hero h1 { font-size: 2.8rem; }
+            .main-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="glass-panel">
+
+        <!-- الرأس -->
+        <div class="hero">
+            <h1>
+                <i class="fas fa-cubes"></i>
+                الهياكل (Structures) في ++C
+                <i class="fas fa-archive"></i>
+            </h1>
+            <div class="hero-sub">
+                <i class="fas fa-object-group"></i> تجميع البيانات – بناء أنواع مخصصة
+            </div>
+        </div>
+
+        <!-- بطاقات تعريفية -->
+        <div class="grid-intro">
+            <div class="grid-item">
+                <div class="item-icon"><i class="fas fa-layer-group"></i></div>
+                <h3>تجميع البيانات</h3>
+                <p>الهيكل (struct) يسمح بتجميع عناصر مختلفة (متغيرات) تحت اسم واحد، لتكوين نوع بيانات مركب.</p>
+            </div>
+            <div class="grid-item">
+                <div class="item-icon"><i class="fas fa-puzzle-piece"></i></div>
+                <h3>نوع مخصص</h3>
+                <p>يمكن تعريف أنواع جديدة تناسب المشكلة، مثل: طالب، موظف، نقطة في المستوى، إلخ.</p>
+            </div>
+            <div class="grid-item">
+                <div class="item-icon"><i class="fas fa-sitemap"></i></div>
+                <h3>قابلية التوسع</h3>
+                <p>الهياكل أساس بناء البرامج الكبيرة؛ يمكن إضافة دوال (طرق) إليها (في ++C).</p>
+            </div>
+        </div>
+
+        <!-- 1. تعريف الهيكل الأساسي -->
+        <h2 class="main-title"><i class="fas fa-pen-ruler"></i> 1. تعريف الهيكل (struct)</h2>
+        <p style="font-size:1.3rem;">يتم تعريف الهيكل باستخدام الكلمة المفتاحية <code>struct</code> متبوعة باسم الهيكل وأعضاءه (members) بين قوسين متعرجين.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">// تعريف هيكل "نقطة" في المستوى الديكارتي
+struct Point {
+    int x;   // الإحداثي x
+    int y;   // الإحداثي y
+};  // انتبه للفاصلة المنقوطة بعد القوس }
+
+// تعريف هيكل "طالب"
+struct Student {
+    string name;
+    int age;
+    double gpa;
+};
+
+// يمكن وضع الهيكل داخل أو خارج الدالة main</code></pre>
+        </div>
+        <div class="warning-box">
+            <i class="fas fa-exclamation-circle"></i>
+            <div><strong>ملاحظة:</strong> لا تنسَ كتابة الفاصلة المنقوطة <code>;</code> بعد القوس المغلق للهيكل، لأنها جزء من الجملة.</div>
+        </div>
+
+        <!-- 2. إنشاء متغيرات من الهيكل والوصول للأعضاء -->
+        <h2 class="main-title"><i class="fas fa-hand-pointer"></i> 2. إنشاء متغيرات والوصول للأعضاء</h2>
+        <p>بعد تعريف الهيكل، يمكن إنشاء متغيرات منه والوصول إلى أعضائها باستخدام النقطة <code>.</code>.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">int main() {
+    // إنشاء متغير من نوع Point
+    Point p1;          // قيم غير محددة (تحتوي على بيانات عشوائية)
+    p1.x = 10;         // تعيين قيمة للعضو x
+    p1.y = -5;         // تعيين قيمة للعضو y
+
+    // إنشاء وتهيئة مباشرة (Aggregate initialization)
+    Point p2 = {20, 30};   // p2.x = 20, p2.y = 30
+
+    // هيكل Student
+    Student s1;
+    s1.name = "أحمد";
+    s1.age = 20;
+    s1.gpa = 3.75;
+
+    Student s2 = {"فاطمة", 22, 3.9};
+
+    // طباعة القيم
+    cout &lt;&lt; s1.name &lt;&lt; " عمره: " &lt;&lt; s1.age;
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 3. تهيئة الهياكل (طرق متعددة) -->
+        <h2 class="main-title"><i class="fas fa-fill-drip"></i> 3. تهيئة الهياكل</h2>
+        <p>توفر ++C عدة طرق لتهيئة الهياكل، خاصة مع المعايير الحديثة.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">struct Product {
+    string name;
+    double price;
+    int quantity;
+};
+
+int main() {
+    // 1. تهيئة تقليدية (حسب ترتيب الأعضاء)
+    Product p1 = {"حاسوب", 2500.0, 10};
+
+    // 2. تهيئة باستخدام قوسين (Uniform initialization) C++11
+    Product p2 {"هاتف", 1200.0, 25};
+
+    // 3. تهيئة مع حذف بعض الأعضاء (الباقي يُصفر)
+    Product p3 = {"كتاب"};  // price = 0, quantity = 0
+
+    // 4. Designated initializers (C++20) : تسمية العضو
+    // Product p4 = {.name = "قلم", .price = 2.5, .quantity = 100};
+
+    // 5. بعد التعريف يمكن تعيين قيم للأعضاء بشكل منفصل
+    Product p5;
+    p5.name = "ممحاة";
+    p5.price = 1.0;
+    p5.quantity = 50;
+}</code></pre>
+        </div>
+
+        <!-- بطاقة: الفرق بين struct و class -->
+        <div class="highlight-box">
+            <i class="fas fa-code-branch"></i>
+            <p><strong>struct مقابل class في ++C:</strong> الفرق الوحيد هو أن أعضاء struct عامة (public) بشكل افتراضي، بينما class خاصة (private). ما عدا ذلك، يمكن للـ struct أن يحتوي على دوال ومُنشئات وكل ميزات class.</p>
+        </div>
+
+        <!-- 4. الهياكل مع الدوال (تمرير وإرجاع) -->
+        <h2 class="main-title"><i class="fas fa-exchange-alt"></i> 4. تمرير الهياكل للدوال</h2>
+        <p>يمكن تمرير الهياكل للدوال بالقيمة (يتم النسخ) أو بالمرجع (لتجنب النسخ والتعديل).</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">struct Rectangle {
+    double width;
+    double height;
+};
+
+// تمرير بالقيمة (يتم نسخ الهيكل) – مناسبة للقراءة فقط
+double areaByValue(Rectangle rect) {
+    return rect.width * rect.height;
+}
+
+// تمرير بالمرجع (لا نسخ، أسرع للهياكل الكبيرة)
+double areaByRef(const Rectangle &rect) {
+    return rect.width * rect.height; // const يضمن عدم التعديل
+}
+
+// تمرير بالمرجع للتعديل على الهيكل الأصلي
+void scale(Rectangle &rect, double factor) {
+    rect.width *= factor;
+    rect.height *= factor;
+}
+
+int main() {
+    Rectangle r = {5.0, 3.0};
+    cout &lt;&lt; "المساحة: " &lt;&lt; areaByRef(r);
+    scale(r, 2.0);  // الآن r.width = 10.0, r.height = 6.0
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 5. المؤشرات والهياكل -->
+        <h2 class="main-title"><i class="fas fa-arrow-pointer"></i> 5. المؤشرات إلى الهياكل</h2>
+        <p>يمكن استخدام المؤشرات مع الهياكل، ويتم الوصول للأعضاء باستخدام <code>-&gt;</code>.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">struct Book {
+    string title;
+    string author;
+    int pages;
+};
+
+int main() {
+    Book b1 = {"C++ Primer", "Lippman", 900};
+    Book *ptr = &b1;
+
+    // الوصول باستخدام ->
+    cout &lt;&lt; ptr->title;   // تعادل (*ptr).title
+    ptr->pages = 950;     // تعديل قيمة pages
+
+    // إنشاء هيكل ديناميكياً
+    Book *pBook = new Book{"Clean Code", "Robert Martin", 400};
+    cout &lt;&lt; pBook->author;
+    delete pBook;
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- جدول مقارنة: struct vs array -->
+        <h2 class="sub-title"><i class="fas fa-table-cells-large"></i> الفرق بين الهيكل والمصفوفة</h2>
+        <div class="elegant-table">
+            <table>
+                <tr><th>الخاصية</th><th>الهيكل (struct)</th><th>المصفوفة (array)</th></tr>
+                <tr><td>نوع البيانات</td><td>يمكن أن يضم أنواعاً مختلفة (int, string, double...)</td><td>جميع العناصر من نفس النوع</td></tr>
+                <tr><td>الوصول إلى العناصر</td><td>باستخدام اسم العضو (p.x)</td><td>باستخدام الفهرس (arr[0])</td></tr>
+                <tr><td>الحجم</td><td>عدد الأعضاء ثابت وقت التعريف</td><td>عدد العناصر ثابت (في المصفوفات الثابتة)</td></tr>
+                <tr><td>الاستخدام</td><td>تمثيل كيان (طالب، سيارة)</td><td>تمثيل قائمة من العناصر المتشابهة</td></tr>
+            </table>
+        </div>
+
+        <!-- 6. الهياكل المتداخلة -->
+        <h2 class="main-title"><i class="fas fa-layer-group"></i> 6. الهياكل المتداخلة (Nested Structures)</h2>
+        <p>يمكن أن يحتوي الهيكل على أعضاء من نوع هيكل آخر.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">struct Address {
+    string city;
+    string street;
+    int building;
+};
+
+struct Person {
+    string name;
+    int age;
+    Address addr;   // هيكل متداخل
+};
+
+int main() {
+    Person p = {"محمد", 30, {"القاهرة", "التحرير", 15}};
+    cout &lt;&lt; p.name &lt;&lt; " يسكن في " &lt;&lt; p.addr.city;
+    p.addr.building = 20; // تعديل العنوان
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- تطبيقات عملية -->
+        <h2 class="sub-title"><i class="fas fa-flask"></i> تطبيقات عملية مع الهياكل</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2.2rem; margin: 3rem 0;">
+            <div style="flex: 1 1 300px; background: #e2f0fd; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-clock"></i> هيكل الوقت</h4>
+                <pre style="background:#163a4f; color:#ecf7ff; padding:1.2rem; border-radius:2rem; direction:ltr;">struct Time {
+    int hours;
+    int minutes;
+    int seconds;
+};
+
+Time t1 = {10, 30, 0};
+// دالة لجمع وقتين
+Time add(Time a, Time b) { ... }</pre>
+            </div>
+            <div style="flex: 1 1 300px; background: #e2f0fd; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-car"></i> هيكل سيارة</h4>
+                <pre style="background:#163a4f; color:#ecf7ff; padding:1.2rem; border-radius:2rem; direction:ltr;">struct Car {
+    string brand;
+    string model;
+    int year;
+    double price;
+};
+
+Car myCar = {"Toyota", 
+             "Corolla", 
+             2022, 
+             15000};</pre>
+            </div>
+        </div>
+
+        <!-- تمرين شامل -->
+        <div style="background: #d1e6fe; border-radius: 3.5rem; padding: 2.8rem; margin: 3.5rem 0;">
+            <h3 style="font-size: 2.4rem; color: #0b4570;"><i class="fas fa-pen"></i> تمرين: أنشئ هيكل "Student" يحتوي على الاسم، العمر، والدرجة. اكتب دالة تقبل مرجعاً إلى Student وتزيد عمره بمقدار 1.</h3>
+            <details style="margin-top:2rem; background: white; border-radius: 2.5rem; padding: 1.8rem;">
+                <summary><i class="fas fa-lightbulb"></i> عرض الحل</summary>
+                <pre style="direction:ltr; background:#1d3347; color:#fff; padding:1.5rem;">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+struct Student {
+    string name;
+    int age;
+    double grade;
+};
+
+void increaseAge(Student &s) {
+    s.age++;
+}
+
+int main() {
+    Student s = {"سارة", 20, 88.5};
+    increaseAge(s);
+    cout &lt;&lt; s.name &lt;&lt; " عمرها الآن: " &lt;&lt; s.age; // 21
+    return 0;
+}</pre>
+            </details>
+        </div>
+
+        <!-- خاتمة وأفضل الممارسات -->
+        <div style="background: #16486b; color: white; border-radius: 3.5rem; padding: 2.8rem; margin-top: 3.5rem;">
+            <i class="fas fa-gem" style="font-size: 3rem; float: right; margin-left: 2rem;"></i>
+            <h3 style="font-size:2.5rem; margin-bottom:1.5rem;">أفضل الممارسات</h3>
+            <ul style="list-style: none; columns: 2; column-gap: 3rem; font-size:1.3rem;">
+                <li><i class="fas fa-check-circle" style="color:#b3dcff;"></i> اجعل أسماء الأعضاء واضحة ومعبرة.</li>
+                <li><i class="fas fa-check-circle" style="color:#b3dcff;"></i> استخدم التهيئة الموحدة {} لتجنب الأخطاء.</li>
+                <li><i class="fas fa-check-circle" style="color:#b3dcff;"></i> مرر الهياكل الكبيرة بالمرجع (const) لتحسين الأداء.</li>
+                <li><i class="fas fa-check-circle" style="color:#b3dcff;"></i> استخدم struct عندما تكون جميع الأعضاء عامة (public).</li>
+                <li><i class="fas fa-check-circle" style="color:#b3dcff;"></i> استخدم class إذا كنت بحاجة إلى تغليف (encapsulation).</li>
+            </ul>
+        </div>
+
+        <!-- تذييل -->
+        <div class="page-footer">
+            <span class="footer-badge"><i class="fas fa-copyright"></i> ++C Standard</span>
+            <span><i class="fas fa-cubes"></i> الإصدار 6.0 – الهياكل</span>
+            <span><i class="fas fa-check-circle"></i> جميع الأمثلة جاهزة</span>
+        </div>
+
+    </div> <!-- glass-panel -->
+</div> <!-- page -->
+<script>Prism.highlightAll();</script>
+</body>
+</html>

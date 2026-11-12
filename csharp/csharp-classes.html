@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C# | الكلاسات والكائنات (OOP) - الدليل المتكامل | تصميم فخم</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(ellipse at 0% 0%, #0a0e27 0%, #050814 100%);
+            color: #eef4ff;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        /* animated particles effect (soft) */
+        .bg-luxury {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at 70% 20%, rgba(100, 80, 255, 0.1), transparent 65%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* hero premium */
+        .hero-oop {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2.5rem 1.5rem;
+            background: rgba(10, 20, 40, 0.6);
+            backdrop-filter: blur(18px);
+            border-radius: 3.5rem;
+            border: 1px solid rgba(120, 100, 255, 0.3);
+            box-shadow: 0 30px 45px -20px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .hero-oop h1 {
+            font-size: 3.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #c084fc, #a855f7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+            margin-bottom: 0.8rem;
+        }
+
+        .hero-oop p {
+            font-size: 1.2rem;
+            color: #cbd5ff;
+            max-width: 850px;
+            margin: 0.8rem auto 0;
+            font-weight: 500;
+        }
+
+        .badge-royal {
+            background: linear-gradient(95deg, #1e1b4b, #0f0c2c);
+            padding: 0.4rem 1.8rem;
+            border-radius: 60px;
+            display: inline-block;
+            font-weight: 700;
+            border: 1px solid #a855f770;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* cards */
+        .card-royal {
+            background: rgba(15, 20, 45, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 2.2rem;
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-royal:hover {
+            border-color: rgba(168, 85, 247, 0.6);
+            background: rgba(20, 28, 58, 0.8);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.5);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.6rem;
+        }
+
+        .card-header i {
+            font-size: 2.2rem;
+            color: #b77cff;
+            filter: drop-shadow(0 0 5px #a855f7);
+        }
+
+        .card-header h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 1.8rem;
+            margin: 1rem 0;
+        }
+
+        .class-card {
+            background: rgba(0, 0, 20, 0.55);
+            border-radius: 1.8rem;
+            padding: 1.5rem;
+            border-left: 4px solid #a855f7;
+            transition: 0.2s;
+        }
+
+        .class-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #ddb6ff;
+        }
+
+        .code-block {
+            border-radius: 1.2rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            font-size: 0.85rem;
+            border-radius: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .pill {
+            background: #2d1b4e;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #d9b4ff;
+            display: inline-block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table td, .comparison-table th {
+            padding: 0.9rem;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+            vertical-align: top;
+        }
+
+        .interactive-lab {
+            background: linear-gradient(145deg, #0a0a22, #030316);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            margin: 1.5rem 0;
+            border: 1px solid #6b21a5;
+        }
+
+        .btn-glow {
+            background: linear-gradient(95deg, #6d28d9, #4c1d95);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 0.7rem 2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            margin-top: 0.8rem;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-glow:hover {
+            background: linear-gradient(95deg, #7c3aed, #5b21b6);
+            transform: scale(0.97);
+        }
+
+        .demo-output {
+            background: #05020f;
+            padding: 1rem 1.2rem;
+            border-radius: 1.2rem;
+            font-family: 'Fira Code', monospace;
+            border-left: 3px solid #a855f7;
+            margin-top: 1rem;
+            color: #e2d5ff;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid #4a2a7a;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 750px) {
+            .container { padding: 1rem; }
+            .hero-oop h1 { font-size: 2rem; }
+            .card-header h2 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-luxury"></div>
+<div class="container">
+    <div class="hero-oop">
+        <div class="badge-royal"><i class="fas fa-gem"></i>  OOP IN C# | الكلاسات والكائنات</div>
+        <h1>🏛️ الكلاسات (Classes) <span style="background: linear-gradient(120deg,#c084fc,#ffffff); background-clip:text; -webkit-background-clip:text; color:transparent;">و الكائنات (Objects)</span></h1>
+        <p>أساس البرمجة الكائنية التوجه (OOP) — شرح متكامل للكلاسات، الحقول، الخصائص، المنشئات، والكائنات مع أمثلة تفاعلية وتصميم فخم.</p>
+    </div>
+
+    <!-- مفهوم الكلاس والكائن -->
+    <div class="card-royal">
+        <div class="card-header">
+            <i class="fas fa-shapes"></i>
+            <h2>ما هو الكلاس؟ وما هو الكائن؟</h2>
+        </div>
+        <p style="font-size:1.05rem; margin-bottom: 1rem;"><strong>الكلاس (Class)</strong> هو قالب أو مخطط لإنشاء كائنات، يحدد الخصائص (fields/properties) والسلوكيات (methods). <strong>الكائن (Object)</strong> هو实例 (instance) حقيقي من الكلاس له حالته الخاصة.</p>
+        <div class="code-block">
+            <pre><code class="language-csharp">// تعريف كلاس بسيط
+public class Car
+{
+    // fields (حقول)
+    public string Model;
+    public int Year;
+    
+    // constructor (منشئ)
+    public Car(string model, int year)
+    {
+        Model = model;
+        Year = year;
+    }
+    
+    // method
+    public void DisplayInfo()
+    {
+        Console.WriteLine($"{Model} - {Year}");
+    }
+}
+
+// إنشاء كائن (object) من الكلاس
+Car myCar = new Car("Tesla", 2024);
+myCar.DisplayInfo();  // Tesla - 2024</code></pre>
+        </div>
+        <div class="note-tip" style="background:#1e1535; border-radius:1rem; padding:0.8rem; margin-top:0.8rem;">
+            <i class="fas fa-microphone-alt"></i> <strong>تشبيه:</strong> الكلاس مثل قالب الكعكة، والكائن هو الكعكة الفعلية المصنوعة من القالب.
+        </div>
+    </div>
+
+    <!-- مكونات الكلاس: fields, properties, methods, constructors -->
+    <div class="card-royal">
+        <div class="card-header">
+            <i class="fas fa-cubes"></i>
+            <h2>مكونات الكلاس المتكاملة</h2>
+        </div>
+        <div class="grid-2col">
+            <div class="class-card">
+                <h3><i class="fas fa-database"></i> الحقول (Fields)</h3>
+                <p>متغيرات داخل الكلاس تحمل البيانات.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">private string name;
+public int age;</code></pre>
+                </div>
+            </div>
+            <div class="class-card">
+                <h3><i class="fas fa-tags"></i> الخصائص (Properties)</h3>
+                <p>تغلف الحقول وتوفر تحكم (get/set).</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public string Name { get; set; }
+public int Age { get; private set; }</code></pre>
+                </div>
+            </div>
+            <div class="class-card">
+                <h3><i class="fas fa-cog"></i> المنشئات (Constructors)</h3>
+                <p>تُستدعى عند إنشاء كائن، لتهيئة الحالة الأولية.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public Person(string name)
+{
+    Name = name;
+}</code></pre>
+                </div>
+            </div>
+            <div class="class-card">
+                <h3><i class="fas fa-functions"></i> الدوال (Methods)</h3>
+                <p>السلوكيات التي يمكن للكائن تنفيذها.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public void Walk() => 
+    Console.WriteLine($"{Name} walks");</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مستويات الوصول (Access Modifiers) -->
+    <div class="card-royal">
+        <div class="card-header">
+            <i class="fas fa-lock"></i>
+            <h2>مستويات الوصول (Access Modifiers)</h2>
+        </div>
+        <table class="comparison-table">
+            <tr style="border-bottom: 2px solid #a855f7;">
+                <th>المُعدِّل</th><th>الوصف</th>
+            </tr>
+            <tr><td class="pill">public</td><td>متاح من أي مكان.</td></tr>
+            <tr><td class="pill">private</td><td>متاح فقط داخل نفس الكلاس.</td></tr>
+            <tr><td class="pill">protected</td><td>متاح داخل الكلاس والكلاسات المشتقة.</td></tr>
+            <tr><td class="pill">internal</td><td>متاح داخل نفس التجميع (assembly).</td></tr>
+        </table>
+        <div class="code-block" style="margin-top: 1rem;">
+            <pre><code class="language-csharp">public class BankAccount
+{
+    private decimal balance;   // لا يمكن الوصول من الخارج
+    public decimal Balance { get { return balance; } }
+    
+    public void Deposit(decimal amount)
+    {
+        if (amount > 0) balance += amount;
+    }
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- هذا (this) و static vs instance -->
+    <div class="card-royal">
+        <div class="card-header">
+            <i class="fas fa-key"></i>
+            <h2>this و static vs instance members</h2>
+        </div>
+        <div class="grid-2col">
+            <div class="class-card">
+                <h3>🔹 الكلمة المفتاحية <span style="color:#b77cff">this</span></h3>
+                <p>تشير إلى الكائن الحالي، تستخدم لتمييز الحقول عن المعاملات.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public class Employee
+{
+    public string Name;
+    public Employee(string Name)
+    {
+        this.Name = Name;
+    }
+}</code></pre>
+                </div>
+            </div>
+            <div class="class-card">
+                <h3>⚡ static vs instance</h3>
+                <p>الأعضاء الثابتة تنتمي للكلاس نفسه وليس لكائن محدد.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public class Utils
+{
+    public static double Pi = 3.14159;
+    public static int Add(int a, int b) => a + b;
+}
+// الاستدعاء: Utils.Add(2,3);</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الوراثة والمفاهيم المتقدمة -->
+    <div class="card-royal">
+        <div class="card-header">
+            <i class="fas fa-code-branch"></i>
+            <h2>الوراثة (Inheritance) و تعدد الأشكال (Polymorphism)</h2>
+        </div>
+        <p>الكلاس يمكن أن يرث من كلاس آخر، ويعيد تعريف الدوال باستخدام <code>virtual</code> و <code>override</code>.</p>
+        <div class="code-block">
+            <pre><code class="language-csharp">public class Animal
+{
+    public virtual void Speak() => Console.WriteLine("صوت حيوان");
+}
+public class Dog : Animal
+{
+    public override void Speak() => Console.WriteLine("نباح: هو هو");
+}
+// الاستخدام:
+Animal pet = new Dog();
+pet.Speak();  // نباح: هو هو</code></pre>
+        </div>
+        <div class="note-tip" style="background:#1e1535; border-radius:1rem; padding:0.8rem;">
+            🧬 الوراثة تعزز إعادة الاستخدام، وتعدد الأشكال يجعل الكود أكثر مرونة.
+        </div>
+    </div>
+
+    <!-- منشئ متقدم: static constructor, this constructor chaining -->
+    <div class="card-royal">
+        <div class="card-header">
+            <i class="fas fa-cogs"></i>
+            <h2>منشئات متقدمة: Constructor Chaining & Static Constructor</h2>
+        </div>
+        <div class="code-block">
+            <pre><code class="language-csharp">public class Product
+{
+    public string Name;
+    public double Price;
+    
+    public Product(string name) : this(name, 0) { }
+    
+    public Product(string name, double price)
+    {
+        Name = name;
+        Price = price;
+    }
+    
+    static Product() // static constructor - ينفذ مرة واحدة
+    {
+        Console.WriteLine("تهيئة الكلاس");
+    }
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- بيئة تفاعلية: إنشاء كائنات ديناميكية -->
+    <div class="interactive-lab">
+        <h3 style="display: flex; gap: 0.8rem;"><i class="fas fa-flask"></i> 🧪 مختبر الكلاسات والكائنات التفاعلي</h3>
+        <p>قم بإنشاء كائن من كلاس "Person" وعرض بياناته وتعديلها بشكل مباشر (محاكاة حية).</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0;">
+            <div style="flex:1">
+                <label>اسم الشخص:</label>
+                <input type="text" id="personName" value="ليلى" style="width:100%; padding:10px; border-radius: 30px; background:#0c0a1f; color:white; border:1px solid #6d28d9;">
+            </div>
+            <div style="flex:1">
+                <label>العمر:</label>
+                <input type="number" id="personAge" value="25" style="width:100%; padding:10px; border-radius: 30px; background:#0c0a1f; color:white; border:1px solid #6d28d9;">
+            </div>
+            <div style="flex:1">
+                <label>المهنة (اختياري):</label>
+                <input type="text" id="personJob" value="مطور برمجيات" style="width:100%; padding:10px; border-radius: 30px; background:#0c0a1f; color:white;">
+            </div>
+        </div>
+        <button class="btn-glow" id="createObjectBtn"><i class="fas fa-plus-circle"></i>  إنشاء كائن وعرض المعلومات</button>
+        <div class="demo-output" id="objectOutput">
+            // سيتم إنشاء كائن من الكلاس Person وعرض حالته ...
+        </div>
+        <p style="font-size:0.7rem; margin-top:8px;"><i class="fas fa-info-circle"></i> المحاكي يوضح كيفية تعريف كلاس، إنشاء كائن، والوصول إلى الخصائص والطرق.</p>
+    </div>
+
+    <!-- أفضل الممارسات والنصائح -->
+    <div class="card-royal">
+        <div class="card-header">
+            <i class="fas fa-medal"></i>
+            <h2>أفضل الممارسات في تصميم الكلاسات</h2>
+        </div>
+        <ul style="list-style-type: none;">
+            <li style="margin-bottom: 0.9rem;">✅ <strong>Encapsulation (التغليف):</strong> اجعل الحقول private ووفّر properties للوصول الآمن.</li>
+            <li style="margin-bottom: 0.9rem;">📐 <strong>مبدأ المسؤولية الواحدة:</strong> كل كلاس يجب أن يكون لديه سبب واحد فقط للتغيير.</li>
+            <li style="margin-bottom: 0.9rem;">🧩 <strong>استخدام المُهيئات (Constructors)</strong> لضمان أن الكائنات تُنشأ بحالة صالحة.</li>
+            <li style="margin-bottom: 0.9rem;">🚀 <strong>تجنب الكلاسات الضخمة:</strong> قسّم الكلاسات الكبيرة إلى كلاسات أصغر ومتخصصة.</li>
+            <li>📖 <strong>التوثيق:</strong> استخدم XML comments لتوثيق الكلاس والأعضاء.</li>
+        </ul>
+    </div>
+
+    <footer>
+        <i class="fab fa-csharp"></i>  دليل شامل للكلاسات والكائنات في C# (OOP) | تصميم فاخر ومحتوى تعليمي متكامل | أمثلة تفاعلية
+    </footer>
+</div>
+
+<script>
+    // المحاكي التفاعلي للكلاس والكائنات
+    const createBtn = document.getElementById('createObjectBtn');
+    const outputDivObj = document.getElementById('objectOutput');
+
+    // كلاس Person محاكي (في JavaScript لنعرض سلوك OOP)
+    class Person {
+        constructor(name, age, job) {
+            this.name = name;
+            this.age = age;
+            this.job = job || "غير محدد";
+        }
+        
+        getInfo() {
+            return `الاسم: ${this.name} | العمر: ${this.age} | المهنة: ${this.job}`;
+        }
+        
+        celebrateBirthday() {
+            this.age++;
+            return `🎂 سنة جديدة! العمر الآن ${this.age}`;
+        }
+    }
+    
+    function simulateObjectDemo() {
+        let name = document.getElementById('personName').value.trim();
+        let age = parseInt(document.getElementById('personAge').value);
+        let job = document.getElementById('personJob').value.trim();
+        
+        if (name === "") name = "زائر";
+        if (isNaN(age)) age = 0;
+        
+        // إنشاء كائن من Person
+        const personObj = new Person(name, age, job || "غير معروف");
+        
+        let infoMsg = personObj.getInfo();
+        let birthdayMsg = personObj.celebrateBirthday();
+        
+        outputDivObj.innerHTML = `🔹 <strong>تم إنشاء كائن Person:</strong><br>📌 ${infoMsg}<br>🎉 ${birthdayMsg}<br><span style="font-size:0.8rem; opacity:0.8;">✨ يمثل هذا المفهوم الحقيقي للكلاس (قالب) والكائن (instance) مع تغليف البيانات.</span>`;
+    }
+    
+    createBtn.addEventListener('click', simulateObjectDemo);
+    // تشغيل أول عرض تلقائي
+    simulateObjectDemo();
+    
+    // إضافة تأثير تحديث عند تغيير الحقول
+    const inputs = ['personName', 'personAge', 'personJob'];
+    inputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', simulateObjectDemo);
+    });
+</script>
+</body>
+</html>

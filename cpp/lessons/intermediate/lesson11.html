@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>++C المراجع (References) في لغة | شرح شامل ومتكامل</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: radial-gradient(circle at 0% 30%, #f0f7ff, #e3f0fc);
+            color: #1a3349;
+            line-height: 1.7;
+            padding: 2rem 1.8rem;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الحاوية الأساسية */
+        .main-card {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 4.5rem;
+            box-shadow: 0 40px 80px -20px #0a314b, 0 0 0 1.5px rgba(255,255,255,0.9);
+            padding: 3rem 3.5rem;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        /* الرأس */
+        .hero {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #0F3D5E, #1F5780, #2B6FA0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero h1 i {
+            background: #1d4f75;
+            color: white;
+            padding: 0.7rem 1.6rem;
+            border-radius: 120px;
+            font-size: 2.6rem;
+            -webkit-text-fill-color: white;
+            box-shadow: 0 15px 30px #0b3857;
+        }
+
+        .hero-sub {
+            font-size: 1.6rem;
+            font-weight: 500;
+            background: #d9ebffcc;
+            padding: 0.8rem 3rem;
+            border-radius: 80px;
+            display: inline-block;
+            margin-top: 1.5rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid white;
+        }
+
+        /* شبكة تمهيدية */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 2.4rem;
+            margin-bottom: 4rem;
+        }
+
+        .intro-item {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 3rem;
+            padding: 2.2rem 2rem;
+            border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: 0 18px 35px -12px #1f5680;
+            transition: 0.25s;
+        }
+
+        .intro-item:hover {
+            background: #ffffffed;
+            transform: translateY(-7px);
+            border-color: #70a9d7;
+        }
+
+        .intro-icon {
+            background: #1b5077;
+            width: 80px;
+            height: 80px;
+            border-radius: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.6rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .intro-item h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #104267;
+            margin-bottom: 1rem;
+        }
+
+        .intro-item p {
+            font-size: 1.2rem;
+            color: #1f4a6b;
+        }
+
+        /* عناوين رئيسية */
+        .chapter-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 4rem 0 2.2rem 0;
+            position: relative;
+            display: inline-block;
+        }
+        .chapter-title:after {
+            content: '';
+            position: absolute;
+            bottom: -14px;
+            right: 0;
+            width: 100%;
+            height: 7px;
+            background: linear-gradient(90deg, #1d608b, #63a1d1, #c2dfff);
+            border-radius: 8px;
+        }
+
+        .section-head {
+            font-size: 2.4rem;
+            font-weight: 600;
+            margin: 3rem 0 1.8rem 0;
+            color: #0f4a70;
+            border-right: 10px solid #1f6fa0;
+            padding-right: 1.8rem;
+        }
+
+        /* كتلة الأكواد */
+        .code-block {
+            background: #152f40;
+            border-radius: 3rem;
+            padding: 2.2rem;
+            margin: 2.5rem 0;
+            box-shadow: 0 25px 40px -15px #07202f, inset 0 1px 10px #98bbdd;
+            border: 1px solid #4177a3;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.15rem;
+            line-height: 1.7;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+        }
+
+        /* بطاقات مميزة */
+        .feature-card {
+            background: linear-gradient(115deg, #17415f, #1b5782);
+            color: white;
+            border-radius: 3rem;
+            padding: 2.3rem 3rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            box-shadow: 0 25px 40px -12px #0d3b5a;
+        }
+
+        .feature-card i {
+            font-size: 3.2rem;
+            color: #ffd98c;
+        }
+
+        .feature-card p {
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+
+        .warning-block {
+            background: #feedd9;
+            border-right: 10px solid #dc8b2b;
+            border-radius: 2.5rem;
+            padding: 1.8rem 2.5rem;
+            margin: 2.5rem 0;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            font-size: 1.25rem;
+        }
+
+        .warning-block i {
+            font-size: 2.8rem;
+            color: #c4741a;
+        }
+
+        /* جدول مقارنة متقن */
+        .comparison-sleek {
+            background: #ffffffec;
+            backdrop-filter: blur(6px);
+            border-radius: 3rem;
+            overflow: hidden;
+            margin: 3rem 0;
+            border: 1px solid #bed6f2;
+        }
+
+        .comparison-sleek table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.2rem;
+        }
+
+        .comparison-sleek th {
+            background: #1c537a;
+            color: white;
+            font-weight: 700;
+            padding: 1.5rem 1.2rem;
+            font-size: 1.5rem;
+        }
+
+        .comparison-sleek td {
+            padding: 1.5rem 1.5rem;
+            border-bottom: 1px solid #b6d2ef;
+            color: #133f5e;
+        }
+
+        .comparison-sleek tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-sleek td:first-child {
+            background: #e3f0ff;
+            font-weight: 700;
+            width: 35%;
+        }
+
+        /* تذييل */
+        .footer {
+            margin-top: 5rem;
+            padding-top: 2.8rem;
+            border-top: 4px solid #bad2ef;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #1b5177;
+            font-size: 1.2rem;
+        }
+
+        .footer span i {
+            margin-left: 0.7rem;
+        }
+
+        .badge {
+            background: #1b5077;
+            color: white;
+            padding: 0.5rem 2rem;
+            border-radius: 60px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .main-card { padding: 1.8rem; }
+            .hero h1 { font-size: 2.6rem; }
+            .chapter-title { font-size: 2.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="main-card">
+
+        <!-- الرأس -->
+        <div class="hero">
+            <h1>
+                <i class="fas fa-link"></i>
+                المراجع (References) في ++C
+                <i class="fas fa-equals"></i>
+            </h1>
+            <div class="hero-sub">
+                <i class="fas fa-code-branch"></i> أسماء مستعارة للذاكرة – كفاءة وتحكم
+            </div>
+        </div>
+
+        <!-- مدخل نظري -->
+        <div class="intro-grid">
+            <div class="intro-item">
+                <div class="intro-icon"><i class="fas fa-tag"></i></div>
+                <h3>اسم مستعار</h3>
+                <p>المرجع هو اسم آخر (alias) لمتغير موجود. لا يستهلك ذاكرة إضافية، بل يشير إلى نفس العنوان.</p>
+            </div>
+            <div class="intro-item">
+                <div class="intro-icon"><i class="fas fa-paper-plane"></i></div>
+                <h3>تمرير بكفاءة</h3>
+                <p>تمرير المتغيرات للدوال بالمرجع يتجنب نسخ البيانات، مما يحسن الأداء للأنواع الكبيرة.</p>
+            </div>
+            <div class="intro-item">
+                <div class="intro-icon"><i class="fas fa-pen-fancy"></i></div>
+                <h3>تعديل مباشر</h3>
+                <p>أي تغيير على المرجع ينعكس على المتغير الأصلي، لأنها تشير إلى نفس الموقع.</p>
+            </div>
+        </div>
+
+        <!-- 1. تعريف المرجع واستخداماته الأساسية -->
+        <h2 class="chapter-title"><i class="fas fa-plus-circle"></i> 1. تعريف المرجع (Reference)</h2>
+        <p style="font-size:1.3rem;">يتم تعريف المرجع باستخدام <code>&</code> بعد النوع. يجب أن تتم تهيئته عند التعريف (لا يمكن أن يكون فارغاً).</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">int original = 50;
+int &ref = original;  // ref أصبح مرجعاً للمتغير original
+
+cout &lt;&lt; original;    // 50
+cout &lt;&lt; ref;         // 50 أيضاً
+
+ref = 100;            // تعديل قيمة ref يعدل original
+cout &lt;&lt; original;     // 100
+
+// ملاحظة: لا يمكن إعادة ربط المرجع بمتغير آخر بعد تعريفه.</code></pre>
+        </div>
+        <div class="warning-block">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div><strong>تنبيه أساسي:</strong> يجب تهيئة المرجع عند تعريفه. لا يمكنك كتابة <code>int &ref;</code> دون إعطائه متغيراً يرتبط به. (الاستثناء: معاملات الدوال، أعضاء class، وفي بعض السياقات المحددة).</div>
+        </div>
+
+        <!-- 2. الفرق بين المرجع والمؤشر -->
+        <h2 class="chapter-title"><i class="fas fa-code-compare"></i> 2. المرجع (&) vs المؤشر (*)</h2>
+        <div class="comparison-sleek">
+            <table>
+                <tr><th>وجه المقارنة</th><th>المرجع (Reference)</th><th>المؤشر (Pointer)</th></tr>
+                <tr><td>التهيئة</td><td>يجب أن يُهيأ عند التعريف (يرتبط بمتغير)</td><td>يمكن تركه غير مهيأ (قيمة عشوائية)</td></tr>
+                <tr><td>إعادة الربط</td><td>لا يمكن جعله يشير إلى متغير آخر بعد الربط</td><td>يمكن تغيير عنوان المؤشر في أي وقت</td></tr>
+                <tr><td>القيمة NULL/nullptr</td><td>لا يمكن أن يكون NULL، دائماً مرتبط بمتغير</td><td>يمكن أن يساوي nullptr (لا يشير لشيء)</td></tr>
+                <tr><td>الوصول للقيمة</td><td>تلقائي (لا حاجة لاستخدام *)</td><td>يحتاج إلى * للإشارة للقيمة (dereference)</td></tr>
+                <tr><td>الاستخدام الأكثر شيوعاً</td><td>معاملات الدوال، التحميل الزائد، for-each</td><td>إدارة الذاكرة الديناميكية، هياكل البيانات</td></tr>
+            </table>
+        </div>
+
+        <!-- 3. المراجع في الدوال (تمرير بالقيمة مقابل بالمرجع) -->
+        <h2 class="chapter-title"><i class="fas fa-exchange-alt"></i> 3. تمرير الدوال بالمرجع</h2>
+        <p style="font-size:1.25rem;">المراجع تسمح للدالة بتعديل المتغير الأصلي، وتجنب نسخ البيانات الضخمة.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">// تمرير بالقيمة (يتم النسخ)
+void incrementByValue(int x) {
+    x++;  // يعدل النسخة فقط، الأصل لا يتغير
+}
+
+// تمرير بالمرجع (يتعامل مع الأصل)
+void incrementByReference(int &x) {
+    x++;  // يعدل المتغير الأصلي
+}
+
+int main() {
+    int a = 10, b = 20;
+    incrementByValue(a);
+    cout &lt;&lt; a;  // 10 (لم يتغير)
+    
+    incrementByReference(b);
+    cout &lt;&lt; b;  // 21 (تغير)
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- بطاقة: تمرير الثوابت بالمرجع -->
+        <div class="feature-card">
+            <i class="fas fa-shield-alt"></i>
+            <p><strong>المرجع إلى ثابت (const reference):</strong> يستخدم لقراءة البيانات دون تعديلها، مع تجنب النسخ. مثالي للكائنات الكبيرة. <code>void display(const string &text);</code></p>
+        </div>
+
+        <!-- 4. إرجاع مرجع من دالة -->
+        <h2 class="chapter-title"><i class="fas fa-undo-alt"></i> 4. إرجاع مرجع من دالة</h2>
+        <p>يمكن للدالة إرجاع مرجع، مما يسمح باستخدامها في الطرف الأيسر من معادلة التخصيص.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">int arr[] = {10, 20, 30};
+
+// دالة ترجع مرجعاً للعنصر في المصفوفة
+int &getElement(int index) {
+    return arr[index];  // إرجاع مرجع
+}
+
+int main() {
+    getElement(1) = 99;  // الآن arr[1] = 99
+    cout &lt;&lt; arr[1];      // 99
+    return 0;
+}</code></pre>
+        </div>
+        <div class="warning-block">
+            <i class="fas fa-radiation"></i>
+            <div><strong>تحذير:</strong> لا تُرجع مرجعاً إلى متغير محلي (local variable) لأنه سيتم تدميره عند انتهاء الدالة.</div>
+        </div>
+
+        <!-- 5. مراجع rvalue (C++11) -->
+        <h2 class="chapter-title"><i class="fas fa-forward"></i> 5. مراجع rvalue (&&) – نقل الموارد</h2>
+        <p>ظهرت في C++11 لدعم دلالات النقل (move semantics) وتجنب النسخ غير الضروري.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">void processValue(int &x) {   // مرجع lvalue
+    cout &lt;&lt; "lvalue reference";
+}
+
+void processValue(int &&x) {  // مرجع rvalue
+    cout &lt;&lt; "rvalue reference";
+}
+
+int main() {
+    int a = 5;
+    processValue(a);           // lvalue reference
+    processValue(10);          // rvalue reference (10 مؤقت)
+    processValue(std::move(a));// rvalue reference بعد تحويل a
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 6. مراجع في حلقات range-based for -->
+        <h2 class="chapter-title"><i class="fas fa-sync"></i> 6. استخدام المراجع مع حلقات for</h2>
+        <p>لتعديل عناصر المجموعة أو تجنب نسخها، نستخدم المرجع.</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">vector&lt;int&gt; vec = {1, 2, 3, 4};
+
+// بدون مرجع (نسخ) – لا يمكن تعديل العناصر
+for (auto x : vec) {
+    x = 0;  // يؤثر على النسخة فقط
+}
+
+// باستخدام مرجع – تعديل حقيقي
+for (auto &x : vec) {
+    x *= 2;  // يضاعف كل عنصر
+}
+
+// مرجع ثابت للقراءة فقط
+for (const auto &x : vec) {
+    cout &lt;&lt; x;  // نقرأ ولا نعدل
+}</code></pre>
+        </div>
+
+        <!-- 7. خصائص إضافية: مرجع إلى مرجع؟ -->
+        <h2 class="chapter-title"><i class="fas fa-stack-overflow"></i> 7. قواعد طي المراجع (Reference collapsing)</h2>
+        <p>في قوالب C++، قد تظهر مراجع لمراجع، لكن القواعد تطويها إلى مرجع واحد. مثال:</p>
+        <div class="code-block">
+            <pre><code class="language-cpp">template&lt;typename T&gt;
+void func(T &x) { // إذا أُرسل int&، تصبح T = int& ، فيصبح النوع int& &
+    // قواعد الطي: & + & → & , && + & → & , & + && → & , && + && → &&
+}</code></pre>
+        </div>
+
+        <!-- تطبيقات عملية -->
+        <h2 class="section-head"><i class="fas fa-flask"></i> تطبيقات عملية مع المراجع</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2rem; margin: 2.5rem 0;">
+            <div style="flex: 1 1 280px; background: #e9f2fe; border-radius: 2.5rem; padding: 2rem;">
+                <h4><i class="fas fa-arrows-alt-h"></i>  المبادلة (Swap) بالمرجع</h4>
+                <pre style="background:#153546; color:#dfecf5; padding:1rem; border-radius:1.8rem; direction:ltr;">void swap(int &a, int &b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}</pre>
+            </div>
+            <div style="flex: 1 1 280px; background: #e9f2fe; border-radius: 2.5rem; padding: 2rem;">
+                <h4><i class="fas fa-search"></i>  البحث وإرجاع مرجع</h4>
+                <pre style="background:#153546; color:#dfecf5; padding:1rem; border-radius:1.8rem; direction:ltr;">int &findLargest(int arr[], int size) {
+    int maxIdx = 0;
+    for(int i=1; i<size; i++)
+        if(arr[i] > arr[maxIdx]) maxIdx = i;
+    return arr[maxIdx];
+}</pre>
+            </div>
+        </div>
+
+        <!-- تمرين شامل -->
+        <div style="background: #cbe3fd; border-radius: 2.8rem; padding: 2.5rem; margin: 3.5rem 0;">
+            <h3 style="font-size: 2.2rem; color: #084269;"><i class="fas fa-puzzle-piece"></i> تمرين: اكتب دالة تستخدم مرجعاً لتقرأ قيمة من المستخدم وتخزنها في متغير</h3>
+            <details style="margin-top:1.5rem; background: white; border-radius: 2rem; padding: 1.5rem;">
+                <summary><i class="fas fa-lightbulb"></i> عرض الحل</summary>
+                <pre style="direction:ltr; background:#152f40; color:#fff; padding:1.2rem;">#include &lt;iostream&gt;
+using namespace std;
+
+void readInput(int &value) {
+    cout &lt;&lt; "أدخل رقماً: ";
+    cin &gt;&gt; value;
+}
+
+int main() {
+    int number;
+    readInput(number);  // يتم تعبئة number مباشرة
+    cout &lt;&lt; "لقد أدخلت: " &lt;&lt; number;
+    return 0;
+}</pre>
+            </details>
+        </div>
+
+        <!-- خاتمة وأفضل الممارسات -->
+        <div style="background: #12405f; color: white; border-radius: 3rem; padding: 2.5rem; margin-top: 3rem;">
+            <i class="fas fa-crown" style="font-size: 2.8rem; float: right; margin-left: 1.8rem;"></i>
+            <h3 style="font-size:2.3rem; margin-bottom:1rem;">أفضل الممارسات</h3>
+            <ul style="list-style: none; columns: 2; column-gap: 2.5rem; font-size:1.2rem;">
+                <li><i class="fas fa-check-circle" style="color:#a3d0ff;"></i> استخدم المراجع للتمرير لتجنب النسخ.</li>
+                <li><i class="fas fa-check-circle" style="color:#a3d0ff;"></i> استخدم const reference للقراءة فقط.</li>
+                <li><i class="fas fa-check-circle" style="color:#a3d0ff;"></i> لا تُرجع مرجعاً لمتغير محلي.</li>
+                <li><i class="fas fa-check-circle" style="color:#a3d0ff;"></i> استخدم المراجع في حلقات for للتعديل.</li>
+                <li><i class="fas fa-check-circle" style="color:#a3d0ff;"></i> تعلم rvalue references للنقل (move).</li>
+                <li><i class="fas fa-check-circle" style="color:#a3d0ff;"></i> المراجع أكثر أماناً من المؤشرات غالباً.</li>
+            </ul>
+        </div>
+
+        <!-- تذييل -->
+        <div class="footer">
+            <span class="badge"><i class="fas fa-copyright"></i> ++C ISO/IEC</span>
+            <span><i class="fas fa-link"></i> الإصدار 5.0 – المراجع</span>
+            <span><i class="fas fa-check-double"></i> جميع الأمثلة جاهزة</span>
+        </div>
+
+    </div> <!-- main-card -->
+</div> <!-- container -->
+<script>Prism.highlightAll();</script>
+</body>
+</html>

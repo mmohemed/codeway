@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>تعلم C# | الجمل الشرطية (if, else, switch)</title>
+    <!-- Google Fonts: خطوط عصرية -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js لتلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f8fafc 0%, #edf2f7 100%);
+            font-family: 'Inter', 'Cairo', sans-serif;
+            color: #1a2c3e;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.8rem;
+        }
+
+        /* Hero Section - جذاب وحديث */
+        .hero {
+            background: linear-gradient(125deg, #1a2a3a 0%, #2c4c6c 100%);
+            border-radius: 2rem;
+            padding: 2.5rem 2rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "⚡ if → else → switch";
+            font-family: monospace;
+            font-size: 2rem;
+            font-weight: 600;
+            opacity: 0.08;
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            letter-spacing: 2px;
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 2.7rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .hero h1 i {
+            background: linear-gradient(135deg, #f9b43a, #fb8c00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.92;
+            max-width: 70%;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* شبكة البطاقات */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.25s ease, box-shadow 0.25s;
+            border: 1px solid rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 22px 35px -14px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            padding: 1.4rem 1.8rem 0.5rem 1.8rem;
+            border-bottom: 2px solid #eef2f8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header i {
+            font-size: 1.9rem;
+            color: #e67e22;
+        }
+
+        .card-header h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #1f4662;
+        }
+
+        .card-body {
+            padding: 1.5rem 1.8rem 1.8rem;
+        }
+
+        .code-block {
+            background: #0f172a;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1.2rem 0;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.85rem;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: #334155;
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #4f5e77;
+        }
+
+        .note {
+            background: #fef5e8;
+            border-right: 4px solid #f39c12;
+            padding: 0.9rem 1.2rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        /* تصميم الجداول والهياكل */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .compare-table td, .compare-table th {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+        .compare-table th {
+            text-align: right;
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .interactive-box {
+            background: #f1f9fe;
+            border-radius: 1.2rem;
+            padding: 1.3rem;
+            margin-top: 0.8rem;
+        }
+
+        .btn-run {
+            background: #e67e22;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0.5rem 0 1rem 0;
+        }
+
+        .btn-run:hover {
+            background: #d35400;
+            transform: scale(0.98);
+        }
+
+        .output-console {
+            background: #0e131f;
+            color: #d4f1f9;
+            font-family: monospace;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            border-left: 4px solid #f39c12;
+        }
+
+        @media (max-width: 880px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+            .hero p {
+                max-width: 100%;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            font-size: 0.85rem;
+            color: #5e7a93;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>
+            <i class="fas fa-code-branch"></i> 
+            الجمل الشرطية في C#
+        </h1>
+        <p>تحكم في مسار برنامجك باستخدام if، else if، else، و switch. تعلم كيف تتخذ القرارات بناءً على الشروط المنطقية.</p>
+        <div class="badge-group">
+            <span class="badge"><i class="fas fa-random"></i> if / else</span>
+            <span class="badge"><i class="fas fa-layer-group"></i> switch statement</span>
+            <span class="badge"><i class="fas fa-question-circle"></i> Ternary Operator</span>
+        </div>
+    </div>
+
+    <!-- الشبكة الأساسية: if/else + switch -->
+    <div class="grid-2col">
+        <!-- if / else if / else -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-code-branch"></i>
+                <h2>if, else if, else</h2>
+            </div>
+            <div class="card-body">
+                <p>تستخدم <strong>if</strong> لتنفيذ كود معين إذا تحقق شرط ما. يمكن ربطها بـ <strong>else if</strong> لعدة شروط، و<strong>else</strong> للحالة الافتراضية.</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyIfCode()"><i class="far fa-copy"></i> نسخ</button>
+                    <pre><code class="language-csharp" id="ifCode">int score = 85;
+
+if (score >= 90)
+{
+    Console.WriteLine("ممتاز!");
+}
+else if (score >= 70)
+{
+    Console.WriteLine("جيد جداً");
+}
+else if (score >= 50)
+{
+    Console.WriteLine("مقبول");
+}
+else
+{
+    Console.WriteLine("راسب، حاول مرة أخرى");
+}</code></pre>
+                </div>
+                <div class="note">
+                    <i class="fas fa-lightbulb"></i> <strong>ملاحظة:</strong> يتم فحص الشروط من الأعلى إلى الأسفل، وعند أول شرط صحيح يتم تنفيذ الكود الخاص به ثم الخروج من الجملة الشرطية.
+                </div>
+            </div>
+        </div>
+
+        <!-- switch statement -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-arrows-spin"></i>
+                <h2>switch case</h2>
+            </div>
+            <div class="card-body">
+                <p>مناسب عند وجود عدة قيم ثابتة لمتغير واحد. <strong>switch</strong> ينفذ الكود المرتبط بالحالة المطابقة.</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copySwitchCode()"><i class="far fa-copy"></i> نسخ</button>
+                    <pre><code class="language-csharp" id="switchCode">char grade = 'B';
+
+switch (grade)
+{
+    case 'A':
+        Console.WriteLine("ممتاز 🔥");
+        break;
+    case 'B':
+        Console.WriteLine("جيد جداً 👍");
+        break;
+    case 'C':
+        Console.WriteLine("جيد ✅");
+        break;
+    default:
+        Console.WriteLine("درجة غير معروفة");
+        break;
+}</code></pre>
+                </div>
+                <div class="note">
+                    <i class="fas fa-info-circle"></i> في C# يجب إنهاء كل case بكلمة <strong>break</strong> أو <strong>return</strong> أو القفز goto (نادر) لتجنب "fall-through".
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- قسم المقارنة بين if و switch -->
+    <div class="card full-width">
+        <div class="card-header">
+            <i class="fas fa-scale-balanced"></i>
+            <h2>متى تستخدم if ومتى تستخدم switch؟</h2>
+        </div>
+        <div class="card-body">
+            <table class="compare-table">
+                <tr><th style="width: 25%;">if / else if</th><th>switch case</th></tr>
+                <tr><td>مناسب للشروط المعقدة (مثل: > , < , && , || )</td><td>مناسب لمقارنة قيم ثابتة (متساوية) لمتغير واحد</td></tr>
+                <tr><td>يمكنه فحص أنواع مختلفة من الشروط المنطقية</td><td>يعمل مع الأنواع الأساسية: int, char, string, bool (منذ C# 7)</td></tr>
+                <tr><td>أكثر مرونة لكن قد يصبح طويلاً مع العديد من الحالات</td><td>أنيق وسهل القراءة عندما يكون هناك العديد من القيم الثابتة</td></tr>
+                <tr><td>مثال: if (age >= 18 && hasLicense)</td><td>مثال: switch (dayOfWeek) { case "Monday": ... }</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- مشغل ثلاثي (Ternary Operator) وعوامل منطقية -->
+    <div class="grid-2col">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-question"></i>
+                <h2>العامل الشرطي (Ternary Operator)</h2>
+            </div>
+            <div class="card-body">
+                <p>طريقة مختصرة لكتابة if-else بسيطة: <code>شرط ? القيمة_إذا_صحيح : القيمة_إذا_خطأ</code></p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">int temperature = 28;
+string weatherStatus = (temperature > 25) ? "حار ☀️" : "معتدل 🌤️";
+Console.WriteLine(weatherStatus);  // الناتج: حار ☀️
+
+// يمكن تداخل العامل الثلاثي لكن بحذر
+int number = 5;
+string result = (number > 0) ? "موجب" : (number < 0) ? "سالب" : "صفر";</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-greater-than-equal"></i>
+                <h2>العوامل المنطقية المركبة</h2>
+            </div>
+            <div class="card-body">
+                <p>دمج الشروط باستخدام <code>&& (AND)</code> , <code>|| (OR)</code> , <code>! (NOT)</code></p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">int age = 20;
+bool hasPermission = true;
+
+if (age >= 18 && hasPermission)
+{
+    Console.WriteLine("مسموح بالدخول");
+}
+
+string day = "Friday";
+if (day == "Saturday" || day == "Friday")
+{
+    Console.WriteLine("عطلة نهاية الأسبوع 🎉");
+}
+
+bool isLoggedIn = false;
+if (!isLoggedIn)
+{
+    Console.WriteLine("الرجاء تسجيل الدخول");
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تجربة تفاعلية محاكاة لتشغيل برنامج شرطي -->
+    <div class="card full-width">
+        <div class="card-header">
+            <i class="fas fa-laptop-code"></i>
+            <h2>جرب بنفسك: محاكاة حية لجمل شرطية</h2>
+        </div>
+        <div class="card-body">
+            <p>هذا البرنامج يطلب (محاكاة) درجة الطالب ثم يطبع التقدير باستخدام if-else if. اضغط على "تشغيل المحاكاة" لترى النتيجة بناءً على درجة محددة مسبقاً (يمكنك تغيير القيمة في الكود أدناه).</p>
+            <div class="code-block">
+                <pre><code class="language-csharp" id="interactiveCodeExample">int studentScore = 76; // غيّر هذه القيمة لتجربة نتائج مختلفة
+
+if (studentScore >= 90)
+    Console.WriteLine("تقدير: A (ممتاز)");
+else if (studentScore >= 80)
+    Console.WriteLine("تقدير: B (جيد جداً)");
+else if (studentScore >= 70)
+    Console.WriteLine("تقدير: C (جيد)");
+else if (studentScore >= 60)
+    Console.WriteLine("تقدير: D (مقبول)");
+else
+    Console.WriteLine("تقدير: F (راسب)");</code></pre>
+            </div>
+            <div class="interactive-box">
+                <button class="btn-run" id="runConditionSimulate"><i class="fas fa-play"></i> تشغيل المحاكاة</button>
+                <div class="output-console" id="conditionOutput">
+                    // انقر على الزر لمشاهدة نتيجة الجمل الشرطية
+                </div>
+                <p style="margin-top: 10px; font-size:0.8rem;"><i class="fas fa-edit"></i> تلميح: يمكنك تخيل تغيير قيمة <code>studentScore</code> إلى 95 أو 45 لترى اختلاف المخرجات.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- أفضل الممارسات والأخطاء الشائعة -->
+    <div class="grid-2col">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-star-of-life"></i>
+                <h2>أفضل الممارسات</h2>
+            </div>
+            <div class="card-body">
+                <ul style="padding-right: 1.2rem;">
+                    <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color:#2c7da0;"></i> استخدم الأقواس {} حتى مع جملة واحدة لتوضيح النطاق.</li>
+                    <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color:#2c7da0;"></i> تجنب تداخل (Nesting) عميق لـ if - استخدم return مبكراً أو switch.</li>
+                    <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color:#2c7da0;"></i> ضع الحالات الأكثر احتمالاً في البداية لتحسين الأداء.</li>
+                    <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color:#2c7da0;"></i> في switch، استخدم default للتعامل مع القيم غير المتوقعة.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h2>أخطاء شائعة تجنبها</h2>
+            </div>
+            <div class="card-body">
+                <ul style="padding-right: 1.2rem;">
+                    <li style="margin-bottom: 10px;"><i class="fas fa-times-circle" style="color:#e67e22;"></i> استخدام = بدلاً من == في الشرط (التخصيص بدل المقارنة).</li>
+                    <li style="margin-bottom: 10px;"><i class="fas fa-times-circle" style="color:#e67e22;"></i> نسيان break في switch يؤدي إلى خطأ ترجمة (C# يمنع fall-through).</li>
+                    <li style="margin-bottom: 10px;"><i class="fas fa-times-circle" style="color:#e67e22;"></i> وضع فاصلة منقوطة بعد if مباشرة: <code>if(score>50);</code> ينهي الشرط فوراً.</li>
+                    <li style="margin-bottom: 10px;"><i class="fas fa-times-circle" style="color:#e67e22;"></i> عدم استخدام الأقواس مع شروط معقدة يسبب أخطاء منطقية.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <i class="fas fa-brain"></i> الجمل الشرطية تمنح برامجك الذكاء والقدرة على اتخاذ القرارات. تدرب على كتابة سيناريوهات حياتية مختلفة.
+        <br>© 2025 | دليل شامل للجمل الشرطية في C# - تصميم حديث وتفاعلي
+    </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script>
+    // نسخ كود if
+    function copyIfCode() {
+        const codeElem = document.getElementById('ifCode');
+        copyToClipboard(codeElem.innerText, document.querySelector('.card .copy-btn'));
+    }
+    function copySwitchCode() {
+        const codeElem = document.getElementById('switchCode');
+        copyToClipboard(codeElem.innerText, document.querySelectorAll('.copy-btn')[1]);
+    }
+    function copyToClipboard(text, btnElement) {
+        navigator.clipboard.writeText(text).then(() => {
+            const originalHtml = btnElement.innerHTML;
+            btnElement.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+            setTimeout(() => { btnElement.innerHTML = originalHtml; }, 1800);
+        }).catch(() => alert("تعذر النسخ"));
+    }
+
+    // محاكاة تشغيل البرنامج الشرطي
+    const runSimulate = document.getElementById('runConditionSimulate');
+    const outputDiv = document.getElementById('conditionOutput');
+    
+    function simulateConditional() {
+        // محاكاة النتيجة بناءً على قيمة studentScore الموجودة في الكود المعروض (الثابت 76)
+        // ولإضافة واقعية: سنقوم بمحاكاة النتيجة كما لو كانت score=76
+        const simulatedOutput = `> تشغيل محاكي C# (جمل شرطية)
+تقدير: C (جيد)
+
+شرح: قيمة studentScore = 76 تقع بين 70 و 79 → تنفيذ else if (score >= 70)
+يمكنك تعديل القيمة في الكود أعلاه لتجربة نتائج مختلفة.`;
+        outputDiv.innerHTML = `<span style="color:#d9f0ec;">${simulatedOutput.replace(/\n/g, '<br>')}</span>`;
+        outputDiv.style.borderLeftColor = "#f1c40f";
+        setTimeout(() => { outputDiv.style.borderLeftColor = "#f39c12"; }, 800);
+    }
+    
+    runSimulate.addEventListener('click', simulateConditional);
+    
+    // إعادة تلوين Prism بعد تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', () => {
+        Prism.highlightAll();
+        console.log("صفحة الجمل الشرطية في C# جاهزة - تعلم صنع القرارات البرمجية!");
+    });
+</script>
+</body>
+</html>

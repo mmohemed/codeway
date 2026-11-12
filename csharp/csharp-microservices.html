@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بناء Microservices بـ .NET | CodeWay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0a2540;
+            --primary-light: #1a3a5c;
+            --accent: #635bff;
+            --accent-hover: #4f46e5;
+            --accent-soft: #eef2ff;
+            --text-dark: #0a2540;
+            --text-body: #425466;
+            --text-muted: #8898aa;
+            --bg: #ffffff;
+            --bg-soft: #f7f9fc;
+            --border: #e6ebf1;
+            --success: #0e9f6e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --code-bg: #0a1929;
+            --micro: #0ea5e9;
+            --micro-soft: #e0f2fe;
+            --dotnet: #512bd4;
+            --dotnet-soft: #ede9fe;
+            --shadow-sm: 0 1px 3px rgba(10,37,64,.06), 0 1px 2px rgba(10,37,64,.04);
+            --shadow-md: 0 4px 12px rgba(10,37,64,.08), 0 2px 4px rgba(10,37,64,.04);
+            --shadow-lg: 0 20px 40px rgba(10,37,64,.1), 0 8px 16px rgba(10,37,64,.06);
+            --shadow-accent: 0 8px 24px rgba(14,165,233,.25);
+            --radius: 14px;
+            --radius-lg: 22px;
+            --transition: all .3s cubic-bezier(.4,0,.2,1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-body);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--micro), var(--dotnet));
+            z-index: 3000;
+            width: 0%;
+            transition: width .1s linear;
+            box-shadow: 0 0 10px rgba(14,165,233,.5);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--primary);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            transition: var(--transition);
+        }
+        .header.scrolled { box-shadow: 0 10px 30px rgba(10,37,64,.25); }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--micro), var(--dotnet));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.15rem;
+            box-shadow: var(--shadow-accent);
+        }
+        .brand-text {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: .5px;
+        }
+        .brand-text span { color: #7dd3fc; }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-nav a {
+            color: rgba(255,255,255,.75);
+            text-decoration: none;
+            font-size: .92rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .header-nav a:hover, .header-nav a.active {
+            color: #fff;
+            background: rgba(255,255,255,.08);
+        }
+        .header-nav a.active {
+            background: rgba(14,165,233,.25);
+            box-shadow: inset 0 0 0 1px rgba(14,165,233,.4);
+        }
+        .header-cta { display: flex; align-items: center; gap: 10px; }
+        .btn-outline-light {
+            padding: 9px 18px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,.2);
+            background: transparent;
+            color: #fff;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.4);
+        }
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.2);
+            color: #fff;
+            width: 40px; height: 40px;
+            border-radius: 9px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+        .hero {
+            background: linear-gradient(180deg, var(--bg-soft) 0%, #fff 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 56px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -120px; left: -120px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(14,165,233,.08), transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; right: -100px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(81,43,212,.06), transparent 70%);
+            border-radius: 50%;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb i { font-size: .65rem; }
+        .breadcrumb .current { color: var(--text-dark); font-weight: 600; }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: var(--micro-soft);
+            color: var(--micro);
+            border-radius: 100px;
+            font-size: .82rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            border: 1px solid rgba(14,165,233,.2);
+        }
+        .hero-badge i { font-size: .75rem; }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.25;
+            margin-bottom: 16px;
+            letter-spacing: -.5px;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--micro), var(--dotnet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-body);
+            max-width: 680px;
+            margin-bottom: 28px;
+            line-height: 1.85;
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            align-items: center;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .92rem;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .meta-item i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--micro-soft);
+            color: var(--micro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+        }
+        .hero-side {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 220px;
+        }
+        .btn-primary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: var(--shadow-accent);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(14,165,233,.35);
+        }
+        .btn-secondary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+        }
+        .btn-secondary:hover {
+            border-color: var(--micro);
+            color: var(--micro);
+            background: var(--micro-soft);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 48px;
+            padding: 48px 0 80px;
+            align-items: start;
+        }
+        .sidebar {
+            position: sticky;
+            top: 96px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-left: 4px;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .toc-title {
+            font-size: .78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toc-list { list-style: none; border-right: 2px solid var(--border); }
+        .toc-list li a {
+            display: block;
+            padding: 9px 16px;
+            color: var(--text-body);
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 500;
+            border-right: 2px solid transparent;
+            margin-right: -2px;
+            transition: var(--transition);
+            border-radius: 0 8px 8px 0;
+        }
+        .toc-list li a:hover { color: var(--accent); background: var(--accent-soft); }
+        .toc-list li a.active {
+            color: var(--accent);
+            border-right-color: var(--accent);
+            background: var(--accent-soft);
+            font-weight: 700;
+        }
+
+        .content { min-width: 0; }
+        .content-section { margin-bottom: 56px; scroll-margin-top: 100px; }
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        .section-num {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--micro), var(--dotnet));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-accent);
+        }
+        .section-heading h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -.3px;
+        }
+        .content p {
+            font-size: 1.02rem;
+            margin-bottom: 18px;
+            color: var(--text-body);
+            line-height: 1.9;
+        }
+        .content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 32px 0 14px;
+        }
+        .content h4 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 24px 0 10px;
+        }
+        .content ul, .content ol {
+            margin: 0 0 20px 0;
+            padding-right: 22px;
+        }
+        .content li {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.85;
+        }
+        .content ul li::marker { color: var(--accent); }
+
+        .inline-code {
+            font-family: 'Fira Code', monospace;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: .88em;
+            font-weight: 500;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .callout {
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+            border: 1px solid;
+        }
+        .callout-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .callout-body h4 { margin: 0 0 6px !important; font-size: 1rem; }
+        .callout-body p { margin: 0 !important; font-size: .95rem !important; line-height: 1.75 !important; }
+        .callout.info { background: #eff6ff; border-color: #bfdbfe; }
+        .callout.info .callout-icon { background: #dbeafe; color: #2563eb; }
+        .callout.info h4 { color: #1e40af; }
+        .callout.warning { background: #fffbeb; border-color: #fde68a; }
+        .callout.warning .callout-icon { background: #fef3c7; color: #d97706; }
+        .callout.warning h4 { color: #92400e; }
+        .callout.success { background: #ecfdf5; border-color: #a7f3d0; }
+        .callout.success .callout-icon { background: #d1fae5; color: var(--success); }
+        .callout.success h4 { color: #065f46; }
+        .callout.danger { background: #fef2f2; border-color: #fecaca; }
+        .callout.danger .callout-icon { background: #fee2e2; color: var(--danger); }
+        .callout.danger h4 { color: #991b1b; }
+        .callout.micro { background: #f0f9ff; border-color: #bae6fd; }
+        .callout.micro .callout-icon { background: var(--micro-soft); color: var(--micro); }
+        .callout.micro h4 { color: #075985; }
+
+        .code-wrapper {
+            background: var(--code-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 22px 0;
+            border: 1px solid #1e3a5f;
+            box-shadow: var(--shadow-md);
+            direction: ltr;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 18px;
+            background: #0d2137;
+            border-bottom: 1px solid #1e3a5f;
+        }
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #93c5fd;
+            font-size: .8rem;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 11px; height: 11px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+        .code-copy {
+            background: rgba(255,255,255,.08);
+            border: none;
+            color: #cbd5e1;
+            font-size: .75rem;
+            padding: 5px 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .code-copy:hover { background: rgba(14,165,233,.3); color: #fff; }
+        .code-copy.copied { background: rgba(14,159,110,.3); color: #6ee7b7; }
+        .code-body { padding: 20px 22px; overflow-x: auto; }
+        .code-body pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: .875rem;
+            line-height: 1.75;
+            color: #e2e8f0;
+            white-space: pre;
+        }
+        .code-body::-webkit-scrollbar { height: 8px; }
+        .code-body::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+
+        .kw { color: #c792ea; }
+        .type { color: #82aaff; }
+        .str { color: #c3e88d; }
+        .num { color: #f78c6c; }
+        .cmt { color: #6a8299; font-style: italic; }
+        .fn { color: #ffcb6b; }
+        .prop { color: #89ddff; }
+        .op { color: #89ddff; }
+        .punc { color: #8fa5b8; }
+        .attr { color: #f78c6c; }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 22px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .92rem;
+            min-width: 560px;
+        }
+        thead { background: var(--primary); }
+        thead th {
+            color: #fff;
+            padding: 14px 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: .88rem;
+        }
+        tbody td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-body);
+            line-height: 1.7;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:nth-child(even) { background: var(--bg-soft); }
+        tbody tr:hover { background: var(--accent-soft); }
+        tbody td strong { color: var(--text-dark); }
+        .badge-cell {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+        .badge-cell.green { background: #d1fae5; color: #065f46; }
+        .badge-cell.amber { background: #fef3c7; color: #92400e; }
+        .badge-cell.red { background: #fee2e2; color: #991b1b; }
+        .badge-cell.blue { background: #dbeafe; color: #1e40af; }
+        .badge-cell.sky { background: var(--micro-soft); color: #075985; }
+
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+            margin: 22px 0;
+        }
+        .steps li {
+            counter-increment: step;
+            position: relative;
+            padding-right: 52px;
+            padding-bottom: 22px;
+            margin: 0 !important;
+        }
+        .steps li:last-child { padding-bottom: 0; }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            right: 0; top: 0;
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--micro-soft);
+            color: var(--micro);
+            border: 1.5px solid rgba(14,165,233,.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .9rem;
+        }
+        .steps li::after {
+            content: '';
+            position: absolute;
+            right: 16px; top: 38px;
+            width: 2px;
+            height: calc(100% - 30px);
+            background: var(--border);
+        }
+        .steps li:last-child::after { display: none; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            border-color: var(--micro);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .feature-card i {
+            width: 42px; height: 42px;
+            border-radius: 11px;
+            background: var(--micro-soft);
+            color: var(--micro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+        }
+        .feature-card h4 { margin: 0 0 8px !important; font-size: 1rem; }
+        .feature-card p { margin: 0 !important; font-size: .88rem !important; color: var(--text-muted) !important; line-height: 1.7 !important; }
+
+        .note-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 28px 30px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .note-card::after {
+            content: '\f0c2';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: -10px; bottom: -30px;
+            font-size: 120px;
+            opacity: .04;
+            color: #fff;
+        }
+        .note-card h4 {
+            color: #7dd3fc !important;
+            margin: 0 0 10px !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem !important;
+        }
+        .note-card p {
+            color: rgba(255,255,255,.85) !important;
+            margin: 0 !important;
+            font-size: .95rem !important;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ Monolith vs Micro ============ */
+        .compare-big {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .compare-panel {
+            border-radius: var(--radius-lg);
+            border: 1px solid;
+            padding: 24px;
+        }
+        .compare-panel.monolith {
+            background: #fef3c7;
+            border-color: #fde68a;
+        }
+        .compare-panel.micro {
+            background: var(--micro-soft);
+            border-color: #bae6fd;
+        }
+        .compare-panel h4 {
+            margin: 0 0 14px !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.05rem !important;
+        }
+        .compare-panel.monolith h4 { color: #92400e; }
+        .compare-panel.micro h4 { color: #075985; }
+        .compare-panel ul {
+            margin: 0 !important;
+            padding-right: 18px;
+        }
+        .compare-panel li {
+            font-size: .9rem !important;
+            margin-bottom: 8px !important;
+        }
+        .compare-panel .diagram {
+            margin-top: 14px;
+            padding: 16px;
+            background: rgba(255,255,255,.6);
+            border-radius: 10px;
+            text-align: center;
+            font-size: .82rem;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+        .compare-panel .diagram .boxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        .compare-panel .diagram .boxes span {
+            background: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: .72rem;
+            border: 1px solid rgba(0,0,0,.1);
+        }
+
+        /* ============ Architecture Diagram ============ */
+        .arch-diagram {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        .arch-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 24px;
+        }
+        .arch-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--micro-soft);
+            color: var(--micro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .arch-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .arch-node {
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: .85rem;
+            font-weight: 700;
+            text-align: center;
+            min-width: 110px;
+            transition: var(--transition);
+            border: 1.5px solid;
+        }
+        .arch-node:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        .arch-node.gateway {
+            background: linear-gradient(135deg, var(--micro), #0284c7);
+            color: #fff;
+            border-color: var(--micro);
+        }
+        .arch-node.service {
+            background: #fff;
+            color: var(--text-dark);
+            border-color: var(--border);
+        }
+        .arch-node.service .svc-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            display: inline-block;
+            margin-left: 6px;
+            animation: pulseDot 1.5s infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .4; }
+        }
+        .arch-node.service .svc-name {
+            font-size: .85rem;
+            display: block;
+        }
+        .arch-node.service .svc-tech {
+            font-size: .68rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        .arch-node.db {
+            background: var(--dotnet-soft);
+            color: var(--dotnet);
+            border-color: #c4b5fd;
+            font-size: .78rem;
+        }
+        .arch-arrow {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: .85rem;
+            margin: 8px 0;
+        }
+        .arch-arrow i {
+            color: var(--micro);
+        }
+
+        /* ============ Interactive Quiz ============ */
+        .interactive-box {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .interactive-box::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--micro), var(--dotnet));
+        }
+        .interactive-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .interactive-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--micro-soft);
+            color: var(--micro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .interactive-hint {
+            font-size: .9rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+        .task-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+        .task-box p { margin-bottom: 12px; font-size: .95rem; }
+        .task-options { display: grid; gap: 10px; }
+        .task-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            font-size: .93rem;
+            text-align: right;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .task-option:hover { border-color: var(--micro); background: var(--micro-soft); }
+        .task-option.correct { border-color: var(--success); background: #ecfdf5; color: #065f46; }
+        .task-option.correct .opt-marker { background: var(--success); color: #fff; border-color: var(--success); }
+        .task-option.wrong { border-color: var(--danger); background: #fef2f2; color: #991b1b; }
+        .task-option.wrong .opt-marker { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .opt-marker {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .task-feedback {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: .9rem;
+            font-weight: 600;
+            display: none;
+        }
+        .task-feedback.show { display: block; animation: fadeInUp .3s ease; }
+        .task-feedback.ok { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .task-feedback.no { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lesson-nav {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 56px;
+            padding-top: 36px;
+            border-top: 1px solid var(--border);
+        }
+        .lesson-nav a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 22px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: var(--transition);
+            background: #fff;
+        }
+        .lesson-nav a:hover {
+            border-color: var(--micro);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .lesson-nav a.next { justify-content: flex-end; text-align: left; }
+        .lesson-nav .nav-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: var(--micro-soft);
+            color: var(--micro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: .9rem;
+        }
+        .lesson-nav .nav-label {
+            font-size: .75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .lesson-nav .nav-title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .footer {
+            background: var(--primary);
+            color: rgba(255,255,255,.7);
+            padding: 48px 0 28px;
+            margin-top: 40px;
+        }
+        .footer-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .footer-bottom {
+            padding-top: 28px;
+            border-top: 1px solid rgba(255,255,255,.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: .85rem;
+        }
+        .footer-bottom a { color: #7dd3fc; text-decoration: none; }
+        .footer-bottom a:hover { text-decoration: underline; }
+
+        .back-top {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(16px);
+            transition: var(--transition);
+            z-index: 900;
+        }
+        .back-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-top:hover { background: var(--micro); }
+
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; gap: 0; }
+            .sidebar {
+                position: static;
+                max-height: none;
+                margin-bottom: 32px;
+                padding: 20px;
+                background: var(--bg-soft);
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+            }
+            .toc-list { border-right: none; display: flex; flex-wrap: wrap; gap: 6px; }
+            .toc-list li a {
+                border-right: none;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                margin-right: 0;
+                padding: 7px 13px;
+                font-size: .85rem;
+                background: #fff;
+            }
+            .toc-list li a.active { border-color: var(--micro); }
+            .compare-big { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .header-nav, .header-cta .btn-outline-light { display: none; }
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .hero h1 { font-size: 1.9rem; }
+            .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+            .hero-side { flex-direction: row; flex-wrap: wrap; }
+            .hero-side .btn-primary, .hero-side .btn-secondary { flex: 1; min-width: 150px; }
+            .section-heading h2 { font-size: 1.35rem; }
+            .lesson-nav { grid-template-columns: 1fr; }
+            .content-section { margin-bottom: 40px; }
+            .container { padding: 0 18px; }
+            .header-inner { padding: 0 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="header" id="header">
+    <div class="header-inner">
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fas fa-code"></i></div>
+            <div class="brand-text">Code<span>Way</span></div>
+        </a>
+        <nav class="header-nav">
+            <a href="#">الرئيسية</a>
+            <a href="#">المسارات</a>
+            <a href="#" class="active">C#</a>
+            <a href="#">المدونة</a>
+            <a href="#">تواصل</a>
+        </nav>
+        <div class="header-cta">
+            <button class="btn-outline-light" onclick="alert('تم حفظ الدرس في قائمتك ✔')">
+                <i class="far fa-bookmark"></i> حفظ
+            </button>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">الرئيسية</a>
+            <i class="fas fa-chevron-left"></i>
+            <a href="#">هندسة البرمجيات</a>
+            <i class="fas fa-chevron-left"></i>
+            <span class="current">Microservices</span>
+        </div>
+        <div class="hero-grid">
+            <div>
+                <span class="hero-badge">
+                    <i class="fas fa-cubes"></i> الدرس الثامن · هندسة البرمجيات
+                </span>
+                <h1>بناء <span class="highlight">Microservices</span> بـ .NET</h1>
+                <p class="hero-desc">
+                    تقسيم النظام الضخم إلى خدمات صغيرة مستقلة، كل منها يعمل ويُنشر منفصلاً.
+                    ستتعلم المعمارية، Docker، API Gateway، gRPC، وأفضل الممارسات — مع
+                    مخطط تفاعلي يريك كيف تتواصل الخدمات.
+                </p>
+                <div class="hero-meta">
+                    <span class="meta-item"><i class="far fa-clock"></i> 90 دقيقة</span>
+                    <span class="meta-item"><i class="fas fa-signal"></i> متقدم</span>
+                    <span class="meta-item"><i class="fas fa-cubes"></i> 8 مفاهيم</span>
+                    <span class="meta-item"><i class="fas fa-code"></i> 10 أمثلة</span>
+                </div>
+            </div>
+            <div class="hero-side">
+                <button class="btn-primary" onclick="document.getElementById('sec-1').scrollIntoView()">
+                    <i class="fas fa-play"></i> ابدأ الدرس
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('sec-5').scrollIntoView()">
+                    <i class="fas fa-sitemap"></i> شاهد المخطط
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="main-layout">
+
+        <aside class="sidebar">
+            <div class="toc-title"><i class="fas fa-list-ul"></i> محتويات الدرس</div>
+            <ul class="toc-list" id="tocList">
+                <li><a href="#sec-1" class="active">1. ما هي Microservices؟</a></li>
+                <li><a href="#sec-2">2. Monolith مقابل Microservices</a></li>
+                <li><a href="#sec-3">3. بناء أول خدمة</a></li>
+                <li><a href="#sec-4">4. Docker و Kubernetes</a></li>
+                <li><a href="#sec-5">5. المعمارية الكاملة</a></li>
+                <li><a href="#sec-6">6. التواصل: REST و gRPC</a></li>
+                <li><a href="#sec-7">7. API Gateway</a></li>
+                <li><a href="#sec-8">8. Message Broker</a></li>
+                <li><a href="#sec-9">9. أفضل الممارسات</a></li>
+                <li><a href="#sec-10">10. تمارين تفاعلية</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+
+            <!-- ====== 1 ====== -->
+            <section class="content-section" id="sec-1">
+                <div class="section-heading">
+                    <div class="section-num">1</div>
+                    <h2>ما هي Microservices؟</h2>
+                </div>
+                <p>
+                    <strong>Microservices</strong> هو نمط معماري يقسّم التطبيق إلى خدمات صغيرة
+                    مستقلة، كل واحدة:
+                </p>
+                <ul>
+                    <li>تعمل في <strong>عملية (process) منفصلة</strong>.</li>
+                    <li>تنشر <strong>بشكل مستقل</strong> عن البقية.</li>
+                    <li>تملك <strong>قاعدة بياناتها</strong> الخاصة.</li>
+                    <li>تتواصل مع الأخرى عبر <strong>شبكة</strong> (HTTP/gRPC/Message).</li>
+                    <li>تنظّم حول <strong>قدرة أعمال</strong> (Business Capability).</li>
+                </ul>
+
+                <h3>مثال: متجر إلكتروني</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-user"></i>
+                        <h4>User Service</h4>
+                        <p>إدارة الحسابات، المصادقة، الملف الشخصي.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-box"></i>
+                        <h4>Product Service</h4>
+                        <p>الكتالوج، الفئات، المخزون.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h4>Order Service</h4>
+                        <p>الطلبات، الدفع، الفواتير.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-bell"></i>
+                        <h4>Notification Service</h4>
+                        <p>إرسال إيميلات وإشعارات.</p>
+                    </div>
+                </div>
+
+                <div class="callout micro">
+                    <div class="callout-icon"><i class="fas fa-gem"></i></div>
+                    <div class="callout-body">
+                        <h4>الفكرة الأساسية</h4>
+                        <p>
+                            كل خدمة يمكن أن تكون صغيرة ويركّز فريقها عليها فقط. لو تعطّلت خدمة
+                            الإشعارات، لا يتوقف المتجر عن العمل — الطلبات تستمر.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 2 ====== -->
+            <section class="content-section" id="sec-2">
+                <div class="section-heading">
+                    <div class="section-num">2</div>
+                    <h2>Monolith مقابل Microservices</h2>
+                </div>
+                <p>
+                    Microservices ليست دائماً الخيار الأفضل. لكل نمط نقاط قوة وضعف.
+                </p>
+
+                <div class="compare-big">
+                    <div class="compare-panel monolith">
+                        <h4><i class="fas fa-cube"></i> Monolith (متجانس)</h4>
+                        <ul>
+                            <li>✅ بسيط للتطوير في البداية.</li>
+                            <li>✅ نشر واحد.</li>
+                            <li>✅ أداء أفضل بين المكونات.</li>
+                            <li>❌ تطوير أبطأ كلما كبر.</li>
+                            <li>❌ نشر صغير يعيد نشر كل شيء.</li>
+                            <li>❌ تقنية واحدة للكل.</li>
+                        </ul>
+                        <div class="diagram">
+                            التطبيق الكامل
+                            <div class="boxes">
+                                <span>Users</span>
+                                <span>Orders</span>
+                                <span>Products</span>
+                                <span>Notif</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="compare-panel micro">
+                        <h4><i class="fas fa-cubes"></i> Microservices</h4>
+                        <ul>
+                            <li>✅ فِرق مستقلة.</li>
+                            <li>✅ نشر مستقل لكل خدمة.</li>
+                            <li>✅ مرونة في التقنيات.</li>
+                            <li>✅ تحمّل الأعطال.</li>
+                            <li>❌ تعقيد تشغيلي كبير.</li>
+                            <li>❌ تأخير في الشبكة.</li>
+                        </ul>
+                        <div class="diagram">
+                            خدمات مستقلة
+                            <div class="boxes">
+                                <span>Users</span>
+                                <span>Orders</span>
+                                <span>Products</span>
+                                <span>Notif</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>جدول مقارنة</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المعيار</th>
+                                <th>Monolith</th>
+                                <th>Microservices</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>البساطة</strong></td>
+                                <td><span class="badge-cell green">عالية</span></td>
+                                <td><span class="badge-cell red">منخفضة</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>النشر</strong></td>
+                                <td><span class="badge-cell amber">موحّد</span></td>
+                                <td><span class="badge-cell green">مستقل</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>الأداء</strong></td>
+                                <td><span class="badge-cell green">ممتاز</span></td>
+                                <td><span class="badge-cell amber">تأخير شبكة</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>الفريق</strong></td>
+                                <td><span class="badge-cell amber">مركزي</span></td>
+                                <td><span class="badge-cell green">موزّع</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>التوسع</strong></td>
+                                <td><span class="badge-cell amber">عمودي</span></td>
+                                <td><span class="badge-cell green">أفقي</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>التعقيد</strong></td>
+                                <td><span class="badge-cell green">منخفض</span></td>
+                                <td><span class="badge-cell red">مرتفع</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="callout-body">
+                        <h4>لا تبدأ بـ Microservices</h4>
+                        <p>
+                            ابدأ بـ <strong>Monolith نظيف</strong>. إذا كبر المشروع واحتجت،
+                            انتقل تدريجياً إلى Microservices. هذا ما يسمى <strong>Monolith First</strong>
+                            — نهج Martin Fowler الموصى به.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 3 ====== -->
+            <section class="content-section" id="sec-3">
+                <div class="section-heading">
+                    <div class="section-num">3</div>
+                    <h2>بناء أول خدمة</h2>
+                </div>
+                <p>
+                    كل خدمة هي مشروع ASP.NET Core Web API مستقل. لننشئ خدمة المنتجات.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Terminal</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt"># إنشاء الحل الرئيسي</span>
+dotnet new sln -n EShop
+
+<span class="cmt"># إنشاء 3 خدمات</span>
+dotnet new webapi -n ProductService
+dotnet new webapi -n OrderService
+dotnet new webapi -n UserService
+
+<span class="cmt"># إضافتها للحل</span>
+dotnet sln add ProductService/ProductService.csproj
+dotnet sln add OrderService/OrderService.csproj
+dotnet sln add UserService/UserService.csproj</pre>
+                    </div>
+                </div>
+
+                <h3>خدمة المنتجات</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> ProductService/Controllers/ProductsController.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> Microsoft.AspNetCore.Mvc;
+
+<span class="kw">namespace</span> ProductService.Controllers;
+
+[<span class="attr">ApiController</span>]
+[<span class="attr">Route</span>(<span class="str">"api/[controller]"</span>)]
+<span class="kw">public class</span> <span class="type">ProductsController</span> : <span class="type">ControllerBase</span>
+{
+    <span class="kw">private readonly</span> <span class="type">IProductService</span> _service;
+
+    <span class="kw">public</span> <span class="fn">ProductsController</span>(<span class="type">IProductService</span> service)
+        => _service = service;
+
+    [<span class="attr">HttpGet</span>]
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">IEnumerable</span>&lt;<span class="type">ProductDto</span>&gt;&gt; <span class="fn">GetAll</span>()
+        => <span class="kw">await</span> _service.<span class="fn">GetAllAsync</span>();
+
+    [<span class="attr">HttpGet</span>(<span class="str">"{id:int}"</span>)]
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">ActionResult</span>&lt;<span class="type">ProductDto</span>&gt;&gt; <span class="fn">GetById</span>(<span class="kw">int</span> id)
+    {
+        <span class="kw">var</span> product = <span class="kw">await</span> _service.<span class="fn">GetByIdAsync</span>(id);
+        <span class="kw">return</span> product <span class="kw">is null</span> ? <span class="fn">NotFound</span>() : <span class="fn">Ok</span>(product);
+    }
+
+    [<span class="attr">HttpPost</span>]
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">ActionResult</span>&lt;<span class="type">ProductDto</span>&gt;&gt; <span class="fn">Create</span>(<span class="type">CreateProductDto</span> dto)
+    {
+        <span class="kw">var</span> product = <span class="kw">await</span> _service.<span class="fn">CreateAsync</span>(dto);
+        <span class="kw">return</span> <span class="fn">CreatedAtAction</span>(<span class="kw">nameof</span>(GetById),
+            <span class="kw">new</span> { id = product.<span class="prop">Id</span> }, product);
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <h3>ملف Dockerfile (لتشغيل الخدمة في حاوية)</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> ProductService/Dockerfile</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">FROM</span> mcr.microsoft.com/dotnet/aspnet:8.0 <span class="kw">AS</span> base
+<span class="kw">WORKDIR</span> /app
+<span class="kw">EXPOSE</span> 8080
+
+<span class="kw">FROM</span> mcr.microsoft.com/dotnet/sdk:8.0 <span class="kw">AS</span> build
+<span class="kw">WORKDIR</span> /src
+<span class="kw">COPY</span> ["ProductService.csproj", "./"]
+<span class="kw">RUN</span> dotnet restore
+<span class="kw">COPY</span> . .
+<span class="kw">RUN</span> dotnet publish -c Release -o /app/publish
+
+<span class="kw">FROM</span> base <span class="kw">AS</span> final
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> --from=build /app/publish .
+<span class="kw">ENV</span> ASPNETCORE_URLS=http://+:8080
+<span class="kw">ENTRYPOINT</span> ["dotnet", "ProductService.dll"]</pre>
+                    </div>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-icon"><i class="fas fa-check"></i></div>
+                    <div class="callout-body">
+                        <h4>كل خدمة قاعدة بياناتها</h4>
+                        <p>
+                            <strong>User Service</strong> → UsersDB. <strong>Order Service</strong>
+                            → OrdersDB. <strong>Product Service</strong> → ProductsDB. لا تشارك
+                            قاعدة بيانات بين الخدمات.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 4 ====== -->
+            <section class="content-section" id="sec-4">
+                <div class="section-heading">
+                    <div class="section-num">4</div>
+                    <h2>Docker و Kubernetes</h2>
+                </div>
+                <p>
+                    لا يمكن تشغيل Microservices يدوياً — تحتاج أتمتة. Docker لحزم الخدمات،
+                    Kubernetes لإدارتها.
+                </p>
+
+                <h3>Docker Compose — تشغيل كل الخدمات بأمر واحد</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> docker-compose.yml</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">version</span>: <span class="str">'3.8'</span>
+
+<span class="kw">services</span>:
+  <span class="kw">users-db</span>:
+    <span class="kw">image</span>: postgres:16
+    <span class="kw">environment</span>:
+      <span class="kw">POSTGRES_DB</span>: usersdb
+      <span class="kw">POSTGRES_PASSWORD</span>: secret
+    <span class="kw">volumes</span>:
+      - users-data:/var/lib/postgresql/data
+
+  <span class="kw">user-service</span>:
+    <span class="kw">build</span>: ./UserService
+    <span class="kw">environment</span>:
+      <span class="kw">ConnectionStrings__Default</span>: Host=users-db;Database=usersdb;Username=postgres;Password=secret
+    <span class="kw">depends_on</span>:
+      - users-db
+    <span class="kw">ports</span>:
+      - <span class="str">"5001:8080"</span>
+
+  <span class="kw">product-service</span>:
+    <span class="kw">build</span>: ./ProductService
+    <span class="kw">environment</span>:
+      <span class="kw">ConnectionStrings__Default</span>: Host=products-db;Database=productsdb;Username=postgres;Password=secret
+    <span class="kw">depends_on</span>:
+      - products-db
+    <span class="kw">ports</span>:
+      - <span class="str">"5002:8080"</span>
+
+  <span class="kw">order-service</span>:
+    <span class="kw">build</span>: ./OrderService
+    <span class="kw">environment</span>:
+      <span class="kw">ConnectionStrings__Default</span>: Host=orders-db;Database=ordersdb;Username=postgres;Password=secret
+      <span class="kw">Services__User__Url</span>: http://user-service:8080
+      <span class="kw">Services__Product__Url</span>: http://product-service:8080
+    <span class="kw">depends_on</span>:
+      - orders-db
+      - user-service
+      - product-service
+    <span class="kw">ports</span>:
+      - <span class="str">"5003:8080"</span>
+
+  <span class="kw">api-gateway</span>:
+    <span class="kw">image</span>: nginx:alpine
+    <span class="kw">volumes</span>:
+      - ./gateway.conf:/etc/nginx/nginx.conf
+    <span class="kw">ports</span>:
+      - <span class="str">"8080:80"</span>
+    <span class="kw">depends_on</span>:
+      - user-service
+      - product-service
+      - order-service
+
+<span class="kw">volumes</span>:
+  <span class="kw">users-data</span>:
+  <span class="kw">products-data</span>:
+  <span class="kw">orders-data</span>:</pre>
+                    </div>
+                </div>
+
+                <h3>أمر واحد لتشغيل الكل</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Terminal</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt"># تشغيل كل الخدمات في الخلفية</span>
+docker compose up -d
+
+<span class="cmt"># مشاهدة اللوجات</span>
+docker compose logs -f user-service
+
+<span class="cmt"># إيقاف الكل</span>
+docker compose down
+
+<span class="cmt"># حذف كل شيء (بما فيه البيانات)</span>
+docker compose down -v</pre>
+                    </div>
+                </div>
+
+                <h3>Kubernetes — للإنتاج</h3>
+                <p>
+                    عندما ينمو المشروع، انتقل من Docker Compose إلى Kubernetes:
+                </p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الميزة</th>
+                                <th>Docker Compose</th>
+                                <th>Kubernetes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>الاستخدام</strong></td>
+                                <td>التطوير المحلي</td>
+                                <td>الإنتاج</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Auto-scaling</strong></td>
+                                <td><span class="badge-cell red">لا</span></td>
+                                <td><span class="badge-cell green">نعم</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Self-healing</strong></td>
+                                <td><span class="badge-cell amber">محدود</span></td>
+                                <td><span class="badge-cell green">كامل</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Load Balancing</strong></td>
+                                <td><span class="badge-cell red">يدوي</span></td>
+                                <td><span class="badge-cell green">مدمج</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rolling Updates</strong></td>
+                                <td><span class="badge-cell red">لا</span></td>
+                                <td><span class="badge-cell green">نعم</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ====== 5 ====== -->
+            <section class="content-section" id="sec-5">
+                <div class="section-heading">
+                    <div class="section-num">5</div>
+                    <h2>المعمارية الكاملة</h2>
+                </div>
+                <p>
+                    في نظام Microservices واقعي، يوجد أكثر من مجرد خدمات. إليك المعمارية الشائعة:
+                </p>
+
+                <div class="arch-diagram">
+                    <div class="arch-title">
+                        <i class="fas fa-sitemap"></i> معمارية متجر إلكتروني
+                    </div>
+
+                    <div class="arch-row">
+                        <div class="arch-node gateway">
+                            <i class="fas fa-globe"></i> API Gateway
+                        </div>
+                    </div>
+
+                    <div class="arch-arrow">
+                        <i class="fas fa-arrow-down"></i> يوجّه الطلبات
+                    </div>
+
+                    <div class="arch-row">
+                        <div class="arch-node service">
+                            <i class="fas fa-user"></i>
+                            <span class="svc-name">User Service<span class="svc-dot"></span></span>
+                            <span class="svc-tech">.NET 8</span>
+                        </div>
+                        <div class="arch-node service">
+                            <i class="fas fa-box"></i>
+                            <span class="svc-name">Product Service<span class="svc-dot"></span></span>
+                            <span class="svc-tech">.NET 8</span>
+                        </div>
+                        <div class="arch-node service">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="svc-name">Order Service<span class="svc-dot"></span></span>
+                            <span class="svc-tech">.NET 8</span>
+                        </div>
+                        <div class="arch-node service">
+                            <i class="fas fa-bell"></i>
+                            <span class="svc-name">Notification<span class="svc-dot"></span></span>
+                            <span class="svc-tech">.NET 8</span>
+                        </div>
+                    </div>
+
+                    <div class="arch-arrow">
+                        <i class="fas fa-arrow-down"></i> كل خدمة لها قاعدتها
+                    </div>
+
+                    <div class="arch-row">
+                        <div class="arch-node db">UsersDB</div>
+                        <div class="arch-node db">ProductsDB</div>
+                        <div class="arch-node db">OrdersDB</div>
+                        <div class="arch-node db">NotifDB</div>
+                    </div>
+
+                    <div class="arch-arrow" style="margin-top:20px">
+                        <i class="fas fa-arrow-down"></i> تتبادل الأحداث
+                    </div>
+
+                    <div class="arch-row">
+                        <div class="arch-node gateway" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:#8b5cf6">
+                            <i class="fas fa-exchange-alt"></i> Message Broker (RabbitMQ)
+                        </div>
+                    </div>
+                </div>
+
+                <h3>المكونات الأساسية</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المكوّن</th>
+                                <th>الوظيفة</th>
+                                <th>أمثلة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>API Gateway</strong></td>
+                                <td>نقطة دخول واحدة + توجيه + مصادقة</td>
+                                <td>Ocelot, YARP, Kong</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Message Broker</strong></td>
+                                <td>تواصل غير متزامن بين الخدمات</td>
+                                <td>RabbitMQ, Kafka</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Service Discovery</strong></td>
+                                <td>اكتشاف عناوين الخدمات</td>
+                                <td>Consul, Eureka</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Config Server</strong></td>
+                                <td>إعدادات مركزية</td>
+                                <td>Spring Cloud Config, Azure App Config</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Log Aggregation</strong></td>
+                                <td>تجميع اللوجات من كل الخدمات</td>
+                                <td>ELK Stack, Seq</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tracing</strong></td>
+                                <td>تتبع طلب واحد عبر الخدمات</td>
+                                <td>Jaeger, Zipkin, OpenTelemetry</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ====== 6 ====== -->
+            <section class="content-section" id="sec-6">
+                <div class="section-heading">
+                    <div class="section-num">6</div>
+                    <h2>التواصل: REST و gRPC</h2>
+                </div>
+                <p>
+                    الخدمات تتحدث مع بعضها بطريقتين رئيسيتين: <strong>REST/HTTP</strong>
+                    (متزامن) و <strong>Message Broker</strong> (غير متزامن).
+                </p>
+
+                <h3>الطريقة 1: HTTP Client</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> OrderService — استدعاء ProductService</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">ProductClient</span>
+{
+    <span class="kw">private readonly</span> <span class="type">HttpClient</span> _http;
+
+    <span class="kw">public</span> <span class="fn">ProductClient</span>(<span class="type">HttpClient</span> http) => _http = http;
+
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">ProductDto</span>?&gt; <span class="fn">GetAsync</span>(<span class="kw">int</span> id)
+    {
+        <span class="kw">var</span> response = <span class="kw">await</span> _http.<span class="fn">GetAsync</span>(<span class="str">$"/api/products/{id}"</span>);
+        <span class="kw">if</span> (!response.IsSuccessStatusCode) <span class="kw">return null</span>;
+
+        <span class="kw">return await</span> response.Content
+            .<span class="fn">ReadFromJsonAsync</span>&lt;<span class="type">ProductDto</span>&gt;();
+    }
+}
+
+<span class="cmt">// التسجيل في DI</span>
+builder.Services.<span class="fn">AddHttpClient</span>&lt;<span class="type">ProductClient</span>&gt;(c =>
+{
+    c.<span class="prop">BaseAddress</span> = <span class="kw">new</span> <span class="type">Uri</span>(
+        builder.Configuration[<span class="str">"Services:Product:Url"</span>]!);
+});</pre>
+                    </div>
+                </div>
+
+                <h3>الطريقة 2: gRPC</h3>
+                <p>
+                    <strong>gRPC</strong> هو بديل حديث لـ REST — أسرع، يستخدم Protocol Buffers،
+                    يدعم Streaming.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Protos/product.proto</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">syntax</span> = <span class="str">"proto3"</span>;
+
+<span class="kw">package</span> product;
+
+<span class="kw">service</span> ProductService {
+  <span class="kw">rpc</span> GetProduct (GetProductRequest) <span class="kw">returns</span> (ProductReply);
+  <span class="kw">rpc</span> ListProducts (Empty) <span class="kw">returns</span> (<span class="kw">stream</span> ProductReply);
+}
+
+<span class="kw">message</span> GetProductRequest {
+  <span class="kw">int32</span> id = <span class="num">1</span>;
+}
+
+<span class="kw">message</span> ProductReply {
+  <span class="kw">int32</span> id = <span class="num">1</span>;
+  <span class="kw">string</span> name = <span class="num">2</span>;
+  <span class="kw">double</span> price = <span class="num">3</span>;
+}</pre>
+                    </div>
+                </div>
+
+                <h3>مقارنة REST و gRPC</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المعيار</th>
+                                <th>REST/JSON</th>
+                                <th>gRPC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>الأداء</strong></td>
+                                <td><span class="badge-cell amber">جيد</span></td>
+                                <td><span class="badge-cell green">ممتاز</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>حجم البيانات</strong></td>
+                                <td><span class="badge-cell amber">JSON نصي</span></td>
+                                <td><span class="badge-cell green">Binary</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>سهولة الاستخدام</strong></td>
+                                <td><span class="badge-cell green">بسيط</span></td>
+                                <td><span class="badge-cell amber">يحتاج proto</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Streaming</strong></td>
+                                <td><span class="badge-cell red">محدود</span></td>
+                                <td><span class="badge-cell green">كامل</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>دعم المتصفح</strong></td>
+                                <td><span class="badge-cell green">كامل</span></td>
+                                <td><span class="badge-cell amber">يحتاج gRPC-Web</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout micro">
+                    <div class="callout-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="callout-body">
+                        <h4>متى تستخدم أيهما؟</h4>
+                        <p>
+                            <strong>REST</strong> للتواصل مع العملاء (Browsers/Mobile).
+                            <strong>gRPC</strong> للتواصل بين الخدمات الداخلية (أسرع بكثير).
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 7 ====== -->
+            <section class="content-section" id="sec-7">
+                <div class="section-heading">
+                    <div class="section-num">7</div>
+                    <h2>API Gateway</h2>
+                </div>
+                <p>
+                    بدلاً من أن يتصل العميل بخدمات متعددة، يتصل بـ <strong>Gateway واحد</strong>
+                    يوجّه الطلبات ويعالج القضايا الشاملة (Cross-cutting Concerns).
+                </p>
+
+                <h3>ماذا يفعل API Gateway؟</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-route"></i>
+                        <h4>Routing</h4>
+                        <p>يوجّه /api/users إلى UserService وهكذا.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shield-halved"></i>
+                        <h4>Authentication</h4>
+                        <p>يتحقق من JWT قبل تمرير الطلب.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-gauge-high"></i>
+                        <h4>Rate Limiting</h4>
+                        <p>يحمي الخدمات من الطلبات الزائدة.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-eye"></i>
+                        <h4>Logging</h4>
+                        <p>يسجل كل طلب في مكان واحد.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-balance-scale"></i>
+                        <h4>Load Balancing</h4>
+                        <p>يوزع الطلبات على نسخ الخدمة.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-arrows-rotate"></i>
+                        <h4>Retry & Circuit Breaker</h4>
+                        <p>يعيد المحاولة أو يعزل خدمة فاشلة.</p>
+                    </div>
+                </div>
+
+                <h3>مثال: Ocelot</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> ocelot.json</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre>{
+  <span class="json-key">"Routes"</span>: [
+    {
+      <span class="json-key">"UpstreamPathTemplate"</span>: <span class="json-str">"/api/users/{everything}"</span>,
+      <span class="json-key">"UpstreamHttpMethod"</span>: [ <span class="json-str">"GET"</span>, <span class="json-str">"POST"</span>, <span class="json-str">"PUT"</span> ],
+      <span class="json-key">"DownstreamPathTemplate"</span>: <span class="json-str">"/api/users/{everything}"</span>,
+      <span class="json-key">"DownstreamScheme"</span>: <span class="json-str">"http"</span>,
+      <span class="json-key">"DownstreamHostAndPorts"</span>: [
+        { <span class="json-key">"Host"</span>: <span class="json-str">"user-service"</span>, <span class="json-key">"Port"</span>: <span class="json-num">8080</span> }
+      ]
+    },
+    {
+      <span class="json-key">"UpstreamPathTemplate"</span>: <span class="json-str">"/api/products/{everything}"</span>,
+      <span class="json-key">"UpstreamHttpMethod"</span>: [ <span class="json-str">"GET"</span>, <span class="json-str">"POST"</span> ],
+      <span class="json-key">"DownstreamPathTemplate"</span>: <span class="json-str">"/api/products/{everything}"</span>,
+      <span class="json-key">"DownstreamScheme"</span>: <span class="json-str">"http"</span>,
+      <span class="json-key">"DownstreamHostAndPorts"</span>: [
+        { <span class="json-key">"Host"</span>: <span class="json-str">"product-service"</span>, <span class="json-key">"Port"</span>: <span class="json-num">8080</span> }
+      ]
+    }
+  ]
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="callout-body">
+                        <h4>Gateway = نقطة فشل واحدة</h4>
+                        <p>
+                            لأن كل الطلبات تمر عبره، Gateway قد يكون عنق زجاجة. شغّله في
+                            وضع <strong>HA</strong> (نسخ متعددة) وراقب أداءه دائماً.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 8 ====== -->
+            <section class="content-section" id="sec-8">
+                <div class="section-heading">
+                    <div class="section-num">8</div>
+                    <h2>Message Broker — التواصل غير المتزامن</h2>
+                </div>
+                <p>
+                    بدلاً من انتظار رد فوري، ترسل الخدمة حدثاً لـ Broker، والخدمات الأخرى
+                    تستمع وتتفاعل. هذا هو نمط <strong>Event-Driven</strong>.
+                </p>
+
+                <h3>مثال: إرسال إشعار عند إنشاء طلب</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> OrderService — نشر حدث</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public async</span> <span class="type">Task</span> <span class="fn">PlaceOrderAsync</span>(<span class="type">Order</span> order)
+{
+    <span class="cmt">// 1) حفظ الطلب في قاعدة البيانات</span>
+    <span class="kw">await</span> _db.<span class="prop">Orders</span>.<span class="fn">AddAsync</span>(order);
+    <span class="kw">await</span> _db.<span class="fn">SaveChangesAsync</span>();
+
+    <span class="cmt">// 2) نشر حدث — لا ننتظر أحداً</span>
+    <span class="kw">await</span> _messageBus.<span class="fn">PublishAsync</span>(
+        <span class="kw">new</span> <span class="type">OrderPlacedEvent</span>
+        {
+            OrderId = order.<span class="prop">Id</span>,
+            UserEmail = order.<span class="prop">UserEmail</span>,
+            Total = order.<span class="prop">Total</span>
+        });
+}</pre>
+                    </div>
+                </div>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> NotificationService — استقبال الحدث</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">OrderPlacedHandler</span>
+    : <span class="type">IIntegrationEventHandler</span>&lt;<span class="type">OrderPlacedEvent</span>&gt;
+{
+    <span class="kw">private readonly</span> <span class="type">IEmailSender</span> _email;
+
+    <span class="kw">public</span> <span class="fn">OrderPlacedHandler</span>(<span class="type">IEmailSender</span> email) => _email = email;
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">HandleAsync</span>(<span class="type">OrderPlacedEvent</span> evt)
+    {
+        <span class="kw">await</span> _email.<span class="fn">SendAsync</span>(
+            evt.<span class="prop">UserEmail</span>,
+            <span class="str">"تم تأكيد طلبك"</span>,
+            <span class="str">$"رقم الطلب: {evt.OrderId}"</span>);
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout micro">
+                    <div class="callout-icon"><i class="fas fa-gem"></i></div>
+                    <div class="callout-body">
+                        <h4>لماذا Message Broker؟</h4>
+                        <p>
+                            <strong>فصل تام:</strong> OrderService لا يعرف من يستمع للأحداث.
+                            <strong>تحمّل الأعطال:</strong> لو تعطّلت NotificationService، تُحفظ
+                            الأحداث وتُعالج عند عودتها.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 9 ====== -->
+            <section class="content-section" id="sec-9">
+                <div class="section-heading">
+                    <div class="section-num">9</div>
+                    <h2>أفضل الممارسات</h2>
+                </div>
+
+                <ul class="steps">
+                    <li><strong>ابدأ بـ Monolith:</strong> لا تنتقل إلى Microservices إلا عند الحاجة الحقيقية.</li>
+                    <li><strong>خدمة = منطق أعمال كامل:</strong> لا تقسم بناءً على طبقات تقنية (Users, Orders) بل على قدرات (Billing, Shipping).</li>
+                    <li><strong>قاعدة بيانات لكل خدمة:</strong> لا تشارك قاعدة بيانات بين خدمتين.</li>
+                    <li><strong>API Gateway نقطة واحدة:</strong> لا تعرّض الخدمات مباشرة للعملاء.</li>
+                    <li><strong>Async للتواصل:</strong> استخدم Message Broker بين الخدمات، وتجنب Calls المتزامنة الطويلة.</li>
+                    <li><strong>Retry + Circuit Breaker:</strong> عالج فشل الخدمات البعيدة تلقائياً (Polly).</li>
+                    <li><strong>رصد مركزي:</strong> Logs وTraces وMetrics في مكان واحد (ELK/OpenTelemetry).</li>
+                    <li><strong>Distributed Tracing:</strong> تتبع طلب واحد عبر كل الخدمات بـ Correlation ID.</li>
+                    <li><strong>Saga Pattern:</strong> للعمليات الموزعة التي تحتاج Rollback.</li>
+                    <li><strong>CI/CD لكل خدمة:</strong> كل خدمة لها pipeline خاص للنشر.</li>
+                    <li><strong>Docker دائماً:</strong> لا تنشر خدمة بدون حاوية.</li>
+                    <li><strong>لا تُفرط في التقسيم:</strong> 50 خدمة صغيرة قد تكون أسوأ من 5 كبيرة.</li>
+                </ul>
+
+                <div class="note-card">
+                    <h4><i class="fas fa-gem"></i> الحقيقة الصادقة</h4>
+                    <p>
+                        Microservices تحل مشاكل تنظيمية أكثر من تقنية. إذا كان لديك فريق واحد صغير
+                        ومشروع بسيط، <strong>Monolith قد يكون أفضل</strong>. اختر ما يخدم مشروعك —
+                        لا ما يقول الترند.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ====== 10 ====== -->
+            <section class="content-section" id="sec-10">
+                <div class="section-heading">
+                    <div class="section-num">10</div>
+                    <h2>تمارين تفاعلية</h2>
+                </div>
+                <p>اختبر فهمك لـ Microservices:</p>
+
+                <div class="interactive-box">
+                    <div class="interactive-title"><i class="fas fa-question-circle"></i> سؤال 1</div>
+                    <p class="interactive-hint">ما الفرق الأساسي بين Monolith و Microservices؟</p>
+                    <div class="task-box" data-quiz="1">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> Microservices أسرع دائماً</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> Microservices = خدمات مستقلة النشر، Monolith = تطبيق واحد</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> Monolith لا يمكن أن يكون كبيراً</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> لا فرق بينهما</button>
+                        </div>
+                        <div class="task-feedback" id="fb1"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 2</div>
+                    <p class="interactive-hint">ما وظيفة API Gateway؟</p>
+                    <div class="task-box" data-quiz="2">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> تخزين البيانات</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> نقطة دخول واحدة توجّه وتحمي وتوثق الطلبات</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> مراقبة الخدمات فقط</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> بديل لقاعدة البيانات</button>
+                        </div>
+                        <div class="task-feedback" id="fb2"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 3</div>
+                    <p class="interactive-hint">متى تختار gRPC على REST؟</p>
+                    <div class="task-box" data-quiz="3">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> للتواصل مع المتصفحات</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> للتواصل بين الخدمات الداخلية (أسرع)</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> بدل قاعدة البيانات</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> عند الحاجة إلى JSON</button>
+                        </div>
+                        <div class="task-feedback" id="fb3"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 4</div>
+                    <p class="interactive-hint">ماذا يفعل Message Broker؟</p>
+                    <div class="task-box" data-quiz="4">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> يعالج الصور</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> ينقل الأحداث بين الخدمات بشكل غير متزامن</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> يحفظ الكود</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> يترجم الكود</button>
+                        </div>
+                        <div class="task-feedback" id="fb4"></div>
+                    </div>
+                </div>
+            </section>
+
+            <nav class="lesson-nav">
+                <a href="#" class="prev">
+                    <div class="nav-icon"><i class="fas fa-arrow-right"></i></div>
+                    <div>
+                        <div class="nav-label">الدرس السابق</div>
+                        <div class="nav-title">Entity Framework Core</div>
+                    </div>
+                </a>
+                <a href="#" class="next">
+                    <div>
+                        <div class="nav-label">الدرس التالي</div>
+                        <div class="nav-title">Azure DevOps و CI/CD</div>
+                    </div>
+                    <div class="nav-icon"><i class="fas fa-arrow-left"></i></div>
+                </a>
+            </nav>
+
+        </main>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-bottom">
+            <span>© 2026 CodeWay — جميع الحقوق محفوظة.</span>
+            <span>صُمم بعناية لتعلم C# بالعربية · <a href="#">سياسة الخصوصية</a></span>
+        </div>
+    </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    /* ============ شريط التقدم ============ */
+    const progressBar = document.getElementById('progressBar');
+    const header = document.getElementById('header');
+    const backTop = document.getElementById('backTop');
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = (scrollTop / docHeight) * 100 + '%';
+        header.classList.toggle('scrolled', scrollTop > 20);
+        backTop.classList.toggle('show', scrollTop > 400);
+    });
+
+    /* ============ نسخ الكود ============ */
+    function copyCode(btn) {
+        const pre = btn.closest('.code-wrapper').querySelector('pre');
+        const text = pre.innerText;
+        const done = () => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1800);
+        };
+        navigator.clipboard.writeText(text).then(done).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            done();
+        });
+    }
+
+    /* ============ التنقل النشط في TOC ============ */
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    const sections = document.querySelectorAll('.content-section');
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                tocLinks.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
+
+    /* ============ التمارين التفاعلية ============ */
+    document.querySelectorAll('.task-box').forEach(box => {
+        const quizId = box.dataset.quiz;
+        const fb = document.getElementById('fb' + quizId);
+        const options = box.querySelectorAll('.task-option');
+
+        options.forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (box.dataset.answered === 'true') return;
+                box.dataset.answered = 'true';
+
+                const isCorrect = opt.dataset.correct === 'true';
+                options.forEach(o => {
+                    if (o.dataset.correct === 'true') o.classList.add('correct');
+                    else if (o === opt) o.classList.add('wrong');
+                });
+
+                if (isCorrect) {
+                    fb.textContent = '✅ إجابة صحيحة! أحسنت.';
+                    fb.className = 'task-feedback show ok';
+                } else {
+                    fb.textContent = '❌ إجابة غير صحيحة. الإجابة الصحيحة مظللة بالأخضر.';
+                    fb.className = 'task-feedback show no';
+                }
+            });
+        });
+    });
+
+    /* ============ قائمة الجوال ============ */
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        const nav = document.querySelector('.header-nav');
+        if (!nav) return;
+        if (nav.style.display === 'flex') {
+            nav.style.display = '';
+        } else {
+            Object.assign(nav.style, {
+                display: 'flex',
+                position: 'absolute',
+                top: '72px',
+                right: '0',
+                left: '0',
+                background: 'var(--primary)',
+                flexDirection: 'column',
+                padding: '16px',
+                gap: '8px',
+                boxShadow: '0 10px 30px rgba(0,0,0,.3)',
+                zIndex: '999'
+            });
+        }
+    });
+
+    /* ============ ظهور الأقسام ============ */
+    const sectionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.05 });
+
+    sections.forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(20px)';
+        s.style.transition = 'opacity .6s ease, transform .6s ease';
+        sectionObserver.observe(s);
+    });
+</script>
+
+</body>
+</html>

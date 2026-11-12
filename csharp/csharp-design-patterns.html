@@ -1,0 +1,2544 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أنماط التصميم في C# | CodeWay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0a2540;
+            --primary-light: #1a3a5c;
+            --accent: #635bff;
+            --accent-hover: #4f46e5;
+            --accent-soft: #eef2ff;
+            --text-dark: #0a2540;
+            --text-body: #425466;
+            --text-muted: #8898aa;
+            --bg: #ffffff;
+            --bg-soft: #f7f9fc;
+            --border: #e6ebf1;
+            --success: #0e9f6e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --code-bg: #0a1929;
+            --eng: #8b5cf6;
+            --eng-soft: #f3e8ff;
+            --shadow-sm: 0 1px 3px rgba(10,37,64,.06), 0 1px 2px rgba(10,37,64,.04);
+            --shadow-md: 0 4px 12px rgba(10,37,64,.08), 0 2px 4px rgba(10,37,64,.04);
+            --shadow-lg: 0 20px 40px rgba(10,37,64,.1), 0 8px 16px rgba(10,37,64,.06);
+            --shadow-accent: 0 8px 24px rgba(139,92,246,.25);
+            --radius: 14px;
+            --radius-lg: 22px;
+            --transition: all .3s cubic-bezier(.4,0,.2,1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-body);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--eng), var(--accent));
+            z-index: 3000;
+            width: 0%;
+            transition: width .1s linear;
+            box-shadow: 0 0 10px rgba(139,92,246,.5);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--primary);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            transition: var(--transition);
+        }
+        .header.scrolled { box-shadow: 0 10px 30px rgba(10,37,64,.25); }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--eng), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.15rem;
+            box-shadow: var(--shadow-accent);
+        }
+        .brand-text {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: .5px;
+        }
+        .brand-text span { color: #c4b5fd; }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-nav a {
+            color: rgba(255,255,255,.75);
+            text-decoration: none;
+            font-size: .92rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .header-nav a:hover, .header-nav a.active {
+            color: #fff;
+            background: rgba(255,255,255,.08);
+        }
+        .header-nav a.active {
+            background: rgba(139,92,246,.25);
+            box-shadow: inset 0 0 0 1px rgba(139,92,246,.4);
+        }
+        .header-cta { display: flex; align-items: center; gap: 10px; }
+        .btn-outline-light {
+            padding: 9px 18px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,.2);
+            background: transparent;
+            color: #fff;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.4);
+        }
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.2);
+            color: #fff;
+            width: 40px; height: 40px;
+            border-radius: 9px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+        .hero {
+            background: linear-gradient(180deg, var(--bg-soft) 0%, #fff 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 56px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -120px; left: -120px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(139,92,246,.08), transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; right: -100px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(99,91,255,.06), transparent 70%);
+            border-radius: 50%;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb i { font-size: .65rem; }
+        .breadcrumb .current { color: var(--text-dark); font-weight: 600; }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            border-radius: 100px;
+            font-size: .82rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            border: 1px solid rgba(139,92,246,.2);
+        }
+        .hero-badge i { font-size: .75rem; }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.25;
+            margin-bottom: 16px;
+            letter-spacing: -.5px;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--eng), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-body);
+            max-width: 680px;
+            margin-bottom: 28px;
+            line-height: 1.85;
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            align-items: center;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .92rem;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .meta-item i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+        }
+        .hero-side {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 220px;
+        }
+        .btn-primary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: var(--shadow-accent);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(139,92,246,.35);
+        }
+        .btn-secondary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+        }
+        .btn-secondary:hover {
+            border-color: var(--eng);
+            color: var(--eng);
+            background: var(--eng-soft);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 48px;
+            padding: 48px 0 80px;
+            align-items: start;
+        }
+        .sidebar {
+            position: sticky;
+            top: 96px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-left: 4px;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .toc-title {
+            font-size: .78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toc-list { list-style: none; border-right: 2px solid var(--border); }
+        .toc-list li a {
+            display: block;
+            padding: 9px 16px;
+            color: var(--text-body);
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 500;
+            border-right: 2px solid transparent;
+            margin-right: -2px;
+            transition: var(--transition);
+            border-radius: 0 8px 8px 0;
+        }
+        .toc-list li a:hover { color: var(--accent); background: var(--accent-soft); }
+        .toc-list li a.active {
+            color: var(--accent);
+            border-right-color: var(--accent);
+            background: var(--accent-soft);
+            font-weight: 700;
+        }
+
+        .content { min-width: 0; }
+        .content-section { margin-bottom: 56px; scroll-margin-top: 100px; }
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        .section-num {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--eng), var(--accent));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-accent);
+        }
+        .section-heading h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -.3px;
+        }
+        .content p {
+            font-size: 1.02rem;
+            margin-bottom: 18px;
+            color: var(--text-body);
+            line-height: 1.9;
+        }
+        .content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 32px 0 14px;
+        }
+        .content h4 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 24px 0 10px;
+        }
+        .content ul, .content ol {
+            margin: 0 0 20px 0;
+            padding-right: 22px;
+        }
+        .content li {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.85;
+        }
+        .content ul li::marker { color: var(--accent); }
+
+        .inline-code {
+            font-family: 'Fira Code', monospace;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: .88em;
+            font-weight: 500;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .callout {
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+            border: 1px solid;
+        }
+        .callout-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .callout-body h4 { margin: 0 0 6px !important; font-size: 1rem; }
+        .callout-body p { margin: 0 !important; font-size: .95rem !important; line-height: 1.75 !important; }
+        .callout.info { background: #eff6ff; border-color: #bfdbfe; }
+        .callout.info .callout-icon { background: #dbeafe; color: #2563eb; }
+        .callout.info h4 { color: #1e40af; }
+        .callout.warning { background: #fffbeb; border-color: #fde68a; }
+        .callout.warning .callout-icon { background: #fef3c7; color: #d97706; }
+        .callout.warning h4 { color: #92400e; }
+        .callout.success { background: #ecfdf5; border-color: #a7f3d0; }
+        .callout.success .callout-icon { background: #d1fae5; color: var(--success); }
+        .callout.success h4 { color: #065f46; }
+        .callout.danger { background: #fef2f2; border-color: #fecaca; }
+        .callout.danger .callout-icon { background: #fee2e2; color: var(--danger); }
+        .callout.danger h4 { color: #991b1b; }
+        .callout.eng { background: #faf5ff; border-color: #e9d5ff; }
+        .callout.eng .callout-icon { background: #f3e8ff; color: var(--eng); }
+        .callout.eng h4 { color: #6b21a8; }
+
+        .code-wrapper {
+            background: var(--code-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 22px 0;
+            border: 1px solid #1e3a5f;
+            box-shadow: var(--shadow-md);
+            direction: ltr;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 18px;
+            background: #0d2137;
+            border-bottom: 1px solid #1e3a5f;
+        }
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #93c5fd;
+            font-size: .8rem;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 11px; height: 11px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+        .code-copy {
+            background: rgba(255,255,255,.08);
+            border: none;
+            color: #cbd5e1;
+            font-size: .75rem;
+            padding: 5px 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .code-copy:hover { background: rgba(139,92,246,.3); color: #fff; }
+        .code-copy.copied { background: rgba(14,159,110,.3); color: #6ee7b7; }
+        .code-body { padding: 20px 22px; overflow-x: auto; }
+        .code-body pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: .875rem;
+            line-height: 1.75;
+            color: #e2e8f0;
+            white-space: pre;
+        }
+        .code-body::-webkit-scrollbar { height: 8px; }
+        .code-body::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+
+        .kw { color: #c792ea; }
+        .type { color: #82aaff; }
+        .str { color: #c3e88d; }
+        .num { color: #f78c6c; }
+        .cmt { color: #6a8299; font-style: italic; }
+        .fn { color: #ffcb6b; }
+        .prop { color: #89ddff; }
+        .op { color: #89ddff; }
+        .punc { color: #8fa5b8; }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 22px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .92rem;
+            min-width: 560px;
+        }
+        thead { background: var(--primary); }
+        thead th {
+            color: #fff;
+            padding: 14px 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: .88rem;
+        }
+        tbody td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-body);
+            line-height: 1.7;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:nth-child(even) { background: var(--bg-soft); }
+        tbody tr:hover { background: var(--accent-soft); }
+        tbody td strong { color: var(--text-dark); }
+        .badge-cell {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+        .badge-cell.green { background: #d1fae5; color: #065f46; }
+        .badge-cell.amber { background: #fef3c7; color: #92400e; }
+        .badge-cell.red { background: #fee2e2; color: #991b1b; }
+        .badge-cell.blue { background: #dbeafe; color: #1e40af; }
+        .badge-cell.purple { background: #f3e8ff; color: #6b21a8; }
+
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+            margin: 22px 0;
+        }
+        .steps li {
+            counter-increment: step;
+            position: relative;
+            padding-right: 52px;
+            padding-bottom: 22px;
+            margin: 0 !important;
+        }
+        .steps li:last-child { padding-bottom: 0; }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            right: 0; top: 0;
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            border: 1.5px solid rgba(139,92,246,.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .9rem;
+        }
+        .steps li::after {
+            content: '';
+            position: absolute;
+            right: 16px; top: 38px;
+            width: 2px;
+            height: calc(100% - 30px);
+            background: var(--border);
+        }
+        .steps li:last-child::after { display: none; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            border-color: var(--eng);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .feature-card i {
+            width: 42px; height: 42px;
+            border-radius: 11px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+        }
+        .feature-card h4 { margin: 0 0 8px !important; font-size: 1rem; }
+        .feature-card p { margin: 0 !important; font-size: .88rem !important; color: var(--text-muted) !important; line-height: 1.7 !important; }
+
+        .note-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 28px 30px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .note-card::after {
+            content: '\f085';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: -10px; bottom: -30px;
+            font-size: 120px;
+            opacity: .04;
+            color: #fff;
+        }
+        .note-card h4 {
+            color: #c4b5fd !important;
+            margin: 0 0 10px !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem !important;
+        }
+        .note-card p {
+            color: rgba(255,255,255,.85) !important;
+            margin: 0 !important;
+            font-size: .95rem !important;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ Pattern Card ============ */
+        .pattern-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .pattern-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--eng);
+        }
+        .pattern-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 18px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+        }
+        .pattern-icon {
+            width: 54px; height: 54px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--eng), var(--accent));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-accent);
+        }
+        .pattern-info { flex: 1; min-width: 0; }
+        .pattern-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 3px;
+        }
+        .pattern-en {
+            font-size: .82rem;
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+            letter-spacing: .5px;
+        }
+        .pattern-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .pattern-tag {
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+        .pattern-tag.creational { background: #dbeafe; color: #1e40af; }
+        .pattern-tag.structural { background: #fef3c7; color: #92400e; }
+        .pattern-tag.behavioral { background: #f3e8ff; color: #6b21a8; }
+
+        .pattern-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .pattern-meta-item {
+            background: var(--bg-soft);
+            border-radius: 10px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+        }
+        .pattern-meta-item .label {
+            font-size: .72rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 3px;
+        }
+        .pattern-meta-item .value {
+            font-size: .88rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        /* ============ Pattern Map ============ */
+        .pattern-map {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        .pattern-map-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+        }
+        .pattern-map-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .pattern-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .pattern-group {
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid;
+        }
+        .pattern-group.creational { background: #eff6ff; border-color: #bfdbfe; }
+        .pattern-group.structural { background: #fffbeb; border-color: #fde68a; }
+        .pattern-group.behavioral { background: #faf5ff; border-color: #e9d5ff; }
+        .pattern-group h5 {
+            font-size: .88rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .pattern-group.creational h5 { color: #1e40af; }
+        .pattern-group.structural h5 { color: #92400e; }
+        .pattern-group.behavioral h5 { color: #6b21a8; }
+        .pattern-group ul {
+            margin: 0 !important;
+            padding: 0 !important;
+            list-style: none;
+        }
+        .pattern-group li {
+            font-size: .82rem !important;
+            margin-bottom: 5px !important;
+            color: var(--text-body);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pattern-group li::before {
+            content: '•';
+            color: var(--eng);
+            font-weight: 900;
+        }
+
+        /* ============ Pattern Selector ============ */
+        .pattern-selector {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 24px 0;
+        }
+        .pattern-selector-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .pattern-selector-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .pattern-selector-hint {
+            font-size: .88rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .selector-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .selector-option {
+            padding: 14px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 11px;
+            background: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            font-size: .88rem;
+            text-align: right;
+            color: var(--text-body);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .selector-option:hover {
+            border-color: var(--eng);
+            background: var(--eng-soft);
+        }
+        .selector-option.active {
+            border-color: var(--eng);
+            background: var(--eng-soft);
+            color: var(--eng);
+        }
+        .selector-option i {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            background: var(--bg-soft);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .selector-option.active i {
+            background: var(--eng);
+            color: #fff;
+        }
+        .selector-result {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 18px;
+            min-height: 100px;
+            font-size: .92rem;
+            line-height: 1.8;
+            color: var(--text-body);
+        }
+        .selector-result .rec-pattern {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--eng);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .selector-result .rec-desc {
+            font-size: .9rem;
+            color: var(--text-body);
+            margin-bottom: 8px;
+        }
+        .selector-result .rec-use {
+            font-size: .82rem;
+            color: var(--text-muted);
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+        }
+
+        /* ============ Interactive Quiz ============ */
+        .interactive-box {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .interactive-box::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--eng), var(--accent));
+        }
+        .interactive-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .interactive-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .interactive-hint {
+            font-size: .9rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+        .task-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+        .task-box p { margin-bottom: 12px; font-size: .95rem; }
+        .task-options { display: grid; gap: 10px; }
+        .task-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            font-size: .93rem;
+            text-align: right;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .task-option:hover { border-color: var(--eng); background: var(--eng-soft); }
+        .task-option.correct { border-color: var(--success); background: #ecfdf5; color: #065f46; }
+        .task-option.correct .opt-marker { background: var(--success); color: #fff; border-color: var(--success); }
+        .task-option.wrong { border-color: var(--danger); background: #fef2f2; color: #991b1b; }
+        .task-option.wrong .opt-marker { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .opt-marker {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .task-feedback {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: .9rem;
+            font-weight: 600;
+            display: none;
+        }
+        .task-feedback.show { display: block; animation: fadeInUp .3s ease; }
+        .task-feedback.ok { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .task-feedback.no { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lesson-nav {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 56px;
+            padding-top: 36px;
+            border-top: 1px solid var(--border);
+        }
+        .lesson-nav a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 22px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: var(--transition);
+            background: #fff;
+        }
+        .lesson-nav a:hover {
+            border-color: var(--eng);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .lesson-nav a.next { justify-content: flex-end; text-align: left; }
+        .lesson-nav .nav-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: .9rem;
+        }
+        .lesson-nav .nav-label {
+            font-size: .75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .lesson-nav .nav-title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .footer {
+            background: var(--primary);
+            color: rgba(255,255,255,.7);
+            padding: 48px 0 28px;
+            margin-top: 40px;
+        }
+        .footer-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .footer-bottom {
+            padding-top: 28px;
+            border-top: 1px solid rgba(255,255,255,.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: .85rem;
+        }
+        .footer-bottom a { color: #c4b5fd; text-decoration: none; }
+        .footer-bottom a:hover { text-decoration: underline; }
+
+        .back-top {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(16px);
+            transition: var(--transition);
+            z-index: 900;
+        }
+        .back-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-top:hover { background: var(--eng); }
+
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; gap: 0; }
+            .sidebar {
+                position: static;
+                max-height: none;
+                margin-bottom: 32px;
+                padding: 20px;
+                background: var(--bg-soft);
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+            }
+            .toc-list { border-right: none; display: flex; flex-wrap: wrap; gap: 6px; }
+            .toc-list li a {
+                border-right: none;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                margin-right: 0;
+                padding: 7px 13px;
+                font-size: .85rem;
+                background: #fff;
+            }
+            .toc-list li a.active { border-color: var(--eng); }
+        }
+        @media (max-width: 768px) {
+            .header-nav, .header-cta .btn-outline-light { display: none; }
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .hero h1 { font-size: 1.9rem; }
+            .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+            .hero-side { flex-direction: row; flex-wrap: wrap; }
+            .hero-side .btn-primary, .hero-side .btn-secondary { flex: 1; min-width: 150px; }
+            .section-heading h2 { font-size: 1.35rem; }
+            .lesson-nav { grid-template-columns: 1fr; }
+            .content-section { margin-bottom: 40px; }
+            .container { padding: 0 18px; }
+            .header-inner { padding: 0 18px; }
+            .pattern-meta { grid-template-columns: 1fr; }
+            .pattern-header { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="header" id="header">
+    <div class="header-inner">
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fas fa-code"></i></div>
+            <div class="brand-text">Code<span>Way</span></div>
+        </a>
+        <nav class="header-nav">
+            <a href="#">الرئيسية</a>
+            <a href="#">المسارات</a>
+            <a href="#" class="active">C#</a>
+            <a href="#">المدونة</a>
+            <a href="#">تواصل</a>
+        </nav>
+        <div class="header-cta">
+            <button class="btn-outline-light" onclick="alert('تم حفظ الدرس في قائمتك ✔')">
+                <i class="far fa-bookmark"></i> حفظ
+            </button>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">الرئيسية</a>
+            <i class="fas fa-chevron-left"></i>
+            <a href="#">هندسة البرمجيات</a>
+            <i class="fas fa-chevron-left"></i>
+            <span class="current">أنماط التصميم</span>
+        </div>
+        <div class="hero-grid">
+            <div>
+                <span class="hero-badge">
+                    <i class="fas fa-shapes"></i> الدرس الثاني · هندسة البرمجيات
+                </span>
+                <h1>أنماط <span class="highlight">التصميم</span> في C#</h1>
+                <p class="hero-desc">
+                    حلول مجرّبة لمشاكل متكررة في تصميم البرمجيات. تعلّم أشهر 12 نمطاً
+                    بأمثلة C# عملية، مع مُختار ذكي يساعدك على اختيار النمط المناسب لمشكلتك
+                    في ثوانٍ.
+                </p>
+                <div class="hero-meta">
+                    <span class="meta-item"><i class="far fa-clock"></i> 75 دقيقة</span>
+                    <span class="meta-item"><i class="fas fa-signal"></i> متقدم</span>
+                    <span class="meta-item"><i class="fas fa-shapes"></i> 12 نمطاً</span>
+                    <span class="meta-item"><i class="fas fa-code"></i> 15 مثالاً</span>
+                </div>
+            </div>
+            <div class="hero-side">
+                <button class="btn-primary" onclick="document.getElementById('sec-1').scrollIntoView()">
+                    <i class="fas fa-play"></i> ابدأ الدرس
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('sec-7').scrollIntoView()">
+                    <i class="fas fa-wand-magic-sparkles"></i> مُختار النمط
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="main-layout">
+
+        <aside class="sidebar">
+            <div class="toc-title"><i class="fas fa-list-ul"></i> محتويات الدرس</div>
+            <ul class="toc-list" id="tocList">
+                <li><a href="#sec-1" class="active">1. ما هي أنماط التصميم؟</a></li>
+                <li><a href="#sec-2">2. التصنيفات الثلاثة</a></li>
+                <li><a href="#sec-3">3. الأنماط الإبداعية</a></li>
+                <li><a href="#sec-4">4. الأنماط الهيكلية</a></li>
+                <li><a href="#sec-5">5. الأنماط السلوكية</a></li>
+                <li><a href="#sec-6">6. أنماط في .NET</a></li>
+                <li><a href="#sec-7">7. مُختار النمط التفاعلي</a></li>
+                <li><a href="#sec-8">8. أفضل الممارسات</a></li>
+                <li><a href="#sec-9">9. تمارين تفاعلية</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+
+            <!-- ====== 1 ====== -->
+            <section class="content-section" id="sec-1">
+                <div class="section-heading">
+                    <div class="section-num">1</div>
+                    <h2>ما هي أنماط التصميم؟</h2>
+                </div>
+                <p>
+                    <strong>أنماط التصميم (Design Patterns)</strong> هي حلول جاهزة ومجرّبة لمشاكل
+                    متكررة في تصميم البرمجيات. ليست كوداً تنسخه، بل <em>قوالب ذهنية</em> تساعدك
+                    على التفكير في الحل الصحيح.
+                </p>
+                <p>
+                    أول من جمعها بشكل منهجي هم "عصابة الأربعة" (Gang of Four) في كتابهم الشهير
+                    <em>Design Patterns: Elements of Reusable Object-Oriented Software</em> عام 1994.
+                </p>
+
+                <h3>لماذا نحتاجها؟</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-comments"></i>
+                        <h4>لغة مشتركة</h4>
+                        <p>قول "استخدم Repository" أسرع من شرح الفكرة كل مرة.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-check-double"></i>
+                        <h4>حلول مجرّبة</h4>
+                        <p>لا تخترع العجلة — أنماط التصميم اختُبرت في آلاف المشاريع.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-arrows-rotate"></i>
+                        <h4>قابلية الصيانة</h4>
+                        <p>الكود المتبع لنمط معروف أسهل للفهم والتعديل.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h4>نمو مهني</h4>
+                        <p>معرفة الأنماط شرط أساسي في المقابلات التقنية.</p>
+                    </div>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="callout-body">
+                        <h4>لا تُفرط في استخدامها</h4>
+                        <p>
+                            الأنماط أدوات، لا أهداف. استخدام نمط حيث لا حاجة له يُعقّد الكود
+                            بدلاً من تبسيطه — هذا ما يُسمى <strong>Over-engineering</strong>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 2 ====== -->
+            <section class="content-section" id="sec-2">
+                <div class="section-heading">
+                    <div class="section-num">2</div>
+                    <h2>التصنيفات الثلاثة</h2>
+                </div>
+                <p>
+                    تنقسم أنماط GoF إلى 3 عائلات رئيسية، حسب الغرض الذي تخدمه.
+                </p>
+
+                <div class="pattern-map">
+                    <div class="pattern-map-title">
+                        <i class="fas fa-sitemap"></i> خريطة أنماط التصميم
+                    </div>
+                    <div class="pattern-map-grid">
+                        <div class="pattern-group creational">
+                            <h5><i class="fas fa-seedling"></i> إبداعية (Creational)</h5>
+                            <ul>
+                                <li>Singleton</li>
+                                <li>Factory Method</li>
+                                <li>Abstract Factory</li>
+                                <li>Builder</li>
+                                <li>Prototype</li>
+                            </ul>
+                        </div>
+                        <div class="pattern-group structural">
+                            <h5><i class="fas fa-cubes"></i> هيكلية (Structural)</h5>
+                            <ul>
+                                <li>Adapter</li>
+                                <li>Decorator</li>
+                                <li>Facade</li>
+                                <li>Proxy</li>
+                                <li>Composite</li>
+                            </ul>
+                        </div>
+                        <div class="pattern-group behavioral">
+                            <h5><i class="fas fa-people-arrows"></i> سلوكية (Behavioral)</h5>
+                            <ul>
+                                <li>Observer</li>
+                                <li>Strategy</li>
+                                <li>Command</li>
+                                <li>State</li>
+                                <li>Template Method</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>الفرق بينها</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>العائلة</th>
+                                <th>الهدف</th>
+                                <th>مثال شائع</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge-cell blue">إبداعية</span></td>
+                                <td>كيف نُنشئ الكائنات؟</td>
+                                <td>Singleton, Factory</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-cell amber">هيكلية</span></td>
+                                <td>كيف نُركّب الكائنات؟</td>
+                                <td>Adapter, Decorator</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-cell purple">سلوكية</span></td>
+                                <td>كيف تتواصل الكائنات؟</td>
+                                <td>Observer, Strategy</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ====== 3 ====== -->
+            <section class="content-section" id="sec-3">
+                <div class="section-heading">
+                    <div class="section-num">3</div>
+                    <h2>الأنماط الإبداعية (Creational)</h2>
+                </div>
+                <p>
+                    تتحكم في عملية إنشاء الكائنات — متى، كيف، ومن المسؤول. الهدف: فصل الكود
+                    الذي يستخدم الكائن عن الكود الذي ينشئه.
+                </p>
+
+                <!-- Singleton -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-fingerprint"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Singleton</div>
+                            <div class="pattern-en">النمط الأحادي</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag creational">إبداعي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">ضمان وجود نسخة واحدة فقط من الكلاس</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">الإعدادات، Logger، اتصال قاعدة البيانات</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Singleton.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="kw">public sealed class</span> <span class="type">AppConfig</span>
+{
+    <span class="kw">private static readonly</span> <span class="type">Lazy</span>&lt;<span class="type">AppConfig</span>&gt; _instance
+        = <span class="kw">new</span>(() => <span class="kw">new</span> <span class="type">AppConfig</span>());
+
+    <span class="kw">public static</span> <span class="type">AppConfig</span> Instance => _instance.<span class="prop">Value</span>;
+
+    <span class="kw">public string</span> ConnectionString { <span class="kw">get</span>; <span class="kw">private set</span>; }
+
+    <span class="kw">private</span> <span class="fn">AppConfig</span>()
+    {
+        ConnectionString = <span class="str">"Server=localhost;Database=AppDB"</span>;
+    }
+}
+
+<span class="cmt">// الاستخدام</span>
+<span class="kw">var</span> config = <span class="type">AppConfig</span>.<span class="prop">Instance</span>;
+Console.<span class="fn">WriteLine</span>(config.<span class="prop">ConnectionString</span>);</pre>
+                        </div>
+                    </div>
+                    <div class="callout warning" style="margin-bottom:0">
+                        <div class="callout-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="callout-body">
+                            <h4>تحذير</h4>
+                            <p>Singleton يجعل الاختبار صعباً (Global State). استخدمه فقط عند الضرورة القصوى.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Factory -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-industry"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Factory Method</div>
+                            <div class="pattern-en">مصنع الكائنات</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag creational">إبداعي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">إنشاء كائنات دون تحديد الفئة الدقيقة</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">لديك أنواع متعددة تختار بينها بناءً على شرط</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Factory.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="type">INotification</span>
+{
+    <span class="kw">void</span> <span class="fn">Send</span>(<span class="kw">string</span> message);
+}
+
+<span class="kw">public class</span> <span class="type">EmailNotification</span> : <span class="type">INotification</span>
+{
+    <span class="kw">public void</span> <span class="fn">Send</span>(<span class="kw">string</span> m) => Console.<span class="fn">WriteLine</span>(<span class="str">$"Email: {m}"</span>);
+}
+
+<span class="kw">public class</span> <span class="type">SmsNotification</span> : <span class="type">INotification</span>
+{
+    <span class="kw">public void</span> <span class="fn">Send</span>(<span class="kw">string</span> m) => Console.<span class="fn">WriteLine</span>(<span class="str">$"SMS: {m}"</span>);
+}
+
+<span class="kw">public static class</span> <span class="type">NotificationFactory</span>
+{
+    <span class="kw">public static</span> <span class="type">INotification</span> <span class="fn">Create</span>(<span class="kw">string</span> type) => type <span class="kw">switch</span>
+    {
+        <span class="str">"email"</span> => <span class="kw">new</span> <span class="type">EmailNotification</span>(),
+        <span class="str">"sms"</span>   => <span class="kw">new</span> <span class="type">SmsNotification</span>(),
+        _ => <span class="kw">throw new</span> <span class="type">ArgumentException</span>(<span class="str">"نوع غير معروف"</span>)
+    };
+}
+
+<span class="cmt">// الاستخدام</span>
+<span class="kw">var</span> notifier = <span class="type">NotificationFactory</span>.<span class="fn">Create</span>(<span class="str">"email"</span>);
+notifier.<span class="fn">Send</span>(<span class="str">"مرحباً!"</span>);</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Builder -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-hammer"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Builder</div>
+                            <div class="pattern-en">الباني</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag creational">إبداعي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">بناء كائنات معقدة خطوة بخطوة</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">كائن له خصائص كثيرة (اختيارية + إلزامية)</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Builder.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">Pizza</span>
+{
+    <span class="kw">public string</span> Size { <span class="kw">get</span>; <span class="kw">init</span>; } = <span class="str">""</span>;
+    <span class="kw">public bool</span> Cheese { <span class="kw">get</span>; <span class="kw">init</span>; }
+    <span class="kw">public bool</span> Olives { <span class="kw">get</span>; <span class="kw">init</span>; }
+    <span class="kw">public bool</span> Pepperoni { <span class="kw">get</span>; <span class="kw">init</span>; }
+}
+
+<span class="kw">public class</span> <span class="type">PizzaBuilder</span>
+{
+    <span class="kw">private string</span> _size = <span class="str">"Medium"</span>;
+    <span class="kw">private bool</span> _cheese, _olives, _pepperoni;
+
+    <span class="kw">public</span> <span class="type">PizzaBuilder</span> <span class="fn">WithSize</span>(<span class="kw">string</span> s) { _size = s; <span class="kw">return this</span>; }
+    <span class="kw">public</span> <span class="type">PizzaBuilder</span> <span class="fn">WithCheese</span>() { _cheese = <span class="kw">true</span>; <span class="kw">return this</span>; }
+    <span class="kw">public</span> <span class="type">PizzaBuilder</span> <span class="fn">WithOlives</span>() { _olives = <span class="kw">true</span>; <span class="kw">return this</span>; }
+    <span class="kw">public</span> <span class="type">PizzaBuilder</span> <span class="fn">WithPepperoni</span>() { _pepperoni = <span class="kw">true</span>; <span class="kw">return this</span>; }
+
+    <span class="kw">public</span> <span class="type">Pizza</span> <span class="fn">Build</span>() => <span class="kw">new</span> <span class="type">Pizza</span>
+    {
+        Size = _size, Cheese = _cheese, Olives = _olives, Pepperoni = _pepperoni
+    };
+}
+
+<span class="cmt">// الاستخدام — fluent API</span>
+<span class="kw">var</span> pizza = <span class="kw">new</span> <span class="type">PizzaBuilder</span>()
+    .<span class="fn">WithSize</span>(<span class="str">"Large"</span>)
+    .<span class="fn">WithCheese</span>()
+    .<span class="fn">WithPepperoni</span>()
+    .<span class="fn">Build</span>();</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Abstract Factory -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-sitemap"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Abstract Factory</div>
+                            <div class="pattern-en">المصنع المجرد</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag creational">إبداعي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">عائلة من الكائنات المترابطة دون تحديد فئاتها</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">لديك "ثيمات" أو "مزودون" متعددون (Dark/Light، AWS/Azure)</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> AbstractFactory.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="type">IButton</span> { <span class="kw">void</span> <span class="fn">Render</span>(); }
+<span class="kw">public interface</span> <span class="type">ICheckbox</span> { <span class="kw">void</span> <span class="fn">Render</span>(); }
+
+<span class="kw">public class</span> <span class="type">DarkButton</span> : <span class="type">IButton</span>
+{
+    <span class="kw">public void</span> <span class="fn">Render</span>() => Console.<span class="fn">WriteLine</span>(<span class="str">"Dark Button"</span>);
+}
+<span class="kw">public class</span> <span class="type">DarkCheckbox</span> : <span class="type">ICheckbox</span>
+{
+    <span class="kw">public void</span> <span class="fn">Render</span>() => Console.<span class="fn">WriteLine</span>(<span class="str">"Dark Checkbox"</span>);
+}
+
+<span class="kw">public interface</span> <span class="type">IUIFactory</span>
+{
+    <span class="type">IButton</span> <span class="fn">CreateButton</span>();
+    <span class="type">ICheckbox</span> <span class="fn">CreateCheckbox</span>();
+}
+
+<span class="kw">public class</span> <span class="type">DarkThemeFactory</span> : <span class="type">IUIFactory</span>
+{
+    <span class="kw">public</span> <span class="type">IButton</span> <span class="fn">CreateButton</span>() => <span class="kw">new</span> <span class="type">DarkButton</span>();
+    <span class="kw">public</span> <span class="type">ICheckbox</span> <span class="fn">CreateCheckbox</span>() => <span class="kw">new</span> <span class="type">DarkCheckbox</span>();
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 4 ====== -->
+            <section class="content-section" id="sec-4">
+                <div class="section-heading">
+                    <div class="section-num">4</div>
+                    <h2>الأنماط الهيكلية (Structural)</h2>
+                </div>
+                <p>
+                    تتحكم في كيفية تركيب الكائنات لتشكيل كائنات أكبر وأكثر وظيفية.
+                </p>
+
+                <!-- Adapter -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-plug"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Adapter</div>
+                            <div class="pattern-en">المحول</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag structural">هيكلي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">جعل واجهات غير متوافقة تعمل معاً</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">تريد استخدام مكتبة قديمة أو خارجية بواجهة مختلفة</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Adapter.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="cmt">// واجهة قديمة في نظامك</span>
+<span class="kw">public interface</span> <span class="type">ILogger</span>
+{
+    <span class="kw">void</span> <span class="fn">Log</span>(<span class="kw">string</span> message);
+}
+
+<span class="cmt">// مكتبة خارجية لا يمكن تعديلها</span>
+<span class="kw">public class</span> <span class="type">ThirdPartyLogger</span>
+{
+    <span class="kw">public void</span> <span class="fn">WriteEntry</span>(<span class="kw">string</span> msg, <span class="kw">int</span> level) { }
+}
+
+<span class="cmt">// المحول</span>
+<span class="kw">public class</span> <span class="type">LoggerAdapter</span> : <span class="type">ILogger</span>
+{
+    <span class="kw">private readonly</span> <span class="type">ThirdPartyLogger</span> _inner = <span class="kw">new</span>();
+    <span class="kw">public void</span> <span class="fn">Log</span>(<span class="kw">string</span> message) => _inner.<span class="fn">WriteEntry</span>(message, <span class="num">1</span>);
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decorator -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-layer-group"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Decorator</div>
+                            <div class="pattern-en">المُزيّن</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag structural">هيكلي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">إضافة سلوك جديد للكائن دون تعديل فئته</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">تحتاج ميزات اختيارية قابلة للتركيب (compression, encryption...)</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Decorator.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="type">IDataSource</span>
+{
+    <span class="kw">string</span> <span class="fn">Read</span>();
+    <span class="kw">void</span> <span class="fn">Write</span>(<span class="kw">string</span> data);
+}
+
+<span class="kw">public class</span> <span class="type">FileDataSource</span> : <span class="type">IDataSource</span>
+{
+    <span class="kw">public string</span> <span class="fn">Read</span>() => <span class="str">"raw data"</span>;
+    <span class="kw">public void</span> <span class="fn">Write</span>(<span class="kw">string</span> d) { }
+}
+
+<span class="kw">public class</span> <span class="type">DataSourceDecorator</span> : <span class="type">IDataSource</span>
+{
+    <span class="kw">protected readonly</span> <span class="type">IDataSource</span> _wrapped;
+    <span class="kw">public</span> <span class="fn">DataSourceDecorator</span>(<span class="type">IDataSource</span> src) => _wrapped = src;
+    <span class="kw">public virtual string</span> <span class="fn">Read</span>() => _wrapped.<span class="fn">Read</span>();
+    <span class="kw">public virtual void</span> <span class="fn">Write</span>(<span class="kw">string</span> d) => _wrapped.<span class="fn">Write</span>(d);
+}
+
+<span class="kw">public class</span> <span class="type">CompressionDecorator</span> : <span class="type">DataSourceDecorator</span>
+{
+    <span class="kw">public</span> <span class="fn">CompressionDecorator</span>(<span class="type">IDataSource</span> s) : <span class="kw">base</span>(s) { }
+    <span class="kw">public override string</span> <span class="fn">Read</span>() => <span class="str">$"[decompress] {base.Read()}"</span>;
+    <span class="kw">public override void</span> <span class="fn">Write</span>(<span class="kw">string</span> d) => <span class="kw">base</span>.<span class="fn">Write</span>(<span class="str">$"[compress] {d}"</span>);
+}
+
+<span class="kw">public class</span> <span class="type">EncryptionDecorator</span> : <span class="type">DataSourceDecorator</span>
+{
+    <span class="kw">public</span> <span class="fn">EncryptionDecorator</span>(<span class="type">IDataSource</span> s) : <span class="kw">base</span>(s) { }
+    <span class="kw">public override string</span> <span class="fn">Read</span>() => <span class="str">$"[decrypt] {base.Read()}"</span>;
+}
+
+<span class="cmt">// تركيب متعدد الطبقات</span>
+<span class="type">IDataSource</span> source = <span class="kw">new</span> <span class="type">EncryptionDecorator</span>(
+    <span class="kw">new</span> <span class="type">CompressionDecorator</span>(
+        <span class="kw">new</span> <span class="type">FileDataSource</span>()));
+
+Console.<span class="fn">WriteLine</span>(source.<span class="fn">Read</span>()); <span class="cmt">// [decrypt] [decompress] raw data</span></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facade -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-masks-theater"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Facade</div>
+                            <div class="pattern-en">الواجهة الموحّدة</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag structural">هيكلي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">واجهة مبسّطة لنظام معقد</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">تريد إخفاء تعقيد عدة أنظمة خلف واجهة واحدة</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Facade.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">VideoConverter</span>
+{
+    <span class="kw">public void</span> <span class="fn">Convert</span>(<span class="kw">string</span> file) => Console.<span class="fn">WriteLine</span>(<span class="str">$"تحويل {file}"</span>);
+}
+
+<span class="kw">public class</span> <span class="type">AudioExtractor</span>
+{
+    <span class="kw">public void</span> <span class="fn">Extract</span>(<span class="kw">string</span> file) => Console.<span class="fn">WriteLine</span>(<span class="str">"استخراج الصوت"</span>);
+}
+
+<span class="kw">public class</span> <span class="type">VideoCompressor</span>
+{
+    <span class="kw">public void</span> <span class="fn">Compress</span>(<span class="kw">string</span> file) => Console.<span class="fn">WriteLine</span>(<span class="str">"ضغط الفيديو"</span>);
+}
+
+<span class="cmt">// الواجهة المبسطة</span>
+<span class="kw">public class</span> <span class="type">MediaProcessor</span>
+{
+    <span class="kw">private readonly</span> <span class="type">VideoConverter</span> _conv = <span class="kw">new</span>();
+    <span class="kw">private readonly</span> <span class="type">AudioExtractor</span> _aud = <span class="kw">new</span>();
+    <span class="kw">private readonly</span> <span class="type">VideoCompressor</span> _comp = <span class="kw">new</span>();
+
+    <span class="kw">public void</span> <span class="fn">Process</span>(<span class="kw">string</span> file)
+    {
+        _conv.<span class="fn">Convert</span>(file);
+        _aud.<span class="fn">Extract</span>(file);
+        _comp.<span class="fn">Compress</span>(file);
+    }
+}
+
+<span class="cmt">// المستخدم يرى شيئاً واحداً فقط</span>
+<span class="kw">new</span> <span class="type">MediaProcessor</span>().<span class="fn">Process</span>(<span class="str">"video.mp4"</span>);</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proxy -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-user-shield"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Proxy</div>
+                            <div class="pattern-en">الوكيل</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag structural">هيكلي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">التحكم في الوصول لكائن آخر</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">حماية، تأجيل التحميل (lazy)، تخزين مؤقت</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Proxy.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="type">IImage</span> { <span class="kw">void</span> <span class="fn">Display</span>(); }
+
+<span class="kw">public class</span> <span class="type">RealImage</span> : <span class="type">IImage</span>
+{
+    <span class="kw">private readonly string</span> _path;
+    <span class="kw">public</span> <span class="fn">RealImage</span>(<span class="kw">string</span> path)
+    {
+        _path = path;
+        <span class="fn">LoadFromDisk</span>(); <span class="cmt">// عملية ثقيلة</span>
+    }
+    <span class="kw">private void</span> <span class="fn">LoadFromDisk</span>() => Console.<span class="fn">WriteLine</span>(<span class="str">$"تحميل {_path}"</span>);
+    <span class="kw">public void</span> <span class="fn">Display</span>() => Console.<span class="fn">WriteLine</span>(<span class="str">$"عرض {_path}"</span>);
+}
+
+<span class="kw">public class</span> <span class="type">ImageProxy</span> : <span class="type">IImage</span>
+{
+    <span class="kw">private readonly string</span> _path;
+    <span class="kw">private</span> <span class="type">RealImage</span>? _real;
+
+    <span class="kw">public</span> <span class="fn">ImageProxy</span>(<span class="kw">string</span> path) => _path = path;
+
+    <span class="kw">public void</span> <span class="fn">Display</span>()
+    {
+        _real ??= <span class="kw">new</span> <span class="type">RealImage</span>(_path); <span class="cmt">// تحميل عند الحاجة فقط</span>
+        _real.<span class="fn">Display</span>();
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 5 ====== -->
+            <section class="content-section" id="sec-5">
+                <div class="section-heading">
+                    <div class="section-num">5</div>
+                    <h2>الأنماط السلوكية (Behavioral)</h2>
+                </div>
+                <p>
+                    تتحكم في التواصل بين الكائنات وتوزيع المسؤوليات.
+                </p>
+
+                <!-- Observer -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-bell"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Observer</div>
+                            <div class="pattern-en">المراقب</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag behavioral">سلوكي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">إشعار عدة كائنات عند تغيّر كائن آخر</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">أحداث، ناشر/مشترك، تحديث واجهات</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Observer.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="type">IObserver</span>
+{
+    <span class="kw">void</span> <span class="fn">Update</span>(<span class="kw">string</span> data);
+}
+
+<span class="kw">public class</span> <span class="type">Subject</span>
+{
+    <span class="kw">private readonly</span> <span class="type">List</span>&lt;<span class="type">IObserver</span>&gt; _observers = <span class="kw">new</span>();
+
+    <span class="kw">public void</span> <span class="fn">Attach</span>(<span class="type">IObserver</span> o) => _observers.<span class="fn">Add</span>(o);
+    <span class="kw">public void</span> <span class="fn">Detach</span>(<span class="type">IObserver</span> o) => _observers.<span class="fn">Remove</span>(o);
+
+    <span class="kw">public void</span> <span class="fn">Notify</span>(<span class="kw">string</span> data)
+    {
+        <span class="kw">foreach</span> (<span class="kw">var</span> o <span class="kw">in</span> _observers) o.<span class="fn">Update</span>(data);
+    }
+}
+
+<span class="kw">public class</span> <span class="type">EmailObserver</span> : <span class="type">IObserver</span>
+{
+    <span class="kw">public void</span> <span class="fn">Update</span>(<span class="kw">string</span> data) => Console.<span class="fn">WriteLine</span>(<span class="str">$"Email: {data}"</span>);
+}
+<span class="kw">public class</span> <span class="type">SmsObserver</span> : <span class="type">IObserver</span>
+{
+    <span class="kw">public void</span> <span class="fn">Update</span>(<span class="kw">string</span> data) => Console.<span class="fn">WriteLine</span>(<span class="str">$"SMS: {data}"</span>);
+}
+
+<span class="cmt">// الاستخدام</span>
+<span class="kw">var</span> sub = <span class="kw">new</span> <span class="type">Subject</span>();
+sub.<span class="fn">Attach</span>(<span class="kw">new</span> <span class="type">EmailObserver</span>());
+sub.<span class="fn">Attach</span>(<span class="kw">new</span> <span class="type">SmsObserver</span>());
+sub.<span class="fn">Notify</span>(<span class="str">"تم إنشاء طلبك"</span>);</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategy -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-code-branch"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Strategy</div>
+                            <div class="pattern-en">الاستراتيجية</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag behavioral">سلوكي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">تبديل الخوارزمية في وقت التشغيل</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">عدة طرق لفعل شيء (دفع، ضغط، ترتيب...)</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Strategy.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="type">IPaymentStrategy</span>
+{
+    <span class="kw">void</span> <span class="fn">Pay</span>(<span class="kw">decimal</span> amount);
+}
+
+<span class="kw">public class</span> <span class="type">CreditCardPayment</span> : <span class="type">IPaymentStrategy</span>
+{
+    <span class="kw">public void</span> <span class="fn">Pay</span>(<span class="kw">decimal</span> a) => Console.<span class="fn">WriteLine</span>(<span class="str">$"بطاقة: {a}"</span>);
+}
+
+<span class="kw">public class</span> <span class="type">PayPalPayment</span> : <span class="type">IPaymentStrategy</span>
+{
+    <span class="kw">public void</span> <span class="fn">Pay</span>(<span class="kw">decimal</span> a) => Console.<span class="fn">WriteLine</span>(<span class="str">$"PayPal: {a}"</span>);
+}
+
+<span class="kw">public class</span> <span class="type">ShoppingCart</span>
+{
+    <span class="kw">private</span> <span class="type">IPaymentStrategy</span>? _strategy;
+
+    <span class="kw">public void</span> <span class="fn">SetStrategy</span>(<span class="type">IPaymentStrategy</span> s) => _strategy = s;
+
+    <span class="kw">public void</span> <span class="fn">Checkout</span>(<span class="kw">decimal</span> total)
+    {
+        _strategy?.<span class="fn">Pay</span>(total);
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Command -->
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon"><i class="fas fa-terminal"></i></div>
+                        <div class="pattern-info">
+                            <div class="pattern-name">Command</div>
+                            <div class="pattern-en">الأمر</div>
+                            <div class="pattern-tags">
+                                <span class="pattern-tag behavioral">سلوكي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pattern-meta">
+                        <div class="pattern-meta-item">
+                            <div class="label">الغرض</div>
+                            <div class="value">تغليف الطلب ككائن — قابل للتخزين والتراجع</div>
+                        </div>
+                        <div class="pattern-meta-item">
+                            <div class="label">متى تستخدمه</div>
+                            <div class="value">Undo/Redo، Queue الطلبات، التسجيل</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Command.cs</div>
+                            <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                        </div>
+                        <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="type">ICommand</span>
+{
+    <span class="kw">void</span> <span class="fn">Execute</span>();
+    <span class="kw">void</span> <span class="fn">Undo</span>();
+}
+
+<span class="kw">public class</span> <span class="type">AddTextCommand</span> : <span class="type">ICommand</span>
+{
+    <span class="kw">private readonly</span> <span class="type">List</span>&lt;<span class="kw">string</span>&gt; _doc;
+    <span class="kw">private readonly string</span> _text;
+
+    <span class="kw">public</span> <span class="fn">AddTextCommand</span>(<span class="type">List</span>&lt;<span class="kw">string</span>&gt; doc, <span class="kw">string</span> text)
+    {
+        _doc = doc;
+        _text = text;
+    }
+
+    <span class="kw">public void</span> <span class="fn">Execute</span>() => _doc.<span class="fn">Add</span>(_text);
+    <span class="kw">public void</span> <span class="fn">Undo</span>() => _doc.<span class="fn">Remove</span>(_text);
+}
+
+<span class="cmt">// تنفيذ + إمكانية التراجع</span>
+<span class="kw">var</span> doc = <span class="kw">new</span> <span class="type">List</span>&lt;<span class="kw">string</span>&gt;();
+<span class="type">ICommand</span> cmd = <span class="kw">new</span> <span class="type">AddTextCommand</span>(doc, <span class="str">"مرحباً"</span>);
+cmd.<span class="fn">Execute</span>();
+cmd.<span class="fn">Undo</span>();</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 6 ====== -->
+            <section class="content-section" id="sec-6">
+                <div class="section-heading">
+                    <div class="section-num">6</div>
+                    <h2>أنماط في .NET</h2>
+                </div>
+                <p>
+                    .NET نفسها تستخدم أنماط التصميم في مئات الأماكن. معرفتها يجعلك تفهم
+                    الإطار وتستخدمه بشكل أفضل.
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>النمط</th>
+                                <th>مثال في .NET</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Singleton</strong></td>
+                                <td><span class="inline-code">Application.Current</span>, <span class="inline-code">DependencyService</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Factory</strong></td>
+                                <td><span class="inline-code">ILoggerFactory</span>, <span class="inline-code">HttpClientFactory</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Builder</strong></td>
+                                <td><span class="inline-code">ConfigurationBuilder</span>, <span class="inline-code">HostBuilder</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Decorator</strong></td>
+                                <td><span class="inline-code">Stream</span> + <span class="inline-code">BufferedStream</span> + <span class="inline-code">GZipStream</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Adapter</strong></td>
+                                <td><span class="inline-code">StreamReader</span>, <span class="inline-code">DbDataAdapter</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Observer</strong></td>
+                                <td>الأحداث (Events) و<span class="inline-code">INotifyPropertyChanged</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Strategy</strong></td>
+                                <td><span class="inline-code">IComparer&lt;T&gt;</span>, <span class="inline-code">JsonSerializerOptions</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Command</strong></td>
+                                <td><span class="inline-code">ICommand</span> في WPF/MVVM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout eng">
+                    <div class="callout-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="callout-body">
+                        <h4>اكتشف الأنماط في .NET</h4>
+                        <p>
+                            عندما تقرأ كود .NET، حاول أن تتعرف على الأنماط. هذا يوطّد فهمك
+                            ويجعلك تراها في كل مكان.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 7 ====== -->
+            <section class="content-section" id="sec-7">
+                <div class="section-heading">
+                    <div class="section-num">7</div>
+                    <h2>مُختار النمط التفاعلي</h2>
+                </div>
+                <p>
+                    اختر نوع المشكلة التي تواجهها، وسأقترح عليك النمط المناسب وأشرح لماذا.
+                </p>
+
+                <div class="pattern-selector">
+                    <div class="pattern-selector-title">
+                        <i class="fas fa-wand-magic-sparkles"></i> ما نوع مشكلتك؟
+                    </div>
+                    <div class="pattern-selector-hint">اضغط على المشكلة لترى النمط المقترح</div>
+
+                    <div class="selector-row" id="selectorRow">
+                        <button class="selector-option" data-problem="single">
+                            <i class="fas fa-clone"></i>
+                            <span>أحتاج نسخة واحدة فقط من كلاس</span>
+                        </button>
+                        <button class="selector-option" data-problem="create">
+                            <i class="fas fa-industry"></i>
+                            <span>أنشئ كائنات بأنواع مختلفة حسب شرط</span>
+                        </button>
+                        <button class="selector-option" data-problem="complex">
+                            <i class="fas fa-cubes"></i>
+                            <span>كائن له خصائص كثيرة اختيارية</span>
+                        </button>
+                        <button class="selector-option" data-problem="incompatible">
+                            <i class="fas fa-plug"></i>
+                            <span>مكتبة خارجية بواجهة مختلفة</span>
+                        </button>
+                        <button class="selector-option" data-problem="extend">
+                            <i class="fas fa-layer-group"></i>
+                            <span>إضافة ميزات لكائن دون تعديل فئته</span>
+                        </button>
+                        <button class="selector-option" data-problem="simplify">
+                            <i class="fas fa-masks-theater"></i>
+                            <span>تبسيط نظام معقد بواجهة واحدة</span>
+                        </button>
+                        <button class="selector-option" data-problem="access">
+                            <i class="fas fa-user-shield"></i>
+                            <span>التحكم في الوصول لكائن</span>
+                        </button>
+                        <button class="selector-option" data-problem="notify">
+                            <i class="fas fa-bell"></i>
+                            <span>إشعار كائنات عند تغيّر آخر</span>
+                        </button>
+                        <button class="selector-option" data-problem="swap">
+                            <i class="fas fa-code-branch"></i>
+                            <span>تبديل الخوارزمية في وقت التشغيل</span>
+                        </button>
+                        <button class="selector-option" data-problem="undo">
+                            <i class="fas fa-terminal"></i>
+                            <span>تغليف الطلبات لدعم Undo/Redo</span>
+                        </button>
+                    </div>
+
+                    <div class="selector-result" id="selectorResult">
+                        <div style="color:var(--text-muted);text-align:center;padding:14px 0">
+                            👆 اختر مشكلة من الأعلى لعرض النمط المناسب
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 8 ====== -->
+            <section class="content-section" id="sec-8">
+                <div class="section-heading">
+                    <div class="section-num">8</div>
+                    <h2>أفضل الممارسات</h2>
+                </div>
+
+                <ul class="steps">
+                    <li><strong>افهم المشكلة أولاً:</strong> لا تبدأ بالنمط ثم تبحث عن مشكلة. ابدأ بالمشكلة وابحث عن النمط المناسب.</li>
+                    <li><strong>تجنّب الإفراط:</strong> Pattern for the sake of pattern = كود معقد. بسّط أولاً.</li>
+                    <li><strong>اقرأ الكود الحقيقي:</strong> افتح .NET source code وشاهد الأنماط في العمل.</li>
+                    <li><strong>استخدم DI Container:</strong> في .NET، معظم الأنماط تُدار عبر DI تلقائياً.</li>
+                    <li><strong>وثّق قراراتك:</strong> أضف تعليقاً قصيراً: "لماذا هذا النمط هنا؟".</li>
+                    <li><strong>ارجع للـ Refactoring:</strong> أحياناً النمط يظهر بعد إعادة الهيكلة، ليس قبلها.</li>
+                    <li><strong>لا تخف من التغيير:</strong> الأنماط ليست مقدسة — ما يصلح اليوم قد لا يصلح غداً.</li>
+                    <li><strong>اختبر النمط:</strong> اكتب اختبارات وحدة لكل نمط تستخدمه.</li>
+                </ul>
+
+                <div class="note-card">
+                    <h4><i class="fas fa-gem"></i> قاعدة ذهبية</h4>
+                    <p>
+                        الأنماط أدوات للتعبير، لا للإبهار. عندما تراها المناسبة، يكون الكود أبسط
+                        وأوضح — لا أعقد. إن لم يحدث ذلك، فربما لا تحتاجها.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ====== 9 ====== -->
+            <section class="content-section" id="sec-9">
+                <div class="section-heading">
+                    <div class="section-num">9</div>
+                    <h2>تمارين تفاعلية</h2>
+                </div>
+                <p>اختبر فهمك لأنماط التصميم:</p>
+
+                <div class="interactive-box">
+                    <div class="interactive-title"><i class="fas fa-question-circle"></i> سؤال 1</div>
+                    <p class="interactive-hint">أي نمط يستخدم في .NET لتطبيق <span class="inline-code">GZipStream</span> حول <span class="inline-code">FileStream</span>؟</p>
+                    <div class="task-box" data-quiz="1">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> Singleton</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">B</span> Factory</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">C</span> Decorator</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> Observer</button>
+                        </div>
+                        <div class="task-feedback" id="fb1"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 2</div>
+                    <p class="interactive-hint">أي نمط يناسب إضافة Undo/Redo لتطبيق محرر نصوص؟</p>
+                    <div class="task-box" data-quiz="2">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> Adapter</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">B</span> Builder</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">C</span> Command</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> Proxy</button>
+                        </div>
+                        <div class="task-feedback" id="fb2"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 3</div>
+                    <p class="interactive-hint">أي عائلة ينتمي إليها نمط Observer؟</p>
+                    <div class="task-box" data-quiz="3">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> إبداعية</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">B</span> هيكلية</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">C</span> سلوكية</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> لا ينتمي لأي عائلة</button>
+                        </div>
+                        <div class="task-feedback" id="fb3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <nav class="lesson-nav">
+                <a href="#" class="prev">
+                    <div class="nav-icon"><i class="fas fa-arrow-right"></i></div>
+                    <div>
+                        <div class="nav-label">الدرس السابق</div>
+                        <div class="nav-title">مقدمة في هندسة البرمجيات</div>
+                    </div>
+                </a>
+                <a href="#" class="next">
+                    <div>
+                        <div class="nav-label">الدرس التالي</div>
+                        <div class="nav-title">مبادئ SOLID في العمق</div>
+                    </div>
+                    <div class="nav-icon"><i class="fas fa-arrow-left"></i></div>
+                </a>
+            </nav>
+
+        </main>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-bottom">
+            <span>© 2026 CodeWay — جميع الحقوق محفوظة.</span>
+            <span>صُمم بعناية لتعلم C# بالعربية · <a href="#">سياسة الخصوصية</a></span>
+        </div>
+    </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    /* ============ شريط التقدم ============ */
+    const progressBar = document.getElementById('progressBar');
+    const header = document.getElementById('header');
+    const backTop = document.getElementById('backTop');
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = (scrollTop / docHeight) * 100 + '%';
+        header.classList.toggle('scrolled', scrollTop > 20);
+        backTop.classList.toggle('show', scrollTop > 400);
+    });
+
+    /* ============ نسخ الكود ============ */
+    function copyCode(btn) {
+        const pre = btn.closest('.code-wrapper').querySelector('pre');
+        const text = pre.innerText;
+        const done = () => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1800);
+        };
+        navigator.clipboard.writeText(text).then(done).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            done();
+        });
+    }
+
+    /* ============ مُختار النمط ============ */
+    const recommendations = {
+        single: {
+            pattern: 'Singleton',
+            en: 'النمط الأحادي',
+            desc: 'يضمن وجود نسخة واحدة فقط من الكلاس، ويوفر نقطة وصول عالمية لها.',
+            use: 'مثل: AppConfig, Logger, اتصال قاعدة البيانات.'
+        },
+        create: {
+            pattern: 'Factory Method',
+            en: 'مصنع الكائنات',
+            desc: 'يُخفي منطق الإنشاء خلف واجهة موحدة، ويسمح بإرجاع أنواع مختلفة حسب المدخلات.',
+            use: 'مثل: INotificationFactory (Email/SMS), ILoggerFactory.'
+        },
+        complex: {
+            pattern: 'Builder',
+            en: 'الباني',
+            desc: 'يبني كائنات معقدة خطوة بخطوة باستخدام fluent API، ويتجنب constructors طويلة.',
+            use: 'مثل: PizzaBuilder, ConfigurationBuilder.'
+        },
+        incompatible: {
+            pattern: 'Adapter',
+            en: 'المحول',
+            desc: 'يجعل واجهتين غير متوافقتين تعملان معاً دون تعديل إحداهما.',
+            use: 'مثل: تكييف مكتبة دفع خارجية لواجهة IPaymentGateway داخلية.'
+        },
+        extend: {
+            pattern: 'Decorator',
+            en: 'المُزيّن',
+            desc: 'يضيف سلوكاً لكائن ديناميكياً عبر تغليفه، بديل مرن للوراثة.',
+            use: 'مثل: GZipStream فوق FileStream، إضافة تسجيل للخدمة.'
+        },
+        simplify: {
+            pattern: 'Facade',
+            en: 'الواجهة الموحّدة',
+            desc: 'يخفي تعقيد عدة أنظمة فرعية خلف واجهة واحدة بسيطة.',
+            use: 'مثل: MediaProcessor يجمع تحويل + استخراج + ضغط.'
+        },
+        access: {
+            pattern: 'Proxy',
+            en: 'الوكيل',
+            desc: 'يتحكم في الوصول لكائن: تأجيل تحميل، حماية، تخزين مؤقت.',
+            use: 'مثل: ImageProxy لتحميل صورة عند العرض فقط.'
+        },
+        notify: {
+            pattern: 'Observer',
+            en: 'المراقب',
+            desc: 'يُخطر عدة كائنات تلقائياً عند تغيّر كائن آخر.',
+            use: 'مثل: أحداث WPF، INotifyPropertyChanged، Pub/Sub.'
+        },
+        swap: {
+            pattern: 'Strategy',
+            en: 'الاستراتيجية',
+            desc: 'يغلّف كل خوارزمية في كلاس مستقل، ويبدّلها في وقت التشغيل.',
+            use: 'مثل: IPaymentStrategy (CreditCard, PayPal, Crypto).'
+        },
+        undo: {
+            pattern: 'Command',
+            en: 'الأمر',
+            desc: 'يغلّف كل طلب ككائن يدعم Execute/Undo ويمكن تخزينه في queue.',
+            use: 'مثل: Undo/Redo في محرر نصوص، Queue مهام.'
+        }
+    };
+
+    const selectorResult = document.getElementById('selectorResult');
+    document.querySelectorAll('.selector-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.selector-option').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const rec = recommendations[btn.dataset.problem];
+            if (!rec) return;
+
+            selectorResult.innerHTML = `
+                <div class="rec-pattern">
+                    <i class="fas fa-lightbulb"></i> ${rec.pattern}
+                </div>
+                <div class="rec-desc"><strong>${rec.en}:</strong> ${rec.desc}</div>
+                <div class="rec-use"><i class="fas fa-circle-info"></i> ${rec.use}</div>
+            `;
+        });
+    });
+
+    /* ============ التنقل النشط في TOC ============ */
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    const sections = document.querySelectorAll('.content-section');
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                tocLinks.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
+
+    /* ============ التمارين التفاعلية ============ */
+    document.querySelectorAll('.task-box').forEach(box => {
+        const quizId = box.dataset.quiz;
+        const fb = document.getElementById('fb' + quizId);
+        const options = box.querySelectorAll('.task-option');
+
+        options.forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (box.dataset.answered === 'true') return;
+                box.dataset.answered = 'true';
+
+                const isCorrect = opt.dataset.correct === 'true';
+                options.forEach(o => {
+                    if (o.dataset.correct === 'true') o.classList.add('correct');
+                    else if (o === opt) o.classList.add('wrong');
+                });
+
+                if (isCorrect) {
+                    fb.textContent = '✅ إجابة صحيحة! أحسنت.';
+                    fb.className = 'task-feedback show ok';
+                } else {
+                    fb.textContent = '❌ إجابة غير صحيحة. الإجابة الصحيحة مظللة بالأخضر.';
+                    fb.className = 'task-feedback show no';
+                }
+            });
+        });
+    });
+
+    /* ============ قائمة الجوال ============ */
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        const nav = document.querySelector('.header-nav');
+        if (!nav) return;
+        if (nav.style.display === 'flex') {
+            nav.style.display = '';
+        } else {
+            Object.assign(nav.style, {
+                display: 'flex',
+                position: 'absolute',
+                top: '72px',
+                right: '0',
+                left: '0',
+                background: 'var(--primary)',
+                flexDirection: 'column',
+                padding: '16px',
+                gap: '8px',
+                boxShadow: '0 10px 30px rgba(0,0,0,.3)',
+                zIndex: '999'
+            });
+        }
+    });
+
+    /* ============ ظهور الأقسام ============ */
+    const sectionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.05 });
+
+    sections.forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(20px)';
+        s.style.transition = 'opacity .6s ease, transform .6s ease';
+        sectionObserver.observe(s);
+    });
+</script>
+
+</body>
+</html>

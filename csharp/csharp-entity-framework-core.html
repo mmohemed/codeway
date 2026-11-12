@@ -1,0 +1,2464 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entity Framework Core — في العمق | CodeWay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0a2540;
+            --primary-light: #1a3a5c;
+            --accent: #635bff;
+            --accent-hover: #4f46e5;
+            --accent-soft: #eef2ff;
+            --text-dark: #0a2540;
+            --text-body: #425466;
+            --text-muted: #8898aa;
+            --bg: #ffffff;
+            --bg-soft: #f7f9fc;
+            --border: #e6ebf1;
+            --success: #0e9f6e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --code-bg: #0a1929;
+            --ef: #512bd4;
+            --ef-soft: #ede9fe;
+            --db: #0ea5e9;
+            --db-soft: #e0f2fe;
+            --shadow-sm: 0 1px 3px rgba(10,37,64,.06), 0 1px 2px rgba(10,37,64,.04);
+            --shadow-md: 0 4px 12px rgba(10,37,64,.08), 0 2px 4px rgba(10,37,64,.04);
+            --shadow-lg: 0 20px 40px rgba(10,37,64,.1), 0 8px 16px rgba(10,37,64,.06);
+            --shadow-accent: 0 8px 24px rgba(81,43,212,.25);
+            --radius: 14px;
+            --radius-lg: 22px;
+            --transition: all .3s cubic-bezier(.4,0,.2,1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-body);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--ef), var(--db));
+            z-index: 3000;
+            width: 0%;
+            transition: width .1s linear;
+            box-shadow: 0 0 10px rgba(81,43,212,.5);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--primary);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            transition: var(--transition);
+        }
+        .header.scrolled { box-shadow: 0 10px 30px rgba(10,37,64,.25); }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--ef), var(--db));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.15rem;
+            box-shadow: var(--shadow-accent);
+        }
+        .brand-text {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: .5px;
+        }
+        .brand-text span { color: #c4b5fd; }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-nav a {
+            color: rgba(255,255,255,.75);
+            text-decoration: none;
+            font-size: .92rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .header-nav a:hover, .header-nav a.active {
+            color: #fff;
+            background: rgba(255,255,255,.08);
+        }
+        .header-nav a.active {
+            background: rgba(81,43,212,.25);
+            box-shadow: inset 0 0 0 1px rgba(81,43,212,.4);
+        }
+        .header-cta { display: flex; align-items: center; gap: 10px; }
+        .btn-outline-light {
+            padding: 9px 18px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,.2);
+            background: transparent;
+            color: #fff;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.4);
+        }
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.2);
+            color: #fff;
+            width: 40px; height: 40px;
+            border-radius: 9px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+        .hero {
+            background: linear-gradient(180deg, var(--bg-soft) 0%, #fff 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 56px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -120px; left: -120px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(81,43,212,.08), transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; right: -100px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(14,165,233,.06), transparent 70%);
+            border-radius: 50%;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb i { font-size: .65rem; }
+        .breadcrumb .current { color: var(--text-dark); font-weight: 600; }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: var(--ef-soft);
+            color: var(--ef);
+            border-radius: 100px;
+            font-size: .82rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            border: 1px solid rgba(81,43,212,.2);
+        }
+        .hero-badge i { font-size: .75rem; }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.25;
+            margin-bottom: 16px;
+            letter-spacing: -.5px;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--ef), var(--db));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-body);
+            max-width: 680px;
+            margin-bottom: 28px;
+            line-height: 1.85;
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            align-items: center;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .92rem;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .meta-item i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--ef-soft);
+            color: var(--ef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+        }
+        .hero-side {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 220px;
+        }
+        .btn-primary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: var(--shadow-accent);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(81,43,212,.35);
+        }
+        .btn-secondary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+        }
+        .btn-secondary:hover {
+            border-color: var(--ef);
+            color: var(--ef);
+            background: var(--ef-soft);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 48px;
+            padding: 48px 0 80px;
+            align-items: start;
+        }
+        .sidebar {
+            position: sticky;
+            top: 96px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-left: 4px;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .toc-title {
+            font-size: .78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toc-list { list-style: none; border-right: 2px solid var(--border); }
+        .toc-list li a {
+            display: block;
+            padding: 9px 16px;
+            color: var(--text-body);
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 500;
+            border-right: 2px solid transparent;
+            margin-right: -2px;
+            transition: var(--transition);
+            border-radius: 0 8px 8px 0;
+        }
+        .toc-list li a:hover { color: var(--accent); background: var(--accent-soft); }
+        .toc-list li a.active {
+            color: var(--accent);
+            border-right-color: var(--accent);
+            background: var(--accent-soft);
+            font-weight: 700;
+        }
+
+        .content { min-width: 0; }
+        .content-section { margin-bottom: 56px; scroll-margin-top: 100px; }
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        .section-num {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--ef), var(--db));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-accent);
+        }
+        .section-heading h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -.3px;
+        }
+        .content p {
+            font-size: 1.02rem;
+            margin-bottom: 18px;
+            color: var(--text-body);
+            line-height: 1.9;
+        }
+        .content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 32px 0 14px;
+        }
+        .content h4 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 24px 0 10px;
+        }
+        .content ul, .content ol {
+            margin: 0 0 20px 0;
+            padding-right: 22px;
+        }
+        .content li {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.85;
+        }
+        .content ul li::marker { color: var(--accent); }
+
+        .inline-code {
+            font-family: 'Fira Code', monospace;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: .88em;
+            font-weight: 500;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .callout {
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+            border: 1px solid;
+        }
+        .callout-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .callout-body h4 { margin: 0 0 6px !important; font-size: 1rem; }
+        .callout-body p { margin: 0 !important; font-size: .95rem !important; line-height: 1.75 !important; }
+        .callout.info { background: #eff6ff; border-color: #bfdbfe; }
+        .callout.info .callout-icon { background: #dbeafe; color: #2563eb; }
+        .callout.info h4 { color: #1e40af; }
+        .callout.warning { background: #fffbeb; border-color: #fde68a; }
+        .callout.warning .callout-icon { background: #fef3c7; color: #d97706; }
+        .callout.warning h4 { color: #92400e; }
+        .callout.success { background: #ecfdf5; border-color: #a7f3d0; }
+        .callout.success .callout-icon { background: #d1fae5; color: var(--success); }
+        .callout.success h4 { color: #065f46; }
+        .callout.danger { background: #fef2f2; border-color: #fecaca; }
+        .callout.danger .callout-icon { background: #fee2e2; color: var(--danger); }
+        .callout.danger h4 { color: #991b1b; }
+        .callout.ef { background: #faf5ff; border-color: #e9d5ff; }
+        .callout.ef .callout-icon { background: var(--ef-soft); color: var(--ef); }
+        .callout.ef h4 { color: #4c1d95; }
+
+        .code-wrapper {
+            background: var(--code-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 22px 0;
+            border: 1px solid #1e3a5f;
+            box-shadow: var(--shadow-md);
+            direction: ltr;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 18px;
+            background: #0d2137;
+            border-bottom: 1px solid #1e3a5f;
+        }
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #93c5fd;
+            font-size: .8rem;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 11px; height: 11px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+        .code-copy {
+            background: rgba(255,255,255,.08);
+            border: none;
+            color: #cbd5e1;
+            font-size: .75rem;
+            padding: 5px 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .code-copy:hover { background: rgba(81,43,212,.3); color: #fff; }
+        .code-copy.copied { background: rgba(14,159,110,.3); color: #6ee7b7; }
+        .code-body { padding: 20px 22px; overflow-x: auto; }
+        .code-body pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: .875rem;
+            line-height: 1.75;
+            color: #e2e8f0;
+            white-space: pre;
+        }
+        .code-body::-webkit-scrollbar { height: 8px; }
+        .code-body::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+
+        .kw { color: #c792ea; }
+        .type { color: #82aaff; }
+        .str { color: #c3e88d; }
+        .num { color: #f78c6c; }
+        .cmt { color: #6a8299; font-style: italic; }
+        .fn { color: #ffcb6b; }
+        .prop { color: #89ddff; }
+        .op { color: #89ddff; }
+        .punc { color: #8fa5b8; }
+        .attr { color: #f78c6c; }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 22px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .92rem;
+            min-width: 560px;
+        }
+        thead { background: var(--primary); }
+        thead th {
+            color: #fff;
+            padding: 14px 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: .88rem;
+        }
+        tbody td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-body);
+            line-height: 1.7;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:nth-child(even) { background: var(--bg-soft); }
+        tbody tr:hover { background: var(--accent-soft); }
+        tbody td strong { color: var(--text-dark); }
+        .badge-cell {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+        .badge-cell.green { background: #d1fae5; color: #065f46; }
+        .badge-cell.amber { background: #fef3c7; color: #92400e; }
+        .badge-cell.red { background: #fee2e2; color: #991b1b; }
+        .badge-cell.blue { background: #dbeafe; color: #1e40af; }
+        .badge-cell.purple { background: var(--ef-soft); color: #4c1d95; }
+
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+            margin: 22px 0;
+        }
+        .steps li {
+            counter-increment: step;
+            position: relative;
+            padding-right: 52px;
+            padding-bottom: 22px;
+            margin: 0 !important;
+        }
+        .steps li:last-child { padding-bottom: 0; }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            right: 0; top: 0;
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--ef-soft);
+            color: var(--ef);
+            border: 1.5px solid rgba(81,43,212,.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .9rem;
+        }
+        .steps li::after {
+            content: '';
+            position: absolute;
+            right: 16px; top: 38px;
+            width: 2px;
+            height: calc(100% - 30px);
+            background: var(--border);
+        }
+        .steps li:last-child::after { display: none; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            border-color: var(--ef);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .feature-card i {
+            width: 42px; height: 42px;
+            border-radius: 11px;
+            background: var(--ef-soft);
+            color: var(--ef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+        }
+        .feature-card h4 { margin: 0 0 8px !important; font-size: 1rem; }
+        .feature-card p { margin: 0 !important; font-size: .88rem !important; color: var(--text-muted) !important; line-height: 1.7 !important; }
+
+        .note-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 28px 30px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .note-card::after {
+            content: '\f1c0';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: -10px; bottom: -30px;
+            font-size: 120px;
+            opacity: .04;
+            color: #fff;
+        }
+        .note-card h4 {
+            color: #c4b5fd !important;
+            margin: 0 0 10px !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem !important;
+        }
+        .note-card p {
+            color: rgba(255,255,255,.85) !important;
+            margin: 0 !important;
+            font-size: .95rem !important;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ ER Diagram ============ */
+        .er-diagram {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        .er-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+        .er-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--ef-soft);
+            color: var(--ef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .er-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            position: relative;
+        }
+        .er-entity {
+            background: var(--bg-soft);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .er-entity:hover {
+            border-color: var(--ef);
+            box-shadow: var(--shadow-sm);
+        }
+        .er-entity-header {
+            background: linear-gradient(135deg, var(--ef), var(--db));
+            color: #fff;
+            padding: 10px 14px;
+            font-weight: 800;
+            font-size: .88rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .er-entity-header i { font-size: .9rem; }
+        .er-entity-body {
+            padding: 10px 14px;
+            font-family: 'Fira Code', monospace;
+            font-size: .78rem;
+            direction: ltr;
+            text-align: left;
+            color: var(--text-body);
+            line-height: 1.9;
+        }
+        .er-entity-body .pk {
+            color: var(--warning);
+            font-weight: 700;
+        }
+        .er-entity-body .fk {
+            color: var(--ef);
+            font-weight: 700;
+        }
+
+        /* ============ SQL vs LINQ ============ */
+        .sql-vs-linq {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .sql-side, .linq-side {
+            border-radius: var(--radius);
+            border: 1px solid;
+            overflow: hidden;
+        }
+        .sql-side {
+            background: #fef3c7;
+            border-color: #fde68a;
+        }
+        .linq-side {
+            background: var(--ef-soft);
+            border-color: #e9d5ff;
+        }
+        .sql-side .side-header, .linq-side .side-header {
+            padding: 10px 16px;
+            font-weight: 800;
+            font-size: .82rem;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .sql-side .side-header {
+            background: #fde68a;
+            color: #92400e;
+        }
+        .linq-side .side-header {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+        .sql-side .side-body, .linq-side .side-body {
+            padding: 14px 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: .78rem;
+            line-height: 1.7;
+            direction: ltr;
+            text-align: left;
+            white-space: pre-wrap;
+            color: var(--text-dark);
+        }
+
+        /* ============ Interactive Quiz ============ */
+        .interactive-box {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .interactive-box::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--ef), var(--db));
+        }
+        .interactive-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .interactive-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--ef-soft);
+            color: var(--ef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .interactive-hint {
+            font-size: .9rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+        .task-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+        .task-box p { margin-bottom: 12px; font-size: .95rem; }
+        .task-options { display: grid; gap: 10px; }
+        .task-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            font-size: .93rem;
+            text-align: right;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .task-option:hover { border-color: var(--ef); background: var(--ef-soft); }
+        .task-option.correct { border-color: var(--success); background: #ecfdf5; color: #065f46; }
+        .task-option.correct .opt-marker { background: var(--success); color: #fff; border-color: var(--success); }
+        .task-option.wrong { border-color: var(--danger); background: #fef2f2; color: #991b1b; }
+        .task-option.wrong .opt-marker { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .opt-marker {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .task-feedback {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: .9rem;
+            font-weight: 600;
+            display: none;
+        }
+        .task-feedback.show { display: block; animation: fadeInUp .3s ease; }
+        .task-feedback.ok { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .task-feedback.no { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lesson-nav {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 56px;
+            padding-top: 36px;
+            border-top: 1px solid var(--border);
+        }
+        .lesson-nav a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 22px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: var(--transition);
+            background: #fff;
+        }
+        .lesson-nav a:hover {
+            border-color: var(--ef);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .lesson-nav a.next { justify-content: flex-end; text-align: left; }
+        .lesson-nav .nav-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: var(--ef-soft);
+            color: var(--ef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: .9rem;
+        }
+        .lesson-nav .nav-label {
+            font-size: .75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .lesson-nav .nav-title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .footer {
+            background: var(--primary);
+            color: rgba(255,255,255,.7);
+            padding: 48px 0 28px;
+            margin-top: 40px;
+        }
+        .footer-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .footer-bottom {
+            padding-top: 28px;
+            border-top: 1px solid rgba(255,255,255,.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: .85rem;
+        }
+        .footer-bottom a { color: #c4b5fd; text-decoration: none; }
+        .footer-bottom a:hover { text-decoration: underline; }
+
+        .back-top {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(16px);
+            transition: var(--transition);
+            z-index: 900;
+        }
+        .back-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-top:hover { background: var(--ef); }
+
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; gap: 0; }
+            .sidebar {
+                position: static;
+                max-height: none;
+                margin-bottom: 32px;
+                padding: 20px;
+                background: var(--bg-soft);
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+            }
+            .toc-list { border-right: none; display: flex; flex-wrap: wrap; gap: 6px; }
+            .toc-list li a {
+                border-right: none;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                margin-right: 0;
+                padding: 7px 13px;
+                font-size: .85rem;
+                background: #fff;
+            }
+            .toc-list li a.active { border-color: var(--ef); }
+            .sql-vs-linq { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .header-nav, .header-cta .btn-outline-light { display: none; }
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .hero h1 { font-size: 1.9rem; }
+            .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+            .hero-side { flex-direction: row; flex-wrap: wrap; }
+            .hero-side .btn-primary, .hero-side .btn-secondary { flex: 1; min-width: 150px; }
+            .section-heading h2 { font-size: 1.35rem; }
+            .lesson-nav { grid-template-columns: 1fr; }
+            .content-section { margin-bottom: 40px; }
+            .container { padding: 0 18px; }
+            .header-inner { padding: 0 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="header" id="header">
+    <div class="header-inner">
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fas fa-code"></i></div>
+            <div class="brand-text">Code<span>Way</span></div>
+        </a>
+        <nav class="header-nav">
+            <a href="#">الرئيسية</a>
+            <a href="#">المسارات</a>
+            <a href="#" class="active">C#</a>
+            <a href="#">المدونة</a>
+            <a href="#">تواصل</a>
+        </nav>
+        <div class="header-cta">
+            <button class="btn-outline-light" onclick="alert('تم حفظ الدرس في قائمتك ✔')">
+                <i class="far fa-bookmark"></i> حفظ
+            </button>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">الرئيسية</a>
+            <i class="fas fa-chevron-left"></i>
+            <a href="#">هندسة البرمجيات</a>
+            <i class="fas fa-chevron-left"></i>
+            <span class="current">Entity Framework Core</span>
+        </div>
+        <div class="hero-grid">
+            <div>
+                <span class="hero-badge">
+                    <i class="fas fa-database"></i> الدرس السابع · هندسة البرمجيات
+                </span>
+                <h1>Entity Framework Core <span class="highlight">في العمق</span></h1>
+                <p class="hero-desc">
+                    ORM الرسمي لمايكروسوفت — يحوّل كائنات C# إلى جداول SQL تلقائياً.
+                    ستتعلم العلاقات، Migrations، LINQ، الأداء، وأفضل الممارسات — مع
+                    محاكي SQL Generator تفاعلي يريك كيف يترجم EF استعلاماتك.
+                </p>
+                <div class="hero-meta">
+                    <span class="meta-item"><i class="far fa-clock"></i> 85 دقيقة</span>
+                    <span class="meta-item"><i class="fas fa-signal"></i> متقدم</span>
+                    <span class="meta-item"><i class="fas fa-database"></i> 10 أمثلة</span>
+                    <span class="meta-item"><i class="fas fa-code"></i> محاكي SQL</span>
+                </div>
+            </div>
+            <div class="hero-side">
+                <button class="btn-primary" onclick="document.getElementById('sec-1').scrollIntoView()">
+                    <i class="fas fa-play"></i> ابدأ الدرس
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('sec-8').scrollIntoView()">
+                    <i class="fas fa-flask"></i> جرّب المحاكي
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="main-layout">
+
+        <aside class="sidebar">
+            <div class="toc-title"><i class="fas fa-list-ul"></i> محتويات الدرس</div>
+            <ul class="toc-list" id="tocList">
+                <li><a href="#sec-1" class="active">1. ما هو EF Core؟</a></li>
+                <li><a href="#sec-2">2. Entity & DbContext</a></li>
+                <li><a href="#sec-3">3. العلاقات</a></li>
+                <li><a href="#sec-4">4. Migrations</a></li>
+                <li><a href="#sec-5">5. LINQ إلى SQL</a></li>
+                <li><a href="#sec-6">6. الأداء و N+1</a></li>
+                <li><a href="#sec-7">7. Repository Pattern</a></li>
+                <li><a href="#sec-8">8. محاكي SQL تفاعلي</a></li>
+                <li><a href="#sec-9">9. أفضل الممارسات</a></li>
+                <li><a href="#sec-10">10. تمارين تفاعلية</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+
+            <!-- ====== 1 ====== -->
+            <section class="content-section" id="sec-1">
+                <div class="section-heading">
+                    <div class="section-num">1</div>
+                    <h2>ما هو EF Core؟</h2>
+                </div>
+                <p>
+                    <strong>Entity Framework Core (EF Core)</strong> هو إطار <strong>ORM</strong>
+                    (Object-Relational Mapper) من مايكروسوفت. وظيفته: تحويل كائنات C# إلى صفوف
+                    في قاعدة بيانات، والعكس — دون كتابة SQL يدوياً في معظم الحالات.
+                </p>
+
+                <h3>لماذا EF Core؟</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-bolt"></i>
+                        <h4>إنتاجية عالية</h4>
+                        <p>لا تكتب CRUD يدوياً — EF يفعله عنك.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shield-halved"></i>
+                        <h4>أمان أكبر</h4>
+                        <p>يحميك من SQL Injection تلقائياً عبر Parameterized Queries.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-code-branch"></i>
+                        <h4>دعم LINQ</h4>
+                        <p>استعلامات مكتوبة بـ C# تُترجم إلى SQL.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-arrows-rotate"></i>
+                        <h4>تتبع التغييرات</h4>
+                        <p>يكتشف ما تغيّر تلقائياً ويولّد UPDATE ذكياً.</p>
+                    </div>
+                </div>
+
+                <h3>مزودون مدعومون</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>قاعدة البيانات</th>
+                                <th>الحزمة</th>
+                                <th>الترخيص</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>SQL Server</strong></td>
+                                <td><span class="inline-code">Microsoft.EntityFrameworkCore.SqlServer</span></td>
+                                <td><span class="badge-cell green">مجاني</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PostgreSQL</strong></td>
+                                <td><span class="inline-code">Npgsql.EntityFrameworkCore.PostgreSQL</span></td>
+                                <td><span class="badge-cell green">مجاني</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>MySQL / MariaDB</strong></td>
+                                <td><span class="inline-code">Pomelo.EntityFrameworkCore.MySql</span></td>
+                                <td><span class="badge-cell green">مجاني</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SQLite</strong></td>
+                                <td><span class="inline-code">Microsoft.EntityFrameworkCore.Sqlite</span></td>
+                                <td><span class="badge-cell green">مجاني</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cosmos DB</strong></td>
+                                <td><span class="inline-code">Microsoft.EntityFrameworkCore.Cosmos</span></td>
+                                <td><span class="badge-cell amber">مدفوع</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout ef">
+                    <div class="callout-icon"><i class="fas fa-gem"></i></div>
+                    <div class="callout-body">
+                        <h4>EF Core ليس بديلاً عن SQL</h4>
+                        <p>
+                            معرفة SQL أساسية حتى مع EF. ستحتاجها لتشخيص الأداء، تحليل الاستعلامات،
+                            وتحسين الاستعلامات البطيئة.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 2 ====== -->
+            <section class="content-section" id="sec-2">
+                <div class="section-heading">
+                    <div class="section-num">2</div>
+                    <h2>Entity & DbContext</h2>
+                </div>
+                <p>
+                    أي تطبيق EF Core يقوم على عنصرين أساسيين: <strong>Entity</strong> (كلاس C#
+                    يمثّل جدولاً) و<strong>DbContext</strong> (الجسر بين الكود وقاعدة البيانات).
+                </p>
+
+                <h3>1) Entity — الكيان</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Models/User.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">User</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }             <span class="cmt">// PK</span>
+    <span class="kw">public string</span> Name { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+    <span class="kw">public string</span> Email { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+    <span class="kw">public</span> <span class="type">DateTime</span> CreatedAt { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="type">DateTime</span>.<span class="prop">UtcNow</span>;
+    <span class="kw">public bool</span> IsActive { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">true</span>;
+
+    <span class="cmt">// Navigation — العلاقة مع Orders</span>
+    <span class="kw">public</span> <span class="type">List</span>&lt;<span class="type">Order</span>&gt; Orders { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+}</pre>
+                    </div>
+                </div>
+
+                <h3>2) DbContext — السياق</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Data/AppDbContext.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">using</span> Microsoft.EntityFrameworkCore;
+
+<span class="kw">public class</span> <span class="type">AppDbContext</span> : <span class="type">DbContext</span>
+{
+    <span class="kw">public</span> <span class="type">DbSet</span>&lt;<span class="type">User</span>&gt; Users { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="type">DbSet</span>&lt;<span class="type">Order</span>&gt; Orders { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="type">DbSet</span>&lt;<span class="type">Product</span>&gt; Products { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="fn">AppDbContext</span>(<span class="type">DbContextOptions</span>&lt;<span class="type">AppDbContext</span>&gt; options)
+        : <span class="kw">base</span>(options) { }
+
+    <span class="kw">protected override void</span> <span class="fn">OnModelCreating</span>(<span class="type">ModelBuilder</span> mb)
+    {
+        <span class="cmt">// تخصيص الجداول</span>
+        mb.<span class="fn">Entity</span>&lt;<span class="type">User</span>&gt;(b =>
+        {
+            b.<span class="fn">ToTable</span>(<span class="str">"Users"</span>);
+            b.<span class="fn">HasKey</span>(u => u.<span class="prop">Id</span>);
+            b.<span class="fn">HasIndex</span>(u => u.<span class="prop">Email</span>).<span class="fn">IsUnique</span>();
+            b.<span class="prop">Property</span>(u => u.<span class="prop">Email</span>)
+                .<span class="fn">IsRequired</span>()
+                .<span class="fn">HasMaxLength</span>(<span class="num">200</span>);
+            b.<span class="prop">Property</span>(u => u.<span class="prop">Name</span>)
+                .<span class="fn">IsRequired</span>()
+                .<span class="fn">HasMaxLength</span>(<span class="num">100</span>);
+        });
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <h3>تسجيل DbContext في DI</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Program.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt">// SQL Server</span>
+builder.Services.<span class="fn">AddDbContext</span>&lt;<span class="type">AppDbContext</span>&gt;(opts =>
+    opts.<span class="fn">UseSqlServer</span>(
+        builder.Configuration.<span class="fn">GetConnectionString</span>(<span class="str">"Default"</span>)));
+
+<span class="cmt">// أو SQLite للتطوير</span>
+builder.Services.<span class="fn">AddDbContext</span>&lt;<span class="type">AppDbContext</span>&gt;(opts =>
+    opts.<span class="fn">UseSqlite</span>(<span class="str">"Data Source=app.db"</span>));
+
+<span class="cmt">// في appsettings.json</span>
+<span class="cmt">// "ConnectionStrings": {</span>
+<span class="cmt">//   "Default": "Server=localhost;Database=AppDB;Trusted_Connection=True;"</span>
+<span class="cmt">// }</span></pre>
+                    </div>
+                </div>
+
+                <div class="callout info">
+                    <div class="callout-icon"><i class="fas fa-info-circle"></i></div>
+                    <div class="callout-body">
+                        <h4>DbContext دورة حياته Scoped</h4>
+                        <p>
+                            <span class="inline-code">AddDbContext</span> يسجّل السياق كـ
+                            <strong>Scoped</strong> تلقائياً — نسخة واحدة لكل طلب HTTP. لا تحاول
+                            تسجيله Singleton.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 3 ====== -->
+            <section class="content-section" id="sec-3">
+                <div class="section-heading">
+                    <div class="section-num">3</div>
+                    <h2>العلاقات (Relationships)</h2>
+                </div>
+                <p>
+                    EF Core يدعم 3 أنواع من العلاقات. فهمها ضروري لتصميم قاعدة بيانات سليمة.
+                </p>
+
+                <div class="er-diagram">
+                    <div class="er-title">
+                        <i class="fas fa-diagram-project"></i> مخطط الكيانات
+                    </div>
+                    <div class="er-grid">
+                        <div class="er-entity">
+                            <div class="er-entity-header">
+                                <i class="fas fa-user"></i> User
+                            </div>
+                            <div class="er-entity-body">
+<span class="pk">Id</span>         int (PK)
+Name       string
+Email      string (unique)
+CreatedAt  DateTime
+                            </div>
+                        </div>
+                        <div class="er-entity">
+                            <div class="er-entity-header">
+                                <i class="fas fa-shopping-cart"></i> Order
+                            </div>
+                            <div class="er-entity-body">
+<span class="pk">Id</span>         int (PK)
+<span class="fk">UserId</span>     int (FK)
+Total      decimal
+Status     string
+CreatedAt  DateTime
+                            </div>
+                        </div>
+                        <div class="er-entity">
+                            <div class="er-entity-header">
+                                <i class="fas fa-box"></i> OrderItem
+                            </div>
+                            <div class="er-entity-body">
+<span class="pk">Id</span>         int (PK)
+<span class="fk">OrderId</span>    int (FK)
+<span class="fk">ProductId</span>  int (FK)
+Quantity   int
+Price      decimal
+                            </div>
+                        </div>
+                        <div class="er-entity">
+                            <div class="er-entity-header">
+                                <i class="fas fa-tag"></i> Product
+                            </div>
+                            <div class="er-entity-body">
+<span class="pk">Id</span>         int (PK)
+Name       string
+Price      decimal
+Stock      int
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>1) One-to-Many (واحد لمتعدد)</h3>
+                <p>
+                    مستخدم واحد له عدة طلبات، لكن كل طلب يخص مستخدماً واحداً.
+                </p>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> One-to-Many</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">User</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span> Name { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+
+    <span class="cmt">// علاقة "واحد لمتعدد" — مستخدم له طلبات كثيرة</span>
+    <span class="kw">public</span> <span class="type">List</span>&lt;<span class="type">Order</span>&gt; Orders { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+}
+
+<span class="kw">public class</span> <span class="type">Order</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="cmt">// Foreign Key</span>
+    <span class="kw">public int</span> UserId { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="cmt">// Navigation — الطلب يخص مستخدماً واحداً</span>
+    <span class="kw">public</span> <span class="type">User</span>? User { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">public decimal</span> Total { <span class="kw">get</span>; <span class="kw">set</span>; }
+}</pre>
+                    </div>
+                </div>
+
+                <h3>2) One-to-One (واحد لواحد)</h3>
+                <p>
+                    مستخدم واحد له ملف شخصي واحد فقط. مثال: User ↔ Profile.
+                </p>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> One-to-One</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">User</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="type">UserProfile</span>? Profile { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="kw">public class</span> <span class="type">UserProfile</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public int</span> UserId { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="type">User</span> User { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">null</span>!;
+    <span class="kw">public string</span>? Bio { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span>? AvatarUrl { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="cmt">// في OnModelCreating</span>
+mb.<span class="fn">Entity</span>&lt;<span class="type">User</span>&gt;()
+  .<span class="fn">HasOne</span>(u => u.<span class="prop">Profile</span>)
+  .<span class="fn">WithOne</span>(p => p.<span class="prop">User</span>)
+  .<span class="fn">HasForeignKey</span>&lt;<span class="type">UserProfile</span>&gt;(p => p.<span class="prop">UserId</span>);</pre>
+                    </div>
+                </div>
+
+                <h3>3) Many-to-Many (متعدد لمتعدد)</h3>
+                <p>
+                    طلب له منتجات كثيرة، والمنتج قد يظهر في طلبات كثيرة. مثال: Order ↔ Product.
+                </p>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Many-to-Many</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">Order</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="type">List</span>&lt;<span class="type">OrderItem</span>&gt; Items { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+}
+
+<span class="kw">public class</span> <span class="type">Product</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span> Name { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+    <span class="kw">public</span> <span class="type">List</span>&lt;<span class="type">OrderItem</span>&gt; Orders { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+}
+
+<span class="cmt">// جدول وسيط يحمل بيانات إضافية</span>
+<span class="kw">public class</span> <span class="type">OrderItem</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public int</span> OrderId { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="type">Order</span> Order { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">null</span>!;
+
+    <span class="kw">public int</span> ProductId { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="type">Product</span> Product { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">null</span>!;
+
+    <span class="kw">public int</span> Quantity { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public decimal</span> Price { <span class="kw">get</span>; <span class="kw">set</span>; }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="callout-body">
+                        <h4>Lazy Loading محظور افتراضياً</h4>
+                        <p>
+                            EF Core لا يدعم Lazy Loading افتراضياً (بعكس EF6). يجب إما:
+                            استخدام <span class="inline-code">Include()</span> (Eager)، أو تفعيل
+                            Lazy Proxies من الحزم الإضافية.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 4 ====== -->
+            <section class="content-section" id="sec-4">
+                <div class="section-heading">
+                    <div class="section-num">4</div>
+                    <h2>Migrations — إدارة تغييرات المخطط</h2>
+                </div>
+                <p>
+                    <strong>Migrations</strong> هي الطريقة الآمنة لتحديث قاعدة البيانات بعد تعديل
+                    الـ Models. بدلاً من تنفيذ SQL يدوياً، EF يولد migration تلقائياً.
+                </p>
+
+                <h3>دورة العمل</h3>
+                <ol class="steps">
+                    <li><strong>عدّل الـ Model:</strong> أضف خاصية أو كلاساً جديداً.</li>
+                    <li><strong>أنشئ Migration:</strong> <span class="inline-code">dotnet ef migrations add Name</span>.</li>
+                    <li><strong>راجع الملف:</strong> افتح Migration وتأكد من التغييرات.</li>
+                    <li><strong>طبّق:</strong> <span class="inline-code">dotnet ef database update</span>.</li>
+                    <li><strong>كرر:</strong> لكل تغيير مستقبلي.</li>
+                </ol>
+
+                <h3>أوامر أساسية</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Terminal</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt"># تثبيت أدوات EF (مرة واحدة)</span>
+dotnet tool install --global dotnet-ef
+
+<span class="cmt"># إنشاء أول migration</span>
+dotnet ef migrations add InitialCreate
+
+<span class="cmt"># تطبيق على قاعدة البيانات</span>
+dotnet ef database update
+
+<span class="cmt"># عرض قائمة Migrations</span>
+dotnet ef migrations list
+
+<span class="cmt"># التراجع عن آخر migration (لم تُطبّق)</span>
+dotnet ef migrations remove
+
+<span class="cmt"># التراجع إلى migration سابقة (مُطبّقة)</span>
+dotnet ef database update PreviousMigrationName
+
+<span class="cmt"># إنشاء سكريبت SQL يدوي (للإنتاج)</span>
+dotnet ef migrations script -o migrate.sql</pre>
+                    </div>
+                </div>
+
+                <h3>شكل ملف Migration</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Migrations/20261103_InitialCreate.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public partial class</span> <span class="type">InitialCreate</span> : <span class="type">Migration</span>
+{
+    <span class="kw">protected override void</span> <span class="fn">Up</span>(<span class="type">MigrationBuilder</span> mb)
+    {
+        mb.<span class="fn">CreateTable</span>(
+            name: <span class="str">"Users"</span>,
+            columns: table => <span class="kw">new</span>
+            {
+                Id = table.<span class="fn">Column</span>&lt;<span class="kw">int</span>&gt;()
+                    .<span class="fn">Annotation</span>(<span class="str">"SqlServer:Identity"</span>, <span class="str">"1, 1"</span>)
+                    .<span class="fn">NotNull</span>(),
+                Name = table.<span class="fn">Column</span>&lt;<span class="kw">string</span>&gt;(<span class="num">100</span>).<span class="fn">NotNull</span>(),
+                Email = table.<span class="fn">Column</span>&lt;<span class="kw">string</span>&gt;(<span class="num">200</span>).<span class="fn">NotNull</span>(),
+                CreatedAt = table.<span class="fn">Column</span>&lt;<span class="type">DateTime</span>&gt;().<span class="fn">NotNull</span>(),
+                Constraints = table.<span class="fn">PrimaryKey</span>(
+                    name: <span class="str">"PK_Users"</span>,
+                    column: x => x.<span class="prop">Id</span>)
+            });
+
+        mb.<span class="fn">CreateIndex</span>(
+            name: <span class="str">"IX_Users_Email"</span>,
+            table: <span class="str">"Users"</span>,
+            column: <span class="str">"Email"</span>,
+            unique: <span class="kw">true</span>);
+    }
+
+    <span class="kw">protected override void</span> <span class="fn">Down</span>(<span class="type">MigrationBuilder</span> mb)
+    {
+        mb.<span class="fn">DropTable</span>(name: <span class="str">"Users"</span>);
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="callout danger">
+                    <div class="callout-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                    <div class="callout-body">
+                        <h4>في الإنتاج</h4>
+                        <p>
+                            لا تنفّذ <span class="inline-code">database update</span> مباشرة على الإنتاج.
+                            استخدم <span class="inline-code">migrations script</span> لتوليد SQL، وراجعه
+                            مع فريق DBA قبل التطبيق.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 5 ====== -->
+            <section class="content-section" id="sec-5">
+                <div class="section-heading">
+                    <div class="section-num">5</div>
+                    <h2>LINQ إلى SQL</h2>
+                </div>
+                <p>
+                    EF Core يترجم استعلامات LINQ إلى SQL. هذا يعني أنك تكتب C#، لكن قاعدة
+                    البيانات تنفذ SQL محسّناً.
+                </p>
+
+                <div class="sql-vs-linq">
+                    <div class="sql-side">
+                        <div class="side-header"><i class="fas fa-database"></i> SQL مباشر</div>
+                        <div class="side-body">SELECT u.Id, u.Name, u.Email
+FROM Users u
+WHERE u.IsActive = 1
+  AND u.CreatedAt > '2026-01-01'
+ORDER BY u.CreatedAt DESC;</div>
+                    </div>
+                    <div class="linq-side">
+                        <div class="side-header"><i class="fas fa-code"></i> LINQ (C#)</div>
+                        <div class="side-body">var users = await _db.Users
+    .Where(u => u.IsActive)
+    .Where(u => u.CreatedAt > cutoff)
+    .OrderByDescending(u => u.CreatedAt)
+    .ToListAsync();</div>
+                    </div>
+                </div>
+
+                <h3>عمليات شائعة</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> LINQ Operations</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt">// 1) تصفية + ترتيب</span>
+<span class="kw">var</span> activeUsers = <span class="kw">await</span> _db.<span class="prop">Users</span>
+    .<span class="fn">Where</span>(u => u.<span class="prop">IsActive</span>)
+    .<span class="fn">OrderBy</span>(u => u.<span class="prop">Name</span>)
+    .<span class="fn">ToListAsync</span>();
+
+<span class="cmt">// 2) بحث</span>
+<span class="kw">var</span> search = <span class="kw">await</span> _db.<span class="prop">Users</span>
+    .<span class="fn">Where</span>(u => u.<span class="prop">Name</span>.<span class="fn">Contains</span>(<span class="str">"Ahmed"</span>))
+    .<span class="fn">ToListAsync</span>();
+
+<span class="cmt">// 3) Pagination</span>
+<span class="kw">var</span> page = <span class="kw">await</span> _db.<span class="prop">Users</span>
+    .<span class="fn">OrderBy</span>(u => u.<span class="prop">Id</span>)
+    .<span class="fn">Skip</span>((pageNum - <span class="num">1</span>) * pageSize)
+    .<span class="fn">Take</span>(pageSize)
+    .<span class="fn">ToListAsync</span>();
+
+<span class="cmt">// 4) Join</span>
+<span class="kw">var</span> userOrders = <span class="kw">await</span> _db.<span class="prop">Orders</span>
+    .<span class="fn">Include</span>(o => o.<span class="prop">User</span>)
+    .<span class="fn">Where</span>(o => o.<span class="prop">Total</span> > <span class="num">100</span>)
+    .<span class="fn">Select</span>(o => <span class="kw">new</span>
+    {
+        OrderId = o.<span class="prop">Id</span>,
+        UserName = o.<span class="prop">User</span>!.<span class="prop">Name</span>,
+        o.<span class="prop">Total</span>
+    })
+    .<span class="fn">ToListAsync</span>();
+
+<span class="cmt">// 5) تجميع</span>
+<span class="kw">var</span> stats = <span class="kw">await</span> _db.<span class="prop">Orders</span>
+    .<span class="fn">GroupBy</span>(o => o.<span class="prop">UserId</span>)
+    .<span class="fn">Select</span>(g => <span class="kw">new</span>
+    {
+        UserId = g.<span class="prop">Key</span>,
+        Count = g.<span class="fn">Count</span>(),
+        Total = g.<span class="fn">Sum</span>(o => o.<span class="prop">Total</span>)
+    })
+    .<span class="fn">ToListAsync</span>();
+
+<span class="cmt">// 6) تحديث جماعي</span>
+<span class="kw">await</span> _db.<span class="prop">Users</span>
+    .<span class="fn">Where</span>(u => !u.<span class="prop">IsActive</span>)
+    .<span class="fn">ExecuteUpdateAsync</span>(s => s
+        .<span class="fn">SetProperty</span>(u => u.<span class="prop">IsActive</span>, <span class="kw">true</span>));
+
+<span class="cmt">// 7) حذف جماعي</span>
+<span class="kw">await</span> _db.<span class="prop">Users</span>
+    .<span class="fn">Where</span>(u => u.<span class="prop">CreatedAt</span> &lt; cutoff)
+    .<span class="fn">ExecuteDeleteAsync</span>();</pre>
+                    </div>
+                </div>
+
+                <div class="callout ef">
+                    <div class="callout-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="callout-body">
+                        <h4>ExecuteUpdate / ExecuteDelete</h4>
+                        <p>
+                            في EF Core 7+، يمكنك تنفيذ تحديث/حذف جماعي دون تحميل الكيانات
+                            إلى الذاكرة. أسرع بكثير لعشرات الآلاف من السجلات.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 6 ====== -->
+            <section class="content-section" id="sec-6">
+                <div class="section-heading">
+                    <div class="section-num">6</div>
+                    <h2>الأداء و N+1</h2>
+                </div>
+                <p>
+                    EF Core سهل، لكنه قد يخفي مشاكل أداء خطيرة. أخطرها: <strong>N+1 Problem</strong>.
+                </p>
+
+                <h3>مشكلة N+1</h3>
+                <p>
+                    عندما تحمّل 100 مستخدم، ثم تحمّل طلبات كل مستخدم في حلقة — EF ينفذ
+                    استعلاماً لكل مستخدم (101 استعلام). هذا يبطئ التطبيق بشكل كبير.
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> ❌ N+1</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt">// سيّئ: 1 + N استعلام</span>
+<span class="kw">var</span> users = <span class="kw">await</span> _db.<span class="prop">Users</span>.<span class="fn">ToListAsync</span>();
+
+<span class="kw">foreach</span> (<span class="kw">var</span> user <span class="kw">in</span> users)
+{
+    <span class="cmt">// استعلام جديد لكل مستخدم!</span>
+    <span class="kw">var</span> orders = <span class="kw">await</span> _db.<span class="prop">Orders</span>
+        .<span class="fn">Where</span>(o => o.<span class="prop">UserId</span> == user.<span class="prop">Id</span>)
+        .<span class="fn">ToListAsync</span>();
+}</pre>
+                    </div>
+                </div>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> ✅ Include</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt">// جيد: استعلام واحد مع JOIN</span>
+<span class="kw">var</span> users = <span class="kw">await</span> _db.<span class="prop">Users</span>
+    .<span class="fn">Include</span>(u => u.<span class="prop">Orders</span>)
+    .<span class="fn">ToListAsync</span>();
+
+<span class="kw">foreach</span> (<span class="kw">var</span> user <span class="kw">in</span> users)
+{
+    <span class="cmt">// Orders محمّلة مسبقاً — لا استعلام إضافي</span>
+    <span class="kw">var</span> orders = user.<span class="prop">Orders</span>;
+}</pre>
+                    </div>
+                </div>
+
+                <h3>تقنيات تحسين الأداء</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التقنية</th>
+                                <th>الفائدة</th>
+                                <th>الاستخدام</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>AsNoTracking</strong></td>
+                                <td>إلغاء تتبع التغييرات</td>
+                                <td><span class="inline-code">.AsNoTracking()</span> للقراءة فقط</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Select</strong></td>
+                                <td>جلب أعمدة محددة فقط</td>
+                                <td><span class="inline-code">.Select(x => new { x.Id })</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>AsSplitQuery</strong></td>
+                                <td>تجنب Cartesian Explosion</td>
+                                <td><span class="inline-code">.AsSplitQuery()</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pagination</strong></td>
+                                <td>جلب جزء من البيانات</td>
+                                <td><span class="inline-code">.Skip(n).Take(m)</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Compiled Queries</strong></td>
+                                <td>تحسين الاستعلامات المتكررة</td>
+                                <td><span class="inline-code">EF.CompileQuery()</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Indexes</strong></td>
+                                <td>تسريع البحث</td>
+                                <td><span class="inline-code">.HasIndex(...)</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="callout-body">
+                        <h4>AsNoTracking للقراءة فقط</h4>
+                        <p>
+                            في الاستعلامات التي لا تحتاج تحديثاً، استخدم
+                            <span class="inline-code">AsNoTracking()</span> — يوفر
+                            30-50% من الذاكرة والوقت لأنه يلغي تتبع التغييرات.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 7 ====== -->
+            <section class="content-section" id="sec-7">
+                <div class="section-heading">
+                    <div class="section-num">7</div>
+                    <h2>Repository Pattern</h2>
+                </div>
+                <p>
+                    بدلاً من استخدام <span class="inline-code">DbContext</span> مباشرة في الـ Controllers،
+                    غلّفه في Repository. هذا يفصل منطق الأعمال عن الوصول للبيانات.
+                </p>
+
+                <h3>الواجهة</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Repositories/IUserRepository.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="type">IUserRepository</span>
+{
+    <span class="type">Task</span>&lt;<span class="type">User</span>?&gt; <span class="fn">GetByIdAsync</span>(<span class="kw">int</span> id);
+    <span class="type">Task</span>&lt;<span class="type">List</span>&lt;<span class="type">User</span>&gt;&gt; <span class="fn">GetAllAsync</span>();
+    <span class="type">Task</span>&lt;<span class="type">List</span>&lt;<span class="type">User</span>&gt;&gt; <span class="fn">SearchAsync</span>(<span class="kw">string</span> term);
+    <span class="type">Task</span>&lt;<span class="type">User</span>&gt; <span class="fn">AddAsync</span>(<span class="type">User</span> user);
+    <span class="type">Task</span> <span class="fn">UpdateAsync</span>(<span class="type">User</span> user);
+    <span class="type">Task</span> <span class="fn">DeleteAsync</span>(<span class="kw">int</span> id);
+    <span class="type">Task</span>&lt;<span class="kw">bool</span>&gt; <span class="fn">ExistsAsync</span>(<span class="kw">int</span> id);
+}</pre>
+                    </div>
+                </div>
+
+                <h3>التنفيذ</h3>
+                <div class="code-wrapper">
+                    <div class="code-header"><div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Repositories/UserRepository.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">UserRepository</span> : <span class="type">IUserRepository</span>
+{
+    <span class="kw">private readonly</span> <span class="type">AppDbContext</span> _db;
+
+    <span class="kw">public</span> <span class="fn">UserRepository</span>(<span class="type">AppDbContext</span> db) => _db = db;
+
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">User</span>?&gt; <span class="fn">GetByIdAsync</span>(<span class="kw">int</span> id) =>
+        <span class="kw">await</span> _db.<span class="prop">Users</span>.<span class="fn">FindAsync</span>(id);
+
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">List</span>&lt;<span class="type">User</span>&gt;&gt; <span class="fn">GetAllAsync</span>() =>
+        <span class="kw">await</span> _db.<span class="prop">Users</span>
+            .<span class="fn">AsNoTracking</span>()
+            .<span class="fn">ToListAsync</span>();
+
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">List</span>&lt;<span class="type">User</span>&gt;&gt; <span class="fn">SearchAsync</span>(<span class="kw">string</span> term) =>
+        <span class="kw">await</span> _db.<span class="prop">Users</span>
+            .<span class="fn">AsNoTracking</span>()
+            .<span class="fn">Where</span>(u => u.<span class="prop">Name</span>.<span class="fn">Contains</span>(term) ||
+                        u.<span class="prop">Email</span>.<span class="fn">Contains</span>(term))
+            .<span class="fn">ToListAsync</span>();
+
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">User</span>&gt; <span class="fn">AddAsync</span>(<span class="type">User</span> user)
+    {
+        _db.<span class="prop">Users</span>.<span class="fn">Add</span>(user);
+        <span class="kw">await</span> _db.<span class="fn">SaveChangesAsync</span>();
+        <span class="kw">return</span> user;
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">UpdateAsync</span>(<span class="type">User</span> user)
+    {
+        _db.<span class="prop">Users</span>.<span class="fn">Update</span>(user);
+        <span class="kw">await</span> _db.<span class="fn">SaveChangesAsync</span>();
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">DeleteAsync</span>(<span class="kw">int</span> id)
+    {
+        <span class="kw">var</span> user = <span class="kw">await</span> _db.<span class="prop">Users</span>.<span class="fn">FindAsync</span>(id);
+        <span class="kw">if</span> (user <span class="kw">is not null</span>)
+        {
+            _db.<span class="prop">Users</span>.<span class="fn">Remove</span>(user);
+            <span class="kw">await</span> _db.<span class="fn">SaveChangesAsync</span>();
+        }
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="kw">bool</span>&gt; <span class="fn">ExistsAsync</span>(<span class="kw">int</span> id) =>
+        <span class="kw">await</span> _db.<span class="prop">Users</span>.<span class="fn">AnyAsync</span>(u => u.<span class="prop">Id</span> == id);
+}</pre>
+                    </div>
+                </div>
+
+                <h3>تسجيله في DI</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Program.cs</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre>builder.Services.<span class="fn">AddDbContext</span>&lt;<span class="type">AppDbContext</span>&gt;(...);
+
+builder.Services.<span class="fn">AddScoped</span>&lt;<span class="type">IUserRepository</span>, <span class="type">UserRepository</span>&gt;();
+builder.Services.<span class="fn">AddScoped</span>&lt;<span class="type">IOrderRepository</span>, <span class="type">OrderRepository</span>&gt;();
+builder.Services.<span class="fn">AddScoped</span>&lt;<span class="type">IUserService</span>, <span class="type">UserService</span>&gt;();</pre>
+                    </div>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-icon"><i class="fas fa-check"></i></div>
+                    <div class="callout-body">
+                        <h4>فوائد Repository</h4>
+                        <p>
+                            قابلية الاختبار (Mock)، مركزية الاستعلامات، وإمكانية تبديل مصدر البيانات.
+                            لكن لا تُفرط — بعض الفرق تفضّل استخدام DbContext مباشرة في الخدمات.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 8 ====== -->
+            <section class="content-section" id="sec-8">
+                <div class="section-heading">
+                    <div class="section-num">8</div>
+                    <h2>محاكي SQL تفاعلي</h2>
+                </div>
+                <p>
+                    اكتب استعلام LINQ وشاهد كيف يترجمه EF Core إلى SQL. اختر من أمثلة جاهزة
+                    أو اكتب استعلامك.
+                </p>
+
+                <div class="sql-sim">
+                    <div class="sql-sim-header">
+                        <div class="sql-sim-title">
+                            <i class="fas fa-code"></i> LINQ → SQL Translator
+                        </div>
+                        <div class="sql-sim-tag">EF Core 8</div>
+                    </div>
+
+                    <div class="sql-sim-body">
+                        <div class="sim-presets">
+                            <button class="preset-btn active" data-preset="0">كل المستخدمين</button>
+                            <button class="preset-btn" data-preset="1">تصفية + ترتيب</button>
+                            <button class="preset-btn" data-preset="2">Include Orders</button>
+                            <button class="preset-btn" data-preset="3">Projection</button>
+                            <button class="preset-btn" data-preset="4">تجميع</button>
+                            <button class="preset-btn" data-preset="5">Pagination</button>
+                        </div>
+
+                        <div class="sim-linq">
+                            <div class="sim-label">
+                                <i class="fas fa-code"></i> LINQ
+                            </div>
+                            <pre id="simLinq">await _db.Users.ToListAsync();</pre>
+                        </div>
+
+                        <div class="sim-arrow">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>EF Core يترجم تلقائياً</span>
+                        </div>
+
+                        <div class="sim-sql">
+                            <div class="sim-label">
+                                <i class="fas fa-database"></i> SQL الناتج
+                            </div>
+                            <pre id="simSql">SELECT [u].[Id], [u].[Name], [u].[Email], [u].[CreatedAt], [u].[IsActive]
+FROM [Users] AS [u]</pre>
+                        </div>
+
+                        <div class="sim-tip" id="simTip">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>استعلام بسيط — يجلب كل الأعمدة. للقراءة فقط استخدم AsNoTracking().</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 9 ====== -->
+            <section class="content-section" id="sec-9">
+                <div class="section-heading">
+                    <div class="section-num">9</div>
+                    <h2>أفضل الممارسات</h2>
+                </div>
+
+                <ul class="steps">
+                    <li><strong>Async دائماً:</strong> استخدم <span class="inline-code">ToListAsync</span>, <span class="inline-code">SaveChangesAsync</span>.</li>
+                    <li><strong>AsNoTracking للقراءة:</strong> يوفر 30-50% من الأداء في عمليات القراءة.</li>
+                    <li><strong>تجنب N+1:</strong> استخدم <span class="inline-code">Include</span> أو <span class="inline-code">Select</span> لجلب علاقات.</li>
+                    <li><strong>Projection:</strong> استخدم <span class="inline-code">Select</span> لجلب الأعمدة التي تحتاجها فقط.</li>
+                    <li><strong>Pagination دائماً:</strong> لا تجلب جدولاً كاملاً أبداً — استخدم <span class="inline-code">Skip/Take</span>.</li>
+                    <li><strong>Add Indexes:</strong> أضف Indexes للأعمدة التي تُستخدم في WHERE/JOIN.</li>
+                    <li><strong>DbContext Scoped:</strong> لا تشاركه بين الطلبات — Scoped هي القاعدة.</li>
+                    <li><strong>لا تحمّل أكثر من الحاجة:</strong> استعلامات دقيقة أفضل من تحميل ثم تصفية.</li>
+                    <li><strong>ExecuteUpdate/Delete:</strong> للعمليات الجماعية — أسرع بكثير من تحميل الكيانات.</li>
+                    <li><strong>راجع SQL المولّد:</strong> استخدم <span class="inline-code">.ToQueryString()</span> في التطوير.</li>
+                    <li><strong>Migrations في Git:</strong> احفظ كل Migration في المستودع.</li>
+                    <li><strong>راجع Migrations قبل التطبيق:</strong> خاصة في الإنتاج — استخدم script.</li>
+                </ul>
+
+                <div class="note-card">
+                    <h4><i class="fas fa-gem"></i> قاعدة ذهبية</h4>
+                    <p>
+                        EF Core أداة قوية — لكنها ليست سحراً. فهم ما يفعله تحت الغطاء، ومراجعة
+                        SQL المولّد، وتحسين الأداء، أمور ضرورية لأي تطبيق احترافي.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ====== 10 ====== -->
+            <section class="content-section" id="sec-10">
+                <div class="section-heading">
+                    <div class="section-num">10</div>
+                    <h2>تمارين تفاعلية</h2>
+                </div>
+                <p>اختبر فهمك لـ EF Core:</p>
+
+                <div class="interactive-box">
+                    <div class="interactive-title"><i class="fas fa-question-circle"></i> سؤال 1</div>
+                    <p class="interactive-hint">ما هي مشكلة N+1؟</p>
+                    <div class="task-box" data-quiz="1">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> جدول يحوي صفوفاً كثيرة</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> استعلام واحد لكل عنصر في حلقة — أداء سيئ</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> خطأ في SQL</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> نسخة قديمة من EF</button>
+                        </div>
+                        <div class="task-feedback" id="fb1"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 2</div>
+                    <p class="interactive-hint">ما فائدة AsNoTracking()؟</p>
+                    <div class="task-box" data-quiz="2">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> يجلب بيانات أكثر</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> يلغي تتبع التغييرات — أسرع للقراءة</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> يحذف الجدول</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> يمنع الـ INSERT</button>
+                        </div>
+                        <div class="task-feedback" id="fb2"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 3</div>
+                    <p class="interactive-hint">ما هو Migration في EF Core؟</p>
+                    <div class="task-box" data-quiz="3">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> نسخ البيانات</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> ملف يصف تغييراً في مخطط قاعدة البيانات</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> نسخة احتياطية</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> صيغة JSON لاستيراد البيانات</button>
+                        </div>
+                        <div class="task-feedback" id="fb3"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 4</div>
+                    <p class="interactive-hint">متى تستخدم Include()؟</p>
+                    <div class="task-box" data-quiz="4">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> لتحديث البيانات</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> لتحميل الكيانات المرتبطة (Eager Loading)</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> لحذف صف</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> لإنشاء Migration</button>
+                        </div>
+                        <div class="task-feedback" id="fb4"></div>
+                    </div>
+                </div>
+            </section>
+
+            <nav class="lesson-nav">
+                <a href="#" class="prev">
+                    <div class="nav-icon"><i class="fas fa-arrow-right"></i></div>
+                    <div>
+                        <div class="nav-label">الدرس السابق</div>
+                        <div class="nav-title">ASP.NET Core</div>
+                    </div>
+                </a>
+                <a href="#" class="next">
+                    <div>
+                        <div class="nav-label">الدرس التالي</div>
+                        <div class="nav-title">بناء Microservices بـ .NET</div>
+                    </div>
+                    <div class="nav-icon"><i class="fas fa-arrow-left"></i></div>
+                </a>
+            </nav>
+
+        </main>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-bottom">
+            <span>© 2026 CodeWay — جميع الحقوق محفوظة.</span>
+            <span>صُمم بعناية لتعلم C# بالعربية · <a href="#">سياسة الخصوصية</a></span>
+        </div>
+    </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<style>
+    /* ============ SQL Simulator ============ */
+    .sql-sim {
+        background: var(--code-bg);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        margin: 24px 0;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid #1e3a5f;
+    }
+    .sql-sim-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        background: #0d2137;
+        border-bottom: 1px solid #1e3a5f;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .sql-sim-title {
+        color: #c4b5fd;
+        font-family: 'Fira Code', monospace;
+        font-size: .88rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .sql-sim-tag {
+        background: rgba(81,43,212,.2);
+        color: #c4b5fd;
+        padding: 4px 12px;
+        border-radius: 100px;
+        font-size: .72rem;
+        font-weight: 700;
+        font-family: 'Fira Code', monospace;
+    }
+    .sql-sim-body {
+        padding: 20px;
+    }
+    .sim-presets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 18px;
+    }
+    .preset-btn {
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,.1);
+        background: rgba(255,255,255,.03);
+        color: #cbd5e1;
+        font-family: inherit;
+        font-size: .8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .2s;
+    }
+    .preset-btn:hover {
+        background: rgba(81,43,212,.2);
+        border-color: rgba(81,43,212,.4);
+        color: #fff;
+    }
+    .preset-btn.active {
+        background: var(--ef);
+        border-color: var(--ef);
+        color: #fff;
+    }
+    .sim-linq, .sim-sql {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #1e3a5f;
+    }
+    .sim-label {
+        padding: 8px 14px;
+        background: #0d2137;
+        border-bottom: 1px solid #1e3a5f;
+        color: #94a3b8;
+        font-family: 'Fira Code', monospace;
+        font-size: .78rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .sim-linq .sim-label { color: #ffcb6b; }
+    .sim-sql .sim-label { color: #c3e88d; }
+    .sim-linq pre, .sim-sql pre {
+        margin: 0;
+        padding: 16px 18px;
+        font-family: 'Fira Code', monospace;
+        font-size: .82rem;
+        line-height: 1.75;
+        direction: ltr;
+        text-align: left;
+        color: #e2e8f0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #0a1929;
+        overflow-x: auto;
+    }
+    .sim-sql pre { color: #c3e88d; }
+    .sim-linq pre { color: #ffcb6b; }
+    .sim-arrow {
+        text-align: center;
+        padding: 14px 0;
+        color: #6a8299;
+        font-size: .8rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+    .sim-arrow i {
+        color: var(--ef);
+        font-size: 1.3rem;
+    }
+    .sim-tip {
+        margin-top: 16px;
+        padding: 12px 16px;
+        background: rgba(81,43,212,.1);
+        border: 1px solid rgba(81,43,212,.3);
+        border-radius: 10px;
+        color: #c4b5fd;
+        font-size: .85rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .sim-tip i {
+        color: #f78c6c;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+</style>
+
+<script>
+    /* ============ شريط التقدم ============ */
+    const progressBar = document.getElementById('progressBar');
+    const header = document.getElementById('header');
+    const backTop = document.getElementById('backTop');
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = (scrollTop / docHeight) * 100 + '%';
+        header.classList.toggle('scrolled', scrollTop > 20);
+        backTop.classList.toggle('show', scrollTop > 400);
+    });
+
+    /* ============ نسخ الكود ============ */
+    function copyCode(btn) {
+        const pre = btn.closest('.code-wrapper').querySelector('pre');
+        const text = pre.innerText;
+        const done = () => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1800);
+        };
+        navigator.clipboard.writeText(text).then(done).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            done();
+        });
+    }
+
+    /* ============ SQL Simulator ============ */
+    const sqlPresets = [
+        {
+            linq: `await _db.Users.ToListAsync();`,
+            sql: `SELECT [u].[Id], [u].[Name], [u].[Email], [u].[CreatedAt], [u].[IsActive]
+FROM [Users] AS [u]`,
+            tip: 'استعلام بسيط — يجلب كل الأعمدة. للقراءة فقط استخدم AsNoTracking().'
+        },
+        {
+            linq: `await _db.Users
+    .Where(u => u.IsActive && u.CreatedAt > cutoff)
+    .OrderByDescending(u => u.CreatedAt)
+    .ToListAsync();`,
+            sql: `SELECT [u].[Id], [u].[Name], [u].[Email], [u].[CreatedAt], [u].[IsActive]
+FROM [Users] AS [u]
+WHERE [u].[IsActive] = CAST(1 AS bit)
+  AND [u].[CreatedAt] > @__cutoff_0
+ORDER BY [u].[CreatedAt] DESC`,
+            tip: 'لاحظ @__cutoff_0 — معامل (parameter) وليس قيمة مباشرة. هذا يمنع SQL Injection ويسمح بإعادة استخدام الخطة.'
+        },
+        {
+            linq: `await _db.Users
+    .Include(u => u.Orders)
+    .ToListAsync();`,
+            sql: `SELECT [u].[Id], [u].[Name], [u].[Email], [u].[CreatedAt], [u].[IsActive],
+       [o].[Id], [o].[UserId], [o].[Total], [o].[Status], [o].[CreatedAt]
+FROM [Users] AS [u]
+LEFT JOIN [Orders] AS [o] ON [u].[Id] = [o].[UserId]
+ORDER BY [u].[Id]`,
+            tip: 'LEFT JOIN — يجلب المستخدمين مع طلباتهم في استعلام واحد. هذا يحل مشكلة N+1.'
+        },
+        {
+            linq: `await _db.Users
+    .Select(u => new { u.Id, u.Name })
+    .ToListAsync();`,
+            sql: `SELECT [u].[Id], [u].[Name]
+FROM [Users] AS [u]`,
+            tip: 'Projection — يجلب عمودين فقط بدلاً من كل الأعمدة. أسرع وأقل استهلاكاً للذاكرة.'
+        },
+        {
+            linq: `await _db.Orders
+    .GroupBy(o => o.UserId)
+    .Select(g => new {
+        UserId = g.Key,
+        Count = g.Count(),
+        Total = g.Sum(o => o.Total)
+    })
+    .ToListAsync();`,
+            sql: `SELECT [o].[UserId],
+       COUNT(*) AS [Count],
+       COALESCE(SUM([o].[Total]), 0.0) AS [Total]
+FROM [Orders] AS [o]
+GROUP BY [o].[UserId]`,
+            tip: 'GroupBy + تجميع — EF يترجمها إلى GROUP BY بكفاءة. لاحظ COALESCE لتجنب NULL في SUM.'
+        },
+        {
+            linq: `await _db.Users
+    .OrderBy(u => u.Id)
+    .Skip((page - 1) * size)
+    .Take(size)
+    .ToListAsync();`,
+            sql: `SELECT [u].[Id], [u].[Name], [u].[Email], [u].[CreatedAt], [u].[IsActive]
+FROM [Users] AS [u]
+ORDER BY [u].[Id]
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY`,
+            tip: 'Pagination — OFFSET/FETCH بدلاً من جلب كل الصفوف. ضروري لكل endpoint يعرض قوائم.'
+        }
+    ];
+
+    const simLinq = document.getElementById('simLinq');
+    const simSql = document.getElementById('simSql');
+    const simTip = document.getElementById('simTip');
+
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const preset = sqlPresets[parseInt(btn.dataset.preset)];
+            if (!preset) return;
+
+            simLinq.textContent = preset.linq;
+            simSql.textContent = preset.sql;
+            simTip.innerHTML = `<i class="fas fa-lightbulb"></i><span>${preset.tip}</span>`;
+        });
+    });
+
+    /* ============ التنقل النشط في TOC ============ */
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    const sections = document.querySelectorAll('.content-section');
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                tocLinks.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
+
+    /* ============ التمارين التفاعلية ============ */
+    document.querySelectorAll('.task-box').forEach(box => {
+        const quizId = box.dataset.quiz;
+        const fb = document.getElementById('fb' + quizId);
+        const options = box.querySelectorAll('.task-option');
+
+        options.forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (box.dataset.answered === 'true') return;
+                box.dataset.answered = 'true';
+
+                const isCorrect = opt.dataset.correct === 'true';
+                options.forEach(o => {
+                    if (o.dataset.correct === 'true') o.classList.add('correct');
+                    else if (o === opt) o.classList.add('wrong');
+                });
+
+                if (isCorrect) {
+                    fb.textContent = '✅ إجابة صحيحة! أحسنت.';
+                    fb.className = 'task-feedback show ok';
+                } else {
+                    fb.textContent = '❌ إجابة غير صحيحة. الإجابة الصحيحة مظللة بالأخضر.';
+                    fb.className = 'task-feedback show no';
+                }
+            });
+        });
+    });
+
+    /* ============ قائمة الجوال ============ */
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        const nav = document.querySelector('.header-nav');
+        if (!nav) return;
+        if (nav.style.display === 'flex') {
+            nav.style.display = '';
+        } else {
+            Object.assign(nav.style, {
+                display: 'flex',
+                position: 'absolute',
+                top: '72px',
+                right: '0',
+                left: '0',
+                background: 'var(--primary)',
+                flexDirection: 'column',
+                padding: '16px',
+                gap: '8px',
+                boxShadow: '0 10px 30px rgba(0,0,0,.3)',
+                zIndex: '999'
+            });
+        }
+    });
+
+    /* ============ ظهور الأقسام ============ */
+    const sectionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.05 });
+
+    sections.forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(20px)';
+        s.style.transition = 'opacity .6s ease, transform .6s ease';
+        sectionObserver.observe(s);
+    });
+</script>
+
+</body>
+</html>

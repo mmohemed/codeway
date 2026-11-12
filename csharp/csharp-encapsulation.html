@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C# | التغليف ومعدلات الوصول - Encapsulation | تصميم فخم</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #0a0f1a 0%, #060b14 100%);
+            color: #edf2ff;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        .bg-encapsulation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(0, 255, 200, 0.05), transparent 70%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* hero section */
+        .hero-encap {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2.5rem 1.5rem;
+            background: rgba(5, 15, 30, 0.6);
+            backdrop-filter: blur(16px);
+            border-radius: 3rem;
+            border: 1px solid rgba(0, 255, 200, 0.25);
+            box-shadow: 0 30px 45px -20px rgba(0, 0, 0, 0.6);
+        }
+
+        .hero-encap h1 {
+            font-size: 3.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #5ef0d0, #00c9a7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+            margin-bottom: 0.8rem;
+        }
+
+        .hero-encap p {
+            font-size: 1.2rem;
+            color: #b8f2e5;
+            max-width: 850px;
+            margin: 0.8rem auto 0;
+            font-weight: 500;
+        }
+
+        .badge-encap {
+            background: linear-gradient(95deg, #0a2a2a, #051a1a);
+            padding: 0.4rem 1.8rem;
+            border-radius: 60px;
+            display: inline-block;
+            font-weight: 700;
+            border: 1px solid #2dd4bf60;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* cards */
+        .card-encap {
+            background: rgba(8, 18, 30, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(45, 212, 191, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-encap:hover {
+            border-color: rgba(45, 212, 191, 0.6);
+            background: rgba(12, 25, 42, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid rgba(45, 212, 191, 0.5);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.6rem;
+        }
+
+        .card-header i {
+            font-size: 2.2rem;
+            color: #5eead4;
+            filter: drop-shadow(0 0 5px #14b8a6);
+        }
+
+        .card-header h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.8rem;
+            margin: 1rem 0;
+        }
+
+        .modifier-card {
+            background: rgba(0, 15, 25, 0.6);
+            border-radius: 1.6rem;
+            padding: 1.4rem;
+            border-left: 4px solid #2dd4bf;
+            transition: 0.2s;
+        }
+
+        .modifier-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #b6f5ea;
+        }
+
+        .code-block {
+            border-radius: 1.2rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            font-size: 0.85rem;
+            border-radius: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .pill-access {
+            background: #115e59;
+            padding: 0.2rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #a7f3d0;
+            display: inline-block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table td, .comparison-table th {
+            padding: 0.9rem;
+            border-bottom: 1px solid rgba(45, 212, 191, 0.25);
+            vertical-align: top;
+        }
+
+        .interactive-shield {
+            background: linear-gradient(145deg, #071b1f, #020d0f);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            margin: 1.5rem 0;
+            border: 1px solid #14b8a6;
+        }
+
+        .btn-lux {
+            background: linear-gradient(95deg, #0f766e, #0d5c54);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 0.7rem 2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            margin-top: 0.8rem;
+            box-shadow: 0 5px 15px rgba(20, 184, 166, 0.3);
+        }
+
+        .btn-lux:hover {
+            background: linear-gradient(95deg, #14b8a6, #0f766e);
+            transform: scale(0.97);
+        }
+
+        .demo-output {
+            background: #031016;
+            padding: 1rem 1.2rem;
+            border-radius: 1.2rem;
+            font-family: 'Fira Code', monospace;
+            border-left: 3px solid #2dd4bf;
+            margin-top: 1rem;
+            color: #ccfbf1;
+        }
+
+        .warning-note {
+            background: #1e2a2a;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid #2c7a6e;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 750px) {
+            .container { padding: 1rem; }
+            .hero-encap h1 { font-size: 2rem; }
+            .card-header h2 { font-size: 1.4rem; }
+        }
+
+        .glow-text {
+            text-shadow: 0 0 6px #2dd4bf;
+        }
+    </style>
+</head>
+<body>
+<div class="bg-encapsulation"></div>
+<div class="container">
+    <div class="hero-encap">
+        <div class="badge-encap"><i class="fas fa-shield-alt"></i>  ENCAPSULATION | التغليف ومعدلات الوصول</div>
+        <h1>🔒 التغليف (Encapsulation) <span style="background: linear-gradient(120deg,#5eead4,#ffffff); background-clip:text; -webkit-background-clip:text; color:transparent;">& معدلات الوصول</span></h1>
+        <p>حماية البيانات، إخفاء التفاصيل الداخلية، والتحكم في الوصول — الركيزة الأساسية للبرمجة الكائنية الاحترافية في C#.</p>
+    </div>
+
+    <!-- مفهوم التغليف -->
+    <div class="card-encap">
+        <div class="card-header">
+            <i class="fas fa-shield-virus"></i>
+            <h2>ما هو التغليف (Encapsulation)؟</h2>
+        </div>
+        <p style="font-size:1.05rem; margin-bottom: 1rem;">التغليف هو مبدأ يهدف إلى <strong>إخفاء البيانات الداخلية</strong> للكلاس ومنع الوصول المباشر إليها من الخارج، وتوفير واجهة عامة (public methods/properties) للتفاعل الآمن مع البيانات. يحمي سلامة الكائن ويمنع التعديلات غير المقصودة.</p>
+        <div class="code-block">
+            <pre><code class="language-csharp">// مثال: كلاس BankAccount مع تغليف كامل
+public class BankAccount
+{
+    private decimal balance;  // حقل خاص (مخفي)
+    
+    // خاصية عامة للوصول الآمن (get فقط)
+    public decimal Balance 
+    { 
+        get { return balance; } 
+    }
+    
+    // دالة عامة للإيداع مع التحقق
+    public void Deposit(decimal amount)
+    {
+        if (amount > 0)
+            balance += amount;
+        else
+            throw new ArgumentException("المبلغ يجب أن يكون موجباً");
+    }
+    
+    // دالة عامة للسحب مع التحقق
+    public bool Withdraw(decimal amount)
+    {
+        if (amount > 0 && balance >= amount)
+        {
+            balance -= amount;
+            return true;
+        }
+        return false;
+    }
+}</code></pre>
+        </div>
+        <div class="warning-note">
+            <i class="fas fa-gem"></i> <strong>فوائد التغليف:</strong> حماية البيانات، مرونة التعديل الداخلي دون التأثير على المستخدمين، إمكانية إضافة قواعد التحقق.
+        </div>
+    </div>
+
+    <!-- معدلات الوصول الستة في C# -->
+    <div class="card-encap">
+        <div class="card-header">
+            <i class="fas fa-key"></i>
+            <h2>معدلات الوصول (Access Modifiers) في C#</h2>
+        </div>
+        <div class="grid-2col">
+            <div class="modifier-card">
+                <h3><span class="pill-access">public</span></h3>
+                <p>متاح من أي مكان داخل التطبيق. لا توجد قيود.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public string Name { get; set; }
+public void DoWork() { }</code></pre>
+                </div>
+            </div>
+            <div class="modifier-card">
+                <h3><span class="pill-access">private</span></h3>
+                <p>متاح فقط داخل نفس الكلاس. أعلى مستوى من الخصوصية.</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">private int id;
+private void Helper() { }</code></pre>
+                </div>
+            </div>
+            <div class="modifier-card">
+                <h3><span class="pill-access">protected</span></h3>
+                <p>متاح داخل الكلاس والكلاسات المشتقة (الموروثة).</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">protected string secret;
+protected void InternalLogic() { }</code></pre>
+                </div>
+            </div>
+            <div class="modifier-card">
+                <h3><span class="pill-access">internal</span></h3>
+                <p>متاح فقط داخل نفس التجميع (assembly/project).</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">internal int Counter;
+internal void Reset() { }</code></pre>
+                </div>
+            </div>
+            <div class="modifier-card">
+                <h3><span class="pill-access">protected internal</span></h3>
+                <p>متاح داخل نفس التجميع OR في الكلاسات المشتقة (حتى من تجميع آخر).</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">protected internal void Log() { }</code></pre>
+                </div>
+            </div>
+            <div class="modifier-card">
+                <h3><span class="pill-access">private protected</span></h3>
+                <p>متاح داخل نفس الكلاس أو الكلاسات المشتقة داخل نفس التجميع فقط (C# 7.2+).</p>
+                <div class="code-block">
+                    <pre><code class="language-csharp">private protected void Advanced() { }</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدول مقارنة شامل -->
+    <div class="card-encap">
+        <div class="card-header">
+            <i class="fas fa-table-list"></i>
+            <h2>جدول مقارنة: مدى الوصول لكل مُعدِّل</h2>
+        </div>
+        <table class="comparison-table">
+            <tr style="border-bottom: 2px solid #2dd4bf;">
+                <th>المُعدِّل</th><th>داخل الكلاس</th><th>الكلاسات المشتقة</th><th>نفس التجميع</th><th>خارج التجميع</th>
+             </tr>
+             <tr><td>public</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+             <tr><td>private</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+             <tr><td>protected</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td></tr>
+             <tr><td>internal</td><td>✅</td><td>✅ (نفس التجميع)</td><td>✅</td><td>❌</td></tr>
+             <tr><td>protected internal</td><td>✅</td><td>✅ (أي مشتق)</td><td>✅</td><td>✅ (للمشتقات فقط)</td></tr>
+             <tr><td>private protected</td><td>✅</td><td>✅ (نفس التجميع)</td><td>✅ (للمشتقات فقط)</td><td>❌</td></tr>
+         </table>
+    </div>
+
+    <!-- الخصائص (Properties) كأداة للتغليف -->
+    <div class="card-encap">
+        <div class="card-header">
+            <i class="fas fa-sliders-h"></i>
+            <h2>الخصائص (Properties) - آلة التغليف الحديثة</h2>
+        </div>
+        <p>الخصائص توفر تغليفاً أنيقاً، حيث تسمح بالتحكم في عمليات get و set مع إمكانية إضافة منطق تحقق.</p>
+        <div class="grid-2col">
+            <div class="modifier-card">
+                <h3>📦 Auto-implemented Property</h3>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public string Name { get; set; }
+public int Age { get; private set; } // set فقط داخل الكلاس</code></pre>
+                </div>
+            </div>
+            <div class="modifier-card">
+                <h3>⚙️ Full Property with Logic</h3>
+                <div class="code-block">
+                    <pre><code class="language-csharp">private int temperature;
+public int Temperature
+{
+    get { return temperature; }
+    set 
+    { 
+        if (value < -50 || value > 60)
+            throw new ArgumentOutOfRangeException();
+        temperature = value;
+    }
+}</code></pre>
+                </div>
+            </div>
+            <div class="modifier-card">
+                <h3>🔐 Readonly (get-only) Property</h3>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public string Id { get; }
+public DateTime CreatedAt { get; init; } // init-only (C# 9)</code></pre>
+                </div>
+            </div>
+            <div class="modifier-card">
+                <h3>🎯 Expression-bodied Property</h3>
+                <div class="code-block">
+                    <pre><code class="language-csharp">public string FullName => $"{FirstName} {LastName}";
+public double Area => Width * Height;</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- التفاعل المباشر: محاكاة التغليف -->
+    <div class="interactive-shield">
+        <h3 style="display: flex; gap: 0.8rem;"><i class="fas fa-microchip"></i> 🛡️ مختبر التغليف التفاعلي</h3>
+        <p>جرب التفاعل مع كلاس <strong>BankAccount</strong> الذي يستخدم التغليف: الحقل <code>balance</code> خاص (private) ولا يمكن الوصول إليه مباشرة، فقط عبر دوال آمنة.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0;">
+            <div style="flex:1">
+                <label>مبلغ الإيداع:</label>
+                <input type="number" id="depositAmount" value="500" step="50" style="width:100%; padding:10px; border-radius: 30px; background:#071a1f; color:white; border:1px solid #2dd4bf;">
+            </div>
+            <div style="flex:1">
+                <label>مبلغ السحب:</label>
+                <input type="number" id="withdrawAmount" value="200" step="50" style="width:100%; padding:10px; border-radius: 30px; background:#071a1f; color:white; border:1px solid #2dd4bf;">
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn-lux" id="depositBtn"><i class="fas fa-plus-circle"></i>  إيداع</button>
+            <button class="btn-lux" id="withdrawBtn"><i class="fas fa-minus-circle"></i>  سحب</button>
+            <button class="btn-lux" id="resetBtn"><i class="fas fa-sync-alt"></i>  إعادة تعيين الحساب</button>
+        </div>
+        <div class="demo-output" id="encapDemoOutput">
+            💰 الرصيد الحالي: 0.00 ريال
+        </div>
+        <div class="warning-note" style="margin-top: 1rem; background:#0a2828;">
+            <i class="fas fa-info-circle"></i> لاحظ أن الحقل <strong>balance</strong> مخفي (private) ولا يمكن الوصول إليه مباشرة. كل العمليات تتم عبر واجهة عامة آمنة — هذا هو جوهر التغليف!
+        </div>
+    </div>
+
+    <!-- أفضل الممارسات في التغليف -->
+    <div class="card-encap">
+        <div class="card-header">
+            <i class="fas fa-star-of-life"></i>
+            <h2>أفضل الممارسات والإرشادات الذهبية</h2>
+        </div>
+        <ul style="list-style-type: none;">
+            <li style="margin-bottom: 1rem;">🎯 <strong>اجعل الحقول private دائماً</strong> — لا تسمح بالوصول المباشر إلى البيانات الداخلية.</li>
+            <li style="margin-bottom: 1rem;">🔓 <strong>استخدم properties بدلاً من public fields</strong> — توفر مرونة وتحكماً مستقبلياً.</li>
+            <li style="margin-bottom: 1rem;">⚖️ <strong>أقل مستوى وصول ممكن</strong> — ابدأ بـ private ثم وسّع حسب الحاجة (مبدأ مبدأ الحد الأدنى من الامتيازات).</li>
+            <li style="margin-bottom: 1rem;">📦 <strong>استخدم get-only properties للقيم التي لا يجب تغييرها بعد الإنشاء.</strong></li>
+            <li style="margin-bottom: 1rem;">✅ <strong>أضف منطق التحقق (validation) في setter أو دوال التعديل.</strong></li>
+            <li>🧩 <strong>قسّم الكلاسات الكبيرة</strong> — التغليف الجيد يؤدي إلى وحدات متماسكة.</li>
+        </ul>
+    </div>
+
+    <!-- الفرق بين public field و property مع تغليف -->
+    <div class="card-encap">
+        <div class="card-header">
+            <i class="fas fa-code-compare"></i>
+            <h2>مقارنة: Public Field vs Property (تغليف)</h2>
+        </div>
+        <div class="code-block">
+            <pre><code class="language-csharp">// Anti-pattern: حقل عام (كسر التغليف)
+public class BadExample
+{
+    public int Age;  // يمكن لأي كود خارجي تعديله دون تحقق!
+}
+
+// تطبيق صحيح للتغليف
+public class GoodExample
+{
+    private int age;
+    public int Age
+    {
+        get { return age; }
+        set 
+        { 
+            if (value >= 0 && value <= 150)
+                age = value;
+            else
+                throw new ArgumentException("عمر غير صالح");
+        }
+    }
+}</code></pre>
+        </div>
+        <div class="warning-note" style="background:#1a2a2a; border-left-color:#2dd4bf;">
+            💡 <strong>خلاصة:</strong> الخصائص (Properties) توفر طبقة من التغليف تسمح بإضافة منطق مستقبلاً دون تغيير واجهة المستخدم.
+        </div>
+    </div>
+
+    <footer>
+        <i class="fas fa-shield-alt"></i>  التغليف ومعدلات الوصول في C# | تصميم فاخر ومحتوى تعليمي شامل | حماية بياناتك أساس البرمجة الاحترافية
+    </footer>
+</div>
+
+<script>
+    // محاكاة كلاس BankAccount مع تغليف كامل
+    let currentBalance = 0;
+    const balanceElement = document.getElementById('encapDemoOutput');
+    
+    function updateBalanceDisplay() {
+        balanceElement.innerHTML = `💰 الرصيد الحالي: ${currentBalance.toFixed(2)} ريال<br>🔒 (الحقل balance خاص private، ويتم الوصول عبر دوال آمنة فقط)`;
+    }
+    
+    function deposit(amount) {
+        if (amount > 0) {
+            currentBalance += amount;
+            balanceElement.innerHTML = `✅ تم إيداع ${amount.toFixed(2)} ريال.<br>💰 الرصيد الحالي: ${currentBalance.toFixed(2)} ريال<br>🛡️ تم التحقق من صحة المبلغ (تغليف).`;
+        } else {
+            balanceElement.innerHTML = `❌ خطأ: مبلغ الإيداع يجب أن يكون موجباً! (تم رفض العملية)`;
+        }
+        setTimeout(() => {
+            if (!balanceElement.innerHTML.includes("الرصيد الحالي:"))
+                updateBalanceDisplay();
+            else if (balanceElement.innerHTML.includes("تم إيداع")) 
+                setTimeout(updateBalanceDisplay, 2000);
+        }, 1500);
+        if (amount > 0) setTimeout(updateBalanceDisplay, 2000);
+        else setTimeout(updateBalanceDisplay, 2000);
+    }
+    
+    function withdraw(amount) {
+        if (amount <= 0) {
+            balanceElement.innerHTML = `❌ خطأ: مبلغ السحب يجب أن يكون موجباً!`;
+        } else if (amount > currentBalance) {
+            balanceElement.innerHTML = `❌ رصيد غير كافٍ! الرصيد الحالي: ${currentBalance.toFixed(2)} ريال، والمطلوب: ${amount.toFixed(2)} ريال.`;
+        } else {
+            currentBalance -= amount;
+            balanceElement.innerHTML = `✅ تم سحب ${amount.toFixed(2)} ريال.<br>💰 الرصيد الجديد: ${currentBalance.toFixed(2)} ريال<br>🛡️ تم التحقق من الرصيد قبل السحب.`;
+        }
+        setTimeout(() => {
+            if (!balanceElement.innerHTML.includes("الرصيد الحالي:"))
+                updateBalanceDisplay();
+            else if (balanceElement.innerHTML.includes("تم سحب"))
+                setTimeout(updateBalanceDisplay, 2000);
+        }, 1800);
+        if (amount > 0 && amount <= currentBalance + amount) setTimeout(updateBalanceDisplay, 2000);
+        else setTimeout(updateBalanceDisplay, 2000);
+    }
+    
+    function resetAccount() {
+        currentBalance = 0;
+        balanceElement.innerHTML = `🔄 تم إعادة تعيين الحساب. الرصيد الحالي: 0.00 ريال<br>🔒 مبدأ التغليف محفوظ.`;
+        setTimeout(updateBalanceDisplay, 2000);
+    }
+    
+    document.getElementById('depositBtn').addEventListener('click', () => {
+        let amount = parseFloat(document.getElementById('depositAmount').value);
+        if (isNaN(amount)) amount = 0;
+        deposit(amount);
+    });
+    document.getElementById('withdrawBtn').addEventListener('click', () => {
+        let amount = parseFloat(document.getElementById('withdrawAmount').value);
+        if (isNaN(amount)) amount = 0;
+        withdraw(amount);
+    });
+    document.getElementById('resetBtn').addEventListener('click', resetAccount);
+    
+    updateBalanceDisplay();
+</script>
+</body>
+</html>

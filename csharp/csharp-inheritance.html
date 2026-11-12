@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المرجع الشامل للوراثة في #C | المبرمج المحترف</title>
+    <link href="https://fonts.googleapis.com/css2?family=Changa:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #512bd4; /* .NET Purple */
+            --accent: #00bcf2;
+            --dark-bg: #0f0f0f;
+            --text-main: #24292e;
+            --code-bg: #1e1e1e;
+            --sidebar-bg: #ffffff;
+            --border: #e1e4e8;
+        }
+
+        body {
+            font-family: 'Changa', sans-serif;
+            margin: 0;
+            background-color: #f6f8fa;
+            color: var(--text-main);
+            scroll-behavior: smooth;
+        }
+
+        /* Layout Structure */
+        .wrapper {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Nav */
+        .sidebar {
+            background: var(--sidebar-bg);
+            border-left: 1px solid var(--border);
+            padding: 30px 15px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h3 { font-size: 1.2rem; color: var(--primary); margin-bottom: 20px; padding-right: 10px; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li a {
+            display: block;
+            padding: 12px 15px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+        .sidebar li a:hover { background: #f0edff; color: var(--primary); }
+        .sidebar .active { background: var(--primary); color: white !important; }
+
+        /* Main Content */
+        .content { padding: 40px 60px; max-width: 900px; }
+
+        /* Typography */
+        h1 { font-size: 2.8rem; color: var(--primary); margin-bottom: 10px; }
+        h2 { font-size: 2rem; color: #333; margin-top: 50px; border-bottom: 3px solid var(--accent); display: inline-block; }
+        p { font-size: 1.1rem; line-height: 1.8; color: #444; }
+
+        /* Code Blocks */
+        .code-window {
+            background: var(--code-bg);
+            border-radius: 12px;
+            margin: 25px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            direction: ltr;
+        }
+        .code-header {
+            background: #333;
+            padding: 10px 20px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            color: #ccc;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+        }
+        pre {
+            margin: 0;
+            padding: 25px;
+            color: #dcdcdc;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+        }
+        .keyword { color: #569cd6; }
+        .type { color: #4ec9b0; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+
+        /* Education Blocks */
+        .deep-dive {
+            background: #fff;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            position: relative;
+        }
+        .deep-dive::before {
+            content: "💡 شرح متعمق";
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 2px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .comparison-table th { background: var(--primary); color: white; padding: 15px; text-align: right; }
+        .comparison-table td { padding: 15px; border-bottom: 1px solid var(--border); }
+
+        @media (max-width: 1024px) {
+            .wrapper { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <aside class="sidebar">
+        <h3>محتويات المرجع</h3>
+        <ul>
+            <li><a href="#intro" class="active">1. فلسفة الوراثة</a></li>
+            <li><a href="#constructors">2. تسلسل المشيدات (Constructors)</a></li>
+            <li><a href="#access">3. مستويات الوصول (Protected)</a></li>
+            <li><a href="#polymorphism">4. تعدد الأشكال الديناميكي</a></li>
+            <li><a href="#abstract">5. الفئات المجردة (Abstract)</a></li>
+            <li><a href="#sealed">6. الوراثة النهائية (Sealed)</a></li>
+        </ul>
+    </aside>
+
+    <div class="content">
+        <header>
+            <span style="color: var(--accent); font-weight: bold;">C# ADVANCED SERIES</span>
+            <h1>الوراثة وتصميم الأنظمة الكبيرة</h1>
+            <p>لا تتعلق الوراثة بمجرد نسخ الكود، بل هي فن بناء علاقات "Is-A" التي تسمح بنمو النظام وتطوره دون الحاجة لهدم الأكواد القديمة.</p>
+        </header>
+
+        <section id="intro">
+            <h2>1. فلسفة الوراثة والذاكرة</h2>
+            <p>عندما تقوم بوراثة كلاس في #C، فإن الذاكرة تقوم بإنشاء كائن يحتوي على جميع حقول الأب متبوعة بحقول الابن. هذا يعني أن كائن الابن هو فعلياً كائن "أب مُعزز".</p>
+            
+            <div class="deep-dive">
+                <strong>لماذا نستخدمها؟</strong>
+                تخيل نظام بنكي. لدينا كلاس <code>Account</code> يحتوي على (الرقم، الرصيد). ثم لدينا <code>SavingsAccount</code> و <code>CheckingAccount</code>. كلاهما حسابات، لكن لكل منهما سلوك مختلف في سحب الأموال. الوراثة تضمن أن كل أنواع الحسابات ستملك "رصيداً" دون تكرار كتابة الكود.
+            </div>
+        </section>
+
+        <section id="constructors">
+            <h2>2. تسلسل استدعاء المشيدات</h2>
+            <p>قاعدة ذهبية: <strong>يتم تنفيذ مشيد الأب دائماً قبل مشيد الابن.</strong> إذا لم تحدد المشيد يدوياً، ستحاول #C استدعاء المشيد الافتراضي للأب.</p>
+
+            <div class="code-window">
+                <div class="code-header"><span>Inheritance_Constructors.cs</span></div>
+<pre>
+<span class="keyword">class</span> <span class="type">BaseEmployee</span>
+{
+    <span class="keyword">public</span> <span class="type">BaseEmployee</span>(<span class="keyword">string</span> name)
+    {
+        Console.WriteLine(<span class="string">"1. تنفيذ مشيد الأب: "</span> + name);
+    }
+}
+
+<span class="keyword">class</span> <span class="type">Manager</span> : <span class="type">BaseEmployee</span>
+{
+    <span class="comment">// استخدام base لتمرير البيانات للأب</span>
+    <span class="keyword">public</span> <span class="type">Manager</span>(<span class="keyword">string</span> name) : <span class="keyword">base</span>(name)
+    {
+        Console.WriteLine(<span class="string">"2. تنفيذ مشيد الابن (Manager)"</span>);
+    }
+}
+</pre>
+            </div>
+        </section>
+
+        <section id="access">
+            <h2>3. التحكم في الوصول: Protected</h2>
+            <table class="comparison-table">
+                <tr>
+                    <th>المُعدل (Modifier)</th>
+                    <th>إمكانية الوصول</th>
+                </tr>
+                <tr>
+                    <td><code>public</code></td>
+                    <td>متاح للجميع في أي مكان.</td>
+                </tr>
+                <tr>
+                    <td><code>private</code></td>
+                    <td>داخل الكلاس نفسه فقط (الابن لا يراه).</td>
+                </tr>
+                <tr>
+                    <td><code>protected</code></td>
+                    <td>داخل الكلاس نفسه <strong>وفي جميع الكلاسات التي ترث منه</strong>.</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="polymorphism">
+            <h2>4. تعدد الأشكال (Polymorphism)</h2>
+            <p>هذا هو الجزء الأقوى. يمكنك معاملة الابن على أنه أب. مثال: قائمة من الموظفين تحتوي على مديرين، مبرمجين، ومحاسبين. يمكنك استدعاء <code>CalculateSalary()</code> للجميع دون معرفة نوعهم الدقيق.</p>
+
+            <div class="code-window">
+                <div class="code-header"><span>Override_Example.cs</span></div>
+<pre>
+<span class="keyword">public class</span> <span class="type">Device</span>
+{
+    <span class="comment">// Virtual تعني: اسمح للأبناء بتغيير طريقتي</span>
+    <span class="keyword">public virtual void</span> <span class="type">TurnOn</span>() => Console.WriteLine(<span class="string">"جاري تشغيل الجهاز..."</span>);
+}
+
+<span class="keyword">public class</span> <span class="type">Laptop</span> : <span class="type">Device</span>
+{
+    <span class="comment">// Override تعني: سأقوم بالتنفيذ بطريقتي الخاصة</span>
+    <span class="keyword">public override void</span> <span class="type">TurnOn</span>() 
+    {
+        Console.WriteLine(<span class="string">"تظهر شاشة الترحيب ويندوز..."</span>);
+    }
+}
+</pre>
+            </div>
+        </section>
+
+        <section id="abstract">
+            <h2>5. الفئات المجردة (Abstract Classes)</h2>
+            <p>الفئة المجردة هي "خطة" لا يمكنك إنشاء كائن منها. هي وجدت فقط لتكون أباً لفئات أخرى.</p>
+            <div class="code-window">
+<pre>
+<span class="keyword">public abstract class</span> <span class="type">Payment</span>
+{
+    <span class="keyword">public abstract void</span> <span class="type">Process</span>(); <span class="comment">// دالة بدون محتوى</span>
+}
+
+<span class="keyword">public class</span> <span class="type">VisaCard</span> : <span class="type">Payment</span>
+{
+    <span class="keyword">public override void</span> <span class="type">Process</span>() => Console.WriteLine(<span class="string">"الدفع عبر فيزا"</span>);
+}
+</pre>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div style="background: var(--dark-bg); color: white; padding: 40px; text-align: center;">
+        <p>هذا المحتوى مقدم كجزء من دورة هندسة البرمجيات المتقدمة</p>
+        <p style="font-size: 0.8rem; opacity: 0.7;">حقوق النشر &copy; 2026 - مبرمج C# المحترف</p>
+    </div>
+</footer>
+
+<script>
+    // كود بسيط لتمييز القسم النشط في القائمة الجانبية
+    window.addEventListener('scroll', () => {
+        let sections = document.querySelectorAll('section');
+        let navLinks = document.querySelectorAll('.sidebar ul li a');
+        
+        sections.forEach(sec => {
+            let top = window.scrollY;
+            let offset = sec.offsetTop - 150;
+            let height = sec.offsetHeight;
+            let id = sec.getAttribute('id');
+
+            if(top >= offset && top < offset + height) {
+                navLinks.forEach(links => {
+                    links.classList.remove('active');
+                    document.querySelector('.sidebar ul li a[href*=' + id + ']').classList.add('active');
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

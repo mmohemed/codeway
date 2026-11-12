@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مقدمة في هندسة البرمجيات بـ C# | CodeWay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0a2540;
+            --primary-light: #1a3a5c;
+            --accent: #635bff;
+            --accent-hover: #4f46e5;
+            --accent-soft: #eef2ff;
+            --text-dark: #0a2540;
+            --text-body: #425466;
+            --text-muted: #8898aa;
+            --bg: #ffffff;
+            --bg-soft: #f7f9fc;
+            --border: #e6ebf1;
+            --success: #0e9f6e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --code-bg: #0a1929;
+            --eng: #8b5cf6;
+            --eng-soft: #f3e8ff;
+            --shadow-sm: 0 1px 3px rgba(10,37,64,.06), 0 1px 2px rgba(10,37,64,.04);
+            --shadow-md: 0 4px 12px rgba(10,37,64,.08), 0 2px 4px rgba(10,37,64,.04);
+            --shadow-lg: 0 20px 40px rgba(10,37,64,.1), 0 8px 16px rgba(10,37,64,.06);
+            --shadow-accent: 0 8px 24px rgba(139,92,246,.25);
+            --radius: 14px;
+            --radius-lg: 22px;
+            --transition: all .3s cubic-bezier(.4,0,.2,1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-body);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--eng), var(--accent));
+            z-index: 3000;
+            width: 0%;
+            transition: width .1s linear;
+            box-shadow: 0 0 10px rgba(139,92,246,.5);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--primary);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            transition: var(--transition);
+        }
+        .header.scrolled { box-shadow: 0 10px 30px rgba(10,37,64,.25); }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--eng), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.15rem;
+            box-shadow: var(--shadow-accent);
+        }
+        .brand-text {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: .5px;
+        }
+        .brand-text span { color: #c4b5fd; }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-nav a {
+            color: rgba(255,255,255,.75);
+            text-decoration: none;
+            font-size: .92rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .header-nav a:hover, .header-nav a.active {
+            color: #fff;
+            background: rgba(255,255,255,.08);
+        }
+        .header-nav a.active {
+            background: rgba(139,92,246,.25);
+            box-shadow: inset 0 0 0 1px rgba(139,92,246,.4);
+        }
+        .header-cta { display: flex; align-items: center; gap: 10px; }
+        .btn-outline-light {
+            padding: 9px 18px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,.2);
+            background: transparent;
+            color: #fff;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.4);
+        }
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.2);
+            color: #fff;
+            width: 40px; height: 40px;
+            border-radius: 9px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+        .hero {
+            background: linear-gradient(180deg, var(--bg-soft) 0%, #fff 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 56px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -120px; left: -120px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(139,92,246,.08), transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; right: -100px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(99,91,255,.06), transparent 70%);
+            border-radius: 50%;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb i { font-size: .65rem; }
+        .breadcrumb .current { color: var(--text-dark); font-weight: 600; }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            border-radius: 100px;
+            font-size: .82rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            border: 1px solid rgba(139,92,246,.2);
+        }
+        .hero-badge i { font-size: .75rem; }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.25;
+            margin-bottom: 16px;
+            letter-spacing: -.5px;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--eng), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-body);
+            max-width: 680px;
+            margin-bottom: 28px;
+            line-height: 1.85;
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            align-items: center;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .92rem;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .meta-item i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+        }
+        .hero-side {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 220px;
+        }
+        .btn-primary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: var(--shadow-accent);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(139,92,246,.35);
+        }
+        .btn-secondary {
+            padding: 13px 26px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+        }
+        .btn-secondary:hover {
+            border-color: var(--eng);
+            color: var(--eng);
+            background: var(--eng-soft);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 48px;
+            padding: 48px 0 80px;
+            align-items: start;
+        }
+        .sidebar {
+            position: sticky;
+            top: 96px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-left: 4px;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .toc-title {
+            font-size: .78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toc-list { list-style: none; border-right: 2px solid var(--border); }
+        .toc-list li a {
+            display: block;
+            padding: 9px 16px;
+            color: var(--text-body);
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 500;
+            border-right: 2px solid transparent;
+            margin-right: -2px;
+            transition: var(--transition);
+            border-radius: 0 8px 8px 0;
+        }
+        .toc-list li a:hover { color: var(--accent); background: var(--accent-soft); }
+        .toc-list li a.active {
+            color: var(--accent);
+            border-right-color: var(--accent);
+            background: var(--accent-soft);
+            font-weight: 700;
+        }
+
+        .content { min-width: 0; }
+        .content-section { margin-bottom: 56px; scroll-margin-top: 100px; }
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        .section-num {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--eng), var(--accent));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-accent);
+        }
+        .section-heading h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -.3px;
+        }
+        .content p {
+            font-size: 1.02rem;
+            margin-bottom: 18px;
+            color: var(--text-body);
+            line-height: 1.9;
+        }
+        .content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 32px 0 14px;
+        }
+        .content h4 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 24px 0 10px;
+        }
+        .content ul, .content ol {
+            margin: 0 0 20px 0;
+            padding-right: 22px;
+        }
+        .content li {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.85;
+        }
+        .content ul li::marker { color: var(--accent); }
+
+        .inline-code {
+            font-family: 'Fira Code', monospace;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: .88em;
+            font-weight: 500;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .callout {
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+            border: 1px solid;
+        }
+        .callout-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .callout-body h4 { margin: 0 0 6px !important; font-size: 1rem; }
+        .callout-body p { margin: 0 !important; font-size: .95rem !important; line-height: 1.75 !important; }
+        .callout.info { background: #eff6ff; border-color: #bfdbfe; }
+        .callout.info .callout-icon { background: #dbeafe; color: #2563eb; }
+        .callout.info h4 { color: #1e40af; }
+        .callout.warning { background: #fffbeb; border-color: #fde68a; }
+        .callout.warning .callout-icon { background: #fef3c7; color: #d97706; }
+        .callout.warning h4 { color: #92400e; }
+        .callout.success { background: #ecfdf5; border-color: #a7f3d0; }
+        .callout.success .callout-icon { background: #d1fae5; color: var(--success); }
+        .callout.success h4 { color: #065f46; }
+        .callout.danger { background: #fef2f2; border-color: #fecaca; }
+        .callout.danger .callout-icon { background: #fee2e2; color: var(--danger); }
+        .callout.danger h4 { color: #991b1b; }
+        .callout.eng { background: #faf5ff; border-color: #e9d5ff; }
+        .callout.eng .callout-icon { background: #f3e8ff; color: var(--eng); }
+        .callout.eng h4 { color: #6b21a8; }
+
+        .code-wrapper {
+            background: var(--code-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 22px 0;
+            border: 1px solid #1e3a5f;
+            box-shadow: var(--shadow-md);
+            direction: ltr;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 18px;
+            background: #0d2137;
+            border-bottom: 1px solid #1e3a5f;
+        }
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #93c5fd;
+            font-size: .8rem;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 11px; height: 11px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+        .code-copy {
+            background: rgba(255,255,255,.08);
+            border: none;
+            color: #cbd5e1;
+            font-size: .75rem;
+            padding: 5px 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .code-copy:hover { background: rgba(139,92,246,.3); color: #fff; }
+        .code-copy.copied { background: rgba(14,159,110,.3); color: #6ee7b7; }
+        .code-body { padding: 20px 22px; overflow-x: auto; }
+        .code-body pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: .875rem;
+            line-height: 1.75;
+            color: #e2e8f0;
+            white-space: pre;
+        }
+        .code-body::-webkit-scrollbar { height: 8px; }
+        .code-body::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+
+        .kw { color: #c792ea; }
+        .type { color: #82aaff; }
+        .str { color: #c3e88d; }
+        .num { color: #f78c6c; }
+        .cmt { color: #6a8299; font-style: italic; }
+        .fn { color: #ffcb6b; }
+        .prop { color: #89ddff; }
+        .op { color: #89ddff; }
+        .punc { color: #8fa5b8; }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 22px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .92rem;
+            min-width: 560px;
+        }
+        thead { background: var(--primary); }
+        thead th {
+            color: #fff;
+            padding: 14px 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: .88rem;
+        }
+        tbody td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-body);
+            line-height: 1.7;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:nth-child(even) { background: var(--bg-soft); }
+        tbody tr:hover { background: var(--accent-soft); }
+        tbody td strong { color: var(--text-dark); }
+        .badge-cell {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+        .badge-cell.green { background: #d1fae5; color: #065f46; }
+        .badge-cell.amber { background: #fef3c7; color: #92400e; }
+        .badge-cell.red { background: #fee2e2; color: #991b1b; }
+        .badge-cell.blue { background: #dbeafe; color: #1e40af; }
+        .badge-cell.purple { background: #f3e8ff; color: #6b21a8; }
+
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+            margin: 22px 0;
+        }
+        .steps li {
+            counter-increment: step;
+            position: relative;
+            padding-right: 52px;
+            padding-bottom: 22px;
+            margin: 0 !important;
+        }
+        .steps li:last-child { padding-bottom: 0; }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            right: 0; top: 0;
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            border: 1.5px solid rgba(139,92,246,.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .9rem;
+        }
+        .steps li::after {
+            content: '';
+            position: absolute;
+            right: 16px; top: 38px;
+            width: 2px;
+            height: calc(100% - 30px);
+            background: var(--border);
+        }
+        .steps li:last-child::after { display: none; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            border-color: var(--eng);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .feature-card i {
+            width: 42px; height: 42px;
+            border-radius: 11px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+        }
+        .feature-card h4 { margin: 0 0 8px !important; font-size: 1rem; }
+        .feature-card p { margin: 0 !important; font-size: .88rem !important; color: var(--text-muted) !important; line-height: 1.7 !important; }
+
+        .note-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 28px 30px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .note-card::after {
+            content: '\f121';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: -10px; bottom: -30px;
+            font-size: 120px;
+            opacity: .04;
+            color: #fff;
+        }
+        .note-card h4 {
+            color: #c4b5fd !important;
+            margin: 0 0 10px !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem !important;
+        }
+        .note-card p {
+            color: rgba(255,255,255,.85) !important;
+            margin: 0 !important;
+            font-size: .95rem !important;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ دورة حياة SDLC ============ */
+        .sdlc-cycle {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            margin: 28px 0;
+        }
+        .sdlc-phase {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 12px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+        .sdlc-phase:hover {
+            border-color: var(--eng);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .sdlc-phase .num {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .82rem;
+            margin: 0 auto 10px;
+        }
+        .sdlc-phase i {
+            font-size: 1.3rem;
+            color: var(--eng);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .sdlc-phase h5 {
+            font-size: .85rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        .sdlc-phase p {
+            font-size: .72rem !important;
+            color: var(--text-muted) !important;
+            margin: 0 !important;
+            line-height: 1.5 !important;
+        }
+
+        /* ============ مقارنة برمجة/هندسة ============ */
+        .compare-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .compare-col {
+            border-radius: var(--radius);
+            padding: 22px;
+            border: 1px solid var(--border);
+        }
+        .compare-col h4 {
+            margin: 0 0 12px !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem !important;
+        }
+        .compare-col ul {
+            margin: 0 !important;
+            padding-right: 18px;
+        }
+        .compare-col li {
+            font-size: .9rem !important;
+            margin-bottom: 7px !important;
+        }
+        .compare-col.coding {
+            background: #fef3c7;
+            border-color: #fde68a;
+        }
+        .compare-col.coding h4 { color: #92400e; }
+        .compare-col.engineering {
+            background: var(--eng-soft);
+            border-color: #e9d5ff;
+        }
+        .compare-col.engineering h4 { color: #6b21a8; }
+
+        /* ============ مخطط الطبقات ============ */
+        .layers-diagram {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        .layers-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+        }
+        .layers-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .layer {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: .9rem;
+            font-weight: 600;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+        .layer:hover {
+            transform: translateX(-4px);
+            box-shadow: var(--shadow-sm);
+        }
+        .layer i {
+            width: 28px; height: 28px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            flex-shrink: 0;
+        }
+        .layer .layer-name { flex: 1; }
+        .layer .layer-desc {
+            font-size: .75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        .layer.l1 { background: #eff6ff; color: #1e40af; }
+        .layer.l1 i { background: #dbeafe; color: #2563eb; }
+        .layer.l2 { background: #f0fdf4; color: #065f46; }
+        .layer.l2 i { background: #d1fae5; color: var(--success); }
+        .layer.l3 { background: #fef3c7; color: #92400e; }
+        .layer.l3 i { background: #fde68a; color: #d97706; }
+        .layer.l4 { background: var(--eng-soft); color: #6b21a8; }
+        .layer.l4 i { background: #e9d5ff; color: var(--eng); }
+
+        /* ============ تمارين ============ */
+        .interactive-box {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .interactive-box::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--eng), var(--accent));
+        }
+        .interactive-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .interactive-title i {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+        .interactive-hint {
+            font-size: .9rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+        .task-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+        .task-box p { margin-bottom: 12px; font-size: .95rem; }
+        .task-options { display: grid; gap: 10px; }
+        .task-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            font-size: .93rem;
+            text-align: right;
+            color: var(--text-body);
+            font-weight: 500;
+        }
+        .task-option:hover { border-color: var(--eng); background: var(--eng-soft); }
+        .task-option.correct { border-color: var(--success); background: #ecfdf5; color: #065f46; }
+        .task-option.correct .opt-marker { background: var(--success); color: #fff; border-color: var(--success); }
+        .task-option.wrong { border-color: var(--danger); background: #fef2f2; color: #991b1b; }
+        .task-option.wrong .opt-marker { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .opt-marker {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .task-feedback {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: .9rem;
+            font-weight: 600;
+            display: none;
+        }
+        .task-feedback.show { display: block; animation: fadeInUp .3s ease; }
+        .task-feedback.ok { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .task-feedback.no { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lesson-nav {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 56px;
+            padding-top: 36px;
+            border-top: 1px solid var(--border);
+        }
+        .lesson-nav a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 22px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: var(--transition);
+            background: #fff;
+        }
+        .lesson-nav a:hover {
+            border-color: var(--eng);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .lesson-nav a.next { justify-content: flex-end; text-align: left; }
+        .lesson-nav .nav-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: var(--eng-soft);
+            color: var(--eng);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: .9rem;
+        }
+        .lesson-nav .nav-label {
+            font-size: .75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .lesson-nav .nav-title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .footer {
+            background: var(--primary);
+            color: rgba(255,255,255,.7);
+            padding: 48px 0 28px;
+            margin-top: 40px;
+        }
+        .footer-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .footer-bottom {
+            padding-top: 28px;
+            border-top: 1px solid rgba(255,255,255,.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: .85rem;
+        }
+        .footer-bottom a { color: #c4b5fd; text-decoration: none; }
+        .footer-bottom a:hover { text-decoration: underline; }
+
+        .back-top {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(16px);
+            transition: var(--transition);
+            z-index: 900;
+        }
+        .back-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-top:hover { background: var(--eng); }
+
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; gap: 0; }
+            .sidebar {
+                position: static;
+                max-height: none;
+                margin-bottom: 32px;
+                padding: 20px;
+                background: var(--bg-soft);
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+            }
+            .toc-list { border-right: none; display: flex; flex-wrap: wrap; gap: 6px; }
+            .toc-list li a {
+                border-right: none;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                margin-right: 0;
+                padding: 7px 13px;
+                font-size: .85rem;
+                background: #fff;
+            }
+            .toc-list li a.active { border-color: var(--eng); }
+            .sdlc-cycle { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .header-nav, .header-cta .btn-outline-light { display: none; }
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .hero h1 { font-size: 1.9rem; }
+            .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+            .hero-side { flex-direction: row; flex-wrap: wrap; }
+            .hero-side .btn-primary, .hero-side .btn-secondary { flex: 1; min-width: 150px; }
+            .section-heading h2 { font-size: 1.35rem; }
+            .lesson-nav { grid-template-columns: 1fr; }
+            .content-section { margin-bottom: 40px; }
+            .container { padding: 0 18px; }
+            .header-inner { padding: 0 18px; }
+            .compare-box { grid-template-columns: 1fr; }
+            .sdlc-cycle { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="header" id="header">
+    <div class="header-inner">
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fas fa-code"></i></div>
+            <div class="brand-text">Code<span>Way</span></div>
+        </a>
+        <nav class="header-nav">
+            <a href="#">الرئيسية</a>
+            <a href="#">المسارات</a>
+            <a href="#" class="active">C#</a>
+            <a href="#">المدونة</a>
+            <a href="#">تواصل</a>
+        </nav>
+        <div class="header-cta">
+            <button class="btn-outline-light" onclick="alert('تم حفظ الدرس في قائمتك ✔')">
+                <i class="far fa-bookmark"></i> حفظ
+            </button>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">الرئيسية</a>
+            <i class="fas fa-chevron-left"></i>
+            <a href="#">هندسة البرمجيات</a>
+            <i class="fas fa-chevron-left"></i>
+            <span class="current">مقدمة في هندسة البرمجيات</span>
+        </div>
+        <div class="hero-grid">
+            <div>
+                <span class="hero-badge">
+                    <i class="fas fa-cogs"></i> الدرس الأول · هندسة البرمجيات
+                </span>
+                <h1>مقدمة في <span class="highlight">هندسة البرمجيات</span> بـ C#</h1>
+                <p class="hero-desc">
+                    ليس كل من يكتب كوداً مهندس برمجيات. هذا الدرس يفتح لك باباً جديداً:
+                    كيف تحوّل مشروعاً صغيراً إلى نظام برمجي احترافي قابل للتوسع والصيانة
+                    والاختبار — باستخدام C# و.NET كأداة تطبيق.
+                </p>
+                <div class="hero-meta">
+                    <span class="meta-item"><i class="far fa-clock"></i> 50 دقيقة</span>
+                    <span class="meta-item"><i class="fas fa-signal"></i> متوسط</span>
+                    <span class="meta-item"><i class="fas fa-cogs"></i> 6 مبادئ</span>
+                    <span class="meta-item"><i class="fas fa-code"></i> 5 أمثلة</span>
+                </div>
+            </div>
+            <div class="hero-side">
+                <button class="btn-primary" onclick="document.getElementById('sec-1').scrollIntoView()">
+                    <i class="fas fa-play"></i> ابدأ الدرس
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('sec-6').scrollIntoView()">
+                    <i class="fas fa-flask"></i> التطبيق العملي
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="main-layout">
+
+        <aside class="sidebar">
+            <div class="toc-title"><i class="fas fa-list-ul"></i> محتويات الدرس</div>
+            <ul class="toc-list" id="tocList">
+                <li><a href="#sec-1" class="active">1. ما هي هندسة البرمجيات؟</a></li>
+                <li><a href="#sec-2">2. الفرق بين البرمجة والهندسة</a></li>
+                <li><a href="#sec-3">3. دورة حياة تطوير البرمجيات (SDLC)</a></li>
+                <li><a href="#sec-4">4. لماذا C# في هندسة البرمجيات؟</a></li>
+                <li><a href="#sec-5">5. مبادئ التصميم الجيد</a></li>
+                <li><a href="#sec-6">6. تطبيق عملي: قبل وبعد</a></li>
+                <li><a href="#sec-7">7. أدوات المهندس</a></li>
+                <li><a href="#sec-8">8. مسارك القادم</a></li>
+                <li><a href="#sec-9">9. تمارين تفاعلية</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+
+            <!-- ====== 1 ====== -->
+            <section class="content-section" id="sec-1">
+                <div class="section-heading">
+                    <div class="section-num">1</div>
+                    <h2>ما هي هندسة البرمجيات؟</h2>
+                </div>
+                <p>
+                    <strong>هندسة البرمجيات (Software Engineering)</strong> هي التخصص الذي يطبّق
+                    المبادئ الهندسية على تطوير البرمجيات. هدفها بناء أنظمة <strong>موثوقة، قابلة للصيانة،
+                    وقابلة للتوسع</strong> — وليس فقط كود يعمل.
+                </p>
+                <p>
+                    عالمياً، تُعرّف IEEE هندسة البرمجيات بأنها:
+                    <em>"تطبيق منهجي، منضبط، وقابل للقياس لمنهجية التطوير والتشغيل والصيانة للبرمجيات."</em>
+                </p>
+
+                <h3>لماذا نحتاجها؟</h3>
+                <p>
+                    لأن <strong>البرمجيات تفشل</strong>. الدراسات تُظهر أن نسبة كبيرة من المشاريع البرمجية
+                    تتأخر أو تتجاوز ميزانيتها أو تُلغى. السبب غالباً ليس الكود نفسه، بل <em>سوء التخطيط والتصميم</em>.
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <h4>مشكلة "الكود الشغّال فقط"</h4>
+                        <p>الكود الذي يعمل اليوم قد يصبح كابوساً غداً إن لم يُصمم جيداً.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-users"></i>
+                        <h4>العمل الجماعي</h4>
+                        <p>في الفريق، الكود يُقرأ أكثر مما يُكتب — لذا يجب أن يكون واضحاً.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-arrows-rotate"></i>
+                        <h4>التغيّر حتمي</h4>
+                        <p>المتطلبات تتغير، والمكتبات تتحدث، والتقنيات تتطور — التصميم الجيد يتحمل ذلك.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shield-halved"></i>
+                        <h4>الأمان والموثوقية</h4>
+                        <p>تطبيقات البنوك والصحة لا تحتمل الأخطاء — الهندسة تضمن الجودة.</p>
+                    </div>
+                </div>
+
+                <div class="callout eng">
+                    <div class="callout-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="callout-body">
+                        <h4>فكرة محورية</h4>
+                        <p>
+                            هندسة البرمجيات لا تعني "كتابة كود أكثر تعقيداً"، بل تعني <strong>كتابة كود أبسط،
+                            أوضح، وأكثر قابلية للتغيير</strong>. التعقيد عدوّك، والوضوح هو هدفك.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 2 ====== -->
+            <section class="content-section" id="sec-2">
+                <div class="section-heading">
+                    <div class="section-num">2</div>
+                    <h2>الفرق بين البرمجة والهندسة</h2>
+                </div>
+                <p>
+                    البرمجة مهارة، وهندسة البرمجيات مهنة. الفرق يشبه الفرق بين النجارة وبناء منزل:
+                    كليهما يحتاج أدوات، لكن بناء المنزل يحتاج مخططاً وأساساً وأماناً.
+                </p>
+
+                <div class="compare-box">
+                    <div class="compare-col coding">
+                        <h4><i class="fas fa-keyboard"></i> البرمجة (Coding)</h4>
+                        <ul>
+                            <li>التركيز: كتابة كود يعمل.</li>
+                            <li>الأفق: الملف أو الدالة الحالية.</li>
+                            <li>النجاح: "هل يعمل الآن؟"</li>
+                            <li>الوقت: أيام أو أسابيع.</li>
+                            <li>الأدوات: محرر كود + مترجم.</li>
+                        </ul>
+                    </div>
+                    <div class="compare-col engineering">
+                        <h4><i class="fas fa-sitemap"></i> الهندسة (Engineering)</h4>
+                        <ul>
+                            <li>التركيز: نظام كامل يحل مشكلة.</li>
+                            <li>الأفق: السنة أو أكثر.</li>
+                            <li>النجاح: "هل سيصمد بعد سنة؟"</li>
+                            <li>الوقت: أشهر أو سنوات.</li>
+                            <li>الأدوات: Git, CI/CD, Tests, DI...</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>مثال على الفرق في C#</h3>
+                <p>
+                    لنفترض أنك تريد دالة تحسب خصماً على سعر. البرمجة السريعة تكتبها في سطر واحد.
+                    الهندسة تسأل: هل الخصم ثابت؟ هل يتغير؟ كيف سنختبره؟
+                </p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> برمجة سريعة ❌</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public double</span> <span class="fn">GetPrice</span>(<span class="kw">double</span> price)
+{
+    <span class="kw">return</span> price * <span class="num">0.9</span>; <span class="cmt">// خصم 10% مضمّن</span>
+}</pre>
+                    </div>
+                </div>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> هندسة برمجيات ✅</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="type">IDiscountStrategy</span>
+{
+    <span class="kw">double</span> <span class="fn">Apply</span>(<span class="kw">double</span> price);
+}
+
+<span class="kw">public class</span> <span class="type">PercentageDiscount</span> : <span class="type">IDiscountStrategy</span>
+{
+    <span class="kw">private readonly double</span> _rate;
+    <span class="kw">public</span> <span class="fn">PercentageDiscount</span>(<span class="kw">double</span> rate) => _rate = rate;
+    <span class="kw">public double</span> <span class="fn">Apply</span>(<span class="kw">double</span> price) => price * (<span class="num">1</span> - _rate);
+}
+
+<span class="kw">public class</span> <span class="type">FixedDiscount</span> : <span class="type">IDiscountStrategy</span>
+{
+    <span class="kw">private readonly double</span> _amount;
+    <span class="kw">public</span> <span class="fn">FixedDiscount</span>(<span class="kw">double</span> amount) => _amount = amount;
+    <span class="kw">public double</span> <span class="fn">Apply</span>(<span class="kw">double</span> price) => <span class="type">Math</span>.<span class="fn">Max</span>(<span class="num">0</span>, price - _amount);
+}</pre>
+                    </div>
+                </div>
+
+                <p>
+                    الكود الثاني أطول، لكنه <strong>قابل للاختبار، للتوسيع، وللتغيير</strong> دون المساس
+                    بباقي النظام. هذا هو جوهر هندسة البرمجيات.
+                </p>
+            </section>
+
+            <!-- ====== 3 ====== -->
+            <section class="content-section" id="sec-3">
+                <div class="section-heading">
+                    <div class="section-num">3</div>
+                    <h2>دورة حياة تطوير البرمجيات (SDLC)</h2>
+                </div>
+                <p>
+                    <strong>SDLC (Software Development Life Cycle)</strong> هي المراحل التي يمر بها
+                    أي مشروع برمجي احترافي من الفكرة إلى الصيانة.
+                </p>
+
+                <div class="sdlc-cycle">
+                    <div class="sdlc-phase">
+                        <div class="num">1</div>
+                        <i class="fas fa-clipboard-list"></i>
+                        <h5>التخطيط</h5>
+                        <p>ما المشكلة؟ من المستخدم؟</p>
+                    </div>
+                    <div class="sdlc-phase">
+                        <div class="num">2</div>
+                        <i class="fas fa-magnifying-glass-chart"></i>
+                        <h5>التحليل</h5>
+                        <p>المتطلبات الوظيفية وغير الوظيفية.</p>
+                    </div>
+                    <div class="sdlc-phase">
+                        <div class="num">3</div>
+                        <i class="fas fa-pen-ruler"></i>
+                        <h5>التصميم</h5>
+                        <p>المعمارية، الفئات، قاعدة البيانات.</p>
+                    </div>
+                    <div class="sdlc-phase">
+                        <div class="num">4</div>
+                        <i class="fas fa-code"></i>
+                        <h5>التنفيذ</h5>
+                        <p>كتابة الكود، الاختبارات، المراجعة.</p>
+                    </div>
+                    <div class="sdlc-phase">
+                        <div class="num">5</div>
+                        <i class="fas fa-vial-circle-check"></i>
+                        <h5>الاختبار</h5>
+                        <p>التحقق من الجودة والأمان.</p>
+                    </div>
+                    <div class="sdlc-phase">
+                        <div class="num">6</div>
+                        <i class="fas fa-screwdriver-wrench"></i>
+                        <h5>الصيانة</h5>
+                        <p>إصلاح الأخطاء، تحسين، إضافة ميزات.</p>
+                    </div>
+                </div>
+
+                <h3>أنماط SDLC</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>النمط</th>
+                                <th>الوصف</th>
+                                <th>مناسب لـ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Waterfall</strong></td>
+                                <td>مراحل متتالية لا رجوع فيها</td>
+                                <td>مشاريع ذات متطلبات ثابتة</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Agile</strong></td>
+                                <td>دورات قصيرة (Sprints) + تعاون مستمر</td>
+                                <td>مشاريع متغيرة أو غير واضحة</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scrum</strong></td>
+                                <td>إطار Agile بأدوار محددة (PO, SM, Team)</td>
+                                <td>فرق تطوير منتجات</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DevOps</strong></td>
+                                <td>دمج التطوير والتشغيل + أتمتة</td>
+                                <td>أنظمة تحتاج نشراً سريعاً</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout info">
+                    <div class="callout-icon"><i class="fas fa-info-circle"></i></div>
+                    <div class="callout-body">
+                        <h4>لا يوجد نمط "أفضل"</h4>
+                        <p>
+                            اختيار النمط يعتمد على طبيعة المشروع وحجم الفريق والمخاطر. معظم الشركات الحديثة
+                            تستخدم <strong>Agile + DevOps</strong>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 4 ====== -->
+            <section class="content-section" id="sec-4">
+                <div class="section-heading">
+                    <div class="section-num">4</div>
+                    <h2>لماذا C# في هندسة البرمجيات؟</h2>
+                </div>
+                <p>
+                    C# هي واحدة من أفضل اللغات لتعلّم هندسة البرمجيات لأنها تجمع بين بساطة القراءة،
+                    قوة النظام البيئي (.NET)، والدعم الكامل للمبادئ الهندسية الحديثة.
+                </p>
+
+                <h3>مزايا C# لمهندس البرمجيات</h3>
+                <ul>
+                    <li><strong>النظام البيئي .NET:</strong> مكتبات ضخمة، DI مدمج، Entity Framework، ASP.NET Core.</li>
+                    <li><strong>البرمجة الكائنية الكاملة:</strong> وراثة، واجهات، تجريد — مفاهيم أساسية في التصميم.</li>
+                    <li><strong>دعم Async/Await:</strong> برمجة غير متزامنة بأسلوب أنيق.</li>
+                    <li><strong>الاختبار:</strong> xUnit, NUnit, Moq — دعم ممتاز لـ TDD.</li>
+                    <li><strong>التوافق العابر:</strong> Windows, Linux, macOS, WebAssembly.</li>
+                    <li><strong>أدوات ممتازة:</strong> Visual Studio, Rider, VS Code.</li>
+                </ul>
+
+                <h3>عمارة نموذجية بـ C#</h3>
+                <p>
+                    النظام الاحترافي في .NET يُبنى عادة على طبقات واضحة. إليك نموذجاً شائعاً:
+                </p>
+
+                <div class="layers-diagram">
+                    <div class="layers-title">
+                        <i class="fas fa-layer-group"></i> طبقات تطبيق .NET احترافي
+                    </div>
+                    <div class="layer l4">
+                        <i class="fas fa-desktop"></i>
+                        <span class="layer-name">Presentation Layer</span>
+                        <span class="layer-desc">Web / WPF / API</span>
+                    </div>
+                    <div class="layer l3">
+                        <i class="fas fa-gears"></i>
+                        <span class="layer-name">Application Layer</span>
+                        <span class="layer-desc">Use Cases / Services</span>
+                    </div>
+                    <div class="layer l2">
+                        <i class="fas fa-cubes"></i>
+                        <span class="layer-name">Domain Layer</span>
+                        <span class="layer-desc">Entities / Rules</span>
+                    </div>
+                    <div class="layer l1">
+                        <i class="fas fa-database"></i>
+                        <span class="layer-name">Infrastructure Layer</span>
+                        <span class="layer-desc">DB / Files / External APIs</span>
+                    </div>
+                </div>
+
+                <p>
+                    هذا الفصل يسمح بتبديل قاعدة البيانات دون تغيير منطق الأعمال، أو إضافة واجهة جديدة
+                    (Web أو Mobile) دون إعادة كتابة النظام. هذا هو جوهر "Clean Architecture".
+                </p>
+
+                <div class="callout eng">
+                    <div class="callout-icon"><i class="fas fa-gem"></i></div>
+                    <div class="callout-body">
+                        <h4>قاعدة التبعية</h4>
+                        <p>
+                            في المعمارية النظيفة: <strong>التبعيات تتجه دائماً نحو المركز (Domain)</strong>.
+                            الطبقات الخارجية تعتمد على الداخلية، وليس العكس.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 5 ====== -->
+            <section class="content-section" id="sec-5">
+                <div class="section-heading">
+                    <div class="section-num">5</div>
+                    <h2>مبادئ التصميم الجيد</h2>
+                </div>
+                <p>
+                    مبادئ SOLID هي الأساس الذي تُبنى عليه البرمجيات النظيفة. سنمر عليها سريعاً هنا،
+                    مع تطبيق C# لكل مبدأ.
+                </p>
+
+                <h3>1. S — مبدأ المسؤولية الواحدة (SRP)</h3>
+                <p>كل فئة يجب أن يكون لها سبب واحد فقط للتغيير.</p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> SRP</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt">// ❌ فئة تفعل 3 أشياء</span>
+<span class="kw">public class</span> <span class="type">UserService</span>
+{
+    <span class="kw">public void</span> <span class="fn">Register</span>(<span class="type">User</span> user) { <span class="cmt">/* ... */</span> }
+    <span class="kw">public void</span> <span class="fn">SendEmail</span>(<span class="kw">string</span> email) { <span class="cmt">/* ... */</span> }
+    <span class="kw">public void</span> <span class="fn">Log</span>(<span class="kw">string</span> message) { <span class="cmt">/* ... */</span> }
+}
+
+<span class="cmt">// ✅ كل فئة لها مسؤولية واحدة</span>
+<span class="kw">public class</span> <span class="type">UserService</span> { <span class="kw">public void</span> <span class="fn">Register</span>(<span class="type">User</span> u) { } }
+<span class="kw">public class</span> <span class="type">EmailService</span> { <span class="kw">public void</span> <span class="fn">Send</span>(<span class="kw">string</span> e) { } }
+<span class="kw">public class</span> <span class="type">Logger</span> { <span class="kw">public void</span> <span class="fn">Log</span>(<span class="kw">string</span> m) { } }</pre>
+                    </div>
+                </div>
+
+                <h3>2. O — مبدأ الانفتاح/الانغلاق (OCP)</h3>
+                <p>الفئات مفتوحة للتوسيع، مغلقة للتعديل.</p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> OCP</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public abstract class</span> <span class="type">Shape</span>
+{
+    <span class="kw">public abstract double</span> <span class="fn">Area</span>();
+}
+
+<span class="kw">public class</span> <span class="type">Circle</span> : <span class="type">Shape</span>
+{
+    <span class="kw">public double</span> Radius { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public override double</span> <span class="fn">Area</span>() => <span class="type">Math</span>.<span class="prop">PI</span> * Radius * Radius;
+}
+
+<span class="kw">public class</span> <span class="type">Rectangle</span> : <span class="type">Shape</span>
+{
+    <span class="kw">public double</span> Width { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public double</span> Height { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public override double</span> <span class="fn">Area</span>() => Width * Height;
+}
+
+<span class="cmt">// إضافة شكل جديد لا تتطلب تعديل الكود القديم</span></pre>
+                    </div>
+                </div>
+
+                <h3>3. L — مبدأ استبدال ليسكوف (LSP)</h3>
+                <p>كائنات الفئة الفرعية يجب أن تحل محل كائنات الفئة الأم دون كسر السلوك.</p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> LSP</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt">// ❌ انتهاك: Square لا يمكن أن يحل محل Rectangle</span>
+<span class="kw">public class</span> <span class="type">Rectangle</span>
+{
+    <span class="kw">public virtual int</span> Width { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public virtual int</span> Height { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="kw">public class</span> <span class="type">Square</span> : <span class="type">Rectangle</span>
+{
+    <span class="kw">public override int</span> Width { <span class="kw">set</span> { <span class="kw">base</span>.Width = <span class="kw">value</span>; <span class="kw">base</span>.Height = <span class="kw">value</span>; } }
+}
+
+<span class="cmt">// ✅ الحل: تجريد أفضل</span>
+<span class="kw">public abstract class</span> <span class="type">Shape</span> { <span class="kw">public abstract int</span> <span class="fn">Area</span>(); }
+<span class="kw">public class</span> <span class="type">Rectangle</span> : <span class="type">Shape</span> { <span class="cmt">/* ... */</span> }
+<span class="kw">public class</span> <span class="type">Square</span> : <span class="type">Shape</span> { <span class="cmt">/* ... */</span> }</pre>
+                    </div>
+                </div>
+
+                <h3>4. I — مبدأ فصل الواجهات (ISP)</h3>
+                <p>لا تُجبر العملاء على الاعتماد على واجهات لا يستخدمونها.</p>
+
+                <h3>5. D — مبدأ عكس التبعية (DIP)</h3>
+                <p>اعتمد على التجريد، لا على التنفيذ.</p>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> DIP + DI</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="type">IEmailSender</span>
+{
+    <span class="type">Task</span> <span class="fn">SendAsync</span>(<span class="kw">string</span> to, <span class="kw">string</span> body);
+}
+
+<span class="kw">public class</span> <span class="type">SmtpEmailSender</span> : <span class="type">IEmailSender</span>
+{
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">SendAsync</span>(<span class="kw">string</span> to, <span class="kw">string</span> body) { <span class="cmt">/* ... */</span> }
+}
+
+<span class="kw">public class</span> <span class="type">OrderService</span>
+{
+    <span class="kw">private readonly</span> <span class="type">IEmailSender</span> _mailer;
+    <span class="kw">public</span> <span class="fn">OrderService</span>(<span class="type">IEmailSender</span> mailer) => _mailer = mailer;
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">PlaceOrderAsync</span>()
+    {
+        <span class="cmt">// منطق الطلب</span>
+        <span class="kw">await</span> _mailer.<span class="fn">SendAsync</span>(<span class="str">"user@example.com"</span>, <span class="str">"تم طلبك"</span>);
+    }
+}
+
+<span class="cmt">// في Program.cs</span>
+builder.Services.<span class="fn">AddScoped</span>&lt;<span class="type">IEmailSender</span>, <span class="type">SmtpEmailSender</span>&gt;();
+builder.Services.<span class="fn">AddScoped</span>&lt;<span class="type">OrderService</span>&gt;();</pre>
+                    </div>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-icon"><i class="fas fa-check"></i></div>
+                    <div class="callout-body">
+                        <h4>النتيجة</h4>
+                        <p>
+                            يمكنك تبديل <span class="inline-code">SmtpEmailSender</span> بـ
+                            <span class="inline-code">SendGridEmailSender</span> دون تعديل
+                            <span class="inline-code">OrderService</span> — فقط سطر في DI.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 6 ====== -->
+            <section class="content-section" id="sec-6">
+                <div class="section-heading">
+                    <div class="section-num">6</div>
+                    <h2>تطبيق عملي: قبل وبعد</h2>
+                </div>
+                <p>
+                    لنرَ كيف يتحول كود بسيط إلى كود احترافي عبر التطبيق التدريجي لمبادئ الهندسة.
+                </p>
+
+                <h3>المرحلة 1: الكود المبدئي (يعمل فقط)</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> ❌ قبل</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="kw">public class</span> <span class="type">Order</span>
+{
+    <span class="kw">public void</span> <span class="fn">Save</span>()
+    {
+        <span class="cmt">// 1) اتصال قاعدة البيانات</span>
+        <span class="kw">var</span> conn = <span class="kw">new</span> <span class="type">SqlConnection</span>(<span class="str">"Server=..."</span>);
+        conn.<span class="fn">Open</span>();
+        <span class="kw">var</span> cmd = <span class="kw">new</span> <span class="type">SqlCommand</span>(<span class="str">"INSERT INTO Orders ..."</span>, conn);
+        cmd.<span class="fn">ExecuteNonQuery</span>();
+
+        <span class="cmt">// 2) إرسال إيميل</span>
+        <span class="kw">var</span> smtp = <span class="kw">new</span> <span class="type">SmtpClient</span>(<span class="str">"smtp.example.com"</span>);
+        smtp.<span class="fn">Send</span>(<span class="str">"a@b.com"</span>, <span class="str">"c@d.com"</span>, <span class="str">"تم الطلب"</span>, <span class="str">"..."</span>);
+
+        <span class="cmt">// 3) تسجيل</span>
+        <span class="type">File</span>.<span class="fn">AppendAllText</span>(<span class="str">"log.txt"</span>, <span class="str">"order saved"</span>);
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <p><strong>المشاكل:</strong></p>
+                <ul>
+                    <li>الكلاس يعرف كل تفاصيل البنية التحتية (DB, SMTP, Files).</li>
+                    <li>لا يمكن اختباره بدون قاعدة بيانات حقيقية.</li>
+                    <li>تغيير مزوّد الإيميل يتطلب تعديل الكود.</li>
+                    <li>لا يوجد معالجة أخطاء أو Async.</li>
+                </ul>
+
+                <h3>المرحلة 2: الفصل والاعتماد على التجريد</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> ✅ بعد</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt">// 1) الكيانات</span>
+<span class="kw">public class</span> <span class="type">Order</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span> CustomerEmail { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+    <span class="kw">public decimal</span> Total { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="cmt">// 2) الواجهات (التجريد)</span>
+<span class="kw">public interface</span> <span class="type">IOrderRepository</span>
+{
+    <span class="type">Task</span> <span class="fn">AddAsync</span>(<span class="type">Order</span> order);
+}
+
+<span class="kw">public interface</span> <span class="type">IEmailSender</span>
+{
+    <span class="type">Task</span> <span class="fn">SendAsync</span>(<span class="kw">string</span> to, <span class="kw">string</span> body);
+}
+
+<span class="kw">public interface</span> <span class="type">ILogger</span>
+{
+    <span class="kw">void</span> <span class="fn">Info</span>(<span class="kw">string</span> message);
+}
+
+<span class="cmt">// 3) التطبيق</span>
+<span class="kw">public class</span> <span class="type">OrderService</span>
+{
+    <span class="kw">private readonly</span> <span class="type">IOrderRepository</span> _repo;
+    <span class="kw">private readonly</span> <span class="type">IEmailSender</span> _mailer;
+    <span class="kw">private readonly</span> <span class="type">ILogger</span> _log;
+
+    <span class="kw">public</span> <span class="fn">OrderService</span>(
+        <span class="type">IOrderRepository</span> repo,
+        <span class="type">IEmailSender</span> mailer,
+        <span class="type">ILogger</span> log)
+    {
+        _repo = repo;
+        _mailer = mailer;
+        _log = log;
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span> <span class="fn">PlaceAsync</span>(<span class="type">Order</span> order)
+    {
+        <span class="kw">await</span> _repo.<span class="fn">AddAsync</span>(order);
+        <span class="kw">await</span> _mailer.<span class="fn">SendAsync</span>(order.CustomerEmail, <span class="str">"تم طلبك"</span>);
+        _log.<span class="fn">Info</span>(<span class="str">$"تم طلب #{order.Id}"</span>);
+    }
+}
+
+<span class="cmt">// 4) التسجيل في DI</span>
+builder.Services.<span class="fn">AddScoped</span>&lt;<span class="type">IOrderRepository</span>, <span class="type">SqlOrderRepository</span>&gt;();
+builder.Services.<span class="fn">AddScoped</span>&lt;<span class="type">IEmailSender</span>, <span class="type">SmtpEmailSender</span>&gt;();
+builder.Services.<span class="fn">AddScoped</span>&lt;<span class="type">ILogger</span>, <span class="type">FileLogger</span>&gt;();
+builder.Services.<span class="fn">AddScoped</span>&lt;<span class="type">OrderService</span>&gt;();</pre>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الخاصية</th>
+                                <th>قبل</th>
+                                <th>بعد</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>الاختبار</strong></td>
+                                <td><span class="badge-cell red">صعب</span></td>
+                                <td><span class="badge-cell green">سهل (Mocks)</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>قابلية التبديل</strong></td>
+                                <td><span class="badge-cell red">تعديل الكود</span></td>
+                                <td><span class="badge-cell green">سطر DI</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>المسؤولية</strong></td>
+                                <td><span class="badge-cell red">مشتركة</span></td>
+                                <td><span class="badge-cell green">واحدة</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>الأداء</strong></td>
+                                <td><span class="badge-cell amber">متزامن</span></td>
+                                <td><span class="badge-cell green">Async</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h4><i class="fas fa-gem"></i> الدرس المستفاد</h4>
+                    <p>
+                        الهندسة ليست إضافة طبقات بلا داعٍ — بل هي <strong>وضع كل مسؤولية في مكانها الصحيح</strong>.
+                        النتيجة: كود أبسط للفهم، وأسهل للتغيير، وأقوى في الإنتاج.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ====== 7 ====== -->
+            <section class="content-section" id="sec-7">
+                <div class="section-heading">
+                    <div class="section-num">7</div>
+                    <h2>أدوات المهندس</h2>
+                </div>
+                <p>
+                    المهندس لا يعمل بالكود وحده. هناك أدوات وممارسات تحيط دورة التطوير وتضمن الجودة.
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fab fa-git-alt"></i>
+                        <h4>Git & GitHub</h4>
+                        <p>إدارة الإصدارات والتعاون — أساس أي مشروع.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-vial"></i>
+                        <h4>Unit Testing</h4>
+                        <p>xUnit, NUnit, Moq — لضمان عدم كسر الكود.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-infinity"></i>
+                        <h4>CI/CD</h4>
+                        <p>GitHub Actions, Azure DevOps — أتمتة البناء والنشر.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shield-halved"></i>
+                        <h4>Static Analysis</h4>
+                        <p>SonarQube, Roslyn Analyzers — اكتشاف المشاكل مبكراً.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Monitoring</h4>
+                        <p>Application Insights, Serilog — مراقبة الأداء في الإنتاج.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-box-open"></i>
+                        <h4>Docker</h4>
+                        <p>حزم التطبيق ليعمل في أي بيئة بشكل موحد.</p>
+                    </div>
+                </div>
+
+                <h3>سطر أوامر سريع</h3>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="code-lang"><div class="code-dots"><span></span><span></span><span></span></div> Terminal</div>
+                        <button class="code-copy" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    </div>
+                    <div class="code-body">
+<pre><span class="cmt"># إنشاء مشروع وحل واحد</span>
+dotnet new sln -n MySolution
+dotnet new console -n MyApp
+dotnet sln <span class="fn">add</span> MyApp/MyApp.csproj
+
+<span class="cmt"># إنشاء مشروع اختبار</span>
+dotnet new xunit -n MyApp.Tests
+dotnet sln <span class="fn">add</span> MyApp.Tests/MyApp.Tests.csproj
+dotnet <span class="fn">add</span> MyApp.Tests reference MyApp
+
+<span class="cmt"># بناء وتشغيل الاختبارات</span>
+dotnet build
+dotnet test</pre>
+                    </div>
+                </div>
+
+                <div class="callout info">
+                    <div class="callout-icon"><i class="fas fa-terminal"></i></div>
+                    <div class="callout-body">
+                        <h4>لماذا CLI؟</h4>
+                        <p>
+                            سطر الأوامر أسرع، ويعمل في أي بيئة (Linux/macOS/Windows)، ويُستخدم في أنظمة
+                            CI/CD — لذا إتقانه ضروري لكل مهندس.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 8 ====== -->
+            <section class="content-section" id="sec-8">
+                <div class="section-heading">
+                    <div class="section-num">8</div>
+                    <h2>مسارك القادم</h2>
+                </div>
+                <p>
+                    هذا الدرس كان تمهيداً. الدروس القادمة في هذا القسم ستأخذك خطوة بخطوة إلى الأمام.
+                </p>
+
+                <ul class="steps">
+                    <li><strong>SOLID Deep Dive:</strong> تطبيق تفصيلي لكل مبدأ مع تمارين.</li>
+                    <li><strong>Design Patterns:</strong> Singleton, Factory, Repository, Decorator...</li>
+                    <li><strong>Clean Code:</strong> تسمية، تنظيم، تعليقات، تحسين.</li>
+                    <li><strong>Unit Testing:</strong> xUnit + Moq + TDD.</li>
+                    <li><strong>ASP.NET Core:</strong> بناء APIs احترافية.</li>
+                    <li><strong>Entity Framework:</strong> ORM وقواعد البيانات.</li>
+                    <li><strong>Microservices:</strong> تقسيم النظام لخدمات مستقلة.</li>
+                </ul>
+
+                <div class="callout eng">
+                    <div class="callout-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="callout-body">
+                        <h4>نصيحة ذهبية</h4>
+                        <p>
+                            لا تحاول تعلّم كل شيء دفعة واحدة. اختر مبدأً واحداً، طبّقه على مشروعك الحالي،
+                            ثم انتقل للتالي. الممارسة أهم من النظرية.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== 9 ====== -->
+            <section class="content-section" id="sec-9">
+                <div class="section-heading">
+                    <div class="section-num">9</div>
+                    <h2>تمارين تفاعلية</h2>
+                </div>
+                <p>اختبر فهمك لأساسيات هندسة البرمجيات:</p>
+
+                <div class="interactive-box">
+                    <div class="interactive-title"><i class="fas fa-question-circle"></i> سؤال 1</div>
+                    <p class="interactive-hint">ما الفرق الأساسي بين البرمجة وهندسة البرمجيات؟</p>
+                    <div class="task-box" data-quiz="1">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> البرمجة أصعب من الهندسة</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> الهندسة تهتم بالنظام ككل وقابلية الصيانة والتوسع</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> لا فرق بينهما</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> الهندسة تحتاج لغة مختلفة</button>
+                        </div>
+                        <div class="task-feedback" id="fb1"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 2</div>
+                    <p class="interactive-hint">أي مبدأ SOLID ينص على "كل فئة لها سبب واحد للتغيير"؟</p>
+                    <div class="task-box" data-quiz="2">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="true"><span class="opt-marker">A</span> Single Responsibility (SRP)</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">B</span> Open/Closed (OCP)</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> Liskov Substitution (LSP)</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> Dependency Inversion (DIP)</button>
+                        </div>
+                        <div class="task-feedback" id="fb2"></div>
+                    </div>
+
+                    <div class="interactive-title" style="margin-top:20px"><i class="fas fa-question-circle"></i> سؤال 3</div>
+                    <p class="interactive-hint">في المعمارية النظيفة، في أي اتجاه تتجه التبعيات؟</p>
+                    <div class="task-box" data-quiz="3">
+                        <div class="task-options">
+                            <button class="task-option" data-correct="false"><span class="opt-marker">A</span> من Domain إلى Infrastructure</button>
+                            <button class="task-option" data-correct="true"><span class="opt-marker">B</span> من الطبقات الخارجية نحو Domain (المركز)</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">C</span> عشوائية</button>
+                            <button class="task-option" data-correct="false"><span class="opt-marker">D</span> لا توجد تبعيات</button>
+                        </div>
+                        <div class="task-feedback" id="fb3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <nav class="lesson-nav">
+                <a href="#" class="prev">
+                    <div class="nav-icon"><i class="fas fa-arrow-right"></i></div>
+                    <div>
+                        <div class="nav-label">الدرس السابق</div>
+                        <div class="nav-title">تطبيق دردشة بـ Sockets</div>
+                    </div>
+                </a>
+                <a href="#" class="next">
+                    <div>
+                        <div class="nav-label">الدرس التالي</div>
+                        <div class="nav-title">أنماط التصميم في C#</div>
+                    </div>
+                    <div class="nav-icon"><i class="fas fa-arrow-left"></i></div>
+                </a>
+            </nav>
+
+        </main>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-bottom">
+            <span>© 2026 CodeWay — جميع الحقوق محفوظة.</span>
+            <span>صُمم بعناية لتعلم C# بالعربية · <a href="#">سياسة الخصوصية</a></span>
+        </div>
+    </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    /* ============ شريط التقدم ============ */
+    const progressBar = document.getElementById('progressBar');
+    const header = document.getElementById('header');
+    const backTop = document.getElementById('backTop');
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = (scrollTop / docHeight) * 100 + '%';
+        header.classList.toggle('scrolled', scrollTop > 20);
+        backTop.classList.toggle('show', scrollTop > 400);
+    });
+
+    /* ============ نسخ الكود ============ */
+    function copyCode(btn) {
+        const pre = btn.closest('.code-wrapper').querySelector('pre');
+        const text = pre.innerText;
+        const done = () => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1800);
+        };
+        navigator.clipboard.writeText(text).then(done).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            done();
+        });
+    }
+
+    /* ============ التنقل النشط في TOC ============ */
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    const sections = document.querySelectorAll('.content-section');
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                tocLinks.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
+
+    /* ============ التمارين التفاعلية ============ */
+    document.querySelectorAll('.task-box').forEach(box => {
+        const quizId = box.dataset.quiz;
+        const fb = document.getElementById('fb' + quizId);
+        const options = box.querySelectorAll('.task-option');
+
+        options.forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (box.dataset.answered === 'true') return;
+                box.dataset.answered = 'true';
+
+                const isCorrect = opt.dataset.correct === 'true';
+                options.forEach(o => {
+                    if (o.dataset.correct === 'true') o.classList.add('correct');
+                    else if (o === opt) o.classList.add('wrong');
+                });
+
+                if (isCorrect) {
+                    fb.textContent = '✅ إجابة صحيحة! أحسنت.';
+                    fb.className = 'task-feedback show ok';
+                } else {
+                    fb.textContent = '❌ إجابة غير صحيحة. الإجابة الصحيحة مظللة بالأخضر.';
+                    fb.className = 'task-feedback show no';
+                }
+            });
+        });
+    });
+
+    /* ============ قائمة الجوال ============ */
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        const nav = document.querySelector('.header-nav');
+        if (!nav) return;
+        if (nav.style.display === 'flex') {
+            nav.style.display = '';
+        } else {
+            Object.assign(nav.style, {
+                display: 'flex',
+                position: 'absolute',
+                top: '72px',
+                right: '0',
+                left: '0',
+                background: 'var(--primary)',
+                flexDirection: 'column',
+                padding: '16px',
+                gap: '8px',
+                boxShadow: '0 10px 30px rgba(0,0,0,.3)',
+                zIndex: '999'
+            });
+        }
+    });
+
+    /* ============ ظهور الأقسام ============ */
+    const sectionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.05 });
+
+    sections.forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(20px)';
+        s.style.transition = 'opacity .6s ease, transform .6s ease';
+        sectionObserver.observe(s);
+    });
+</script>
+
+</body>
+</html>

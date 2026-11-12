@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ الجمل الشرطية في لغة | شرح شامل ومتكامل</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(145deg, #f6f9fc 0%, #edf2f9 100%);
+            color: #1e293b;
+            line-height: 1.7;
+            padding: 2rem 1.5rem;
+            direction: rtl;
+        }
+
+        /* الرئيسية الحاوية */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 3.5rem;
+            box-shadow: 0 30px 60px rgba(0, 10, 30, 0.2), 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 2.8rem 3rem;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        /* رأس الصفحة العلمي */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #0B4A6F, #1E3A5F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            display: inline-block;
+            padding: 0 1rem;
+        }
+
+        .header .sub {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #2c3e50;
+            background: #d0e2f2b3;
+            display: inline-block;
+            padding: 0.6rem 2rem;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+            margin-top: 0.8rem;
+            border: 1px solid #b5d0e6;
+        }
+
+        .header i {
+            color: #1e4a6b;
+            margin-left: 0.6rem;
+        }
+
+        /* بطاقات المفاهيم */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            padding: 1.8rem 1.8rem;
+            box-shadow: 0 15px 30px -10px rgba(0,30,50,0.15);
+            border: 1px solid rgba(255,255,255,0.7);
+            transition: transform 0.25s ease, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 40px -10px #0a2a44a0;
+            background: rgba(255,255,255,0.85);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            background: #1e3a5f20;
+            width: 70px;
+            height: 70px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: #1E3A5F;
+            border: 2px dashed #1e3a5f60;
+        }
+
+        .card h3 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #0B2A44;
+        }
+
+        .card p {
+            font-size: 1.1rem;
+            color: #1e3a5f;
+            opacity: 0.9;
+        }
+
+        /* أقسام الشرح الرئيسية */
+        .section-title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin: 3rem 0 2rem 0;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 80%;
+            height: 5px;
+            background: linear-gradient(90deg, #1e3a5f, #4b7aa1, #a3c6e9);
+            border-radius: 10px;
+        }
+
+        .subsection-title {
+            font-size: 1.9rem;
+            font-weight: 600;
+            margin: 2.2rem 0 1.5rem 0;
+            color: #163A5C;
+            border-right: 7px solid #1e4a6b;
+            padding-right: 1.2rem;
+        }
+
+        /* كتلة الكود المنسق */
+        .code-block {
+            background: #0e1e2b;
+            border-radius: 2rem;
+            padding: 1.8rem;
+            margin: 2rem 0;
+            box-shadow: inset 0 0 15px #00000030, 0 15px 20px -8px #0b1e2e;
+            border: 1px solid #2d4b66;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            line-height: 1.6;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+        }
+
+        /* الجدول المقارن */
+        .comparison-table {
+            background: #ffffffd9;
+            backdrop-filter: blur(5px);
+            border-radius: 2.2rem;
+            overflow: hidden;
+            margin: 2.5rem 0;
+            border: 1px solid #bdd3e8;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.1rem;
+        }
+
+        .comparison-table th {
+            background: #1e3a5f;
+            color: white;
+            font-weight: 600;
+            padding: 1.2rem 1rem;
+            font-size: 1.3rem;
+        }
+
+        .comparison-table td {
+            padding: 1.4rem 1.2rem;
+            border-bottom: 1px solid #b0cde0;
+            color: #0a2a44;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table td:first-child {
+            font-weight: 700;
+            background: #ecf5fc;
+            width: 35%;
+        }
+
+        .note-box {
+            background: #d1e4f5;
+            border-right: 8px solid #1e4a6b;
+            border-radius: 1.5rem;
+            padding: 1.5rem 2rem;
+            margin: 2.5rem 0;
+            font-size: 1.15rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .note-box i {
+            font-size: 2.5rem;
+            color: #1e3a5f;
+        }
+
+        /* شريط المعلومات الجانبي داخل المحتوى */
+        .tip-card {
+            background: #1e3a5f;
+            color: white;
+            border-radius: 1.8rem;
+            padding: 1.8rem 2rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            box-shadow: 0 15px 25px #0a1f33;
+        }
+
+        .tip-card i {
+            font-size: 2.7rem;
+            color: #ffd966;
+        }
+
+        .tip-card p {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 2px solid #9fbad3;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #264e6b;
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer span i {
+            margin-left: 0.5rem;
+            color: #1e4a6b;
+        }
+
+        /* التجاوب مع الجوال */
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .container { padding: 1.5rem 1rem; }
+            .header h1 { font-size: 2.2rem; }
+            .section-title { font-size: 1.9rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- الرأس -->
+    <div class="header">
+        <h1><i class="fas fa-code-branch"></i> الجمل الشرطية في لغة ++C <i class="fas fa-greater-than"></i></h1>
+        <div class="sub"><i class="fas fa-microchip"></i> شرح أكاديمي متكامل – التحكم في تدفق البرنامج</div>
+    </div>
+
+    <!-- بطاقات مفاهيمية تمهيدية -->
+    <div class="concept-grid">
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-random"></i></div>
+            <h3>اتخاذ القرار</h3>
+            <p>تسمح الجمل الشرطية للبرنامج باختيار مسار معين بناءً على شرط منطقي، تمامًا مثل القرارات في الحياة الواقعية.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-toggle-on"></i></div>
+            <h3>قيم منطقية</h3>
+            <p>أساس الشروط هو التعبيرات التي تكون قيمتها <span dir="ltr">true</span> (صحيح) أو <span dir="ltr">false</span> (خاطئ).</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-sitemap"></i></div>
+            <h3>هيكلة الأكواد</h3>
+            <p>تنظيم العمليات المعقدة وجعل البرنامج أكثر ذكاءً واستجابة للمدخلات المختلفة.</p>
+        </div>
+    </div>
+
+    <!-- بداية الشرح الأساسي -->
+    <h2 class="section-title"><i class="fas fa-caret-left"></i> 1. الجملة الشرطية if</h2>
+    <p style="font-size:1.2rem;">أبسط صورة للشرط: إذا تحقق الشرط ننفذ كتلة معينة، وإلا نتجاوزها.</p>
+
+    <!-- مثال if -->
+    <div class="code-block">
+        <pre><code class="language-cpp">// صيغة if الأساسية
+if (الشرط) {
+    // الكود الذي ينفذ إذا كان الشرط true
+}
+
+// مثال عملي
+int درجة = 85;
+if (درجة >= 50) {
+    cout &lt;&lt; "نجحت! تهانينا." &lt;&lt; endl;
+}</code></pre>
+    </div>
+
+    <h2 class="section-title"><i class="fas fa-code-branch"></i> 2. if – else (إذا ... وإلا)</h2>
+    <p style="font-size:1.2rem;">نستخدمها عندما نريد تنفيذ كود في حال تحقق الشرط، وكود آخر في حال عدم تحققه.</p>
+    <div class="code-block">
+        <pre><code class="language-cpp">if (الشرط) {
+    // إذا كان الشرط صحيحاً
+} else {
+    // إذا كان الشرط خاطئاً
+}
+
+// مثال: تحديد زوجي أو فردي
+int عدد = 7;
+if (عدد % 2 == 0) {
+    cout &lt;&lt; "العدد زوجي" &lt;&lt; endl;
+} else {
+    cout &lt;&lt; "العدد فردي" &lt;&lt; endl;
+}</code></pre>
+    </div>
+
+    <!-- شريحة تلميحات -->
+    <div class="tip-card">
+        <i class="fas fa-lightbulb"></i>
+        <p><strong>نصيحة:</strong> يمكن حذف الأقواس {} إذا كان هناك جملة واحدة فقط، لكن يُفضل دائماً استخدامها للوضوح وتجنب الأخطاء.</p>
+    </div>
+
+    <h2 class="section-title"><i class="fas fa-level-down-alt"></i> 3. if – else if – else (شروط متعددة)</h2>
+    <p style="font-size:1.2rem;">عندما يكون لدينا أكثر من احتمال، نستخدم <span dir="ltr">else if</span> لتحديد شروط إضافية.</p>
+    <div class="code-block">
+        <pre><code class="language-cpp">if (الشرط1) {
+    // إذا تحقق الشرط1
+} else if (الشرط2) {
+    // إذا لم يتحقق الشرط1 وتحقق الشرط2
+} else if (الشرط3) {
+    // إذا لم يتحقق الشرط1 والشرط2 وتحقق الشرط3
+} else {
+    // إذا لم يتحقق أي من الشروط السابقة
+}
+
+// مثال: تقدير الدرجات
+if (درجة >= 90) {
+    cout &lt;&lt; "امتياز";
+} else if (درجة >= 75) {
+    cout &lt;&lt; "جيد جداً";
+} else if (درجة >= 60) {
+    cout &lt;&lt; "جيد";
+} else {
+    cout &lt;&lt; "راسب";
+}</code></pre>
+    </div>
+
+    <!-- قسم مطور: Switch -->
+    <h2 class="section-title"><i class="fas fa-cogs"></i> 4. switch (الاختيار المتعدد المنظم)</h2>
+    <p style="font-size:1.2rem;">تستخدم عندما نريد مقارنة متغير بعدد ثابت من القيم (أعداد صحيحة أو محارف). أنيقة وفعالة.</p>
+    <div class="code-block">
+        <pre><code class="language-cpp">switch (التعبير) {
+    case قيمة1:
+        // كود
+        break;
+    case قيمة2:
+        // كود
+        break;
+    default:
+        // إذا لم يتطابق أي case
+}
+
+// مثال: أيام الأسبوع
+int يوم = 3;
+switch (يوم) {
+    case 1: cout &lt;&lt; "السبت"; break;
+    case 2: cout &lt;&lt; "الأحد"; break;
+    case 3: cout &lt;&lt; "الاثنين"; break;
+    case 4: cout &lt;&lt; "الثلاثاء"; break;
+    case 5: cout &lt;&lt; "الأربعاء"; break;
+    case 6: cout &lt;&lt; "الخميس"; break;
+    case 7: cout &lt;&lt; "الجمعة"; break;
+    default: cout &lt;&lt; "يوم غير صحيح";
+}</code></pre>
+    </div>
+    <div class="note-box">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div><strong>تنبيه:</strong> لا تنسَ كتابة <span dir="ltr">break</span> بعد كل حالة، وإلا ستستمر الجملة في تنفيذ الحالات التالية (fall-through).</div>
+    </div>
+
+    <!-- الشرط الثلاثي (Ternary) -->
+    <h2 class="section-title"><i class="fas fa-question-circle"></i> 5. العامل الشرطي (?:) – Ternary Operator</h2>
+    <p style="font-size:1.2rem;">طريقة مختصرة لكتابة if بسيط من سطر واحد. مفيد للتعيينات السريعة.</p>
+    <div class="code-block">
+        <pre><code class="language-cpp">// الصيغة: (شرط) ? (قيمة إذا true) : (قيمة إذا false);
+
+int عمر = 20;
+string نتيجة = (عمر >= 18) ? "بالغ" : "قاصر";
+cout &lt;&lt; نتيجة; // سيطبع "بالغ"
+
+// يمكن استخدامه مع العمليات الحسابية أيضاً
+int x = 10, y = 20;
+int الأكبر = (x > y) ? x : y; // الأكبر = 20</code></pre>
+    </div>
+
+    <!-- جدول مقارن بين if و switch -->
+    <h2 class="subsection-title"><i class="fas fa-balance-scale"></i> الفروقات الجوهرية بين if و switch</h2>
+    <div class="comparison-table">
+        <table>
+            <thead><tr><th>المقارنة</th><th>if – else if</th><th>switch</th></tr></thead>
+            <tbody>
+                <tr><td>نوع التعبير</td><td>أي تعبير منطقي (علاقات، منطق، متغيرات)</td><td>أعداد صحيحة أو محارف (int, char, enum)</td></tr>
+                <tr><td>التعبير المعقد</td><td>يمكن استخدام شروط مركبة (&&, ||)</td><td>كل case قيمة ثابتة فقط</td></tr>
+                <tr><td>المرونة</td><td>عالية جداً، يمكن استخدام نطاقات (x > 5 && x < 10)</td><td>محدود بقيم ثابتة محددة</td></tr>
+                <tr><td>الأداء في الحالات الكثيرة</td><td>قد يكون أبطأ قليلاً</td><td>غالباً أسرع (جدول قفز)</td></tr>
+                <tr><td>إمكانية وقوع خطأ</td><td>أقل عرضة للخطأ المبرمجي</td><td>خطر نسيان break يسبب fall-through</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- شروط متداخلة + أمثلة -->
+    <h2 class="section-title"><i class="fas fa-layer-group"></i> 6. الشروط المتداخلة (Nested)</h2>
+    <p>يمكن وضع جملة شرطية داخل أخرى لفحص أدق. لكن احذر من التعقيد الزائد.</p>
+    <div class="code-block">
+        <pre><code class="language-cpp">int رقم = 15;
+if (رقم > 0) {
+    cout &lt;&lt; "موجب ";
+    if (رقم % 2 == 0) {
+        cout &lt;&lt; "وزوجي";
+    } else {
+        cout &lt;&lt; "وفردي";
+    }
+} else {
+    cout &lt;&lt; "سالِب أو صفر";
+}
+// الناتج: "موجب وفردي"</code></pre>
+    </div>
+
+    <!-- أفضل الممارسات -->
+    <div class="tip-card" style="background: #0b4b6b;">
+        <i class="fas fa-check-double"></i>
+        <p><strong>أفضل الممارسات:</strong> اجعل شروطك واضحة، تجنب التداخل العميق أكثر من 3 مستويات، استخدم الأقواس حتى مع جملة واحدة، وعلّق على الشروط المعقدة.</p>
+    </div>
+
+    <!-- ملخص سريع بالجداول الذهنية -->
+    <h2 class="subsection-title"><i class="fas fa-table"></i> ملصق تذكاري: أنواع الشروط بلغة ++C</h2>
+    <div style="background: #1e2f3f; color: #e6f3ff; border-radius: 2rem; padding: 2rem; margin: 2.5rem 0;">
+        <ul style="list-style: none; font-size: 1.3rem; columns: 2; column-gap: 3rem;">
+            <li><i class="fas fa-check-circle" style="color:#72b9ff;"></i> <span dir="ltr">if (condition) { }</span></li>
+            <li><i class="fas fa-check-circle" style="color:#72b9ff;"></i> <span dir="ltr">if () { } else { }</span></li>
+            <li><i class="fas fa-check-circle" style="color:#72b9ff;"></i> <span dir="ltr">if () { } else if () { } else { }</span></li>
+            <li><i class="fas fa-check-circle" style="color:#72b9ff;"></i> <span dir="ltr">switch (x) { case ...: }</span></li>
+            <li><i class="fas fa-check-circle" style="color:#72b9ff;"></i> <span dir="ltr">(cond) ? expr1 : expr2</span></li>
+            <li><i class="fas fa-check-circle" style="color:#72b9ff;"></i> <span dir="ltr">Nested statements</span></li>
+        </ul>
+    </div>
+
+    <!-- خاتمة وتدريب -->
+    <div style="background: #f4f9ff; border-radius: 2.5rem; padding: 2rem; margin: 2.5rem 0; border: 2px solid #b3cce2;">
+        <h3 style="font-size: 2rem; margin-bottom: 1rem;"><i class="fas fa-pen"></i> تمرين تطبيقي</h3>
+        <p style="font-size:1.2rem;">اكتب برنامج C++ يطلب من المستخدم إدخال رقم، ويستخدم if..else if ليحدد إذا كان الرقم < 0 أو > 0 أو يساوي صفر، ثم يستخدم switch لطباعة كلمة "ZERO" إذا كان صفراً أو "POS" أو "NEG"؟</p>
+        <p style="background: #d9e6f5; padding: 1rem; border-radius: 1.5rem; margin-top: 1rem;"> <i class="fas fa-lightbulb"></i> حافظ على ترتيب الكود واستخدم مكتبة iostream.</p>
+    </div>
+
+    <!-- تذييل المصادر -->
+    <div class="footer">
+        <span><i class="far fa-file-code"></i> ++C Reference / ISO</span>
+        <span><i class="fas fa-book-open"></i>  الجمل الشرطية – شرح متكامل</span>
+        <span><i class="fas fa-calendar-alt"></i>  الإصدار التعليمي 2.0</span>
+    </div>
+
+    <div style="text-align: left; margin-top: 1rem; font-size: 1rem; opacity: 0.7; letter-spacing: 0.5px;">
+        <span dir="ltr">❮ ❯ جميع الأمثلة جُربت على مترجم ++C القياسي</span>
+    </div>
+</div>
+
+<!-- إعادة توجيه Prism للأكواد -->
+<script>Prism.highlightAll();</script>
+</body>
+</html>

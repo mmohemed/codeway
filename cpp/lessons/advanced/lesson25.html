@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>++C ملفات الإدخال/الإخراج (File I/O) في لغة | شرح شامل ومتكامل</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(145deg, #1a2f3f, #234a5e);
+            color: #e6f3ff;
+            line-height: 1.7;
+            padding: 2rem 1.8rem;
+            direction: rtl;
+        }
+
+        .wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الحاوية الرئيسية */
+        .glass-panel {
+            background: rgba(25, 55, 75, 0.85);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-radius: 5rem;
+            box-shadow: 0 45px 90px -20px #000000, 0 0 0 2px rgba(100, 200, 255, 0.25);
+            padding: 3.2rem 3.8rem;
+            border: 1px solid rgba(70, 180, 230, 0.5);
+        }
+
+        /* الرأس */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #a0d0ff, #c0e6ff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero h1 i {
+            background: #2f8ac8;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 130px;
+            font-size: 2.8rem;
+            -webkit-text-fill-color: white;
+            box-shadow: 0 18px 35px #0a3e5a;
+        }
+
+        .hero-sub {
+            font-size: 1.8rem;
+            font-weight: 500;
+            background: #1f6f9ecc;
+            padding: 0.9rem 3.5rem;
+            border-radius: 90px;
+            display: inline-block;
+            margin-top: 1.6rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid #5ac0ff;
+            color: #ffffff;
+        }
+
+        /* بطاقات تمهيدية */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.2rem;
+            margin: 4rem 0;
+        }
+
+        .intro-card {
+            background: rgba(30, 70, 95, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 3rem;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border: 1px solid #3fa0d6;
+            transition: 0.3s;
+        }
+
+        .intro-card:hover {
+            transform: translateY(-10px);
+            background: #2d6a8fe0;
+            border-color: #7ac6ff;
+        }
+
+        .intro-icon {
+            background: #3292d3;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            margin: 0 auto 1.5rem;
+            color: white;
+        }
+
+        .intro-card h3 {
+            font-size: 2.2rem;
+            color: #c0e4ff;
+            margin-bottom: 1rem;
+        }
+
+        .intro-card p {
+            font-size: 1.2rem;
+            color: #d0eaff;
+        }
+
+        @media (max-width: 800px) {
+            .intro-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 500px) {
+            .intro-grid { grid-template-columns: 1fr; }
+        }
+
+        /* عناوين رئيسية */
+        .main-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 4rem 0 2.5rem 0;
+            position: relative;
+            display: inline-block;
+            color: #c0e4ff;
+        }
+        .main-title:after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            right: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #3fa0d6, #70c0f0, #b5e0ff);
+            border-radius: 10px;
+        }
+
+        .sub-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 3rem 0 2rem 0;
+            color: #c0e4ff;
+            border-right: 12px solid #4da0ec;
+            padding-right: 2rem;
+        }
+
+        /* كتلة الكود */
+        .code-box {
+            background: #1a2f3f;
+            border-radius: 3.2rem;
+            padding: 2.5rem;
+            margin: 2.8rem 0;
+            box-shadow: 0 30px 45px -18px #000000, inset 0 1px 12px #41a0c7;
+            border: 1px solid #3090aa;
+        }
+
+        .code-box pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+            color: #e2eef9;
+        }
+
+        /* بطاقات مميزة */
+        .highlight-box {
+            background: linear-gradient(115deg, #1f5f8a, #2a80b0);
+            color: white;
+            border-radius: 3.2rem;
+            padding: 2.5rem 3.2rem;
+            margin: 3rem 0;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            box-shadow: 0 28px 45px -15px #000000b3;
+        }
+
+        .highlight-box i {
+            font-size: 3.5rem;
+            color: #ffde9e;
+        }
+
+        .highlight-box p {
+            font-size: 1.35rem;
+            font-weight: 500;
+        }
+
+        .note-box {
+            background: #1f3f55;
+            border-right: 12px solid #e6a52e;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #ffdeb4;
+        }
+
+        .note-box i {
+            font-size: 3rem;
+            color: #f39c12;
+        }
+
+        .warning-box {
+            background: #2f2a2a;
+            border-right: 12px solid #e66545;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #ffb4b4;
+        }
+
+        .warning-box i {
+            font-size: 3rem;
+            color: #ff6b6b;
+        }
+
+        /* جدول أنيق */
+        .elegant-table {
+            background: #1f4f6fef;
+            backdrop-filter: blur(6px);
+            border-radius: 3.5rem;
+            overflow: hidden;
+            margin: 3.2rem 0;
+            border: 1px solid #3fa0d6;
+        }
+
+        .elegant-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.25rem;
+            color: #e1f0ff;
+        }
+
+        .elegant-table th {
+            background: #2f80b0;
+            color: white;
+            font-weight: 700;
+            padding: 1.6rem 1.2rem;
+            font-size: 1.6rem;
+        }
+
+        .elegant-table td {
+            padding: 1.6rem 1.8rem;
+            border-bottom: 1px solid #3fa0d6;
+            color: #d4ecff;
+        }
+
+        .elegant-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .elegant-table td:first-child {
+            background: #1f5f7f;
+            font-weight: 700;
+            width: 30%;
+        }
+
+        /* أعلام الأوضاع */
+        .mode-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .mode-badge {
+            background: #2f5f8f;
+            padding: 0.5rem 1.5rem;
+            border-radius: 3rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.1rem;
+            border: 1px solid #7ac6ff;
+        }
+
+        /* تذييل */
+        .page-footer {
+            margin-top: 5.5rem;
+            padding-top: 3rem;
+            border-top: 5px solid #3fa0d6;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #c0e4ff;
+            font-size: 1.25rem;
+        }
+
+        .footer-badge {
+            background: #2f80b0;
+            color: white;
+            padding: 0.6rem 2.2rem;
+            border-radius: 70px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .glass-panel { padding: 2rem; }
+            .hero h1 { font-size: 2.8rem; }
+            .main-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="glass-panel">
+
+        <!-- الرأس -->
+        <div class="hero">
+            <h1>
+                <i class="fas fa-file-alt"></i>
+                ملفات الإدخال/الإخراج (File I/O)
+                <i class="fas fa-save"></i>
+            </h1>
+            <div class="hero-sub">
+                <i class="fas fa-folder-open"></i> قراءة وكتابة الملفات – تخزين دائم للبيانات
+            </div>
+        </div>
+
+        <!-- مقدمة -->
+        <p style="font-size:1.4rem; text-align:center; margin-bottom:2rem;">ملفات الإدخال/الإخراج (File I/O) تسمح للبرنامج بالتفاعل مع الملفات على القرص الصلب. يمكن قراءة البيانات من ملفات (إدخال) أو كتابتها إلى ملفات (إخراج) للتخزين الدائم.</p>
+
+        <!-- بطاقات تمهيدية -->
+        <div class="intro-grid">
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-sign-in-alt"></i></div>
+                <h3>ifstream</h3>
+                <p>Input File Stream:用于 قراءة البيانات من الملفات (إدخال).</p>
+            </div>
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-sign-out-alt"></i></div>
+                <h3>ofstream</h3>
+                <p>Output File Stream:用于 كتابة البيانات إلى الملفات (إخراج).</p>
+            </div>
+            <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-exchange-alt"></i></div>
+                <h3>fstream</h3>
+                <p>File Stream:用于 القراءة والكتابة معاً (إدخال/إخراج).</p>
+            </div>
+        </div>
+
+        <!-- 1. تضمين المكتبة -->
+        <h2 class="main-title"><i class="fas fa-book"></i> 1. تضمين مكتبة الملفات</h2>
+        <p>للتعامل مع الملفات في ++C، يجب تضمين المكتبة <code>&lt;fstream&gt;</code>.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;fstream&gt;   // مكتبة ملفات الإدخال/الإخراج
+#include &lt;string&gt;
+using namespace std;</code></pre>
+        </div>
+
+        <!-- 2. فتح وإغلاق الملفات -->
+        <h2 class="main-title"><i class="fas fa-door-open"></i> 2. فتح وإغلاق الملفات</h2>
+        <p>قبل التعامل مع ملف، يجب فتحه. بعد الانتهاء، يجب إغلاقه لتحرير الموارد.</p>
+
+        <h3 class="sub-title"><i class="fas fa-file-export"></i> مثال: كتابة إلى ملف (ofstream)</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+using namespace std;
+
+int main() {
+    // إنشاء كائن ofstream وفتح ملف للكتابة
+    ofstream outFile("example.txt");
+
+    // التحقق من نجاح الفتح
+    if (!outFile) {
+        cerr &lt;&lt; "خطأ في فتح الملف للكتابة!" &lt;&lt; endl;
+        return 1;
+    }
+
+    // كتابة بيانات إلى الملف
+    outFile &lt;&lt; "مرحباً بالعالم!" &lt;&lt; endl;
+    outFile &lt;&lt; "هذا سطر ثاني." &lt;&lt; endl;
+    outFile &lt;&lt; "رقم: " &lt;&lt; 42 &lt;&lt; endl;
+
+    // إغلاق الملف
+    outFile.close();
+    cout &lt;&lt; "تمت الكتابة بنجاح." &lt;&lt; endl;
+    return 0;
+}</code></pre>
+        </div>
+
+        <h3 class="sub-title"><i class="fas fa-file-import"></i> مثال: قراءة من ملف (ifstream)</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    // فتح ملف للقراءة
+    ifstream inFile("example.txt");
+
+    if (!inFile) {
+        cerr &lt;&lt; "خطأ في فتح الملف للقراءة!" &lt;&lt; endl;
+        return 1;
+    }
+
+    string line;
+    // قراءة سطر سطر حتى نهاية الملف
+    while (getline(inFile, line)) {
+        cout &lt;&lt; "اقرأ: " &lt;&lt; line &lt;&lt; endl;
+    }
+
+    inFile.close();
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 3. أوضاع فتح الملفات -->
+        <h2 class="main-title"><i class="fas fa-sliders-h"></i> 3. أوضاع فتح الملفات (File Modes)</h2>
+        <p>يمكن تحديد كيفية فتح الملف باستخدام flags من <code>ios</code>.</p>
+        <div class="elegant-table">
+            <table>
+                <tr><th>الوضع</th><th>الوصف</th></tr>
+                <tr><td>ios::in</td><td>فتح للقراءة (افتراضي لـ ifstream).</td></tr>
+                <tr><td>ios::out</td><td>فتح للكتابة (افتراضي لـ ofstream). يحذف المحتوى السابق.</td></tr>
+                <tr><td>ios::app</td><td>فتح للإضافة (append) - الكتابة في نهاية الملف.</td></tr>
+                <tr><td>ios::ate</td><td>فتح والانتقال إلى نهاية الملف.</td></tr>
+                <tr><td>ios::trunc</td><td>حذف محتوى الملف إذا كان موجوداً.</td></tr>
+                <tr><td>ios::binary</td><td>فتح الملف كملف ثنائي (بدلاً من نصي).</td></tr>
+            </table>
+        </div>
+        <div class="mode-badges">
+            <span class="mode-badge">ios::in</span>
+            <span class="mode-badge">ios::out</span>
+            <span class="mode-badge">ios::app</span>
+            <span class="mode-badge">ios::ate</span>
+            <span class="mode-badge">ios::trunc</span>
+            <span class="mode-badge">ios::binary</span>
+        </div>
+
+        <h3 class="sub-title"><i class="fas fa-edit"></i> مثال: استخدام أوضاع مختلفة</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;fstream&gt;
+using namespace std;
+
+int main() {
+    // الكتابة مع مسح المحتوى السابق (الوضع الافتراضي)
+    ofstream fout1("test.txt", ios::out);
+    fout1 &lt;&lt; "سطر جديد" &lt;&lt; endl;
+    fout1.close();
+
+    // الإضافة إلى نهاية الملف (بدون مسح)
+    ofstream fout2("test.txt", ios::app);
+    fout2 &lt;&lt; "سطر مضاف في النهاية" &lt;&lt; endl;
+    fout2.close();
+
+    // فتح للقراءة والكتابة معاً
+    fstream file("data.txt", ios::in | ios::out | ios::trunc);
+    if (file.is_open()) {
+        file &lt;&lt; "بيانات جديدة" &lt;&lt; endl;
+        file.seekg(0);  // العودة للبداية للقراءة
+        string content;
+        getline(file, content);
+        cout &lt;&lt; content &lt;&lt; endl;
+        file.close();
+    }
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 4. قراءة أنواع مختلفة من البيانات -->
+        <h2 class="main-title"><i class="fas fa-stream"></i> 4. قراءة وكتابة أنواع مختلفة</h2>
+
+        <h3 class="sub-title"><i class="fas fa-words"></i> قراءة كلمة بكلمة</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">ifstream inFile("words.txt");
+string word;
+while (inFile >> word) {  // تقرأ كلمة (حتى أول مسافة)
+    cout &lt;&lt; "كلمة: " &lt;&lt; word &lt;&lt; endl;
+}</code></pre>
+        </div>
+
+        <h3 class="sub-title"><i class="fas fa-grip-lines"></i> قراءة سطر بسطر</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">ifstream inFile("lines.txt");
+string line;
+while (getline(inFile, line)) {
+    cout &lt;&lt; "سطر: " &lt;&lt; line &lt;&lt; endl;
+}</code></pre>
+        </div>
+
+        <h3 class="sub-title"><i class="fas fa-table"></i> قراءة بيانات منظمة (مثل CSV)</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;sstream&gt;  // لـ stringstream
+
+struct Student {
+    string name;
+    int age;
+    double gpa;
+};
+
+int main() {
+    ifstream inFile("students.txt");
+    vector&lt;Student&gt; students;
+    string line;
+
+    while (getline(inFile, line)) {
+        stringstream ss(line);
+        Student s;
+        string token;
+
+        getline(ss, s.name, ',');  // قراءة حتى الفاصلة
+        getline(ss, token, ',');
+        s.age = stoi(token);
+        getline(ss, token, ',');
+        s.gpa = stod(token);
+
+        students.push_back(s);
+    }
+
+    for (const auto& s : students) {
+        cout &lt;&lt; s.name &lt;&lt; ", " &lt;&lt; s.age &lt;&lt; ", " &lt;&lt; s.gpa &lt;&lt; endl;
+    }
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 5. الملفات الثنائية (Binary Files) -->
+        <h2 class="main-title"><i class="fas fa-binary"></i> 5. الملفات الثنائية (Binary Files)</h2>
+        <p>الملفات الثنائية تخزن البيانات بنفس تمثيلها في الذاكرة، مما يوفر مساحة وسرعة أكبر. تستخدم الدوال <code>read()</code> و <code>write()</code>.</p>
+
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;fstream&gt;
+using namespace std;
+
+struct Person {
+    char name[50];
+    int age;
+    double salary;
+};
+
+int main() {
+    // كتابة هيكل إلى ملف ثنائي
+    Person p1 = {"Ahmed", 30, 5000.0};
+    ofstream outFile("person.dat", ios::binary);
+    outFile.write(reinterpret_cast&lt;char*&gt;(&p1), sizeof(Person));
+    outFile.close();
+
+    // قراءة هيكل من ملف ثنائي
+    Person p2;
+    ifstream inFile("person.dat", ios::binary);
+    inFile.read(reinterpret_cast&lt;char*&gt;(&p2), sizeof(Person));
+    inFile.close();
+
+    cout &lt;&lt; "الاسم: " &lt;&lt; p2.name &lt;&lt; ", العمر: " &lt;&lt; p2.age &lt;&lt; ", الراتب: " &lt;&lt; p2.salary &lt;&lt; endl;
+    return 0;
+}</code></pre>
+        </div>
+        <div class="warning-box">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div><strong>تحذير:</strong> استخدام <code>reinterpret_cast</code> يتطلب حذراً. تأكد من أن الهيكل لا يحتوي على مؤشرات أو أنواع معقدة.</div>
+        </div>
+
+        <!-- 6. التحقق من حالة الملف -->
+        <h2 class="main-title"><i class="fas fa-check-circle"></i> 6. التحقق من حالة الملف</h2>
+        <p>توفر كائنات الملف دوالاً للتحقق من حالتها:</p>
+        <div class="elegant-table">
+            <table>
+                <tr><th>الدالة</th><th>الوصف</th></tr>
+                <tr><td>is_open()</td><td>ترجع true إذا كان الملف مفتوحاً بنجاح.</td></tr>
+                <tr><td>good()</td><td>ترجع true إذا كانت العملية السابقة ناجحة ولا يوجد خطأ.</td></tr>
+                <tr><td>fail()</td><td>ترجع true إذا فشلت العملية السابقة (خطأ قابل للاسترجاع).</td></tr>
+                <tr><td>bad()</td><td>ترجع true إذا حدث خطأ جسيم (غير قابل للاسترجاع).</td></tr>
+                <tr><td>eof()</td><td>ترجع true إذا تم الوصول إلى نهاية الملف.</td></tr>
+                <tr><td>clear()</td><td>تعيد ضبط حالة الخطأ.</td></tr>
+            </table>
+        </div>
+        <div class="code-box">
+            <pre><code class="language-cpp">ifstream file("test.txt");
+if (!file.is_open()) {
+    cerr &lt;&lt; "فشل فتح الملف" &lt;&lt; endl;
+    return 1;
+}
+
+int x;
+file >> x;
+if (file.fail()) {
+    cout &lt;&lt; "فشل في القراءة (خطأ في التنسيق)" &lt;&lt; endl;
+    file.clear();  // إعادة ضبط حالة الخطأ
+}
+
+if (file.eof()) {
+    cout &lt;&lt; "وصلنا إلى نهاية الملف" &lt;&lt; endl;
+}</code></pre>
+        </div>
+
+        <!-- 7. التحرك داخل الملف (Seeking) -->
+        <h2 class="main-title"><i class="fas fa-arrows-alt-h"></i> 7. التحرك داخل الملف (Seeking)</h2>
+        <p>يمكنك التحرك إلى مواقع محددة في الملف باستخدام <code>seekg()</code> (للقراءة) و <code>seekp()</code> (للكتابة).</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;fstream&gt;
+using namespace std;
+
+int main() {
+    fstream file("data.txt", ios::in | ios::out | ios::trunc);
+    file &lt;&lt; "0123456789";
+
+    // التحرك إلى الموقع 5 للقراءة
+    file.seekg(5, ios::beg);  // من بداية الملف
+    char ch;
+    file.get(ch);
+    cout &lt;&lt; "الحرف في الموقع 5: " &lt;&lt; ch &lt;&lt; endl;  // '5'
+
+    // التحرك من الموضع الحالي
+    file.seekg(-2, ios::cur);  // رجوع خطوتين
+    file.get(ch);
+    cout &lt;&lt; "الحرف بعد الرجوع: " &lt;&lt; ch &lt;&lt; endl;  // '4'
+
+    // التحرك من نهاية الملف
+    file.seekg(-3, ios::end);
+    file.get(ch);
+    cout &lt;&lt; "الحرف الثالث من النهاية: " &lt;&lt; ch &lt;&lt; endl;  // '7'
+
+    // معرفة الموقع الحالي
+    streampos pos = file.tellg();
+    cout &lt;&lt; "الموقع الحالي: " &lt;&lt; pos &lt;&lt; endl;
+
+    file.close();
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- تطبيقات عملية -->
+        <h2 class="sub-title"><i class="fas fa-flask"></i> تطبيقات عملية</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2.2rem; margin: 3rem 0;">
+            <div style="flex: 1 1 300px; background: #1f5f7f; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-copy"></i> نسخ ملف</h4>
+                <pre style="background:#1a2f3f; color:#f0e6d2; padding:1.2rem; border-radius:2rem; direction:ltr;">ifstream src("source.txt");
+ofstream dst("dest.txt");
+dst &lt;&lt; src.rdbuf();  // نسخ كامل</pre>
+            </div>
+            <div style="flex: 1 1 300px; background: #1f5f7f; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-chart-line"></i> إحصائيات ملف</h4>
+                <pre style="background:#1a2f3f; color:#f0e6d2; padding:1.2rem; border-radius:2rem; direction:ltr;">ifstream file("text.txt");
+int lines = 0, words = 0, chars = 0;
+string line;
+while (getline(file, line)) {
+    lines++;
+    chars += line.length();
+    // عد الكلمات...
+}</pre>
+            </div>
+        </div>
+
+        <!-- تمرين شامل -->
+        <div style="background: #1f6f9e; border-radius: 3.5rem; padding: 2.8rem; margin: 3.5rem 0;">
+            <h3 style="font-size: 2.4rem; color: #ffffff;"><i class="fas fa-pen"></i> تمرين: اكتب برنامجاً يقرأ ملفاً نصياً (input.txt)، ويقوم بتحويل جميع الأحرف إلى uppercase، ويكتب النتيجة في ملف آخر (output.txt).</h3>
+            <details style="margin-top:2rem; background: #1f3f55; border-radius: 2.5rem; padding: 1.8rem;">
+                <summary style="color:#c0e4ff;"><i class="fas fa-lightbulb"></i> عرض الحل</summary>
+                <pre style="direction:ltr; background:#1a2f3f; color:#f0e6d2; padding:1.5rem;">#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;cctype&gt;  // for toupper
+using namespace std;
+
+int main() {
+    ifstream inFile("input.txt");
+    ofstream outFile("output.txt");
+
+    if (!inFile) {
+        cerr &lt;&lt; "خطأ في فتح ملف الإدخال" &lt;&lt; endl;
+        return 1;
+    }
+    if (!outFile) {
+        cerr &lt;&lt; "خطأ في فتح ملف الإخراج" &lt;&lt; endl;
+        return 1;
+    }
+
+    char ch;
+    while (inFile.get(ch)) {
+        outFile.put(toupper(ch));
+    }
+
+    cout &lt;&lt; "تمت المعالجة بنجاح." &lt;&lt; endl;
+    inFile.close();
+    outFile.close();
+    return 0;
+}</pre>
+            </details>
+        </div>
+
+        <!-- خاتمة وأفضل الممارسات -->
+        <div style="background: #1f5f7f; border-radius: 3.5rem; padding: 2.8rem; margin-top: 3.5rem;">
+            <i class="fas fa-crown" style="font-size: 3rem; float: right; margin-left: 2rem; color:#ffd966;"></i>
+            <h3 style="font-size:2.5rem; margin-bottom:1.5rem; color:#ffffff;">أفضل الممارسات في التعامل مع الملفات</h3>
+            <ul style="list-style: none; columns: 2; column-gap: 3rem; font-size:1.3rem; color:#e0f0ff;">
+                <li><i class="fas fa-check-circle" style="color:#7ac6ff;"></i> تحقق دائماً من نجاح فتح الملف قبل استخدامه.</li>
+                <li><i class="fas fa-check-circle" style="color:#7ac6ff;"></i> أغلق الملف بعد الانتهاء (أو استخدم النطاق التلقائي).</li>
+                <li><i class="fas fa-check-circle" style="color:#7ac6ff;"></i> استخدم أوضاع الفتح المناسبة (ios::app للإضافة).</li>
+                <li><i class="fas fa-check-circle" style="color:#7ac6ff;"></i> تعامل مع الأخطاء بشكل مناسب (تحقق من fail(), bad(), eof()).</li>
+                <li><i class="fas fa-check-circle" style="color:#7ac6ff;"></i> للبيانات المنظمة، فكر في استخدام مكتبات مثل JSON أو XML.</li>
+                <li><i class="fas fa-check-circle" style="color:#7ac6ff;"></i> تذكر أن الملفات النصية قابلة للقراءة البشرية، بينما الثنائية أكثر كفاءة.</li>
+            </ul>
+        </div>
+
+        <!-- تذييل -->
+        <div class="page-footer">
+            <span class="footer-badge"><i class="fas fa-copyright"></i> ++C File I/O</span>
+            <span><i class="fas fa-file"></i> ifstream / ofstream / fstream</span>
+            <span><i class="fas fa-check-double"></i> قراءة وكتابة الملفات</span>
+        </div>
+
+    </div> <!-- glass-panel -->
+</div> <!-- wrapper -->
+<script>Prism.highlightAll();</script>
+</body>
+</html>

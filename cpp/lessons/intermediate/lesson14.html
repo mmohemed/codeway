@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>++C إدارة الذاكرة الديناميكية في لغة | شرح شامل ومتكامل</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(145deg, #0b1f2f, #132c41);
+            color: #e3f0fd;
+            line-height: 1.7;
+            padding: 2rem 1.8rem;
+            direction: rtl;
+        }
+
+        .page {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الحاوية الرئيسية بتأثير زجاجي داكن */
+        .glass-panel {
+            background: rgba(18, 38, 58, 0.75);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-radius: 5rem;
+            box-shadow: 0 45px 90px -20px #000000, 0 0 0 2px rgba(100, 180, 255, 0.15);
+            padding: 3.2rem 3.8rem;
+            border: 1px solid rgba(70, 150, 220, 0.3);
+        }
+
+        /* الرأس */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 4.2rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #8ecaff, #b8dcff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero h1 i {
+            background: #1f5e9e;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 130px;
+            font-size: 2.8rem;
+            -webkit-text-fill-color: white;
+            box-shadow: 0 18px 35px #0a1e32;
+        }
+
+        .hero-sub {
+            font-size: 1.7rem;
+            font-weight: 500;
+            background: #1e4569cc;
+            padding: 0.9rem 3.2rem;
+            border-radius: 90px;
+            display: inline-block;
+            margin-top: 1.6rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid #4790dd;
+            color: #e1f0ff;
+        }
+
+        /* شبكة تمهيدية */
+        .grid-intro {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .grid-item {
+            background: rgba(18, 45, 70, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 3.2rem;
+            padding: 2.3rem 2.2rem;
+            border: 1px solid rgba(80, 160, 240, 0.4);
+            box-shadow: 0 20px 40px -15px #00000080;
+            transition: 0.3s;
+        }
+
+        .grid-item:hover {
+            background: #1b3e60e0;
+            transform: translateY(-8px);
+            border-color: #6ab0ff;
+        }
+
+        .item-icon {
+            background: #216bb0;
+            width: 85px;
+            height: 85px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            color: white;
+            margin-bottom: 1.7rem;
+        }
+
+        .grid-item h3 {
+            font-size: 2.3rem;
+            font-weight: 700;
+            color: #b5dcff;
+            margin-bottom: 1.2rem;
+        }
+
+        .grid-item p {
+            font-size: 1.25rem;
+            color: #cce5ff;
+        }
+
+        /* عناوين رئيسية */
+        .main-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 4rem 0 2.5rem 0;
+            position: relative;
+            display: inline-block;
+            color: #d6ecff;
+        }
+        .main-title:after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            right: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #2f7ec9, #68acf0, #b2d9ff);
+            border-radius: 10px;
+        }
+
+        .sub-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 3rem 0 2rem 0;
+            color: #b5dbff;
+            border-right: 12px solid #3d93e6;
+            padding-right: 2rem;
+        }
+
+        /* كتلة الكود */
+        .code-box {
+            background: #0b1f30;
+            border-radius: 3.2rem;
+            padding: 2.5rem;
+            margin: 2.8rem 0;
+            box-shadow: 0 30px 45px -18px #000000, inset 0 1px 12px #357ec7;
+            border: 1px solid #2c6da0;
+        }
+
+        .code-box pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+            color: #e2eef9;
+        }
+
+        /* بطاقات مميزة */
+        .highlight-box {
+            background: linear-gradient(115deg, #113a5a, #16538a);
+            color: white;
+            border-radius: 3.2rem;
+            padding: 2.5rem 3.2rem;
+            margin: 3rem 0;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            box-shadow: 0 28px 45px -15px #000000b3;
+        }
+
+        .highlight-box i {
+            font-size: 3.5rem;
+            color: #ffdc9c;
+        }
+
+        .highlight-box p {
+            font-size: 1.35rem;
+            font-weight: 500;
+        }
+
+        .warning-box {
+            background: #2a1f1f;
+            border-right: 12px solid #e67e22;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #ffdeb4;
+        }
+
+        .warning-box i {
+            font-size: 3rem;
+            color: #f39c12;
+        }
+
+        /* جدول أنيق */
+        .elegant-table {
+            background: #102f48ef;
+            backdrop-filter: blur(6px);
+            border-radius: 3.5rem;
+            overflow: hidden;
+            margin: 3.2rem 0;
+            border: 1px solid #3c84c0;
+        }
+
+        .elegant-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.25rem;
+            color: #e1f0ff;
+        }
+
+        .elegant-table th {
+            background: #1b5a94;
+            color: white;
+            font-weight: 700;
+            padding: 1.6rem 1.2rem;
+            font-size: 1.6rem;
+        }
+
+        .elegant-table td {
+            padding: 1.6rem 1.8rem;
+            border-bottom: 1px solid #26659b;
+            color: #d4ecff;
+        }
+
+        .elegant-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .elegant-table td:first-child {
+            background: #123f62;
+            font-weight: 700;
+            width: 35%;
+        }
+
+        /* تذييل */
+        .page-footer {
+            margin-top: 5.5rem;
+            padding-top: 3rem;
+            border-top: 5px solid #266aa0;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #b9dbff;
+            font-size: 1.25rem;
+        }
+
+        .footer-badge {
+            background: #1a6196;
+            color: white;
+            padding: 0.6rem 2.2rem;
+            border-radius: 70px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .glass-panel { padding: 2rem; }
+            .hero h1 { font-size: 2.8rem; }
+            .main-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="glass-panel">
+
+        <!-- الرأس -->
+        <div class="hero">
+            <h1>
+                <i class="fas fa-memory"></i>
+                إدارة الذاكرة الديناميكية في ++C
+                <i class="fas fa-dharmachakra"></i>
+            </h1>
+            <div class="hero-sub">
+                <i class="fas fa-microchip"></i> new / delete – التحكم اليدوي بالذاكرة
+            </div>
+        </div>
+
+        <!-- بطاقات تعريفية -->
+        <div class="grid-intro">
+            <div class="grid-item">
+                <div class="item-icon"><i class="fas fa-stack-overflow"></i></div>
+                <h3>ذاكرة الكومة (Heap)</h3>
+                <p>منطقة ذاكرة كبيرة تُدار يدوياً، تتيح إنشاء متغيرات تستمر بعد انتهاء الدوال.</p>
+            </div>
+            <div class="grid-item">
+                <div class="item-icon"><i class="fas fa-hand-holding"></i></div>
+                <h3>تحكم كامل</h3>
+                <p>المبرمج مسؤول عن تخصيص (new) وتحرير (delete) الذاكرة في الوقت المناسب.</p>
+            </div>
+            <div class="grid-item">
+                <div class="item-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <h3>مسؤولية كبيرة</h3>
+                <p>سوء الإدارة يؤدي إلى تسرب الذاكرة (memory leak) أو تعطل البرنامج.</p>
+            </div>
+        </div>
+
+        <!-- 1. الفرق بين Stack و Heap -->
+        <h2 class="main-title"><i class="fas fa-balance-scale"></i> 1. الذاكرة: Stack vs Heap</h2>
+        <div class="elegant-table">
+            <table>
+                <tr><th>الخاصية</th><th>المكدس (Stack)</th><th>الكومة (Heap)</th></tr>
+                <tr><td>الحجم</td><td>صغير نسبياً (عادة ~1-8 ميجابايت)</td><td>كبير (يعتمد على الذاكرة الفعلية)</td></tr>
+                <tr><td>السرعة</td><td>سريع جداً (تخصيص متتابع)</td><td>أبطأ (تحتاج بحث عن كتلة مناسبة)</td></tr>
+                <tr><td>إدارة الذاكرة</td><td>تلقائية (بخروج الدالة تتحرر)</td><td>يدوية (يجب استخدام delete)</td></tr>
+                <tr><td>عمر المتغير</td><td>أثناء تنفيذ الدالة فقط</td><td>حتى يتم تحريره يدوياً</td></tr>
+                <tr><td>الوصول</td><td>متغيرات محلية</td><td>مؤشرات تشير إلى عناوين</td></tr>
+            </table>
+        </div>
+
+        <!-- 2. العمليات الأساسية: new و delete -->
+        <h2 class="main-title"><i class="fas fa-plus-circle"></i> 2. التخصيص والتحرير: new / delete</h2>
+        <p style="font-size:1.3rem;">تخصيص متغير واحد أو مصفوفة على الكومة باستخدام <code>new</code>، وتحرير الذاكرة بـ <code>delete</code>.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">// تخصيص متغير واحد
+int *p = new int;      // تخصيص مساحة لعدد صحيح
+*p = 42;               // تعيين قيمة
+cout &lt;&lt; *p;            // استخدام القيمة
+delete p;              // تحرير الذاكرة (لا تنسى!)
+
+// تخصيص مع التهيئة
+int *q = new int(100); // تخصيص وتهيئة بالقيمة 100
+
+// تخصيص مصفوفة
+int *arr = new int[10]; // مصفوفة من 10 أعداد
+for(int i = 0; i < 10; i++) arr[i] = i;
+delete[] arr;           // تحرير مصفوفة (استخدم [])
+
+// تخصيص مصفوفة مع تهيئة (C++11)
+int *arr2 = new int[5]{1, 2, 3, 4, 5};</code></pre>
+        </div>
+        <div class="warning-box">
+            <i class="fas fa-skull-crosswalk"></i>
+            <div><strong>خطر كبير:</strong> كل <code>new</code> يجب أن يقابله <code>delete</code>، وكل <code>new[]</code> يقابله <code>delete[]</code>. الخلط يؤدي إلى سلوك غير محدد.</div>
+        </div>
+
+        <!-- 3. تسرب الذاكرة (Memory Leak) -->
+        <h2 class="main-title"><i class="fas fa-tint"></i> 3. تسرب الذاكرة (Memory Leak)</h2>
+        <p>يحدث عندما تفقد المؤشر إلى ذاكرة مخصصة دون تحريرها. يظل الجزء محجوزاً حتى إغلاق البرنامج.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">void createLeak() {
+    int *p = new int(5);
+    // ننسى delete p; -> تسرب!
+} // عند الخروج من الدالة، المؤشر p يختفي لكن الذاكرة لا تزال محجوزة
+
+int main() {
+    while(true) {
+        int *x = new int(10);
+        // بدون delete، يستهلك البرنامج ذاكرة حتى الانهيار
+    }
+    return 0;
+}</code></pre>
+        </div>
+        <div class="highlight-box">
+            <i class="fas fa-lightbulb"></i>
+            <p><strong>نصيحة ذهبية:</strong> استخدم المؤشرات الذكية (smart pointers) في ++C الحديثة لتجنب التسريبات.</p>
+        </div>
+
+        <!-- 4. المؤشرات البرية (Dangling Pointers) -->
+        <h2 class="main-title"><i class="fas fa-skull"></i> 4. المؤشرات البرية (Dangling Pointers)</h2>
+        <p>مؤشر يشير إلى ذاكرة تم تحريرها. استخدامه يؤدي إلى نتائج كارثية.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">int *p = new int(42);
+delete p;
+// p الآن "مؤشر بري" (dangling)
+cout &lt;&lt; *p; // سلوك غير متوقع (قد ينهار البرنامج)
+
+// الحل: تعيين المؤشر إلى nullptr بعد الحذف
+delete p;
+p = nullptr;
+
+if (p != nullptr) { // آمن
+    cout &lt;&lt; *p;
+}</code></pre>
+        </div>
+
+        <!-- 5. new و delete مع الهياكل والأشياء -->
+        <h2 class="main-title"><i class="fas fa-cubes"></i> 5. تخصيص الهياكل والكائنات</h2>
+        <div class="code-box">
+            <pre><code class="language-cpp">struct Student {
+    string name;
+    int age;
+    double gpa;
+};
+
+int main() {
+    // تخصيص هيكل على الكومة
+    Student *s1 = new Student;
+    s1->name = "أحمد";
+    s1->age = 22;
+    s1->gpa = 3.8;
+
+    // تخصيص مع تهيئة باستخدام {}
+    Student *s2 = new Student {"فاطمة", 21, 3.9};
+
+    cout &lt;&lt; s2->name;
+    delete s1;  // تحرير
+    delete s2;
+
+    // تخصيص مصفوفة من الهياكل
+    Student *classroom = new Student[3];
+    classroom[0].name = "سعيد";
+    // ...
+    delete[] classroom;
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 6. المؤشرات الذكية (Smart Pointers) مقدمة -->
+        <h2 class="main-title"><i class="fas fa-shield-alt"></i> 6. المؤشرات الذكية (C++11+)</h2>
+        <p>أغلفة (wrappers) تدير الذاكرة تلقائياً. موجودة في <code>&lt;memory&gt;</code>. الأنواع الرئيسية: <code>unique_ptr</code>, <code>shared_ptr</code>, <code>weak_ptr</code>.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;memory&gt;
+
+int main() {
+    // unique_ptr: ملكية حصرية
+    std::unique_ptr&lt;int&gt; uptr(new int(50));
+    cout &lt;&lt; *uptr;   // 50
+    // لا تحتاج delete، تتحرر تلقائياً عند الخروج من النطاق
+
+    // shared_ptr: ملكية مشتركة (عد مرجعي)
+    std::shared_ptr&lt;int&gt; sptr1 = std::make_shared&lt;int&gt;(100);
+    std::shared_ptr&lt;int&gt; sptr2 = sptr1; // الآن العد = 2
+    // عندما يخرج آخر shared_ptr من النطاق، تتحرر الذاكرة.
+
+    // make_unique (C++14) و make_shared أفضل (أمان استثنائي)
+    auto u = std::make_unique&lt;double&gt;(3.14);
+    auto s = std::make_shared&lt;string&gt;("مرحبا");
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- 7. عمليات متقدمة: placement new -->
+        <h2 class="sub-title"><i class="fas fa-map-pin"></i> 7. Placement new (بناء في موقع محدد)</h2>
+        <p>يسمح ببناء كائن في ذاكرة موجودة مسبقاً. نادر الاستخدام لكنه مفيد في الأنظمة المضمنة.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">#include &lt;new&gt;  // لازم
+
+char buffer[sizeof(int) * 10];  // ذاكرة خام
+
+int main() {
+    // بناء int في بداية buffer
+    int *p = new (buffer) int(42);
+    cout &lt;&lt; *p;
+    // لا تستخدم delete هنا، فقط استدعِ المدمر إذا لزم الأمر
+    // p->~int();  // تدمير يدوي
+    return 0;
+}</code></pre>
+        </div>
+
+        <!-- تطبيقات عملية -->
+        <h2 class="sub-title"><i class="fas fa-flask"></i> تطبيقات عملية</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2.2rem; margin: 3rem 0;">
+            <div style="flex: 1 1 300px; background: #123a57; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-arrows-alt-v"></i> مصفوفة ديناميكية ثنائية الأبعاد</h4>
+                <pre style="background:#0b1f2e; color:#daf0ff; padding:1.2rem; border-radius:2rem; direction:ltr;">int rows=3, cols=4;
+int **matrix = new int*[rows];
+for(int i=0; i<rows; i++)
+    matrix[i] = new int[cols];
+// ... استخدام
+for(int i=0; i<rows; i++)
+    delete[] matrix[i];
+delete[] matrix;</pre>
+            </div>
+            <div style="flex: 1 1 300px; background: #123a57; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-link"></i> قائمة مرتبطة بسيطة</h4>
+                <pre style="background:#0b1f2e; color:#daf0ff; padding:1.2rem; border-radius:2rem; direction:ltr;">struct Node {
+    int data;
+    Node* next;
+    Node(int d) : data(d), next(nullptr) {}
+};
+Node* head = new Node(5);
+head->next = new Node(10);
+// ... يجب تحرير جميع العقد لاحقاً</pre>
+            </div>
+        </div>
+
+        <!-- تمرين شامل -->
+        <div style="background: #1a4569; border-radius: 3.5rem; padding: 2.8rem; margin: 3.5rem 0;">
+            <h3 style="font-size: 2.4rem; color: #ffffff;"><i class="fas fa-pen"></i> تمرين: اكتب دالة تنشئ مصفوفة ديناميكية من الأعداد الصحيحة بحجم يُمرر لها، وتعطيها قيماً تصاعدية. ثم اكتب دالة لتحريرها.</h3>
+            <details style="margin-top:2rem; background: #0f2f48; border-radius: 2.5rem; padding: 1.8rem;">
+                <summary style="color:#aad0ff;"><i class="fas fa-lightbulb"></i> عرض الحل</summary>
+                <pre style="direction:ltr; background:#0b1f30; color:#fff; padding:1.5rem;">#include &lt;iostream&gt;
+using namespace std;
+
+int* createArray(int size) {
+    int* arr = new int[size];
+    for(int i = 0; i < size; i++)
+        arr[i] = i + 1;  // 1,2,3,...
+    return arr;
+}
+
+void freeArray(int* arr) {
+    delete[] arr;
+}
+
+int main() {
+    int n = 10;
+    int* myArray = createArray(n);
+    for(int i=0; i<n; i++) cout << myArray[i] << " ";
+    freeArray(myArray);
+    myArray = nullptr; // تجنب المؤشر البري
+    return 0;
+}</pre>
+            </details>
+        </div>
+
+        <!-- خاتمة وأفضل الممارسات -->
+        <div style="background: #0f3150; border-radius: 3.5rem; padding: 2.8rem; margin-top: 3.5rem;">
+            <i class="fas fa-crown" style="font-size: 3rem; float: right; margin-left: 2rem; color:#ffd966;"></i>
+            <h3 style="font-size:2.5rem; margin-bottom:1.5rem; color:#ffffff;">أفضل الممارسات</h3>
+            <ul style="list-style: none; columns: 2; column-gap: 3rem; font-size:1.3rem; color:#d0ebff;">
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> استخدم <code>new</code>/<code>delete</code> فقط عند الضرورة.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> في ++C الحديثة، استخدم المؤشرات الذكية (smart pointers).</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> بعد <code>delete</code>، اجعل المؤشر <code>nullptr</code>.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> طابق <code>new</code> مع <code>delete</code> و <code>new[]</code> مع <code>delete[]</code>.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> تجنب تخصيص الذاكرة داخل الدوال دون توثيق المسؤولية.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> استخدم <code>std::vector</code> بدل المصفوفات الديناميكية اليدوية.</li>
+            </ul>
+        </div>
+
+        <!-- تذييل -->
+        <div class="page-footer">
+            <span class="footer-badge"><i class="fas fa-copyright"></i> ++C Standard</span>
+            <span><i class="fas fa-memory"></i> الإصدار 7.0 – الذاكرة الديناميكية</span>
+            <span><i class="fas fa-shield"></i> المؤشرات الذكية</span>
+        </div>
+
+    </div> <!-- glass-panel -->
+</div> <!-- page -->
+<script>Prism.highlightAll();</script>
+</body>
+</html>

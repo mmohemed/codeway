@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeWay | العوامل الحسابية والمنطقية في C++</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Prism.js لتلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0f1e 0%, #1a1f35 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(145deg, #0b1120cc 0%, #1e2740cc 100%);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 5%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border: 2px solid #ffd700;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .header-content {
+            text-align: center;
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-content h1 span {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* شريط التقدم */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* عنوان الصفحة */
+        .page-header {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* جدول المحتويات */
+        .table-of-contents {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .table-of-contents h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: rgba(255, 215, 0, 0.15);
+            transform: translateX(-5px);
+        }
+
+        .toc-item i {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .toc-item a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .toc-item:hover a {
+            color: #ffd700;
+        }
+
+        /* أقسام الشرح */
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 30px;
+            padding: 3rem;
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, transparent);
+        }
+
+        .section h3 {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin: 2rem 0 1rem;
+        }
+
+        .section p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* صناديق الكود */
+        .code-box {
+            background: #1a1f2e;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .code-header span {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+        }
+
+        pre {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            background: transparent !important;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 1rem !important;
+        }
+
+        /* شرح الكود */
+        .code-explanation {
+            background: rgba(255, 215, 0, 0.03);
+            border-right: 3px solid #ffd700;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .code-explanation p {
+            margin: 0.5rem 0;
+        }
+
+        .code-explanation i {
+            color: #ffd700;
+            margin-left: 0.5rem;
+        }
+
+        /* جداول العوامل */
+        .operators-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .operators-table th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .operators-table td {
+            padding: 1rem;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            text-align: center;
+        }
+
+        .operators-table tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .operator-symbol {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        /* بطاقات العوامل */
+        .operators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .operator-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .operator-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .operator-card h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .operator-example {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* صندوق النتائج */
+        .result-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .result-box h4 {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        /* التمارين التفاعلية */
+        .exercise-box {
+            background: linear-gradient(145deg, #1e2740, #0b1120);
+            border: 1px solid #ffd700;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .exercise-box h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .exercise-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            color: #e0e0e0;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .exercise-btn {
+            background: #ffd700;
+            color: #0a0f1e;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0;
+        }
+
+        .exercise-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .exercise-output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace;
+            min-height: 60px;
+        }
+
+        /* جدول أولويات العمليات */
+        .precedence-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+
+        .precedence-table th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 1rem;
+        }
+
+        .precedence-table td {
+            padding: 1rem;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .precedence-table tr:first-child td {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        /* أزرار التنقل */
+        .lesson-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+        }
+
+        .nav-lesson-btn {
+            background: transparent;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-lesson-btn:hover {
+            background: #ffd700;
+            color: #0a0f1e;
+            transform: translateX(-5px);
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            background: linear-gradient(145deg, #0b1120cc, #1a1f35cc);
+            backdrop-filter: blur(10px);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: #b0b0b0;
+            text-decoration: none;
+            display: block;
+            margin: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffd700;
+        }
+
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0f1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffaa00;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .section {
+                padding: 2rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-content {
+                margin: 0.5rem 0;
+            }
+
+            .operators-table {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">CodeWay</a>
+            <div class="header-content">
+                <h1>شرح <span>العوامل الحسابية والمنطقية</span> في C++</h1>
+            </div>
+            <div style="width: 100px;"></div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- رأس الصفحة -->
+        <div class="page-header">
+            <h1>العوامل الحسابية والمنطقية</h1>
+            <p>تعلم كيفية استخدام العوامل الحسابية والمنطقية في لغة C++ مع شرح مفصل وأمثلة عملية</p>
+        </div>
+
+        <!-- جدول المحتويات -->
+        <div class="table-of-contents">
+            <h2><i class="fas fa-list"></i> محتويات الدرس</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <i class="fas fa-calculator"></i>
+                    <a href="#arithmetic">العوامل الحسابية</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-plus-circle"></i>
+                    <a href="#assignment">عوامل الإسناد</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-plus-minus"></i>
+                    <a href="#increment">الزيادة والنقصان</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-brain"></i>
+                    <a href="#logical">العوامل المنطقية</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-greater-than"></i>
+                    <a href="#relational">عوامل المقارنة</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-sort-amount-up"></i>
+                    <a href="#precedence">أولويات العمليات</a>
+                </div>
+                <div class="toc-item">
+                    <i class="fas fa-tasks"></i>
+                    <a href="#exercises">تمارين وتطبيقات</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم العوامل الحسابية -->
+        <section id="arithmetic" class="section">
+            <h2>العوامل الحسابية (Arithmetic Operators)</h2>
+            <p>تستخدم العوامل الحسابية لإجراء العمليات الرياضية الأساسية على الأرقام.</p>
+
+            <table class="operators-table">
+                <tr>
+                    <th>العامل</th>
+                    <th>الوصف</th>
+                    <th>مثال</th>
+                    <th>النتيجة</th>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">+</span></td>
+                    <td>الجمع</td>
+                    <td>5 + 3</td>
+                    <td>8</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">-</span></td>
+                    <td>الطرح</td>
+                    <td>10 - 4</td>
+                    <td>6</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">*</span></td>
+                    <td>الضرب</td>
+                    <td>6 * 7</td>
+                    <td>42</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">/</span></td>
+                    <td>القسمة</td>
+                    <td>15 / 4</td>
+                    <td>3.75</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">%</span></td>
+                    <td>الباقي (Modulus)</td>
+                    <td>17 % 5</td>
+                    <td>2</td>
+                </tr>
+            </table>
+
+            <h3>أمثلة عملية:</h3>
+            
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 1: العمليات الحسابية الأساسية</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int a = 15, b = 4;
+    
+    cout &lt;&lt; "a = " &lt;&lt; a &lt;&lt; ", b = " &lt;&lt; b &lt;&lt; endl;
+    cout &lt;&lt; "الجمع: " &lt;&lt; a + b &lt;&lt; endl;
+    cout &lt;&lt; "الطرح: " &lt;&lt; a - b &lt;&lt; endl;
+    cout &lt;&lt; "الضرب: " &lt;&lt; a * b &lt;&lt; endl;
+    cout &lt;&lt; "القسمة: " &lt;&lt; a / b &lt;&lt; endl;  // ناتج قسمة عددين صحيحين
+    cout &lt;&lt; "الباقي: " &lt;&lt; a % b &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-explanation">
+                <p><i class="fas fa-info-circle"></i> <strong>ملاحظات مهمة:</strong></p>
+                <p>1. عند قسمة عددين صحيحين، تكون النتيجة عدداً صحيحاً (يتم تجاهل الكسور)</p>
+                <p>2. عامل الباقي % يعمل فقط مع الأعداد الصحيحة</p>
+                <p>3. للحصول على ناتج قسمة دقيق، استخدم الأعداد العشرية (double/float)</p>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 2: القسمة مع الأعداد العشرية</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    double x = 15.0, y = 4.0;
+    int a = 15, b = 4;
+    
+    cout &lt;&lt; "قسمة أعداد عشرية: " &lt;&lt; x / y &lt;&lt; endl;
+    cout &lt;&lt; "قسمة أعداد صحيحة: " &lt;&lt; a / b &lt;&lt; endl;
+    cout &lt;&lt; "قسمة مع تحويل النوع: " &lt;&lt; (double)a / b &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="result-box">
+                <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                <div class="result-value">
+                    قسمة أعداد عشرية: 3.75<br>
+                    قسمة أعداد صحيحة: 3<br>
+                    قسمة مع تحويل النوع: 3.75
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم عوامل الإسناد -->
+        <section id="assignment" class="section">
+            <h2>عوامل الإسناد المركبة (Assignment Operators)</h2>
+            <p>تستخدم لاختصار العمليات الحسابية مع الإسناد في نفس الوقت.</p>
+
+            <table class="operators-table">
+                <tr>
+                    <th>العامل</th>
+                    <th>المعنى</th>
+                    <th>مثال</th>
+                    <th>يعادل</th>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">+=</span></td>
+                    <td>إضافة وإسناد</td>
+                    <td>x += 5</td>
+                    <td>x = x + 5</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">-=</span></td>
+                    <td>طرح وإسناد</td>
+                    <td>x -= 3</td>
+                    <td>x = x - 3</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">*=</span></td>
+                    <td>ضرب وإسناد</td>
+                    <td>x *= 2</td>
+                    <td>x = x * 2</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">/=</span></td>
+                    <td>قسمة وإسناد</td>
+                    <td>x /= 4</td>
+                    <td>x = x / 4</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">%=</span></td>
+                    <td>باقي وإسناد</td>
+                    <td>x %= 3</td>
+                    <td>x = x % 3</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 3: استخدام عوامل الإسناد المركبة</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int x = 10;
+    
+    cout &lt;&lt; "x = " &lt;&lt; x &lt;&lt; endl;
+    
+    x += 5;  // x = x + 5
+    cout &lt;&lt; "بعد x += 5: " &lt;&lt; x &lt;&lt; endl;
+    
+    x *= 2;  // x = x * 2
+    cout &lt;&lt; "بعد x *= 2: " &lt;&lt; x &lt;&lt; endl;
+    
+    x -= 7;  // x = x - 7
+    cout &lt;&lt; "بعد x -= 7: " &lt;&lt; x &lt;&lt; endl;
+    
+    x %= 4;  // x = x % 4
+    cout &lt;&lt; "بعد x %= 4: " &lt;&lt; x &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم الزيادة والنقصان -->
+        <section id="increment" class="section">
+            <h2>عوامل الزيادة والنقصان (Increment/Decrement)</h2>
+            <p>تستخدم لزيادة أو نقصان قيمة المتغير بمقدار 1.</p>
+
+            <div class="operators-grid">
+                <div class="operator-card">
+                    <h3><i class="fas fa-plus-circle"></i> ++ (الزيادة)</h3>
+                    <p>تزيد قيمة المتغير بمقدار 1</p>
+                    <div class="operator-example">
+                        int x = 5;<br>
+                        x++;  // x = 6<br>
+                        ++x;  // x = 7
+                    </div>
+                </div>
+                <div class="operator-card">
+                    <h3><i class="fas fa-minus-circle"></i> -- (النقصان)</h3>
+                    <p>تنقص قيمة المتغير بمقدار 1</p>
+                    <div class="operator-example">
+                        int y = 5;<br>
+                        y--;  // y = 4<br>
+                        --y;  // y = 3
+                    </div>
+                </div>
+            </div>
+
+            <h3>الفرق بين prefix و postfix:</h3>
+            
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 4: prefix vs postfix</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int a = 5, b = 5;
+    
+    // Postfix: تستخدم القيمة ثم تزيد
+    cout &lt;&lt; "postfix a++: " &lt;&lt; a++ &lt;&lt; endl;  // تطبع 5 ثم تزيد إلى 6
+    cout &lt;&lt; "قيمة a الآن: " &lt;&lt; a &lt;&lt; endl;
+    
+    // Prefix: تزيد ثم تستخدم القيمة
+    cout &lt;&lt; "prefix ++b: " &lt;&lt; ++b &lt;&lt; endl;  // تزيد إلى 6 ثم تطبع 6
+    cout &lt;&lt; "قيمة b الآن: " &lt;&lt; b &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="result-box">
+                <h4><i class="fas fa-play"></i> المخرجات:</h4>
+                <div class="result-value">
+                    postfix a++: 5<br>
+                    قيمة a الآن: 6<br>
+                    prefix ++b: 6<br>
+                    قيمة b الآن: 6
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم عوامل المقارنة -->
+        <section id="relational" class="section">
+            <h2>عوامل المقارنة (Relational Operators)</h2>
+            <p>تستخدم لمقارنة قيمتين وتنتج قيمة منطقية (true/false).</p>
+
+            <table class="operators-table">
+                <tr>
+                    <th>العامل</th>
+                    <th>الوصف</th>
+                    <th>مثال</th>
+                    <th>النتيجة</th>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">==</span></td>
+                    <td>يساوي</td>
+                    <td>5 == 5</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">!=</span></td>
+                    <td>لا يساوي</td>
+                    <td>5 != 3</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">&gt;</span></td>
+                    <td>أكبر من</td>
+                    <td>7 > 3</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">&lt;</span></td>
+                    <td>أصغر من</td>
+                    <td>4 < 8</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">&gt;=</span></td>
+                    <td>أكبر من أو يساوي</td>
+                    <td>5 >= 5</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">&lt;=</span></td>
+                    <td>أصغر من أو يساوي</td>
+                    <td>3 <= 5</td>
+                    <td>true</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 5: استخدام عوامل المقارنة</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int x = 10, y = 5;
+    
+    cout &lt;&lt; boolalpha;  // لطباعة true/false بدلاً من 1/0
+    
+    cout &lt;&lt; "x == y: " &lt;&lt; (x == y) &lt;&lt; endl;
+    cout &lt;&lt; "x != y: " &lt;&lt; (x != y) &lt;&lt; endl;
+    cout &lt;&lt; "x > y: " &lt;&lt; (x > y) &lt;&lt; endl;
+    cout &lt;&lt; "x < y: " &lt;&lt; (x < y) &lt;&lt; endl;
+    cout &lt;&lt; "x >= y: " &lt;&lt; (x >= y) &lt;&lt; endl;
+    cout &lt;&lt; "x <= y: " &lt;&lt; (x <= y) &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم العوامل المنطقية -->
+        <section id="logical" class="section">
+            <h2>العوامل المنطقية (Logical Operators)</h2>
+            <p>تستخدم لربط الشروط المنطقية وإنتاج نتائج منطقية.</p>
+
+            <table class="operators-table">
+                <tr>
+                    <th>العامل</th>
+                    <th>الوصف</th>
+                    <th>مثال</th>
+                    <th>النتيجة</th>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">&amp;&amp;</span></td>
+                    <td>و (AND)</td>
+                    <td>(5 > 3) && (2 < 4)</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">||</span></td>
+                    <td>أو (OR)</td>
+                    <td>(5 < 3) || (2 < 4)</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td><span class="operator-symbol">!</span></td>
+                    <td>نفي (NOT)</td>
+                    <td>!(5 < 3)</td>
+                    <td>true</td>
+                </tr>
+            </table>
+
+            <h3>جدول الحقيقة:</h3>
+            
+            <table class="operators-table" style="max-width: 500px; margin: 0 auto;">
+                <tr>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>A && B</th>
+                    <th>A || B</th>
+                    <th>!A</th>
+                </tr>
+                <tr>
+                    <td>true</td>
+                    <td>true</td>
+                    <td>true</td>
+                    <td>true</td>
+                    <td>false</td>
+                </tr>
+                <tr>
+                    <td>true</td>
+                    <td>false</td>
+                    <td>false</td>
+                    <td>true</td>
+                    <td>false</td>
+                </tr>
+                <tr>
+                    <td>false</td>
+                    <td>true</td>
+                    <td>false</td>
+                    <td>true</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td>false</td>
+                    <td>false</td>
+                    <td>false</td>
+                    <td>false</td>
+                    <td>true</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 6: استخدام العوامل المنطقية</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int age = 25;
+    bool hasLicense = true;
+    bool isStudent = false;
+    
+    cout &lt;&lt; boolalpha;
+    
+    // التحقق من شروط قيادة السيارة
+    bool canDrive = (age >= 18) && hasLicense;
+    cout &lt;&lt; "يمكنه القيادة: " &lt;&lt; canDrive &lt;&lt; endl;
+    
+    // التحقق من خصم الطلاب
+    bool hasDiscount = isStudent || (age >= 60);
+    cout &lt;&lt; "له خصم: " &lt;&lt; hasDiscount &lt;&lt; endl;
+    
+    // نفي الشرط
+    bool isMinor = !(age >= 18);
+    cout &lt;&lt; "قاصر: " &lt;&lt; isMinor &lt;&lt; endl;
+    
+    // شروط مركبة
+    bool condition = (age > 20) && (age < 30) && hasLicense;
+    cout &lt;&lt; "شرط مركب: " &lt;&lt; condition &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- قسم أولويات العمليات -->
+        <section id="precedence" class="section">
+            <h2>أولويات العمليات (Operator Precedence)</h2>
+            <p>تحدد أولويات العمليات الترتيب الذي يتم به تقييم التعبيرات الحسابية.</p>
+
+            <table class="precedence-table">
+                <tr>
+                    <th>الأولوية</th>
+                    <th>العامل</th>
+                    <th>الوصف</th>
+                </tr>
+                <tr>
+                    <td>1 (أعلى)</td>
+                    <td>()</td>
+                    <td>الأقواس</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>++ -- !</td>
+                    <td>الزيادة/النقصان والنفي</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>* / %</td>
+                    <td>الضرب والقسمة والباقي</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>+ -</td>
+                    <td>الجمع والطرح</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>&lt; &lt;= &gt; &gt;=</td>
+                    <td>عوامل المقارنة</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>== !=</td>
+                    <td>المساواة وعدم المساواة</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>&amp;&amp;</td>
+                    <td>الوصل المنطقي AND</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>||</td>
+                    <td>الوصل المنطقي OR</td>
+                </tr>
+                <tr>
+                    <td>9 (أدنى)</td>
+                    <td>= += -= *= /= %=</td>
+                    <td>الإسناد</td>
+                </tr>
+            </table>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span><i class="fas fa-code"></i> مثال 7: تأثير أولويات العمليات</span>
+                    <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                </div>
+                <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int a = 5, b = 3, c = 2;
+    
+    // بدون أقواس
+    int result1 = a + b * c;
+    cout &lt;&lt; "a + b * c = " &lt;&lt; result1 &lt;&lt; " (الضرب أولاً)" &lt;&lt; endl;
+    
+    // مع أقواس
+    int result2 = (a + b) * c;
+    cout &lt;&lt; "(a + b) * c = " &lt;&lt; result2 &lt;&lt; " (الجمع أولاً)" &lt;&lt; endl;
+    
+    // مثال معقد
+    int result3 = a++ * b + --c;
+    cout &lt;&lt; "a++ * b + --c = " &lt;&lt; result3 &lt;&lt; endl;
+    
+    // شرط منطقي
+    bool result4 = (a > b) && (b < c) || (a == 5);
+    cout &lt;&lt; boolalpha &lt;&lt; "نتيجة الشرط: " &lt;&lt; result4 &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+            </div>
+
+            <div class="code-explanation">
+                <p><i class="fas fa-lightbulb"></i> <strong>نصيحة:</strong> استخدم الأقواس لتوضيح أولويات العمليات وجعل الكود أكثر قابلية للقراءة، حتى عندما تكون الأولويات واضحة.</p>
+            </div>
+        </section>
+
+        <!-- تمارين تفاعلية -->
+        <section id="exercises" class="section">
+            <h2>تمارين وتطبيقات عملية</h2>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 1: آلة حاسبة متقدمة</h3>
+                <p>اكتب برنامجاً يطلب رقمين من المستخدم ويقوم بجميع العمليات الحسابية عليهم.</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;iomanip&gt;
+using namespace std;
+
+int main() {
+    double num1, num2;
+    
+    cout &lt;&lt; "أدخل الرقم الأول: ";
+    cin &gt;&gt; num1;
+    
+    cout &lt;&lt; "أدخل الرقم الثاني: ";
+    cin &gt;&gt; num2;
+    
+    cout &lt;&lt; fixed &lt;&lt; setprecision(2);
+    cout &lt;&lt; "\n=== النتائج ===\n";
+    cout &lt;&lt; num1 &lt;&lt; " + " &lt;&lt; num2 &lt;&lt; " = " &lt;&lt; num1 + num2 &lt;&lt; endl;
+    cout &lt;&lt; num1 &lt;&lt; " - " &lt;&lt; num2 &lt;&lt; " = " &lt;&lt; num1 - num2 &lt;&lt; endl;
+    cout &lt;&lt; num1 &lt;&lt; " * " &lt;&lt; num2 &lt;&lt; " = " &lt;&lt; num1 * num2 &lt;&lt; endl;
+    
+    if (num2 != 0) {
+        cout &lt;&lt; num1 &lt;&lt; " / " &lt;&lt; num2 &lt;&lt; " = " &lt;&lt; num1 / num2 &lt;&lt; endl;
+        
+        // باقي القسمة للأعداد الصحيحة فقط
+        int n1 = (int)num1, n2 = (int)num2;
+        if (n2 != 0) {
+            cout &lt;&lt; n1 &lt;&lt; " % " &lt;&lt; n2 &lt;&lt; " = " &lt;&lt; n1 % n2 &lt;&lt; endl;
+        }
+    } else {
+        cout &lt;&lt; "لا يمكن القسمة على صفر!" &lt;&lt; endl;
+    }
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <h3><i class="fas fa-puzzle-piece"></i> التمرين 2: التحقق من الشروط</h3>
+                <p>اكتب برنامجاً يتحقق من شروط معينة في رقم مدخل.</p>
+                
+                <div class="code-box">
+                    <div class="code-header">
+                        <span><i class="fas fa-code"></i> الحل</span>
+                        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                    </div>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int number;
+    
+    cout &lt;&lt; "أدخل رقماً: ";
+    cin &gt;&gt; number;
+    
+    cout &lt;&lt; boolalpha;
+    cout &lt;&lt; "\n=== نتائج التحقق ===\n";
+    cout &lt;&lt; "الرقم موجب: " &lt;&lt; (number > 0) &lt;&lt; endl;
+    cout &lt;&lt; "الرقم زوجي: " &lt;&lt; (number % 2 == 0) &lt;&lt; endl;
+    cout &lt;&lt; "الرقم يقبل القسمة على 3: " &lt;&lt; (number % 3 == 0) &lt;&lt; endl;
+    cout &lt;&lt; "الرقم بين 10 و 20: " &lt;&lt; (number > 10 && number < 20) &lt;&lt; endl;
+    cout &lt;&lt; "الرقم أقل من 0 أو أكبر من 100: " &lt;&lt; (number < 0 || number > 100) &lt;&lt; endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- تمرين تفاعلي -->
+            <div class="exercise-box">
+                <h3><i class="fas fa-laptop-code"></i> جرب بنفسك</h3>
+                <p>أدخل رقمين وجرب العمليات الحسابية والمنطقية:</p>
+                
+                <input type="number" id="num1" class="exercise-input" placeholder="أدخل الرقم الأول" value="10">
+                <input type="number" id="num2" class="exercise-input" placeholder="أدخل الرقم الثاني" value="3">
+                
+                <button class="exercise-btn" onclick="testOperators()">تشغيل العمليات</button>
+                
+                <div id="output" class="exercise-output">
+                    النتائج ستظهر هنا...
+                </div>
+            </div>
+        </section>
+
+        <!-- أزرار التنقل بين الدروس -->
+        <div class="lesson-navigation">
+            <a href="lesson-io.html" class="nav-lesson-btn">
+                <i class="fas fa-arrow-right"></i> الدرس السابق: المدخلات والمخرجات
+            </a>
+            <a href="lesson-conditionals.html" class="nav-lesson-btn">
+                الدرس التالي: الجمل الشرطية <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CodeWay</h3>
+                <p>منصة عربية متكاملة لتعليم البرمجة</p>
+            </div>
+            <div class="footer-section">
+                <h3>روابط مفيدة</h3>
+                <a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> الدروس</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> المشاريع</a>
+                <a href="#"><i class="fas fa-chevron-left"></i> عن المنصة</a>
+            </div>
+            <div class="footer-section">
+                <h3>تابعنا</h3>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+                <a href="#"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem; color: #808080;">
+            <p>© 2024 CodeWay - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+
+    <script>
+        // شريط التقدم
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress").style.width = scrolled + "%";
+        };
+
+        // نسخ الكود
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = "تم النسخ!";
+                setTimeout(() => {
+                    button.textContent = "نسخ";
+                }, 2000);
+            });
+        }
+
+        // التمرين التفاعلي
+        function testOperators() {
+            const num1 = parseFloat(document.getElementById('num1').value);
+            const num2 = parseFloat(document.getElementById('num2').value);
+            const output = document.getElementById('output');
+            
+            if (isNaN(num1) || isNaN(num2)) {
+                output.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #ff4444;"></i> الرجاء إدخال أرقام صحيحة';
+                return;
+            }
+            
+            const sum = num1 + num2;
+            const diff = num1 - num2;
+            const prod = num1 * num2;
+            const quot = num2 !== 0 ? (num1 / num2).toFixed(2) : 'غير معرف (قسمة على صفر)';
+            const mod = num2 !== 0 ? (Math.floor(num1) % Math.floor(num2)) : 'غير معرف';
+            
+            const isPositive1 = num1 > 0;
+            const isPositive2 = num2 > 0;
+            const bothPositive = isPositive1 && isPositive2;
+            const eitherPositive = isPositive1 || isPositive2;
+            
+            output.innerHTML = `
+                <i class="fas fa-calculator" style="color: #ffd700;"></i> <strong>العمليات الحسابية:</strong><br>
+                ${num1} + ${num2} = ${sum}<br>
+                ${num1} - ${num2} = ${diff}<br>
+                ${num1} × ${num2} = ${prod}<br>
+                ${num1} ÷ ${num2} = ${quot}<br>
+                ${Math.floor(num1)} % ${Math.floor(num2)} = ${mod}<br>
+                <hr style="border-color: #ffd700; margin: 10px 0;">
+                <i class="fas fa-brain" style="color: #ffd700;"></i> <strong>العمليات المنطقية:</strong><br>
+                هل الرقم الأول موجب؟ ${isPositive1}<br>
+                هل الرقم الثاني موجب؟ ${isPositive2}<br>
+                كلا الرقمين موجبين؟ ${bothPositive}<br>
+                أحدهما على الأقل موجب؟ ${eitherPositive}<br>
+                هل الرقم الأول أكبر من الثاني؟ ${num1 > num2}<br>
+                هل الرقمان متساويان؟ ${num1 === num2}
+            `;
+        }
+
+        // تمرير سلس للروابط الداخلية
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

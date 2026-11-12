@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>++C المفاهيم الأساسية OOP في لغة | شرح شامل ومتكامل</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(145deg, #0f2b40, #1a3f5c);
+            color: #e6f3ff;
+            line-height: 1.7;
+            padding: 2rem 1.8rem;
+            direction: rtl;
+        }
+
+        .wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* الحاوية الرئيسية */
+        .glass-panel {
+            background: rgba(20, 45, 70, 0.8);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-radius: 5rem;
+            box-shadow: 0 45px 90px -20px #000000, 0 0 0 2px rgba(100, 180, 255, 0.2);
+            padding: 3.2rem 3.8rem;
+            border: 1px solid rgba(70, 150, 220, 0.4);
+        }
+
+        /* الرأس */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #a0d0ff, #d4ecff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero h1 i {
+            background: #2a6fb0;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 130px;
+            font-size: 2.8rem;
+            -webkit-text-fill-color: white;
+            box-shadow: 0 18px 35px #0a1e32;
+        }
+
+        .hero-sub {
+            font-size: 1.8rem;
+            font-weight: 500;
+            background: #1e4f7acc;
+            padding: 0.9rem 3.5rem;
+            border-radius: 90px;
+            display: inline-block;
+            margin-top: 1.6rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid #5aa3ff;
+            color: #ffffff;
+        }
+
+        /* شبكة الركائز الأربع */
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.8rem;
+            margin: 4rem 0;
+        }
+
+        .pillar-item {
+            background: rgba(15, 50, 80, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 2.5rem;
+            padding: 1.8rem 1.5rem;
+            text-align: center;
+            border: 1px solid #3e87ce;
+            transition: 0.3s;
+        }
+
+        .pillar-item:hover {
+            transform: translateY(-8px);
+            background: #1d4d7ae0;
+        }
+
+        .pillar-icon {
+            background: #2d7fd1;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1.2rem;
+            color: white;
+        }
+
+        .pillar-item h3 {
+            font-size: 2rem;
+            color: #c2e2ff;
+            margin-bottom: 0.8rem;
+        }
+
+        .pillar-item p {
+            font-size: 1.1rem;
+            color: #d0e9ff;
+        }
+
+        @media (max-width: 900px) {
+            .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 500px) {
+            .pillars-grid { grid-template-columns: 1fr; }
+        }
+
+        /* عناوين رئيسية */
+        .main-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 4rem 0 2.5rem 0;
+            position: relative;
+            display: inline-block;
+            color: #d6ecff;
+        }
+        .main-title:after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            right: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #3f8ad6, #70b0f0, #b5daff);
+            border-radius: 10px;
+        }
+
+        .sub-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 3rem 0 2rem 0;
+            color: #c2e2ff;
+            border-right: 12px solid #4d9eec;
+            padding-right: 2rem;
+        }
+
+        /* كتلة الكود */
+        .code-box {
+            background: #0b1f30;
+            border-radius: 3.2rem;
+            padding: 2.5rem;
+            margin: 2.8rem 0;
+            box-shadow: 0 30px 45px -18px #000000, inset 0 1px 12px #4180c7;
+            border: 1px solid #3070aa;
+        }
+
+        .code-box pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            direction: ltr;
+            text-align: left;
+            background: transparent;
+            color: #e2eef9;
+        }
+
+        /* بطاقات مميزة */
+        .highlight-box {
+            background: linear-gradient(115deg, #154e7a, #1f66a0);
+            color: white;
+            border-radius: 3.2rem;
+            padding: 2.5rem 3.2rem;
+            margin: 3rem 0;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            box-shadow: 0 28px 45px -15px #000000b3;
+        }
+
+        .highlight-box i {
+            font-size: 3.5rem;
+            color: #ffde9e;
+        }
+
+        .highlight-box p {
+            font-size: 1.35rem;
+            font-weight: 500;
+        }
+
+        .note-box {
+            background: #1c3142;
+            border-right: 12px solid #e68a2e;
+            border-radius: 3rem;
+            padding: 2rem 2.8rem;
+            margin: 2.8rem 0;
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #ffdeb4;
+        }
+
+        .note-box i {
+            font-size: 3rem;
+            color: #f39c12;
+        }
+
+        /* جدول أنيق */
+        .elegant-table {
+            background: #123a58ef;
+            backdrop-filter: blur(6px);
+            border-radius: 3.5rem;
+            overflow: hidden;
+            margin: 3.2rem 0;
+            border: 1px solid #4080c0;
+        }
+
+        .elegant-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.25rem;
+            color: #e1f0ff;
+        }
+
+        .elegant-table th {
+            background: #1f62a0;
+            color: white;
+            font-weight: 700;
+            padding: 1.6rem 1.2rem;
+            font-size: 1.6rem;
+        }
+
+        .elegant-table td {
+            padding: 1.6rem 1.8rem;
+            border-bottom: 1px solid #2c70b0;
+            color: #d4ecff;
+        }
+
+        .elegant-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .elegant-table td:first-child {
+            background: #154d78;
+            font-weight: 700;
+            width: 30%;
+        }
+
+        /* تذييل */
+        .page-footer {
+            margin-top: 5.5rem;
+            padding-top: 3rem;
+            border-top: 5px solid #2f7cc9;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #b9dbff;
+            font-size: 1.25rem;
+        }
+
+        .footer-badge {
+            background: #1f68a8;
+            color: white;
+            padding: 0.6rem 2.2rem;
+            border-radius: 70px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .glass-panel { padding: 2rem; }
+            .hero h1 { font-size: 2.8rem; }
+            .main-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="glass-panel">
+
+        <!-- الرأس -->
+        <div class="hero">
+            <h1>
+                <i class="fas fa-cube"></i>
+                OOP في ++C
+                <i class="fas fa-cubes"></i>
+            </h1>
+            <div class="hero-sub">
+                <i class="fas fa-bolt"></i> البرمجة كائنية التوجه – المبادئ الأربعة
+            </div>
+        </div>
+
+        <!-- مقدمة -->
+        <p style="font-size:1.4rem; text-align:center; margin-bottom:2rem;">البرمجة كائنية التوجه (Object-Oriented Programming) هي نمط برمجة يعتمد على مفهوم "الكائنات" التي تحتوي على بيانات (خصائص) ودوال (سلوكيات). تتيح OOP تنظيم البرامج المعقدة وجعلها أكثر قابلية للفهم والصيانة.</p>
+
+        <!-- الركائز الأربع (شبكة) -->
+        <h2 class="main-title"><i class="fas fa-columns"></i> الركائز الأربع لـ OOP</h2>
+        <div class="pillars-grid">
+            <div class="pillar-item">
+                <div class="pillar-icon"><i class="fas fa-lock"></i></div>
+                <h3>التغليف</h3>
+                <p>Encapsulation: جمع البيانات والدوال معًا وإخفاء التفاصيل الداخلية.</p>
+            </div>
+            <div class="pillar-item">
+                <div class="pillar-icon"><i class="fas fa-share-alt"></i></div>
+                <h3>الوراثة</h3>
+                <p>Inheritance: إنشاء أصناف جديدة بناءً على أصناف موجودة.</p>
+            </div>
+            <div class="pillar-item">
+                <div class="pillar-icon"><i class="fas fa-chaos"></i></div>
+                <h3>تعدد الأشكال</h3>
+                <p>Polymorphism: إمكانية التعامل مع كائنات مختلفة بنفس الواجهة.</p>
+            </div>
+            <div class="pillar-item">
+                <div class="pillar-icon"><i class="fas fa-puzzle-piece"></i></div>
+                <h3>التجريد</h3>
+                <p>Abstraction: إخفاء التعقيد وإظهار الأساسيات فقط.</p>
+            </div>
+        </div>
+
+        <!-- 1. التغليف (Encapsulation) -->
+        <h2 class="main-title"><i class="fas fa-lock"></i> 1. التغليف (Encapsulation)</h2>
+        <p>هو تجميع البيانات (الخصائص) والدوال (الطرق) التي تعالجها داخل وحدة واحدة (الصنف)، وتقييد الوصول المباشر لبعض مكونات الكائن. يتم باستخدام معدلات الوصول: private, protected, public.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">class BankAccount {
+private:
+    double balance;  // لا يمكن الوصول إليها مباشرة خارج الصنف
+
+public:
+    // واجهة عامة للتعامل مع الرصيد
+    void deposit(double amount) {
+        if (amount > 0) balance += amount;
+    }
+
+    double getBalance() const {
+        return balance;
+    }
+};
+
+int main() {
+    BankAccount acc;
+    // acc.balance = 1000;  // خطأ! balance خاصة
+    acc.deposit(500);       // صحيح: استخدام الواجهة العامة
+    cout &lt;&lt; acc.getBalance(); // 500
+    return 0;
+}</code></pre>
+        </div>
+        <div class="highlight-box">
+            <i class="fas fa-shield"></i>
+            <p><strong>فوائد التغليف:</strong> حماية البيانات من التعديل العشوائي، إمكانية تغيير التنفيذ الداخلي دون التأثير على الكود الخارجي، زيادة نمطية البرنامج.</p>
+        </div>
+
+        <!-- 2. الوراثة (Inheritance) -->
+        <h2 class="main-title"><i class="fas fa-share-alt"></i> 2. الوراثة (Inheritance)</h2>
+        <p>آلية تسمح لصنف (فئة فرعية) باشتقاق خصائص وسلوكيات من صنف آخر (فئة أساسية). تعزز إعادة استخدام الكود وتمثل علاقة "is-a".</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">// الصنف الأساسي (Parent)
+class Animal {
+public:
+    void eat() {
+        cout &lt;&lt; "الحيوان يأكل" &lt;&lt; endl;
+    }
+};
+
+// الصنف المشتق (Child) يرث من Animal
+class Dog : public Animal {
+public:
+    void bark() {
+        cout &lt;&lt; "الكلب ينبح" &lt;&lt; endl;
+    }
+};
+
+int main() {
+    Dog d;
+    d.eat();  // موروثة من Animal
+    d.bark(); // خاصة بـ Dog
+    return 0;
+}</code></pre>
+        </div>
+        <div class="elegant-table">
+            <table>
+                <tr><th>نوع الوراثة</th><th>وصف</th></tr>
+                <tr><td>public</td><td>الأعضاء العامة في الأساس تبقى عامة في المشتق، والمحمية تبقى محمية.</td></tr>
+                <tr><td>protected</td><td>الأعضاء العامة والمحمية في الأساس تصبح محمية في المشتق.</td></tr>
+                <tr><td>private</td><td>جميع الأعضاء في الأساس تصبح خاصة في المشتق (لا يمكن الوصول إليها).</td></tr>
+            </table>
+        </div>
+
+        <!-- 3. تعدد الأشكال (Polymorphism) -->
+        <h2 class="main-title"><i class="fas fa-chaos"></i> 3. تعدد الأشكال (Polymorphism)</h2>
+        <p>القدرة على استخدام واجهة واحدة لتمثيل أنواع مختلفة من الكائنات. يتحقق نوعان: تعدد الأشكال أثناء الترجمة (تحميل الدوال) وأثناء التنفيذ (الدوال الافتراضية).</p>
+        
+        <h3 class="sub-title">أ. تعدد الأشكال أثناء التنفيذ (الدوال الافتراضية)</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">class Shape {
+public:
+    virtual void draw() {  // دالة افتراضية
+        cout &lt;&lt; "رسم شكل عام" &lt;&lt; endl;
+    }
+};
+
+class Circle : public Shape {
+public:
+    void draw() override {  // تجاوز الدالة
+        cout &lt;&lt; "رسم دائرة" &lt;&lt; endl;
+    }
+};
+
+class Rectangle : public Shape {
+public:
+    void draw() override {
+        cout &lt;&lt; "رسم مستطيل" &lt;&lt; endl;
+    }
+};
+
+int main() {
+    Shape* shapes[2];
+    shapes[0] = new Circle();
+    shapes[1] = new Rectangle();
+
+    for(int i = 0; i < 2; i++) {
+        shapes[i]->draw();  // ينادي الدالة المناسبة حسب نوع الكائن
+    }
+    // الإخراج: رسم دائرة / رسم مستطيل
+    return 0;
+}</code></pre>
+        </div>
+
+        <h3 class="sub-title">ب. تعدد الأشكال أثناء الترجمة (تحميل الدوال)</h3>
+        <div class="code-box">
+            <pre><code class="language-cpp">class Printer {
+public:
+    void print(int i) {
+        cout &lt;&lt; "طباعة عدد: " &lt;&lt; i &lt;&lt; endl;
+    }
+    void print(double d) {
+        cout &lt;&lt; "طباعة عدد عشري: " &lt;&lt; d &lt;&lt; endl;
+    }
+    void print(string s) {
+        cout &lt;&lt; "طباعة نص: " &lt;&lt; s &lt;&lt; endl;
+    }
+};</code></pre>
+        </div>
+
+        <!-- 4. التجريد (Abstraction) -->
+        <h2 class="main-title"><i class="fas fa-puzzle-piece"></i> 4. التجريد (Abstraction)</h2>
+        <p>إخفاء تفاصيل التنفيذ المعقدة وإظهار الوظائف الأساسية فقط للمستخدم. في ++C، يتحقق باستخدام الأصناف المجردة (Abstract classes) التي تحتوي على دوال افتراضية بحتة (pure virtual).</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">// صنف مجرد (لا يمكن إنشاء كائنات منه)
+class Vehicle {
+public:
+    virtual void start() = 0;  // دالة افتراضية بحتة
+    virtual void stop() = 0;
+
+    void fuel() {  // دالة عادية
+        cout &lt;&lt; "تزويد بالوقود" &lt;&lt; endl;
+    }
+};
+
+class Car : public Vehicle {
+public:
+    void start() override {
+        cout &lt;&lt; "السيارة تبدأ" &lt;&lt; endl;
+    }
+    void stop() override {
+        cout &lt;&lt; "السيارة تتوقف" &lt;&lt; endl;
+    }
+};
+
+int main() {
+    // Vehicle v; // خطأ! صنف مجرد
+    Car myCar;
+    myCar.start();   // السيارة تبدأ
+    myCar.fuel();    // تزويد بالوقود
+    return 0;
+}</code></pre>
+        </div>
+        <div class="note-box">
+            <i class="fas fa-lightbulb"></i>
+            <div><strong>ملاحظة:</strong> الأصناف المجردة تستخدم لتحديد واجهة موحدة لمجموعة من الأصناف المشتقة، ولا يمكن إنشاء كائنات منها مباشرة.</div>
+        </div>
+
+        <!-- منشئ ومدمر -->
+        <h2 class="main-title"><i class="fas fa-tools"></i> المنشئ (Constructor) والمدمر (Destructor)</h2>
+        <p>المنشئ هو دالة خاصة تُستدعى تلقائياً عند إنشاء كائن. المدمر يُستدعى عند تدمير الكائن.</p>
+        <div class="code-box">
+            <pre><code class="language-cpp">class Person {
+private:
+    string name;
+    int age;
+public:
+    // المنشئ
+    Person(string n, int a) {
+        name = n;
+        age = a;
+        cout &lt;&lt; "تم إنشاء كائن Person" &lt;&lt; endl;
+    }
+
+    // المدمر
+    ~Person() {
+        cout &lt;&lt; "تم تدمير كائن Person" &lt;&lt; endl;
+    }
+
+    void display() {
+        cout &lt;&lt; "الاسم: " &lt;&lt; name &lt;&lt; ", العمر: " &lt;&lt; age &lt;&lt; endl;
+    }
+};
+
+int main() {
+    Person p1("أحمد", 25);
+    p1.display();
+    return 0; // عند انتهاء الدالة، يُستدعى المدمر تلقائياً
+}</code></pre>
+        </div>
+
+        <!-- جدول مقارنة: struct vs class -->
+        <h2 class="sub-title"><i class="fas fa-table"></i> الفرق بين struct و class في ++C</h2>
+        <div class="elegant-table">
+            <table>
+                <tr><th>الخاصية</th><th>struct</th><th>class</th></tr>
+                <tr><td>الوصول الافتراضي للأعضاء</td><td>public</td><td>private</td></tr>
+                <tr><td>الوصول الافتراضي في الوراثة</td><td>public</td><td>private</td></tr>
+                <tr><td>الاستخدام التقليدي</td><td>هياكل بيانات بسيطة</td><td>كائنات معقدة مع تغليف</td></tr>
+                <tr><td>يمكن استخدام كل ميزات OOP</td><td>نعم (من الناحية الفنية)</td><td>نعم</td></tr>
+            </table>
+        </div>
+
+        <!-- تطبيقات عملية -->
+        <h2 class="sub-title"><i class="fas fa-flask"></i> تطبيقات عملية</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2.2rem; margin: 3rem 0;">
+            <div style="flex: 1 1 300px; background: #144b70; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-car"></i> نظام مركبات</h4>
+                <pre style="background:#0b1f2e; color:#daf0ff; padding:1.2rem; border-radius:2rem; direction:ltr;">class Vehicle {
+protected:
+    int speed;
+public:
+    virtual void move() = 0;
+};
+
+class Bicycle : public Vehicle {
+public:
+    void move() override {
+        cout << "الدراجة تتحرك";
+    }
+};</pre>
+            </div>
+            <div style="flex: 1 1 300px; background: #144b70; border-radius: 2.8rem; padding: 2.2rem;">
+                <h4><i class="fas fa-users"></i> إدارة الموظفين</h4>
+                <pre style="background:#0b1f2e; color:#daf0ff; padding:1.2rem; border-radius:2rem; direction:ltr;">class Employee {
+private:
+    string name;
+    double salary;
+public:
+    Employee(string n, double s) 
+        : name(n), salary(s) {}
+    virtual double calculateBonus() = 0;
+};</pre>
+            </div>
+        </div>
+
+        <!-- تمرين شامل -->
+        <div style="background: #1b5580; border-radius: 3.5rem; padding: 2.8rem; margin: 3.5rem 0;">
+            <h3 style="font-size: 2.4rem; color: #ffffff;"><i class="fas fa-pen"></i> تمرين: صمم صنف Shape مع دوال افتراضية، ثم اشتق منه صنفين Circle و Rectangle. أضف دالة لحساب المساحة.</h3>
+            <details style="margin-top:2rem; background: #10344f; border-radius: 2.5rem; padding: 1.8rem;">
+                <summary style="color:#aad0ff;"><i class="fas fa-lightbulb"></i> عرض الحل</summary>
+                <pre style="direction:ltr; background:#0b1f30; color:#fff; padding:1.5rem;">#include &lt;iostream&gt;
+using namespace std;
+
+class Shape {
+public:
+    virtual double area() const = 0; // pure virtual
+};
+
+class Circle : public Shape {
+private:
+    double radius;
+public:
+    Circle(double r) : radius(r) {}
+    double area() const override {
+        return 3.14159 * radius * radius;
+    }
+};
+
+class Rectangle : public Shape {
+private:
+    double width, height;
+public:
+    Rectangle(double w, double h) : width(w), height(h) {}
+    double area() const override {
+        return width * height;
+    }
+};
+
+int main() {
+    Circle c(5);
+    Rectangle r(4, 6);
+    cout &lt;&lt; "مساحة الدائرة: " &lt;&lt; c.area() &lt;&lt; endl;
+    cout &lt;&lt; "مساحة المستطيل: " &lt;&lt; r.area() &lt;&lt; endl;
+    return 0;
+}</pre>
+            </details>
+        </div>
+
+        <!-- خاتمة وأفضل الممارسات -->
+        <div style="background: #124066; border-radius: 3.5rem; padding: 2.8rem; margin-top: 3.5rem;">
+            <i class="fas fa-crown" style="font-size: 3rem; float: right; margin-left: 2rem; color:#ffd966;"></i>
+            <h3 style="font-size:2.5rem; margin-bottom:1.5rem; color:#ffffff;">أفضل الممارسات في OOP</h3>
+            <ul style="list-style: none; columns: 2; column-gap: 3rem; font-size:1.3rem; color:#d0ebff;">
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> اتبع مبدأ Single Responsibility: كل صنف له مسؤولية واحدة.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> استخدم التغليف لحماية البيانات (اجعل الخصائص private).</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> فضل التركيب (composition) على الوراثة عندما يكون مناسباً.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> استخدم الدوال الافتراضية (virtual) عندما تتوقع تعدد الأشكال.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> اجعل المدمرات virtual في الأصناف الأساسية.</li>
+                <li><i class="fas fa-check-circle" style="color:#6ab0ff;"></i> استخدم const مع الدوال التي لا تعدل الكائن.</li>
+            </ul>
+        </div>
+
+        <!-- تذييل -->
+        <div class="page-footer">
+            <span class="footer-badge"><i class="fas fa-copyright"></i> ++C OOP</span>
+            <span><i class="fas fa-cubes"></i> الإصدار 8.0 – البرمجة كائنية التوجه</span>
+            <span><i class="fas fa-check-double"></i> الركائز الأربع</span>
+        </div>
+
+    </div> <!-- glass-panel -->
+</div> <!-- wrapper -->
+<script>Prism.highlightAll();</script>
+</body>
+</html>

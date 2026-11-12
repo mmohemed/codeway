@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C# | الحلقات التكرارية - الدليل المتكامل الفخم</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Highlight.js for code elegance -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 10% 20%, rgba(5, 15, 25, 1) 0%, rgba(0, 0, 0, 0.95) 100%);
+            color: #eef4ff;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        /* أناقة الخلفية */
+        .bg-glow {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(ellipse at 50% 30%, rgba(0, 180, 255, 0.08), transparent 70%);
+        }
+
+        .container {
+            max-width: 1350px;
+            margin: 0 auto;
+            padding: 2rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* هيدر فخم */
+        .hero-luxury {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 1rem;
+            background: rgba(10, 25, 45, 0.55);
+            backdrop-filter: blur(12px);
+            border-radius: 4rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 30px 40px -20px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.05);
+        }
+
+        .hero-luxury h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #7AD0FF, #2A9DF4);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-luxury p {
+            font-size: 1.2rem;
+            color: #bbd4f0;
+            max-width: 750px;
+            margin: 0.8rem auto 0;
+            font-weight: 500;
+        }
+
+        .badge-lux {
+            background: linear-gradient(95deg, #0f2b3d, #071a28);
+            padding: 0.4rem 1.6rem;
+            border-radius: 60px;
+            display: inline-block;
+            font-weight: 700;
+            border: 1px solid #2c9bcf40;
+            margin-bottom: 1.2rem;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        /* card style فخامة */
+        .card-premium {
+            background: rgba(12, 22, 35, 0.65);
+            backdrop-filter: blur(10px);
+            border-radius: 2.5rem;
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(72, 187, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.4);
+        }
+
+        .card-premium:hover {
+            border-color: rgba(72, 187, 255, 0.6);
+            background: rgba(15, 28, 44, 0.75);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid rgba(0, 200, 255, 0.4);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header i {
+            font-size: 2.2rem;
+            color: #3bc9ff;
+            text-shadow: 0 0 5px #00a3ff;
+        }
+
+        .card-header h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .loop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .loop-card {
+            background: rgba(0, 10, 20, 0.7);
+            border-radius: 1.8rem;
+            padding: 1.5rem;
+            border-left: 4px solid #2c9ef0;
+            transition: 0.2s;
+        }
+
+        .loop-card h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #b9e2ff;
+        }
+
+        .op-symbol {
+            font-family: monospace;
+            background: #0a1929;
+            padding: 0.2rem 0.7rem;
+            border-radius: 12px;
+            font-weight: bold;
+            color: #5fc3ff;
+            font-size: 1rem;
+        }
+
+        pre code {
+            font-size: 0.85rem;
+            border-radius: 1.2rem;
+        }
+
+        .example-code {
+            border-radius: 1.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .comparison-table td, .comparison-table th {
+            padding: 0.9rem;
+            border-bottom: 1px solid rgba(72, 187, 255, 0.2);
+        }
+
+        .interactive-panel {
+            background: linear-gradient(145deg, #071a28, #03121e);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 1px solid #2f7ea0;
+        }
+
+        .btn-run {
+            background: linear-gradient(95deg, #1f6392, #0d466b);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,160,255,0.2);
+        }
+        .btn-run:hover {
+            background: linear-gradient(95deg, #2b7bb0, #135a84);
+            transform: scale(0.97);
+            box-shadow: 0 8px 20px rgba(0,160,255,0.3);
+        }
+
+        .demo-output {
+            background: #030e17;
+            padding: 1rem 1.3rem;
+            border-radius: 1.4rem;
+            font-family: 'Fira Code', monospace;
+            border-left: 4px solid #3bc9ff;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            color: #c7edff;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid #2c5a7a;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1.2rem; }
+            .hero-luxury h1 { font-size: 2rem; }
+            .card-header h2 { font-size: 1.5rem; }
+        }
+        .glow-text {
+            text-shadow: 0 0 8px rgba(0,200,255,0.3);
+        }
+        .badge-new {
+            background: #2c7da0;
+            border-radius: 40px;
+            padding: 0.2rem 0.9rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="container">
+    <div class="hero-luxury">
+        <div class="badge-lux"><i class="fas fa-sync-alt"></i>  LOOPS IN C# | الحلقات التكرارية</div>
+        <h1>♾️ إتقان الحلقات التكرارية</h1>
+        <p>for, while, do-while, foreach — أدوات التحكم في التكرار. شرح متكامل، أمثلة حقيقية، وتصميم فخم يعكس قوة C#.</p>
+    </div>
+
+    <!-- بطاقات الحلقات الأساسية -->
+    <div class="card-premium">
+        <div class="card-header">
+            <i class="fas fa-infinity"></i>
+            <h2>أنواع الحلقات الأساسية</h2>
+        </div>
+        <div class="loop-grid">
+            <div class="loop-card">
+                <h3><i class="fas fa-code-branch"></i> for <span class="badge-new">الأكثر شيوعاً</span></h3>
+                <p>تستخدم عندما يكون عدد التكرارات معلومًا. تتكون من تهيئة، شرط، ومُغير.</p>
+                <div class="example-code">
+                    <pre><code class="language-csharp">// طباعة الأرقام من 1 إلى 5
+for (int i = 1; i <= 5; i++)
+{
+    Console.Write(i + " ");
+}
+// الناتج: 1 2 3 4 5</code></pre>
+                </div>
+                <div class="example-code">
+                    <pre><code class="language-csharp">// تكرار تنازلي
+for (int j = 10; j > 0; j-=2)
+    Console.WriteLine(j);</code></pre>
+                </div>
+            </div>
+            <div class="loop-card">
+                <h3><i class="fas fa-hourglass-half"></i> while</h3>
+                <p>ينفذ طالما الشرط صحيح. يُستخدم عندما لا نعرف عدد التكرارات مسبقاً.</p>
+                <div class="example-code">
+                    <pre><code class="language-csharp">int counter = 0;
+while (counter < 5)
+{
+    Console.WriteLine($"تكرار {counter}");
+    counter++;
+}</code></pre>
+                </div>
+                <div class="note-tip" style="background:#0e293b; border-radius: 1rem; padding:0.5rem; margin-top:0.5rem;">
+                    <i class="fas fa-exclamation-triangle"></i> احذر من الحلقات اللانهائية: تأكد من تحديث الشرط.
+                </div>
+            </div>
+            <div class="loop-card">
+                <h3><i class="fas fa-redo-alt"></i> do-while</h3>
+                <p>ينفذ مرة واحدة على الأقل، ثم يتحقق الشرط.</p>
+                <div class="example-code">
+                    <pre><code class="language-csharp">int number = 0;
+do {
+    Console.WriteLine("ينفذ حتماً");
+    number++;
+} while (number < 3);</code></pre>
+                </div>
+            </div>
+            <div class="loop-card">
+                <h3><i class="fas fa-list-ul"></i> foreach</h3>
+                <p>مثالي للتكرار على المجموعات (arrays, lists).</p>
+                <div class="example-code">
+                    <pre><code class="language-csharp">string[] names = {"أحمد", "سارة", "يوسف"};
+foreach (string name in names)
+{
+    Console.WriteLine($"مرحباً {name}");
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مقارنة وجدول شامل -->
+    <div class="card-premium">
+        <div class="card-header">
+            <i class="fas fa-chart-simple"></i>
+            <h2>مقارنة سريعة: متى تستخدم أي حلقة؟</h2>
+        </div>
+        <table class="comparison-table">
+            <tr style="border-bottom: 2px solid #3bc9ff;">
+                <th>الحلقة</th><th>الاستخدام الأمثل</th><th>مثال شائع</th>
+            </tr>
+            <tr><td><span class="op-symbol">for</span></td><td>عدد تكرارات محدد مسبقاً (مصفوفات، نطاق عددي)</td><td>for(int i=0; i<arr.Length; i++)</td></tr>
+            <tr><td><span class="op-symbol">while</span></td><td>شرط غير معروف مسبقاً (قراءة بيانات حتى إشارة توقف)</td><td>while(IsRunning) { ... }</td></tr>
+            <tr><td><span class="op-symbol">do-while</span></td><td>تنفيذ مرة ثم إعادة التحقق (قوائم تفاعل المستخدم)</td><td>do { input = GetInput(); } while(input != "exit");</td></tr>
+            <tr><td><span class="op-symbol">foreach</span></td><td>التكرار الآمن والسريع على المجموعات</td><td>foreach(var item in collection)</td></tr>
+        </table>
+    </div>
+
+    <!-- أمثلة متقدمة وتطبيقات عملية -->
+    <div class="card-premium">
+        <div class="card-header">
+            <i class="fas fa-microchip"></i>
+            <h2>تطبيقات متقدمة & خوارزميات</h2>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+            <div style="flex:1; min-width: 220px;">
+                <h3><i class="fas fa-calculator"></i> حساب المضروب (Factorial)</h3>
+                <div class="example-code">
+                    <pre><code class="language-csharp">int n = 5, fact = 1;
+for (int i = 1; i <= n; i++)
+    fact *= i;
+Console.WriteLine($"5! = {fact}"); // 120</code></pre>
+                </div>
+            </div>
+            <div style="flex:1; min-width: 220px;">
+                <h3><i class="fas fa-search"></i> البحث عن قيمة في مصفوفة</h3>
+                <div class="example-code">
+                    <pre><code class="language-csharp">int[] nums = { 8, 23, 77, 42 };
+int target = 77;
+bool found = false;
+foreach (int num in nums)
+    if (num == target) { found = true; break; }
+Console.WriteLine(found ? "تم العثور" : "غير موجود");</code></pre>
+                </div>
+            </div>
+            <div style="flex:1; min-width: 220px;">
+                <h3><i class="fas fa-sync"></i> while مع إدخال المستخدم</h3>
+                <div class="example-code">
+                    <pre><code class="language-csharp">string input = "";
+while (input != "quit")
+{
+    Console.Write("أدخل كلمة (quit للخروج): ");
+    input = Console.ReadLine();
+    Console.WriteLine($"أدخلت: {input}");
+}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="note-tip" style="background: #0c2437; border-radius: 1.4rem; padding: 1rem; margin-top: 1rem;">
+            <i class="fas fa-star-of-life"></i> <strong>نصائح ذهبية:</strong> استخدم <code>break</code> للخروج المبكر، <code>continue</code> لتخطي التكرار الحالي. الحلقات المتداخلة مفيدة للمصفوفات ثنائية الأبعاد.
+        </div>
+    </div>
+
+    <!-- حلقة تفاعلية مميزة (محاكي حي) -->
+    <div class="interactive-panel">
+        <h3 style="display: flex; gap: 0.8rem; align-items: center;"><i class="fas fa-laptop-code fa-fw"></i> 🔥 بيئة تفاعلية: محاكي الحلقات</h3>
+        <p>اختر نوع الحلقة وقم بتخصيص المعاملات وشاهد النتيجة بشكل لحظي (محاكاة سلوك C#).</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 1.2rem; margin: 1rem 0;">
+            <div style="flex:1">
+                <label>نوع الحلقة:</label>
+                <select id="loopTypeSelect" style="width:100%; padding: 10px; border-radius: 30px; background:#0a1929; color:white; border:1px solid #2c7da0;">
+                    <option value="for">for (من .. إلى)</option>
+                    <option value="while">while (حتى شرط)</option>
+                    <option value="foreachDemo">foreach (على مصفوفة)</option>
+                    <option value="doWhile">do-while (مرة واحدة على الأقل)</option>
+                </select>
+            </div>
+            <div id="dynamicInputs" style="flex:2">
+                <!-- سيتم تغييرها حسب نوع الحلقة -->
+            </div>
+        </div>
+        <button class="btn-run" id="simulateLoopBtn"><i class="fas fa-play"></i>  تشغيل المحاكاة</button>
+        <div class="demo-output" id="loopSimOutput">
+            // النتائج ستظهر هنا ...
+        </div>
+        <div class="note-tip" style="background: transparent; font-size:0.8rem; margin-top:0.8rem; border:0;">
+            ⚡ هذا المحاكي يعرض مخرجات الحلقة بناءً على منطق C#، لتوضيح سلوك التكرار.
+        </div>
+    </div>
+
+    <!-- التحكم: break و continue -->
+    <div class="card-premium">
+        <div class="card-header">
+            <i class="fas fa-code"></i>
+            <h2>التحكم في تدفق الحلقات: <span style="color:#5fc3ff">break</span> و <span style="color:#5fc3ff">continue</span></h2>
+        </div>
+        <div class="loop-grid">
+            <div class="loop-card">
+                <h3><i class="fas fa-ban"></i> break</h3>
+                <p>يخرج من الحلقة بشكل فوري.</p>
+                <div class="example-code">
+                    <pre><code class="language-csharp">for (int i = 0; i < 10; i++)
+{
+    if (i == 5) break;
+    Console.Write(i + " "); // 0 1 2 3 4
+}</code></pre>
+                </div>
+            </div>
+            <div class="loop-card">
+                <h3><i class="fas fa-forward"></i> continue</h3>
+                <p>يتخطى التكرار الحالي وينتقل للتالي.</p>
+                <div class="example-code">
+                    <pre><code class="language-csharp">for (int i = 1; i <= 6; i++)
+{
+    if (i % 2 == 0) continue;
+    Console.Write(i + " "); // 1 3 5
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نصائح الأداء والحلقات اللانهائية -->
+    <div class="card-premium">
+        <div class="card-header">
+            <i class="fas fa-gem"></i>
+            <h2>إتقان الحلقات: أداء وأخطاء شائعة</h2>
+        </div>
+        <ul style="list-style-type: none; margin-top: 1rem;">
+            <li style="margin-bottom: 0.8rem;">✨ <strong>تجنب الحلقات اللانهائية:</strong> تأكد من تحديث متغير الشرط داخل while.</li>
+            <li style="margin-bottom: 0.8rem;">🚀 <strong>foreach أسرع وأكثر أماناً</strong> للمصفوفات والقوائم، لكن لا يمكن تعديل المجموعة أثناء التكرار.</li>
+            <li style="margin-bottom: 0.8rem;">🎯 <strong>for vs foreach:</strong> foreach أكثر readable، بينما for يعطيك تحكم كامل بالمؤشر.</li>
+            <li style="margin-bottom: 0.8rem;">📌 <strong>الحلقات المتداخلة</strong>: انتبه للأداء عند التعشيق العميق (O(n²).</li>
+        </ul>
+    </div>
+
+    <footer>
+        <i class="fab fa-csharp"></i>  دورة متكاملة عن الحلقات التكرارية في C# | تصميم فخم عالي الجودة | أمثلة تفاعلية وشاملة
+    </footer>
+</div>
+
+<script>
+    // الجزء التفاعلي المتطور
+    const loopSelect = document.getElementById('loopTypeSelect');
+    const dynamicDiv = document.getElementById('dynamicInputs');
+    const simulateBtn = document.getElementById('simulateLoopBtn');
+    const outputArea = document.getElementById('loopSimOutput');
+
+    function updateDynamicInputs() {
+        const type = loopSelect.value;
+        if (type === 'for') {
+            dynamicDiv.innerHTML = `
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <div><label>البداية (from):</label><input type="number" id="startVal" value="1" style="background:#0a1929; border-radius:20px; padding:6px; color:white;"></div>
+                    <div><label>النهاية (to):</label><input type="number" id="endVal" value="5" style="background:#0a1929; border-radius:20px; padding:6px; color:white;"></div>
+                    <div><label>الخطوة (step):</label><input type="number" id="stepVal" value="1" style="background:#0a1929; border-radius:20px; padding:6px; color:white;"></div>
+                </div>`;
+        } else if (type === 'while') {
+            dynamicDiv.innerHTML = `
+                <div><label>الحد الأقصى للتكرار (شرط counter < max):</label>
+                <input type="number" id="maxWhile" value="4" style="background:#0a1929; border-radius:20px; padding:6px; width:100%;"></div>`;
+        } else if (type === 'foreachDemo') {
+            dynamicDiv.innerHTML = `<div><label>مصفوفة نموذجية (أسماء مفصولة بفاصلة):</label>
+            <input type="text" id="arrayItems" value="سيف, ليان, كرم, نور" style="background:#0a1929; border-radius:20px; padding:6px; width:100%;"></div>`;
+        } else if (type === 'doWhile') {
+            dynamicDiv.innerHTML = `<div><label>عدد مرات التكرار (do while counter < limit):</label>
+            <input type="number" id="doLimit" value="3" style="background:#0a1929; border-radius:20px; padding:6px; width:100%;"></div>`;
+        }
+    }
+
+    function simulateLoop() {
+        const type = loopSelect.value;
+        let outputText = "🔹 مخرجات الحلقة:\n";
+        try {
+            if (type === 'for') {
+                let start = parseInt(document.getElementById('startVal').value);
+                let end = parseInt(document.getElementById('endVal').value);
+                let step = parseInt(document.getElementById('stepVal').value);
+                if (isNaN(start)) start = 1;
+                if (isNaN(end)) end = 5;
+                if (isNaN(step) || step === 0) step = 1;
+                let results = [];
+                if (step > 0) {
+                    for (let i = start; i <= end; i += step) results.push(i);
+                } else {
+                    for (let i = start; i >= end; i += step) results.push(i);
+                }
+                outputText += `التكرار (for) من ${start} إلى ${end} بخطوة ${step} :\n[ ${results.join(', ')} ]`;
+            } 
+            else if (type === 'while') {
+                let max = parseInt(document.getElementById('maxWhile').value);
+                if (isNaN(max)) max = 4;
+                let counter = 0;
+                let values = [];
+                while (counter < max) {
+                    values.push(counter);
+                    counter++;
+                }
+                outputText += `while (counter < ${max}) :\n القيم: ${values.join(' → ')} \nعدد التكرارات: ${values.length}`;
+            }
+            else if (type === 'foreachDemo') {
+                let raw = document.getElementById('arrayItems').value;
+                let items = raw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                if (items.length === 0) items = ["مثال", "بيانات"];
+                let resultItems = [];
+                foreach: for (let idx = 0; idx < items.length; idx++) {
+                    resultItems.push(`'${items[idx]}'`);
+                }
+                outputText += `foreach على المجموعة: [${items.join(', ')}]\n🔁 التكرار:\n${resultItems.join(' - ')}`;
+            }
+            else if (type === 'doWhile') {
+                let limit = parseInt(document.getElementById('doLimit').value);
+                if (isNaN(limit)) limit = 3;
+                let counter = 0;
+                let values = [];
+                do {
+                    values.push(counter);
+                    counter++;
+                } while (counter < limit);
+                outputText += `do-while ينفذ مرة على الأقل، الحد الأقصى ${limit}:\nالقيم المتولدة: ${values.join(', ')}`;
+            }
+            outputArea.innerHTML = outputText;
+        } catch(e) {
+            outputArea.innerHTML = `⚠️ خطأ في المدخلات: ${e.message}`;
+        }
+    }
+
+    loopSelect.addEventListener('change', () => {
+        updateDynamicInputs();
+        simulateLoop(); // تحديث تلقائي
+    });
+    simulateBtn.addEventListener('click', simulateLoop);
+    updateDynamicInputs();
+    simulateLoop();
+    // إضافة مستمع ديناميكي للتحديث المباشر (عند تغيير حقول الإدخال)
+    document.addEventListener('input', function(e) {
+        if (e.target.matches('#dynamicInputs input, #dynamicInputs select')) {
+            simulateLoop();
+        }
+    });
+</script>
+</body>
+</html>
