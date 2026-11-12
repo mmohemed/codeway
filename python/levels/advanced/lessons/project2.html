@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مشروع 2: API كاملة باستخدام Flask/FastAPI | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">المستوى المتقدم</a>
+        <span class="sep">/</span>
+        <span>مشروع FastAPI</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-bolt"></i>
+            مشروع 2 · واجهة برمجية احترافية
+        </div>
+        <h1 class="lesson-title">مشروع 2: API متجر إلكتروني باستخدام FastAPI</h1>
+        <p class="lesson-intro">
+            بنيت في الدروس السابقة APIs باستخدام Flask. الآن ستتعرف على <strong>FastAPI</strong>: إطار حديث وسريع جدًا يتحقق من البيانات <strong>تلقائيًا</strong> ويولّد <strong>توثيقًا تفاعليًا</strong> للـ API بدون أي جهد. ستبني API كاملة لمتجر إلكتروني: منتجات، فلترة، مفتاح حماية للعمليات الحساسة، واختبارات آلية.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 2–3 ساعات</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 API احترافية بالتحقق التلقائي</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 متقدم</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرسين 14 و 15</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#why">1. لماذا FastAPI؟</a>
+            <a href="#first">2. أول تطبيق</a>
+            <a href="#models">3. نماذج Pydantic</a>
+            <a href="#code">4. الكود الكامل</a>
+            <a href="#read">5. القراءة والفلترة</a>
+            <a href="#write">6. العمليات المحمية</a>
+            <a href="#tests">7. الاختبارات</a>
+            <a href="#deploy">8. الهيكل والنشر</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="why">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        لماذا FastAPI؟
+    </h2>
+        <p>
+            في Flask كتبنا دالة <code>validate</code> طويلة بأنفسنا للتحقق من كل حقل. في FastAPI <strong>تصف شكل البيانات مرة واحدة</strong>
+            باستخدام تلميحات الأنواع (Type Hints)، فيتولى الإطار الباقي:
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الميزة</th><th>Flask</th><th>FastAPI</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>التحقق من البيانات</td><td>يدوي (أو مكتبة إضافية)</td><td>✅ تلقائي عبر Pydantic</td></tr>
+                    <tr><td>التوثيق</td><td>يدوي</td><td>✅ صفحة <code>/docs</code> تفاعلية تلقائيًا</td></tr>
+                    <tr><td>تحويل الأنواع</td><td>يدوي (<code>type=int</code>)</td><td>✅ من تلميحات الأنواع</td></tr>
+                    <tr><td>البرمجة غير المتزامنة async</td><td>دعم محدود</td><td>✅ دعم كامل</td></tr>
+                    <tr><td>السرعة</td><td>جيدة</td><td>من أسرع أطر Python</td></tr>
+                    <tr><td>البساطة ومواقع HTML</td><td>✅ ممتاز للمواقع التقليدية</td><td>مصمم أساسًا للـ APIs</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+                <span>التثبيت والتشغيل</span>
+            </div>
+<pre>pip install "fastapi[standard]"
+fastapi dev shop_api.py              <span class="cm"># أو: uvicorn shop_api:app --reload</span>
+<span class="cm"># افتح http://127.0.0.1:8000/docs لترى التوثيق التفاعلي</span></pre>
+        </div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>صفحة /docs سحرية:</strong> فيها قائمة بكل المسارات، وشكل البيانات المطلوب، وزر <em>Try it out</em> لتجربة
+                كل مسار مباشرة من المتصفح، دون Postman ولا curl.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="first">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-play"></i>
+        أول تطبيق FastAPI
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>hello_fastapi.py</span>
+    </div>
+<pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> fastapi.testclient <span class="kw">import</span> TestClient
+
+app = <span class="fn">FastAPI</span>()
+
+
+@app.<span class="fn">get</span>(<span class="str">"/"</span>)
+<span class="kw">def</span> <span class="fn">home</span>():
+    <span class="kw">return</span> {<span class="str">"message"</span>: <span class="str">"مرحبًا من FastAPI"</span>}
+
+
+@app.<span class="fn">get</span>(<span class="str">"/square/{n}"</span>)
+<span class="kw">def</span> <span class="fn">square</span>(n: int, show_steps: bool = <span class="kw">False</span>):     <span class="cm"># n من المسار، و show_steps من الاستعلام</span>
+    result = {<span class="str">"n"</span>: n, <span class="str">"square"</span>: n * n}
+    <span class="kw">if</span> show_steps:
+        result[<span class="str">"steps"</span>] = <span class="str">f"{n} × {n}"</span>
+    <span class="kw">return</span> result
+
+
+client = <span class="fn">TestClient</span>(app)
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/"</span>).<span class="fn">json</span>())
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/square/7?show_steps=true"</span>).<span class="fn">json</span>())
+
+r = client.<span class="fn">get</span>(<span class="str">"/square/seven"</span>)                    <span class="cm"># ليس رقمًا!</span>
+<span class="fn">print</span>(r.status_code, r.<span class="fn">json</span>()[<span class="str">"detail"</span>][<span class="num">0</span>][<span class="str">"msg"</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'message': 'مرحبًا من FastAPI'}
+{'n': 7, 'square': 49, 'steps': '7 × 7'}
+422 Input should be a valid integer, unable to parse string as an integer</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>لاحظ:</strong> لم نكتب أي كود للتحقق! لأننا كتبنا <code>n: int</code>، رفض FastAPI القيمة <code>seven</code>
+                تلقائيًا ورد بالرمز <code>422</code> (Unprocessable Entity) ورسالة توضح المشكلة. والمعامل
+                <code>show_steps: bool</code> تحوّل من النص <code>"true"</code> إلى <code>True</code> تلقائيًا.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="models">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-shapes"></i>
+        نماذج Pydantic: وصف شكل البيانات
+    </h2>
+        <p>
+            <strong>Pydantic</strong> هي المكتبة التي يعتمد عليها FastAPI للتحقق. تعرّف كلاسًا يرث من <code>BaseModel</code>،
+            وتحدد الحقول وأنواعها وقيودها:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>pydantic_demo.py</span>
+    </div>
+<pre><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field, ValidationError
+
+
+<span class="kw">class</span> <span class="fn">ProductIn</span>(BaseModel):
+    name: str = <span class="fn">Field</span>(min_length=<span class="num">2</span>, max_length=<span class="num">60</span>)
+    price: float = <span class="fn">Field</span>(gt=<span class="num">0</span>)          <span class="cm"># أكبر من صفر</span>
+    stock: int = <span class="fn">Field</span>(default=<span class="num">0</span>, ge=<span class="num">0</span>) <span class="cm"># صفر أو أكثر</span>
+
+
+p = <span class="fn">ProductIn</span>(name=<span class="str">"سماعة"</span>, price=<span class="str">"220"</span>)    <span class="cm"># النص "220" يتحول إلى 220.0</span>
+<span class="fn">print</span>(p)
+<span class="fn">print</span>(p.<span class="fn">model_dump</span>())
+
+<span class="kw">try</span>:
+    <span class="fn">ProductIn</span>(name=<span class="str">"x"</span>, price=-<span class="num">5</span>, stock=-<span class="num">1</span>)
+<span class="kw">except</span> ValidationError <span class="kw">as</span> e:
+    <span class="kw">for</span> err <span class="kw">in</span> e.<span class="fn">errors</span>():
+        <span class="fn">print</span>(<span class="str">f"- {err['loc'][0]}: {err['msg']}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>name='سماعة' price=220.0 stock=0
+{'name': 'سماعة', 'price': 220.0, 'stock': 0}
+- name: String should have at least 2 characters
+- price: Input should be greater than 0
+- stock: Input should be greater than or equal to 0</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>القيد</th><th>المعنى</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>gt / ge</code></td><td>أكبر من / أكبر من أو يساوي</td></tr>
+                    <tr><td><code>lt / le</code></td><td>أصغر من / أصغر من أو يساوي</td></tr>
+                    <tr><td><code>min_length / max_length</code></td><td>طول النص أو القائمة</td></tr>
+                    <tr><td><code>pattern</code></td><td>تعبير نمطي (Regex) يجب أن يطابقه النص</td></tr>
+                    <tr><td><code>str | None = None</code></td><td>حقل اختياري</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="code">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-code"></i>
+        الكود الكامل لـ API المتجر
+    </h2>
+        <p>هذا هو ملف <code>shop_api.py</code> كاملًا (حوالي 130 سطرًا تقدم API احترافية):</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>shop_api.py</span>
+    </div>
+<pre><span class="str">"""shop_api.py — API متجر إلكتروني بـ FastAPI"""</span>
+<span class="kw">from</span> enum <span class="kw">import</span> Enum
+
+<span class="kw">from</span> fastapi <span class="kw">import</span> Depends, FastAPI, Header, HTTPException, Query, status
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+
+app = <span class="fn">FastAPI</span>(title=<span class="str">"متجر CodeWay"</span>, version=<span class="str">"1.0.0"</span>,
+              description=<span class="str">"API لإدارة منتجات متجر إلكتروني"</span>)
+
+API_KEY = <span class="str">"secret-123"</span>        <span class="cm"># في مشروع حقيقي: يُقرأ من متغيرات البيئة</span>
+
+
+<span class="kw">class</span> <span class="fn">Category</span>(str, Enum):
+    electronics = <span class="str">"electronics"</span>
+    books = <span class="str">"books"</span>
+    clothes = <span class="str">"clothes"</span>
+
+
+<span class="kw">class</span> <span class="fn">ProductIn</span>(BaseModel):
+    name: str = <span class="fn">Field</span>(min_length=<span class="num">2</span>, max_length=<span class="num">60</span>)
+    price: float = <span class="fn">Field</span>(gt=<span class="num">0</span>, description=<span class="str">"السعر بالريال"</span>)
+    stock: int = <span class="fn">Field</span>(default=<span class="num">0</span>, ge=<span class="num">0</span>)
+    category: Category
+
+
+<span class="kw">class</span> <span class="fn">ProductUpdate</span>(BaseModel):
+    name: str | <span class="kw">None</span> = <span class="fn">Field</span>(default=<span class="kw">None</span>, min_length=<span class="num">2</span>, max_length=<span class="num">60</span>)
+    price: float | <span class="kw">None</span> = <span class="fn">Field</span>(default=<span class="kw">None</span>, gt=<span class="num">0</span>)
+    stock: int | <span class="kw">None</span> = <span class="fn">Field</span>(default=<span class="kw">None</span>, ge=<span class="num">0</span>)
+    category: Category | <span class="kw">None</span> = <span class="kw">None</span>
+
+
+<span class="kw">class</span> <span class="fn">Product</span>(ProductIn):
+    id: int
+
+
+<span class="cm"># ---------- مستودع بيانات بسيط في الذاكرة ----------</span>
+db: dict[int, Product] = {}
+
+
+<span class="kw">def</span> <span class="fn">seed</span>():
+    db.<span class="fn">clear</span>()
+    <span class="kw">for</span> item <span class="kw">in</span> [
+        {<span class="str">"name"</span>: <span class="str">"لابتوب"</span>, <span class="str">"price"</span>: <span class="num">3200</span>, <span class="str">"stock"</span>: <span class="num">5</span>, <span class="str">"category"</span>: <span class="str">"electronics"</span>},
+        {<span class="str">"name"</span>: <span class="str">"سماعة"</span>, <span class="str">"price"</span>: <span class="num">220</span>, <span class="str">"stock"</span>: <span class="num">30</span>, <span class="str">"category"</span>: <span class="str">"electronics"</span>},
+        {<span class="str">"name"</span>: <span class="str">"رواية الخيميائي"</span>, <span class="str">"price"</span>: <span class="num">45</span>, <span class="str">"stock"</span>: <span class="num">12</span>, <span class="str">"category"</span>: <span class="str">"books"</span>},
+        {<span class="str">"name"</span>: <span class="str">"قميص قطني"</span>, <span class="str">"price"</span>: <span class="num">89</span>, <span class="str">"stock"</span>: <span class="num">0</span>, <span class="str">"category"</span>: <span class="str">"clothes"</span>},
+    ]:
+        pid = <span class="fn">len</span>(db) + <span class="num">1</span>
+        db[pid] = <span class="fn">Product</span>(id=pid, **item)
+
+
+<span class="fn">seed</span>()
+
+
+<span class="cm"># ---------- الاعتماديات (Dependencies) ----------</span>
+<span class="kw">def</span> <span class="fn">require_api_key</span>(x_api_key: str | <span class="kw">None</span> = <span class="fn">Header</span>(default=<span class="kw">None</span>)):
+    <span class="kw">if</span> x_api_key != API_KEY:
+        <span class="kw">raise</span> <span class="fn">HTTPException</span>(status.HTTP_401_UNAUTHORIZED, <span class="str">"مفتاح API غير صالح أو مفقود"</span>)
+
+
+<span class="kw">def</span> <span class="fn">get_product_or_404</span>(product_id: int) -&gt; Product:
+    <span class="kw">if</span> product_id <span class="kw">not</span> <span class="kw">in</span> db:
+        <span class="kw">raise</span> <span class="fn">HTTPException</span>(status.HTTP_404_NOT_FOUND, <span class="str">f"المنتج {product_id} غير موجود"</span>)
+    <span class="kw">return</span> db[product_id]
+
+
+<span class="cm"># ---------- المسارات ----------</span>
+@app.<span class="fn">get</span>(<span class="str">"/products"</span>, response_model=list[Product], tags=[<span class="str">"products"</span>])
+<span class="kw">def</span> <span class="fn">list_products</span>(
+    category: Category | <span class="kw">None</span> = <span class="kw">None</span>,
+    min_price: float = <span class="fn">Query</span>(default=<span class="num">0</span>, ge=<span class="num">0</span>),
+    max_price: float | <span class="kw">None</span> = <span class="fn">Query</span>(default=<span class="kw">None</span>, gt=<span class="num">0</span>),
+    in_stock: bool = <span class="kw">False</span>,
+    q: str | <span class="kw">None</span> = <span class="fn">Query</span>(default=<span class="kw">None</span>, min_length=<span class="num">2</span>),
+    limit: int = <span class="fn">Query</span>(default=<span class="num">20</span>, ge=<span class="num">1</span>, le=<span class="num">100</span>),
+):
+    items = <span class="fn">list</span>(db.<span class="fn">values</span>())
+    <span class="kw">if</span> category:
+        items = [p <span class="kw">for</span> p <span class="kw">in</span> items <span class="kw">if</span> p.category == category]
+    <span class="kw">if</span> q:
+        items = [p <span class="kw">for</span> p <span class="kw">in</span> items <span class="kw">if</span> q <span class="kw">in</span> p.name]
+    <span class="kw">if</span> in_stock:
+        items = [p <span class="kw">for</span> p <span class="kw">in</span> items <span class="kw">if</span> p.stock &gt; <span class="num">0</span>]
+    items = [p <span class="kw">for</span> p <span class="kw">in</span> items <span class="kw">if</span> p.price &gt;= min_price <span class="kw">and</span> (max_price <span class="kw">is</span> <span class="kw">None</span> <span class="kw">or</span> p.price &lt;= max_price)]
+    <span class="kw">return</span> items[:limit]
+
+
+@app.<span class="fn">get</span>(<span class="str">"/products/{product_id}"</span>, response_model=Product, tags=[<span class="str">"products"</span>])
+<span class="kw">def</span> <span class="fn">get_product</span>(product: Product = <span class="fn">Depends</span>(get_product_or_404)):
+    <span class="kw">return</span> product
+
+
+@app.<span class="fn">post</span>(<span class="str">"/products"</span>, response_model=Product, status_code=<span class="num">201</span>,
+          dependencies=[<span class="fn">Depends</span>(require_api_key)], tags=[<span class="str">"admin"</span>])
+<span class="kw">def</span> <span class="fn">create_product</span>(data: ProductIn):
+    pid = <span class="fn">max</span>(db, default=<span class="num">0</span>) + <span class="num">1</span>
+    db[pid] = <span class="fn">Product</span>(id=pid, **data.<span class="fn">model_dump</span>())
+    <span class="kw">return</span> db[pid]
+
+
+@app.<span class="fn">patch</span>(<span class="str">"/products/{product_id}"</span>, response_model=Product,
+           dependencies=[<span class="fn">Depends</span>(require_api_key)], tags=[<span class="str">"admin"</span>])
+<span class="kw">def</span> <span class="fn">update_product</span>(data: ProductUpdate, product: Product = <span class="fn">Depends</span>(get_product_or_404)):
+    changes = data.<span class="fn">model_dump</span>(exclude_unset=<span class="kw">True</span>)
+    updated = product.<span class="fn">model_copy</span>(update=changes)
+    db[product.id] = updated
+    <span class="kw">return</span> updated
+
+
+@app.<span class="fn">delete</span>(<span class="str">"/products/{product_id}"</span>, status_code=<span class="num">204</span>,
+            dependencies=[<span class="fn">Depends</span>(require_api_key)], tags=[<span class="str">"admin"</span>])
+<span class="kw">def</span> <span class="fn">delete_product</span>(product: Product = <span class="fn">Depends</span>(get_product_or_404)):
+    <span class="kw">del</span> db[product.id]
+
+
+@app.<span class="fn">get</span>(<span class="str">"/stats"</span>, tags=[<span class="str">"reports"</span>])
+<span class="kw">def</span> <span class="fn">stats</span>():
+    products = <span class="fn">list</span>(db.<span class="fn">values</span>())
+    <span class="kw">return</span> {
+        <span class="str">"products"</span>: <span class="fn">len</span>(products),
+        <span class="str">"out_of_stock"</span>: [p.name <span class="kw">for</span> p <span class="kw">in</span> products <span class="kw">if</span> p.stock == <span class="num">0</span>],
+        <span class="str">"inventory_value"</span>: <span class="fn">sum</span>(p.price * p.stock <span class="kw">for</span> p <span class="kw">in</span> products),
+    }</pre>
+</div>
+        <div class="note-box">
+            <strong>🔍 أهم الأفكار في الكود:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> <strong>ثلاثة نماذج:</strong> <code>ProductIn</code> لما يرسله العميل، و <code>ProductUpdate</code> بحقول اختيارية للتعديل الجزئي، و <code>Product</code> للرد (يضيف <code>id</code>).</li>
+                <li><i class="fas fa-angle-left"></i> <strong><code>Category(str, Enum)</code>:</strong> يقبل فقط التصنيفات المعرّفة، ويظهر كقائمة اختيار في <code>/docs</code>.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>الاعتماديات <code>Depends</code>:</strong> دالة تُنفَّذ قبل المسار. استخدمناها للتحقق من مفتاح API ولجلب المنتج أو إرجاع 404 — بدل تكرار نفس الكود في كل مسار.</li>
+                <li><i class="fas fa-angle-left"></i> <strong><code>response_model</code>:</strong> يحدد شكل الرد ويفلتره، فلا تتسرب حقول داخلية بالخطأ.</li>
+                <li><i class="fas fa-angle-left"></i> <strong><code>exclude_unset=True</code>:</strong> في التعديل الجزئي نأخذ فقط الحقول التي أرسلها العميل فعلًا.</li>
+            </ul>
+        </div>
+</section>
+
+<section class="section-card" id="read">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-search"></i>
+        تجربة القراءة والفلترة
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>read_products.py</span>
+    </div>
+<pre><span class="kw">def</span> <span class="fn">names</span>(url):
+    r = client.<span class="fn">get</span>(url)
+    <span class="kw">return</span> r.status_code, [p[<span class="str">"name"</span>] <span class="kw">for</span> p <span class="kw">in</span> r.<span class="fn">json</span>()] <span class="kw">if</span> r.status_code == <span class="num">200</span> <span class="kw">else</span> r.<span class="fn">json</span>()
+
+<span class="fn">print</span>(<span class="fn">names</span>(<span class="str">"/products"</span>))
+<span class="fn">print</span>(<span class="fn">names</span>(<span class="str">"/products?category=electronics"</span>))
+<span class="fn">print</span>(<span class="fn">names</span>(<span class="str">"/products?max_price=100"</span>))
+<span class="fn">print</span>(<span class="fn">names</span>(<span class="str">"/products?in_stock=true&amp;min_price=50"</span>))
+<span class="fn">print</span>(<span class="fn">names</span>(<span class="str">"/products?category=toys"</span>))          <span class="cm"># تصنيف غير معروف</span>
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/products/3"</span>).<span class="fn">json</span>())
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/products/99"</span>).status_code, client.<span class="fn">get</span>(<span class="str">"/products/99"</span>).<span class="fn">json</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>(200, ['لابتوب', 'سماعة', 'رواية الخيميائي', 'قميص قطني'])
+(200, ['لابتوب', 'سماعة'])
+(200, ['رواية الخيميائي', 'قميص قطني'])
+(200, ['لابتوب', 'سماعة'])
+(422, {'detail': [{'type': 'enum', 'loc': ['query', 'category'], 'msg': "Input should be 'electronics', 'books' or 'clothes'", 'input': 'toys', 'ctx': {'expected': "'electronics', 'books' or 'clothes'"}}]})
+{'name': 'رواية الخيميائي', 'price': 45.0, 'stock': 12, 'category': 'books', 'id': 3}
+404 {'detail': 'المنتج 99 غير موجود'}</pre>
+</div>
+        <p>
+            لاحظ الرد على <code>category=toys</code>: الرمز <code>422</code> مع رسالة تذكر القيم المسموحة. لم نكتب سطرًا واحدًا لذلك!
+        </p>
+</section>
+
+<section class="section-card" id="write">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-lock"></i>
+        العمليات المحمية: إنشاء وتعديل وحذف
+    </h2>
+        <p>
+            عمليات الكتابة تتطلب ترويسة <code>X-API-Key</code>. هكذا لا يستطيع أي زائر تعديل منتجات المتجر:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>write_products.py</span>
+    </div>
+<pre>new = {<span class="str">"name"</span>: <span class="str">"لوحة مفاتيح"</span>, <span class="str">"price"</span>: <span class="num">150</span>, <span class="str">"stock"</span>: <span class="num">20</span>, <span class="str">"category"</span>: <span class="str">"electronics"</span>}
+
+r = client.<span class="fn">post</span>(<span class="str">"/products"</span>, json=new)                       <span class="cm"># بدون مفتاح</span>
+<span class="fn">print</span>(r.status_code, r.<span class="fn">json</span>())
+
+r = client.<span class="fn">post</span>(<span class="str">"/products"</span>, json=new, headers=ADMIN)       <span class="cm"># مع المفتاح</span>
+<span class="fn">print</span>(r.status_code, r.<span class="fn">json</span>())
+
+r = client.<span class="fn">post</span>(<span class="str">"/products"</span>, json={<span class="str">"name"</span>: <span class="str">"؟"</span>, <span class="str">"price"</span>: <span class="num">0</span>, <span class="str">"category"</span>: <span class="str">"food"</span>}, headers=ADMIN)
+<span class="fn">print</span>(r.status_code, [<span class="str">f"{e['loc'][-1]}: {e['type']}"</span> <span class="kw">for</span> e <span class="kw">in</span> r.<span class="fn">json</span>()[<span class="str">"detail"</span>]])
+
+r = client.<span class="fn">patch</span>(<span class="str">"/products/4"</span>, json={<span class="str">"stock"</span>: <span class="num">15</span>}, headers=ADMIN)
+<span class="fn">print</span>(r.status_code, r.<span class="fn">json</span>())
+
+r = client.<span class="fn">delete</span>(<span class="str">"/products/2"</span>, headers=ADMIN)
+<span class="fn">print</span>(r.status_code, <span class="str">"| موجود؟"</span>, client.<span class="fn">get</span>(<span class="str">"/products/2"</span>).status_code)
+
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/stats"</span>).<span class="fn">json</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>401 {'detail': 'مفتاح API غير صالح أو مفقود'}
+201 {'name': 'لوحة مفاتيح', 'price': 150.0, 'stock': 20, 'category': 'electronics', 'id': 5}
+422 ['name: string_too_short', 'price: greater_than', 'category: enum']
+200 {'name': 'قميص قطني', 'price': 89.0, 'stock': 15, 'category': 'clothes', 'id': 4}
+204 | موجود؟ 404
+{'products': 4, 'out_of_stock': [], 'inventory_value': 20875.0}</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>عن الأمان:</strong> مفتاح API ثابت في الكود مناسب للتعلم فقط. في الإنتاج: اقرأه من متغير بيئة
+                (<code>os.environ["API_KEY"]</code>)، واستخدم HTTPS دائمًا، وللمستخدمين الحقيقيين استخدم نظام دخول مثل
+                <strong>OAuth2 مع JWT</strong> الذي يدعمه FastAPI مباشرة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="tests">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-vial"></i>
+        الاختبارات الآلية
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>test_shop_api.py</span>
+    </div>
+<pre><span class="kw">import</span> unittest
+
+<span class="kw">from</span> fastapi.testclient <span class="kw">import</span> TestClient
+
+<span class="kw">import</span> shop_api
+
+ADMIN = {<span class="str">"X-API-Key"</span>: shop_api.API_KEY}
+
+
+<span class="kw">class</span> <span class="fn">ShopApiTest</span>(unittest.TestCase):
+    <span class="kw">def</span> <span class="fn">setUp</span>(self):
+        shop_api.<span class="fn">seed</span>()                       <span class="cm"># بيانات نظيفة قبل كل اختبار</span>
+        self.client = <span class="fn">TestClient</span>(shop_api.app)
+
+    <span class="kw">def</span> <span class="fn">test_list_all</span>(self):
+        self.<span class="fn">assertEqual</span>(<span class="fn">len</span>(self.client.<span class="fn">get</span>(<span class="str">"/products"</span>).<span class="fn">json</span>()), <span class="num">4</span>)
+
+    <span class="kw">def</span> <span class="fn">test_filter_by_category</span>(self):
+        r = self.client.<span class="fn">get</span>(<span class="str">"/products"</span>, params={<span class="str">"category"</span>: <span class="str">"books"</span>})
+        self.<span class="fn">assertEqual</span>([p[<span class="str">"name"</span>] <span class="kw">for</span> p <span class="kw">in</span> r.<span class="fn">json</span>()], [<span class="str">"رواية الخيميائي"</span>])
+
+    <span class="kw">def</span> <span class="fn">test_create_requires_key</span>(self):
+        r = self.client.<span class="fn">post</span>(<span class="str">"/products"</span>, json={<span class="str">"name"</span>: <span class="str">"قلم"</span>, <span class="str">"price"</span>: <span class="num">5</span>, <span class="str">"category"</span>: <span class="str">"books"</span>})
+        self.<span class="fn">assertEqual</span>(r.status_code, <span class="num">401</span>)
+
+    <span class="kw">def</span> <span class="fn">test_create_and_fetch</span>(self):
+        r = self.client.<span class="fn">post</span>(<span class="str">"/products"</span>, json={<span class="str">"name"</span>: <span class="str">"قلم"</span>, <span class="str">"price"</span>: <span class="num">5</span>, <span class="str">"category"</span>: <span class="str">"books"</span>}, headers=ADMIN)
+        self.<span class="fn">assertEqual</span>(r.status_code, <span class="num">201</span>)
+        self.<span class="fn">assertEqual</span>(self.client.<span class="fn">get</span>(<span class="str">f"/products/{r.json()['id']}"</span>).<span class="fn">json</span>()[<span class="str">"name"</span>], <span class="str">"قلم"</span>)
+
+    <span class="kw">def</span> <span class="fn">test_negative_price_rejected</span>(self):
+        r = self.client.<span class="fn">post</span>(<span class="str">"/products"</span>, json={<span class="str">"name"</span>: <span class="str">"قلم"</span>, <span class="str">"price"</span>: -<span class="num">1</span>, <span class="str">"category"</span>: <span class="str">"books"</span>}, headers=ADMIN)
+        self.<span class="fn">assertEqual</span>(r.status_code, <span class="num">422</span>)
+
+    <span class="kw">def</span> <span class="fn">test_partial_update_keeps_other_fields</span>(self):
+        r = self.client.<span class="fn">patch</span>(<span class="str">"/products/1"</span>, json={<span class="str">"price"</span>: <span class="num">2999</span>}, headers=ADMIN)
+        self.<span class="fn">assertEqual</span>(r.<span class="fn">json</span>()[<span class="str">"price"</span>], <span class="num">2999</span>)
+        self.<span class="fn">assertEqual</span>(r.<span class="fn">json</span>()[<span class="str">"name"</span>], <span class="str">"لابتوب"</span>)
+
+
+unittest.<span class="fn">main</span>(verbosity=<span class="num">2</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>test_create_and_fetch (__main__.ShopApiTest.test_create_and_fetch) ... ok
+test_create_requires_key (__main__.ShopApiTest.test_create_requires_key) ... ok
+test_filter_by_category (__main__.ShopApiTest.test_filter_by_category) ... ok
+test_list_all (__main__.ShopApiTest.test_list_all) ... ok
+test_negative_price_rejected (__main__.ShopApiTest.test_negative_price_rejected) ... ok
+test_partial_update_keeps_other_fields (__main__.ShopApiTest.test_partial_update_keeps_other_fields) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.079s
+
+OK</pre>
+</div>
+</section>
+
+<section class="section-card" id="deploy">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-cloud-upload-alt"></i>
+        هيكل المشروع والنشر
+    </h2>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-folder"></i> Project</span>
+                <span>shop-api/ (عندما يكبر المشروع)</span>
+            </div>
+<pre>shop-api/
+├── app/
+│   ├── main.py           <span class="cm"># إنشاء FastAPI وتسجيل المسارات</span>
+│   ├── models.py         <span class="cm"># نماذج Pydantic</span>
+│   ├── database.py       <span class="cm"># الاتصال بقاعدة البيانات (SQLite / PostgreSQL)</span>
+│   ├── dependencies.py   <span class="cm"># require_api_key وغيرها</span>
+│   └── routers/
+│       ├── products.py   <span class="cm"># APIRouter لمسارات المنتجات</span>
+│       └── orders.py
+├── tests/
+├── requirements.txt
+└── .env                  <span class="cm"># الأسرار — لا تُرفع إلى GitHub!</span></pre>
+        </div>
+        <div class="note-box">
+            <strong>🚀 تحديات لتطوير المشروع:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> استبدل القاموس <code>db</code> بقاعدة بيانات SQLite باستخدام <code>sqlite3</code> أو مكتبة <code>SQLModel</code>.</li>
+                <li><i class="fas fa-angle-left"></i> أضف مورد <code>/orders</code>: إنشاء طلب يُنقص المخزون، ويرفض الطلب إذا كانت الكمية غير متوفرة (409 Conflict).</li>
+                <li><i class="fas fa-angle-left"></i> أضف ترتيبًا <code>?sort=price</code> وتقسيمًا لصفحات <code>?page=2</code>.</li>
+                <li><i class="fas fa-angle-left"></i> انشر الـ API مجانًا على منصات مثل Render أو Railway أو PythonAnywhere.</li>
+                <li><i class="fas fa-angle-left"></i> أعد بناء نفس المشروع بـ Flask وقارن طول الكود وسهولة كتابته.</li>
+            </ul>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! تلميح النوع &lt;code&gt;int&lt;/code&gt; يكفي ليتحقق FastAPI ويرفض القيمة." data-hint="FastAPI يستخدم تلميحات الأنواع للتحقق قبل استدعاء دالتك.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">التحقق التلقائي</span>
+    </div>
+    <p class="exercise-question">لدينا المسار <code>@app.get("/items/{item_id}")</code> والدالة <code>def get_item(item_id: int)</code>. ماذا يحدث عند طلب <code>/items/abc</code>؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> تُستدعى الدالة و <code>item_id</code> يساوي النص <code>"abc"</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="2"> يتوقف الخادم بخطأ 500</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="3"> يرد FastAPI تلقائيًا بالرمز 422 مع شرح الخطأ</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> يرد بالرمز 404 دائمًا</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! فهمت أساسيات FastAPI جيدًا." data-hint="422 تعني بيانات غير صالحة من العميل، والأسرار لا تُرفع أبدًا.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">FastAPI يولّد صفحة توثيق تفاعلية على المسار <code>/docs</code> تلقائيًا.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>Field(gt=0)</code> تعني أن القيمة يجب أن تكون أكبر من صفر.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>Depends</code> تُستخدم لتنفيذ دالة مشتركة قبل المسار مثل التحقق من المفتاح.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">الرمز 422 يعني أن الخادم تعطل بسبب خطأ برمجي.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">من الآمن رفع ملف <code>.env</code> الذي يحتوي الأسرار إلى GitHub.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="رائع! الحذف بدون مفتاح 401، ومعه 204، والإنشاء بدون category الإلزامي 422." data-hint="انتبه للترويسة في كل طلب، وللحقول الإلزامية في &lt;code&gt;ProductIn&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">باستخدام API المتجر من المشروع (4 منتجات، والمفتاح <code>secret-123</code>)، ما رموز الحالة التي سيطبعها الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/products/2"</span>).status_code)
+<span class="fn">print</span>(client.<span class="fn">delete</span>(<span class="str">"/products/2"</span>).status_code)
+<span class="fn">print</span>(client.<span class="fn">delete</span>(<span class="str">"/products/2"</span>, headers=ADMIN).status_code)
+<span class="fn">print</span>(client.<span class="fn">post</span>(<span class="str">"/products"</span>, json={<span class="str">"name"</span>: <span class="str">"قلم"</span>, <span class="str">"price"</span>: <span class="num">5</span>}, headers=ADMIN).status_code)</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="200" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="401" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثالث:</span><input type="text" class="blank-input" data-answers="204" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الرابع:</span><input type="text" class="blank-input" data-answers="422" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذا مسار FastAPI كامل مع تحقق تلقائي من العمر." data-hint="النماذج ترث من &lt;code&gt;BaseModel&lt;/code&gt;، و «أكبر من أو يساوي» هي &lt;code&gt;ge&lt;/code&gt;، والإنشاء بـ &lt;code&gt;post&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">نموذج ومسار</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لتعريف نموذج طالب ومسار ينشئه:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI</span></div>
+        <div class="line"><span><span class="kw">from</span> pydantic <span class="kw">import</span> </span><input type="text" class="blank-input" data-answers="BaseModel" placeholder="..." style="min-width:156px;" autocomplete="off" spellcheck="false"><span>, Field</span></div>
+        <div class="line"><span>app = <span class="fn">FastAPI</span>()</span></div>
+        <div class="line"><span><span class="kw">class</span> <span class="fn">Student</span>(BaseModel):</span></div>
+        <div class="line"><span>    name: </span><input type="text" class="blank-input" data-answers="str" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span>    age: int = <span class="fn">Field</span>(</span><input type="text" class="blank-input" data-answers="ge" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>=<span class="num">6</span>)</span></div>
+        <div class="line"><span>@app.</span><input type="text" class="blank-input" data-answers="post" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'/students'</span>, status_code=<span class="num">201</span>)</span></div>
+        <div class="line"><span><span class="kw">def</span> <span class="fn">create</span>(student: Student):</span></div>
+        <div class="line"><span>    <span class="kw">return</span> student</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب صحيح! هذه هي دورة حياة الطلب في FastAPI." data-hint="دالتك لا تُستدعى إلا بعد نجاح كل عمليات التحقق.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب ما يحدث داخل FastAPI عند استقبال طلب <code>POST /products</code> مع مفتاح صحيح. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="5" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">5) تحويل الناتج حسب response_model وإرسال الرد 201</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">3) التحقق من جسم الطلب وتحويله إلى ProductIn</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">1) مطابقة المسار والطريقة مع create_product</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="4" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">4) تنفيذ دالة create_product وحفظ المنتج</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) تنفيذ الاعتمادية require_api_key للتحقق من المفتاح</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> محاكي /docs التفاعلي</div>
+    <p style="color:var(--text-light); font-size:0.95em;">محاكاة مبسطة لصفحة التوثيق التي يولّدها FastAPI. اختر مسارًا، وعدّل البيانات والمفتاح، ثم اضغط <em>Execute</em>. جرّب إرسال سعر سالب أو تصنيف غير موجود لترى رد 422، أو احذف المفتاح لترى 401.</p>
+    <div class="lab-row">
+        <select class="lab-select" id="docsEp" style="direction:ltr; flex:1;" onchange="docsPreset()">
+            <option value="list">GET /products</option>
+            <option value="get">GET /products/{id}</option>
+            <option value="create">POST /products 🔒</option>
+            <option value="update">PATCH /products/{id} 🔒</option>
+            <option value="delete">DELETE /products/{id} 🔒</option>
+            <option value="stats">GET /stats</option>
+        </select>
+    </div>
+    <div class="lab-row">
+        <label>id:</label><input type="text" class="lab-input" id="docsId" value="1" style="max-width:80px; direction:ltr;">
+        <label>Query:</label><input type="text" class="lab-input" id="docsQuery" value="category=electronics" style="flex:1; direction:ltr;">
+    </div>
+    <div class="lab-row">
+        <label>X-API-Key:</label><input type="text" class="lab-input" id="docsKey" value="secret-123" style="max-width:160px; direction:ltr;">
+        <label>Body:</label><input type="text" class="lab-input" id="docsBody" style="flex:1; direction:ltr;" value='{"name": "قلم", "price": 5, "category": "books"}'>
+        <button class="btn btn-primary" onclick="docsExecute()"><i class="fas fa-play"></i> Execute</button>
+    </div>
+    <div class="lab-console" id="docsConsole"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> الفرق بين Flask و FastAPI ومتى تختار كلًّا منهما.</li>
+                <li><i class="fas fa-check"></i> المسارات ومعاملات المسار والاستعلام مع التحويل والتحقق التلقائي من تلميحات الأنواع.</li>
+                <li><i class="fas fa-check"></i> نماذج Pydantic والقيود <code>Field(gt, ge, min_length...)</code> ورسائل 422.</li>
+                <li><i class="fas fa-check"></i> النماذج المنفصلة للإدخال والتعديل الجزئي والإخراج، و <code>response_model</code>.</li>
+                <li><i class="fas fa-check"></i> الاعتماديات <code>Depends</code> للحماية بمفتاح API ولجلب المورد أو إرجاع 404.</li>
+                <li><i class="fas fa-check"></i> <code>HTTPException</code> ورموز الحالة 201 و 204 و 401 و 404 و 422.</li>
+                <li><i class="fas fa-check"></i> الاختبار بـ <code>TestClient</code>، والتوثيق التفاعلي <code>/docs</code>، وهيكلة المشاريع الأكبر.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> افتح <code>/docs</code> دائمًا أثناء التطوير، فهو أسرع طريقة لتجربة الـ API.</li>
+                <li><i class="fas fa-lightbulb"></i> اجعل النماذج دقيقة بالقيود؛ كل قيد يحميك من بيانات خاطئة.</li>
+                <li><i class="fas fa-lightbulb"></i> لا تكتب الأسرار في الكود؛ استخدم متغيرات البيئة وملف <code>.env</code>.</li>
+                <li><i class="fas fa-lightbulb"></i> انشر مشروعك على منصة مجانية وأضف الرابط إلى ملفك على GitHub.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في المشروع التالي ستبني <strong>أداة سطر أوامر لتحليل التقارير</strong> تقرأ ملفات CSV و Excel وتنتج تقريرًا احترافيًا تلقائيًا.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="project1.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى: مشروع 1 — إدارة المهام</span>
+        </a>
+        <a href="project3.html" class="nav-link next">
+            <span>التالي: مشروع 3 — أداة تحليل تقارير</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · مشروع FastAPI
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '90%';
+            text.textContent = '90% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== محاكي /docs ========== */
+    const CATS = ['electronics', 'books', 'clothes'];
+    const SHOP = new Map([
+        [1, { id: 1, name: 'لابتوب', price: 3200, stock: 5, category: 'electronics' }],
+        [2, { id: 2, name: 'سماعة', price: 220, stock: 30, category: 'electronics' }],
+        [3, { id: 3, name: 'رواية الخيميائي', price: 45, stock: 12, category: 'books' }],
+        [4, { id: 4, name: 'قميص قطني', price: 89, stock: 0, category: 'clothes' }],
+    ]);
+
+    function docsPreset() {
+        const ep = document.getElementById('docsEp').value;
+        document.getElementById('docsBody').value = ep === 'update' ? '{"price": 199}' : '{"name": "قلم", "price": 5, "category": "books"}';
+    }
+
+    function validateProduct(d, partial) {
+        const errs = [];
+        const check = (f, ok, type, msg) => { if (d[f] !== undefined || !partial) { if (!ok) errs.push({ loc: ['body', f], type, msg }); } };
+        if (!partial && d.name === undefined) errs.push({ loc: ['body', 'name'], type: 'missing', msg: 'Field required' });
+        else check('name', typeof d.name === 'string' && d.name.length >= 2 && d.name.length <= 60, 'string_too_short', 'String should have at least 2 characters');
+        if (!partial && d.price === undefined) errs.push({ loc: ['body', 'price'], type: 'missing', msg: 'Field required' });
+        else check('price', typeof d.price === 'number' && d.price > 0, 'greater_than', 'Input should be greater than 0');
+        if (d.stock !== undefined && !(Number.isInteger(d.stock) && d.stock >= 0)) errs.push({ loc: ['body', 'stock'], type: 'greater_than_equal', msg: 'Input should be greater than or equal to 0' });
+        if (!partial && d.category === undefined) errs.push({ loc: ['body', 'category'], type: 'missing', msg: 'Field required' });
+        else check('category', CATS.includes(d.category), 'enum', "Input should be 'electronics', 'books' or 'clothes'");
+        return errs;
+    }
+
+    function docsHandle(ep, id, query, key, bodyText) {
+        const params = new URLSearchParams(query);
+        const needKey = ['create', 'update', 'delete'].includes(ep);
+        if (needKey && key !== 'secret-123') return [401, { detail: 'مفتاح API غير صالح أو مفقود' }];
+        if (['get', 'update', 'delete'].includes(ep)) {
+            if (!/^\d+$/.test(id)) return [422, { detail: [{ loc: ['path', 'product_id'], type: 'int_parsing', msg: 'Input should be a valid integer' }] }];
+            if (!SHOP.has(+id)) return [404, { detail: `المنتج ${id} غير موجود` }];
+        }
+        let body = {};
+        if (ep === 'create' || ep === 'update') {
+            try { body = JSON.parse(bodyText || '{}'); } catch (e) { return [422, { detail: [{ type: 'json_invalid', msg: 'JSON decode error' }] }]; }
+            const errs = validateProduct(body, ep === 'update');
+            if (errs.length) return [422, { detail: errs }];
+        }
+        if (ep === 'list') {
+            const cat = params.get('category');
+            if (cat && !CATS.includes(cat)) return [422, { detail: [{ loc: ['query', 'category'], type: 'enum', msg: "Input should be 'electronics', 'books' or 'clothes'" }] }];
+            let items = [...SHOP.values()];
+            if (cat) items = items.filter(p => p.category === cat);
+            if (params.get('q')) items = items.filter(p => p.name.includes(params.get('q')));
+            if (params.get('in_stock') === 'true') items = items.filter(p => p.stock > 0);
+            if (params.get('max_price')) items = items.filter(p => p.price <= +params.get('max_price'));
+            if (params.get('min_price')) items = items.filter(p => p.price >= +params.get('min_price'));
+            return [200, items];
+        }
+        if (ep === 'get') return [200, SHOP.get(+id)];
+        if (ep === 'create') {
+            const nid = Math.max(0, ...SHOP.keys()) + 1;
+            const p = { name: body.name, price: body.price, stock: body.stock ?? 0, category: body.category, id: nid };
+            SHOP.set(nid, p);
+            return [201, p];
+        }
+        if (ep === 'update') { const p = Object.assign(SHOP.get(+id), body); return [200, p]; }
+        if (ep === 'delete') { SHOP.delete(+id); return [204, null]; }
+        const all = [...SHOP.values()];
+        return [200, { products: all.length, out_of_stock: all.filter(p => p.stock === 0).map(p => p.name), inventory_value: all.reduce((a, p) => a + p.price * p.stock, 0) }];
+    }
+
+    function docsExecute() {
+        const ep = document.getElementById('docsEp').value;
+        const id = document.getElementById('docsId').value.trim();
+        const query = document.getElementById('docsQuery').value.trim();
+        const key = document.getElementById('docsKey').value.trim();
+        const body = document.getElementById('docsBody').value;
+        const [status, data] = docsHandle(ep, id, query, key, body);
+        const label = document.getElementById('docsEp').selectedOptions[0].text.replace(' 🔒', '').replace('{id}', id) +
+            (ep === 'list' && query ? '?' + query : '');
+        const color = status < 300 ? '#a5d6a7' : '#ef9a9a';
+        document.getElementById('docsConsole').innerHTML = `<span class="prompt">${escapeHtml(label)}</span>\n` +
+            `<span style="color:${color}">Code: ${status}</span>\n` + (data === null ? '(no content)' : escapeHtml(JSON.stringify(data, null, 2)));
+    }
+
+    document.addEventListener('DOMContentLoaded', docsExecute);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

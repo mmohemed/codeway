@@ -6,6 +6,7 @@
     app.innerHTML = `<div class="container empty"><h2>الدورة غير موجودة</h2><a class="btn btn-primary" href="catalog.html">العودة إلى الكتالوج</a></div>`;
     return;
   }
+  if (CW.academy[c.id]) { location.replace(CW.academy[c.id]); return; }   // دروسها في أكاديميتها
   document.title = c.name + " | CodeWay";
   const fields = CW.fieldsUsing(c.id);
   const paths = CW.pathsUsing(c.id);

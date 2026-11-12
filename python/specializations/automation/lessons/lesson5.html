@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 5: البريد الإلكتروني والتنبيهات | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص الأتمتة</a>
+        <span class="sep">/</span>
+        <span>البريد والتنبيهات</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-envelope"></i>
+            الدرس 5 · التواصل
+        </div>
+        <h1 class="lesson-title">البريد الإلكتروني والتنبيهات</h1>
+        <p class="lesson-intro">
+            تقرير يُرسل كل صباح للمدير، وتذكير بالفواتير لمئة عميل، وتنبيه فوري على جوالك عند امتلاء القرص — كلها رسائل يستطيع سكربتك إرسالها وحده. في هذا الدرس ستتعلم <strong>إرسال البريد بأمان</strong> عبر SMTP، و<strong>رسائل HTML بالمرفقات</strong>، و<strong>الإرسال الجماعي المخصص</strong> مع سجل للنتائج، و<strong>تنبيهات Telegram و Slack</strong> عبر Webhooks، وبناء <strong>نظام تنبيه ذكي</strong> لا يزعجك بالرسائل المكررة.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 75 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 رسائل وتنبيهات تلقائية</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 4</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#how">1. كيف يعمل البريد</a>
+            <a href="#testsrv">2. خادم الاختبار</a>
+            <a href="#first">3. أول رسالة</a>
+            <a href="#html">4. رسائل HTML</a>
+            <a href="#bulk">5. الإرسال الجماعي</a>
+            <a href="#hooks">6. تنبيهات فورية</a>
+            <a href="#smart">7. التنبيه الذكي</a>
+            <a href="#imap">8. قراءة البريد</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="how">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-paper-plane"></i>
+        كيف يرسل Python بريدًا؟
+    </h2>
+        <p>
+            لإرسال بريد، يتصل سكربتك بـ<strong>خادم SMTP</strong> (خادم البريد الصادر) لمزوّد بريدك، ويسجل الدخول، ثم يسلّمه الرسالة ليوصلها.
+            بايثون يأتي بكل ما تحتاجه: <code>smtplib</code> للاتصال، و <code>email.message.EmailMessage</code> لبناء الرسالة.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المزوّد</th><th>الخادم</th><th>المنفذ</th><th>ملاحظة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Gmail</td><td><code>smtp.gmail.com</code></td><td>587 (STARTTLS)</td><td>يتطلب التحقق بخطوتين و<strong>كلمة مرور تطبيق</strong></td></tr>
+                    <tr><td>Outlook / Microsoft 365</td><td><code>smtp.office365.com</code></td><td>587 (STARTTLS)</td><td>قد يتطلب تفعيل SMTP من مسؤول الحساب</td></tr>
+                    <tr><td>بريد الشركة</td><td>يحدده قسم تقنية المعلومات</td><td>587 أو 465 (SSL)</td><td>اسأل عن الخادم وطريقة الدخول</td></tr>
+                    <tr><td>خدمات الإرسال الجماعي</td><td>SendGrid، Mailgun، Amazon SES</td><td>587 أو API</td><td>للآلاف من الرسائل يوميًا</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>لا تكتب كلمة المرور في الكود أبدًا.</strong> ولا تستخدم كلمة مرور حسابك الأصلية: أنشئ في Gmail «كلمة مرور تطبيق» (App Password)
+                من إعدادات الأمان، وضعها في ملف <code>.env</code> الذي تضيفه إلى <code>.gitignore</code>. إذا تسربت يمكنك إلغاؤها وحدها دون تغيير كلمة مرور حسابك.
+            </div>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fas fa-file-alt"></i> ENV</span>
+        <span>.env</span>
+    </div>
+<pre>SMTP_HOST=smtp.gmail.com
+SMTP_PORT=<span class="num">587</span>
+SMTP_USER=reports.bot@gmail.com
+SMTP_PASSWORD=abcd efgh ijkl mnop</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>mailer.py</span>
+    </div>
+<pre><span class="kw">import</span> os
+<span class="kw">import</span> smtplib
+<span class="kw">from</span> email.message <span class="kw">import</span> EmailMessage
+
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv   <span class="cm"># pip install python-dotenv</span>
+
+<span class="fn">load_dotenv</span>()                    <span class="cm"># يقرأ ملف .env إلى متغيرات البيئة</span>
+
+
+<span class="kw">def</span> <span class="fn">send_email</span>(to, subject, body):
+    msg = <span class="fn">EmailMessage</span>()
+    msg[<span class="str">"From"</span>] = os.environ[<span class="str">"SMTP_USER"</span>]
+    msg[<span class="str">"To"</span>] = to
+    msg[<span class="str">"Subject"</span>] = subject
+    msg.<span class="fn">set_content</span>(body)
+
+    <span class="kw">with</span> smtplib.<span class="fn">SMTP</span>(os.environ[<span class="str">"SMTP_HOST"</span>], <span class="fn">int</span>(os.environ[<span class="str">"SMTP_PORT"</span>]), timeout=<span class="num">30</span>) <span class="kw">as</span> server:
+        server.<span class="fn">starttls</span>()                                   <span class="cm"># تشفير الاتصال</span>
+        server.<span class="fn">login</span>(os.environ[<span class="str">"SMTP_USER"</span>], os.environ[<span class="str">"SMTP_PASSWORD"</span>])
+        server.<span class="fn">send_message</span>(msg)
+
+
+<span class="fn">send_email</span>(<span class="str">"manager@company.com"</span>, <span class="str">"تقرير اليوم"</span>, <span class="str">"مرحبًا، التقرير جاهز."</span>)</pre>
+</div>
+</section>
+
+<section class="section-card" id="testsrv">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-flask"></i>
+        خادم بريد تجريبي على جهازك
+    </h2>
+        <p>
+            لا ترسل مئة رسالة حقيقية وأنت تجرّب! شغّل خادم SMTP تجريبيًا على جهازك يستقبل الرسائل ويطبعها بدل إرسالها.
+            افتح نافذة طرفية جديدة واكتب:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+        <span>terminal</span>
+    </div>
+<pre>pip install aiosmtpd
+python -m aiosmtpd -n -l localhost:<span class="num">1025</span></pre>
+</div>
+        <p>
+            الآن أرسل إلى <code>localhost</code> على المنفذ <code>1025</code> بدون <code>starttls</code> ولا <code>login</code>. كل أمثلة هذا الدرس تعمل على خادم
+            تجريبي كهذا، و<strong>الأسطر التي تبدأ بـ 📥 في المخرجات يطبعها الخادم</strong> ليريك ما وصله فعلًا. وقد جهزناه ليرفض أي عنوان فيه كلمة
+            <code>invalid</code>، لنتدرب على التعامل مع الأخطاء.
+        </p>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>نصيحة احترافية:</strong> اجعل الخادم إعدادًا في <code>.env</code>. في التطوير <code>SMTP_HOST=localhost</code>، وفي التشغيل الحقيقي
+                <code>smtp.gmail.com</code> — دون تغيير سطر واحد من الكود.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="first">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-envelope-open-text"></i>
+        أول رسالة: نص ومرفق
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>first_email.py</span>
+    </div>
+<pre><span class="kw">import</span> smtplib
+<span class="kw">from</span> email.message <span class="kw">import</span> EmailMessage
+
+msg = <span class="fn">EmailMessage</span>()
+msg[<span class="str">"From"</span>] = <span class="str">"reports.bot@company.com"</span>
+msg[<span class="str">"To"</span>] = <span class="str">"manager@company.com"</span>
+msg[<span class="str">"Cc"</span>] = <span class="str">"team@company.com"</span>
+msg[<span class="str">"Subject"</span>] = <span class="str">"تقرير المبيعات اليومي"</span>
+msg.<span class="fn">set_content</span>(<span class="str">"مرحبًا،\n\nإجمالي مبيعات اليوم: 48,200 ريال.\n\nرسالة آلية — لا ترد عليها."</span>)
+
+<span class="cm"># إرفاق ملف: نقرأه كبايتات ونحدد نوعه</span>
+csv_data = <span class="str">"الفرع,المبيعات\nالرياض,48200\nجدة,39500\n"</span>.<span class="fn">encode</span>(<span class="str">"utf-8-sig"</span>)
+msg.<span class="fn">add_attachment</span>(csv_data, maintype=<span class="str">"text"</span>, subtype=<span class="str">"csv"</span>, filename=<span class="str">"sales_today.csv"</span>)
+
+<span class="kw">with</span> smtplib.<span class="fn">SMTP</span>(<span class="str">"localhost"</span>, <span class="num">1025</span>, timeout=<span class="num">30</span>) <span class="kw">as</span> server:
+    refused = server.<span class="fn">send_message</span>(msg)
+
+<span class="fn">print</span>(<span class="str">"✅ أُرسلت. المرفوضون:"</span>, refused <span class="kw">or</span> <span class="str">"لا أحد"</span>)
+<span class="fn">print</span>(<span class="str">"الأجزاء:"</span>, [part.<span class="fn">get_content_type</span>() <span class="kw">for</span> part <span class="kw">in</span> msg.<span class="fn">iter_parts</span>()])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   📥 [خادم الاختبار] إلى: manager@company.com, team@company.com | الموضوع: تقرير المبيعات اليومي | الأجزاء: text/plain, 📎 sales_today.csv
+✅ أُرسلت. المرفوضون: لا أحد
+الأجزاء: ['text/plain', 'text/csv']</pre>
+</div>
+        <ul>
+            <li><code>send_message</code> ترسل إلى كل العناوين في <code>To</code> و <code>Cc</code> و <code>Bcc</code>، وتُرجع قاموس العناوين المرفوضة (فارغًا عند النجاح).</li>
+            <li>عند إضافة مرفق تتحول الرسالة تلقائيًا إلى <code>multipart/mixed</code>: جزء للنص وجزء للملف.</li>
+            <li>لملف حقيقي على القرص: <code>msg.add_attachment(path.read_bytes(), maintype=..., subtype=..., filename=path.name)</code>،
+                ويمكن تخمين النوع بـ <code>mimetypes.guess_type(path)</code> كما سنرى.</li>
+        </ul>
+</section>
+
+<section class="section-card" id="html">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-code"></i>
+        رسائل HTML منسقة بالمرفقات
+    </h2>
+        <p>
+            الرسالة الاحترافية تحتوي نسختين: <strong>نصًا عاديًا</strong> للبرامج التي لا تعرض HTML، و<strong>HTML</strong> بجدول وألوان.
+            نضيف الثانية بـ <code>add_alternative</code>، ويختار برنامج البريد الأنسب:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>html_email.py</span>
+    </div>
+<pre><span class="kw">import</span> mimetypes
+<span class="kw">import</span> smtplib
+<span class="kw">from</span> email.message <span class="kw">import</span> EmailMessage
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+sales = [(<span class="str">"الرياض"</span>, <span class="num">48200</span>), (<span class="str">"جدة"</span>, <span class="num">39500</span>), (<span class="str">"الدمام"</span>, <span class="num">21800</span>)]
+
+rows = <span class="str">""</span>.<span class="fn">join</span>(<span class="str">f"&lt;tr&gt;&lt;td&gt;{b}&lt;/td&gt;&lt;td style='text-align:left'&gt;{v:,}&lt;/td&gt;&lt;/tr&gt;"</span> <span class="kw">for</span> b, v <span class="kw">in</span> sales)
+html = <span class="str">f"""\
+&lt;html dir="rtl"&gt;&lt;body style="font-family:Tahoma, Arial; color:#222"&gt;
+  &lt;h2 style="color:#b8860b"&gt;تقرير المبيعات&lt;/h2&gt;
+  &lt;table border="1" cellpadding="6" style="border-collapse:collapse"&gt;
+    &lt;tr style="background:#f5d76e"&gt;&lt;th&gt;الفرع&lt;/th&gt;&lt;th&gt;المبيعات&lt;/th&gt;&lt;/tr&gt;{rows}
+  &lt;/table&gt;
+  &lt;p&gt;الإجمالي: &lt;b&gt;{sum(v for _, v in sales):,} ريال&lt;/b&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;"""</span>
+
+msg = <span class="fn">EmailMessage</span>()
+msg[<span class="str">"From"</span>], msg[<span class="str">"To"</span>], msg[<span class="str">"Subject"</span>] = <span class="str">"reports.bot@company.com"</span>, <span class="str">"manager@company.com"</span>, <span class="str">"📊 تقرير المبيعات"</span>
+msg.<span class="fn">set_content</span>(<span class="str">"تقرير المبيعات مرفق. افتح الرسالة في برنامج يدعم HTML لرؤية الجدول."</span>)
+msg.<span class="fn">add_alternative</span>(html, subtype=<span class="str">"html"</span>)
+
+<span class="cm"># إرفاق ملفات بتخمين نوعها من الامتداد</span>
+<span class="fn">Path</span>(<span class="str">"summary.txt"</span>).<span class="fn">write_text</span>(<span class="str">"ملخص الأسبوع"</span>, encoding=<span class="str">"utf-8"</span>)
+<span class="fn">Path</span>(<span class="str">"chart.png"</span>).<span class="fn">write_bytes</span>(<span class="str">b"\x89PNG fake image data"</span>)
+<span class="kw">for</span> path <span class="kw">in</span> [<span class="fn">Path</span>(<span class="str">"summary.txt"</span>), <span class="fn">Path</span>(<span class="str">"chart.png"</span>)]:
+    ctype, _ = mimetypes.<span class="fn">guess_type</span>(path.name)
+    maintype, subtype = (ctype <span class="kw">or</span> <span class="str">"application/octet-stream"</span>).<span class="fn">split</span>(<span class="str">"/"</span>)
+    msg.<span class="fn">add_attachment</span>(path.<span class="fn">read_bytes</span>(), maintype=maintype, subtype=subtype, filename=path.name)
+
+<span class="kw">with</span> smtplib.<span class="fn">SMTP</span>(<span class="str">"localhost"</span>, <span class="num">1025</span>) <span class="kw">as</span> server:
+    server.<span class="fn">send_message</span>(msg)
+<span class="fn">print</span>(<span class="str">"✅ النوع النهائي:"</span>, msg.<span class="fn">get_content_type</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   📥 [خادم الاختبار] إلى: manager@company.com | الموضوع: 📊 تقرير المبيعات | الأجزاء: text/plain, text/html, 📎 summary.txt, 📎 chart.png
+✅ النوع النهائي: multipart/mixed</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                برامج البريد تتجاهل CSS الخارجي ووسوم <code>&lt;style&gt;</code> غالبًا، لذلك نكتب التنسيق <strong>داخل الوسوم</strong> (<code>style="..."</code>)
+                ونستخدم الجداول للتخطيط. وأضف <code>dir="rtl"</code> ليظهر النص العربي صحيحًا.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="bulk">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-users"></i>
+        الإرسال الجماعي المخصص
+    </h2>
+        <p>
+            تذكير بالفواتير لكل عميل باسمه ومبلغه. القواعد الذهبية: <strong>رسالة مستقلة لكل مستلم</strong> (لا تكشف عناوين العملاء لبعضهم)،
+            و<strong>اتصال واحد</strong> للجميع، و<strong>خطأ عميل لا يوقف الباقين</strong>، و<strong>سجل</strong> بما حدث، و<strong>وضع تجربة</strong> قبل الإرسال الحقيقي.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>bulk_send.py</span>
+    </div>
+<pre><span class="kw">import</span> csv
+<span class="kw">import</span> smtplib
+<span class="kw">import</span> time
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+<span class="kw">from</span> email.message <span class="kw">import</span> EmailMessage
+<span class="kw">from</span> io <span class="kw">import</span> StringIO
+
+CUSTOMERS = <span class="fn">StringIO</span>(<span class="str">"""name,email,invoice,amount
+سارة,sara@client.com,1001,1250
+خالد,khaled@invalid.com,1002,980
+منى,mona@client.com,1003,4600
+"""</span>)
+TEMPLATE = <span class="str">"عزيزي/عزيزتي {name}،\n\nنذكّرك بالفاتورة رقم {invoice} بمبلغ {amount:,} ريال.\n\nشكرًا لك."</span>
+DRY_RUN = <span class="kw">False</span>          <span class="cm"># اجعلها True لترى الرسائل دون إرسالها</span>
+
+
+<span class="kw">def</span> <span class="fn">build</span>(row):
+    msg = <span class="fn">EmailMessage</span>()
+    msg[<span class="str">"From"</span>] = <span class="str">"billing@company.com"</span>
+    msg[<span class="str">"To"</span>] = row[<span class="str">"email"</span>]
+    msg[<span class="str">"Subject"</span>] = <span class="str">f"تذكير: الفاتورة {row['invoice']}"</span>
+    msg.<span class="fn">set_content</span>(TEMPLATE.<span class="fn">format</span>(**row))
+    <span class="kw">return</span> msg
+
+
+rows = <span class="fn">list</span>(csv.<span class="fn">DictReader</span>(CUSTOMERS))
+<span class="kw">for</span> row <span class="kw">in</span> rows:
+    row[<span class="str">"amount"</span>] = <span class="fn">int</span>(row[<span class="str">"amount"</span>])
+
+log = []
+<span class="kw">with</span> smtplib.<span class="fn">SMTP</span>(<span class="str">"localhost"</span>, <span class="num">1025</span>) <span class="kw">as</span> server:
+    <span class="kw">for</span> row <span class="kw">in</span> rows:
+        msg = <span class="fn">build</span>(row)
+        <span class="kw">if</span> DRY_RUN:
+            <span class="fn">print</span>(<span class="str">"🧪"</span>, msg[<span class="str">"To"</span>], <span class="str">"|"</span>, msg[<span class="str">"Subject"</span>])
+            <span class="kw">continue</span>
+        <span class="kw">try</span>:
+            server.<span class="fn">send_message</span>(msg)
+            log.<span class="fn">append</span>((row[<span class="str">"email"</span>], <span class="str">"sent"</span>, <span class="str">""</span>))
+        <span class="kw">except</span> smtplib.SMTPRecipientsRefused <span class="kw">as</span> e:
+            code, reason = e.recipients[row[<span class="str">"email"</span>]]
+            log.<span class="fn">append</span>((row[<span class="str">"email"</span>], <span class="str">"failed"</span>, <span class="str">f"{code} {reason.decode()}"</span>))
+        time.<span class="fn">sleep</span>(<span class="num">0.1</span>)  <span class="cm"># تهدئة بسيطة كي لا يعتبرك المزود مرسل رسائل مزعجة</span>
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">f"send_log_{date(2025, 3, 14)}.csv"</span>, <span class="str">"w"</span>, newline=<span class="str">""</span>, encoding=<span class="str">"utf-8-sig"</span>) <span class="kw">as</span> f:
+    csv.<span class="fn">writer</span>(f).<span class="fn">writerows</span>([(<span class="str">"email"</span>, <span class="str">"status"</span>, <span class="str">"error"</span>), *log])
+
+<span class="kw">for</span> email, status, error <span class="kw">in</span> log:
+    <span class="fn">print</span>(<span class="str">f"{'✅' if status == 'sent' else '❌'} {email:&lt;20} {error}"</span>)
+<span class="fn">print</span>(<span class="str">f"النتيجة: {sum(s == 'sent' for _, s, _ in log)} من {len(log)} أُرسلت"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   📥 [خادم الاختبار] إلى: sara@client.com | الموضوع: تذكير: الفاتورة 1001 | الأجزاء: text/plain
+   📥 [خادم الاختبار] إلى: mona@client.com | الموضوع: تذكير: الفاتورة 1003 | الأجزاء: text/plain
+✅ sara@client.com      
+❌ khaled@invalid.com   550 5.1.1 Mailbox not found
+✅ mona@client.com      
+النتيجة: 2 من 3 أُرسلت</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الاستثناء</th><th>متى يحدث</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>SMTPAuthenticationError</code></td><td>اسم المستخدم أو كلمة مرور التطبيق خطأ</td></tr>
+                    <tr><td><code>SMTPRecipientsRefused</code></td><td>الخادم رفض كل المستلمين (عنوان غير موجود)</td></tr>
+                    <tr><td><code>SMTPServerDisconnected</code></td><td>انقطع الاتصال (أعد الاتصال وأكمل)</td></tr>
+                    <tr><td><code>TimeoutError</code> / <code>OSError</code></td><td>لا يوجد إنترنت أو الخادم لا يستجيب</td></tr>
+                    <tr><td><code>smtplib.SMTPException</code></td><td>الأب لكل أخطاء SMTP — التقطه أخيرًا</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>حدود الإرسال حقيقية:</strong> Gmail يسمح بنحو 500 رسالة يوميًا للحساب العادي. وإرسال رسائل لم يطلبها أصحابها قد يوقف حسابك.
+                أرسل فقط لمن يتوقع رسائلك، وللآلاف استخدم خدمة إرسال متخصصة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="hooks">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-bell"></i>
+        تنبيهات فورية: Telegram و Slack و Discord
+    </h2>
+        <p>
+            البريد ممتاز للتقارير، لكن للتنبيه العاجل تريد إشعارًا على جوالك فورًا. أغلب منصات المحادثة تقبل رسائل عبر <strong>Webhook</strong>:
+            رابط سري ترسل إليه طلب <code>POST</code> بصيغة JSON فيظهر كرسالة.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المنصة</th><th>كيف تحصل على الرابط</th><th>شكل الرسالة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Telegram</td><td>أنشئ بوتًا عبر <code>@BotFather</code> لتحصل على Token، ثم اعرف <code>chat_id</code> الخاص بك</td><td><code>{"chat_id": ..., "text": "..."}</code></td></tr>
+                    <tr><td>Slack</td><td>Incoming Webhooks في إعدادات التطبيق</td><td><code>{"text": "..."}</code></td></tr>
+                    <tr><td>Discord</td><td>إعدادات القناة ← Integrations ← Webhooks</td><td><code>{"content": "..."}</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>notify_telegram.py</span>
+    </div>
+<pre><span class="kw">import</span> os
+
+<span class="kw">import</span> requests
+
+TOKEN = os.environ[<span class="str">"TELEGRAM_TOKEN"</span>]       <span class="cm"># من BotFather — سري مثل كلمة المرور</span>
+CHAT_ID = os.environ[<span class="str">"TELEGRAM_CHAT_ID"</span>]
+
+
+<span class="kw">def</span> <span class="fn">telegram</span>(text):
+    r = requests.<span class="fn">post</span>(<span class="str">f"https://api.telegram.org/bot{TOKEN}/sendMessage"</span>,
+                      json={<span class="str">"chat_id"</span>: CHAT_ID, <span class="str">"text"</span>: text}, timeout=<span class="num">10</span>)
+    r.<span class="fn">raise_for_status</span>()
+
+
+<span class="fn">telegram</span>(<span class="str">"🚨 القرص ممتلئ بنسبة 93% على خادم التقارير"</span>)</pre>
+</div>
+        <p>
+            لنكتب دالة واحدة ترسل للمنصة المطلوبة، ونجربها على خادم Webhook تجريبي على الجهاز (يطبع ما يصله بعد 📥):
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>notify.py</span>
+    </div>
+<pre><span class="kw">import</span> requests
+
+WEBHOOKS = {   <span class="cm"># في الواقع: روابط Slack و Discord الحقيقية من ملف .env</span>
+    <span class="str">"slack"</span>: <span class="str">"http://127.0.0.1:8765/slack/T000/B000"</span>,
+    <span class="str">"discord"</span>: <span class="str">"http://127.0.0.1:8765/discord/123/abc"</span>,
+}
+PAYLOAD_KEY = {<span class="str">"slack"</span>: <span class="str">"text"</span>, <span class="str">"discord"</span>: <span class="str">"content"</span>}
+
+
+<span class="kw">def</span> <span class="fn">notify</span>(platform, text, level=<span class="str">"info"</span>):
+    icon = {<span class="str">"info"</span>: <span class="str">"ℹ️"</span>, <span class="str">"warning"</span>: <span class="str">"⚠️"</span>, <span class="str">"critical"</span>: <span class="str">"🚨"</span>}[level]
+    <span class="kw">try</span>:
+        r = requests.<span class="fn">post</span>(WEBHOOKS[platform], json={PAYLOAD_KEY[platform]: <span class="str">f"{icon} {text}"</span>}, timeout=<span class="num">10</span>)
+        r.<span class="fn">raise_for_status</span>()
+        <span class="kw">return</span> <span class="kw">True</span>
+    <span class="kw">except</span> requests.RequestException <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="str">"فشل التنبيه:"</span>, e)     <span class="cm"># التنبيه لا يجب أن يُسقط السكربت الأصلي</span>
+        <span class="kw">return</span> <span class="kw">False</span>
+
+
+<span class="fn">print</span>(<span class="fn">notify</span>(<span class="str">"slack"</span>, <span class="str">"اكتمل النسخ الاحتياطي الليلي (2.4 GB)"</span>))
+<span class="fn">print</span>(<span class="fn">notify</span>(<span class="str">"discord"</span>, <span class="str">"فشل استيراد ملف المبيعات"</span>, level=<span class="str">"critical"</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   📥 [/slack/T000/B000] {"text": "ℹ️ اكتمل النسخ الاحتياطي الليلي (2.4 GB)"}
+True
+   📥 [/discord/123/abc] {"content": "🚨 فشل استيراد ملف المبيعات"}
+True</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>لاحظ الـ <code>try/except</code>:</strong> إذا كان Slack متوقفًا، لا نريد أن يفشل سكربت النسخ الاحتياطي كله بسبب التنبيه.
+                الإشعار خدمة إضافية، وفشله يُسجل ولا يوقف العمل.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="smart">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-brain"></i>
+        نظام تنبيه ذكي لا يزعجك
+    </h2>
+        <p>
+            سكربت يفحص حرارة الخادم كل 5 دقائق ويرسل تنبيهًا كلما تجاوزت 85°… سيرسل لك 12 رسالة في الساعة عن المشكلة نفسها، فتتجاهلها كلها!
+            التنبيه الذكي يعتمد على <strong>تغيّر الحالة</strong> و<strong>فترة تهدئة (Cooldown)</strong>:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>smart_alerts.py</span>
+    </div>
+<pre><span class="kw">from</span> datetime <span class="kw">import</span> datetime, timedelta
+
+
+<span class="kw">class</span> <span class="fn">AlertManager</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, threshold, cooldown_minutes, send):
+        self.threshold = threshold
+        self.cooldown = <span class="fn">timedelta</span>(minutes=cooldown_minutes)
+        self.send = send
+        self.alerting = <span class="kw">False</span>        <span class="cm"># هل نحن في حالة إنذار الآن؟</span>
+        self.last_sent = <span class="kw">None</span>
+
+    <span class="kw">def</span> <span class="fn">check</span>(self, now, value):
+        <span class="kw">if</span> value &gt;= self.threshold:
+            <span class="kw">if</span> <span class="kw">not</span> self.alerting:
+                self.<span class="fn">_notify</span>(now, <span class="str">f"🚨 تنبيه: القيمة {value} تجاوزت {self.threshold}"</span>)
+            <span class="kw">elif</span> now - self.last_sent &gt;= self.cooldown:
+                self.<span class="fn">_notify</span>(now, <span class="str">f"🔁 تذكير: المشكلة مستمرة ({value})"</span>)
+            self.alerting = <span class="kw">True</span>
+        <span class="kw">elif</span> self.alerting:
+            self.alerting = <span class="kw">False</span>
+            self.<span class="fn">_notify</span>(now, <span class="str">f"✅ عادت القيمة طبيعية ({value})"</span>)
+
+    <span class="kw">def</span> <span class="fn">_notify</span>(self, now, text):
+        self.last_sent = now
+        self.<span class="fn">send</span>(<span class="str">f"{now:%H:%M} {text}"</span>)
+
+
+sent = []
+manager = <span class="fn">AlertManager</span>(threshold=<span class="num">85</span>, cooldown_minutes=<span class="num">30</span>, send=sent.append)
+readings = [<span class="num">72</span>, <span class="num">80</span>, <span class="num">88</span>, <span class="num">91</span>, <span class="num">93</span>, <span class="num">90</span>, <span class="num">89</span>, <span class="num">92</span>, <span class="num">94</span>, <span class="num">90</span>, <span class="num">86</span>, <span class="num">78</span>, <span class="num">74</span>, <span class="num">87</span>, <span class="num">70</span>]
+start = <span class="fn">datetime</span>(<span class="num">2025</span>, <span class="num">3</span>, <span class="num">14</span>, <span class="num">9</span>, <span class="num">0</span>)
+<span class="kw">for</span> i, value <span class="kw">in</span> <span class="fn">enumerate</span>(readings):
+    manager.<span class="fn">check</span>(start + <span class="fn">timedelta</span>(minutes=<span class="num">5</span> * i), value)
+
+<span class="fn">print</span>(<span class="str">"\n"</span>.<span class="fn">join</span>(sent))
+naive = <span class="fn">sum</span>(v &gt;= <span class="num">85</span> <span class="kw">for</span> v <span class="kw">in</span> readings)
+<span class="fn">print</span>(<span class="str">f"\nالتنبيه الساذج: {naive} رسائل | التنبيه الذكي: {len(sent)} رسائل"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>09:10 🚨 تنبيه: القيمة 88 تجاوزت 85
+09:40 🔁 تذكير: المشكلة مستمرة (94)
+09:55 ✅ عادت القيمة طبيعية (78)
+10:05 🚨 تنبيه: القيمة 87 تجاوزت 85
+10:10 ✅ عادت القيمة طبيعية (70)
+
+التنبيه الساذج: 10 رسائل | التنبيه الذكي: 5 رسائل</pre>
+</div>
+        <p>
+            عشر قراءات مرتفعة، لكن بدل عشر رسائل وصلتك رسائل قليلة تحمل كل المعلومات: متى بدأت المشكلة، وأنها ما زالت مستمرة، ومتى انتهت.
+            جرّب هذا المنطق بقيمك الخاصة في المختبر أسفل الصفحة.
+        </p>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                في سكربت يعمل بالجدولة (الدرس 7) يُعاد تشغيله كل مرة من الصفر، فتضيع <code>alerting</code> و <code>last_sent</code>.
+                الحل: احفظ الحالة في ملف JSON صغير واقرأها في بداية كل تشغيل.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="imap">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-inbox"></i>
+        قراءة البريد الوارد تلقائيًا
+    </h2>
+        <p>
+            الأتمتة تعمل في الاتجاهين: يمكنك أيضًا <strong>قراءة</strong> البريد عبر بروتوكول IMAP — مثلًا تنزيل كل فواتير PDF المرفقة من مورد معين
+            إلى مجلد، ثم معالجتها بما تعلمته في الدرس 3:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>fetch_invoices.py</span>
+    </div>
+<pre><span class="kw">import</span> email
+<span class="kw">import</span> imaplib
+<span class="kw">import</span> os
+<span class="kw">from</span> email <span class="kw">import</span> policy
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+out = <span class="fn">Path</span>(<span class="str">"invoices"</span>)
+out.<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+
+<span class="kw">with</span> imaplib.<span class="fn">IMAP4_SSL</span>(<span class="str">"imap.gmail.com"</span>) <span class="kw">as</span> box:
+    box.<span class="fn">login</span>(os.environ[<span class="str">"SMTP_USER"</span>], os.environ[<span class="str">"SMTP_PASSWORD"</span>])
+    box.<span class="fn">select</span>(<span class="str">"INBOX"</span>, readonly=<span class="kw">True</span>)                 <span class="cm"># للقراءة فقط: لا نغيّر شيئًا</span>
+    _, ids = box.<span class="fn">search</span>(<span class="kw">None</span>, <span class="str">'(FROM "billing@supplier.com" SINCE "01-Mar-2025")'</span>)
+    <span class="kw">for</span> msg_id <span class="kw">in</span> ids[<span class="num">0</span>].<span class="fn">split</span>():
+        _, data = box.<span class="fn">fetch</span>(msg_id, <span class="str">"(RFC822)"</span>)
+        msg = email.<span class="fn">message_from_bytes</span>(data[<span class="num">0</span>][<span class="num">1</span>], policy=policy.default)
+        <span class="kw">for</span> part <span class="kw">in</span> msg.<span class="fn">iter_attachments</span>():
+            name = part.<span class="fn">get_filename</span>()
+            <span class="kw">if</span> name <span class="kw">and</span> name.<span class="fn">lower</span>().<span class="fn">endswith</span>(<span class="str">".pdf"</span>):
+                (out / <span class="fn">Path</span>(name).name).<span class="fn">write_bytes</span>(part.<span class="fn">get_payload</span>(decode=<span class="kw">True</span>))
+                <span class="fn">print</span>(<span class="str">"⬇️"</span>, name, <span class="str">"من رسالة:"</span>, msg[<span class="str">"Subject"</span>])</pre>
+</div>
+        <ul>
+            <li><code>readonly=True</code> يمنع تعليم الرسائل كمقروءة أثناء التجربة.</li>
+            <li><code>Path(name).name</code> يحميك من أسماء مرفقات خبيثة مثل <code>../../file</code> تحاول الكتابة خارج المجلد.</li>
+            <li>لا تفتح المرفقات التنفيذية تلقائيًا أبدًا؛ نزّل فقط الأنواع التي تتوقعها.</li>
+        </ul>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! كلمة مرور التطبيق في ملف بيئة غير مرفوع، ويمكن إلغاؤها وحدها عند تسربها." data-hint="أي شيء داخل الكود سيصل يومًا إلى Git أو لزميل.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">الأمان</span>
+    </div>
+    <p class="exercise-question">أين تضع كلمة مرور البريد التي يستخدمها سكربت إرسال التقارير؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> داخل الكود في متغير <code>PASSWORD</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> في ملف <code>.env</code> مستبعد من Git، وتكون «كلمة مرور تطبيق» لا كلمة الحساب الأصلية</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> في تعليق داخل الكود حتى لا تنساها</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> في اسم الملف نفسه</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تعرف كيف ترسل بأمان ولباقة." data-hint="فكر في خصوصية العملاء وفي إزعاج الرسائل المتكررة.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">المنفذ 587 يستخدم عادة مع <code>starttls()</code> لتشفير الاتصال.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">لإرسال تذكير لمئة عميل، ضع كل عناوينهم في حقل <code>To</code> لرسالة واحدة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>add_alternative(html, subtype='html')</code> تضيف نسخة HTML بجانب النص العادي.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">نظام التنبيه الجيد يرسل رسالة عند كل قراءة تتجاوز الحد.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">فشل إرسال تنبيه Slack لا يجب أن يوقف السكربت الأساسي.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! &lt;code&gt;**row&lt;/code&gt; تفك القاموس إلى معاملات بالاسم، و &lt;code&gt;,.2f&lt;/code&gt; تضيف الفواصل ومنزلتين عشريتين." data-hint="&lt;code&gt;:,.2f&lt;/code&gt; تعني: فاصل الآلاف ورقمان بعد الفاصلة العشرية.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">القوالب</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre>template = <span class="str">"مرحبا {name}، رصيدك {balance:,.2f}"</span>
+<span class="fn">print</span>(template.<span class="fn">format</span>(name=<span class="str">"سارة"</span>, balance=<span class="num">1250.5</span>))
+row = {<span class="str">"name"</span>: <span class="str">"خالد"</span>, <span class="str">"balance"</span>: <span class="num">980</span>}
+<span class="fn">print</span>(template.<span class="fn">format</span>(**row))</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر 1:</span><input type="text" class="blank-input" data-answers="مرحبا سارة، رصيدك 1,250.50" placeholder="..." style="min-width:394px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 2:</span><input type="text" class="blank-input" data-answers="مرحبا خالد، رصيدك 980.00" placeholder="..." style="min-width:366px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! بناء الرسالة ← تشفير الاتصال ← الدخول ← الإرسال." data-hint="التشفير يسبق الدخول دائمًا حتى لا تُرسل كلمة المرور مكشوفة.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">smtplib</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لإرسال رسالة عبر Gmail بشكل آمن:</p>
+    <div class="code-fill">
+        <div class="line"><span>msg = </span><input type="text" class="blank-input" data-answers="EmailMessage" placeholder="..." style="min-width:198px;" autocomplete="off" spellcheck="false"><span>()</span></div>
+        <div class="line"><span>msg[<span class="str">'Subject'</span>] = <span class="str">'تقرير اليوم'</span></span></div>
+        <div class="line"><span>msg.</span><input type="text" class="blank-input" data-answers="set_content" placeholder="..." style="min-width:184px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'التقرير جاهز'</span>)</span></div>
+        <div class="line"><span><span class="kw">with</span> smtplib.<span class="fn">SMTP</span>(<span class="str">'smtp.gmail.com'</span>, <span class="num">587</span>) <span class="kw">as</span> s:</span></div>
+        <div class="line"><span>    s.</span><input type="text" class="blank-input" data-answers="starttls" placeholder="..." style="min-width:142px;" autocomplete="off" spellcheck="false"><span>()</span></div>
+        <div class="line"><span>    s.</span><input type="text" class="blank-input" data-answers="login" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"><span>(user, app_password)</span></div>
+        <div class="line"><span>    s.</span><input type="text" class="blank-input" data-answers="send_message" placeholder="..." style="min-width:198px;" autocomplete="off" spellcheck="false"><span>(msg)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! اتصال واحد، ورسالة لكل مستلم، وسجل لكل نتيجة." data-hint="السجل يُحفظ بعد انتهاء كل الرسائل.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب خطوات سكربت الإرسال الجماعي الاحترافي. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) الإرسال داخل try/except وتسجيل النتيجة</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">1) قراءة المستلمين من ملف CSV</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">5) حفظ سجل الإرسال وطباعة الملخص</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">3) لكل مستلم: بناء رسالة مخصصة من القالب</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) فتح اتصال SMTP واحد</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر نظام التنبيه الذكي</div>
+    <p style="color:var(--text-light); font-size:0.95em;">أدخل قراءات (كل 5 دقائق بدءًا من 09:00)، والحد، وفترة التهدئة. شاهد متى يرسل النظام تنبيهًا أو تذكيرًا أو إشعار تعافٍ، وقارن عدد الرسائل بالتنبيه الساذج. المنطق مطابق لكلاس <code>AlertManager</code> في الدرس.</p>
+    <div class="lab-row">
+        <label>الحد:</label>
+        <input class="lab-input" id="alThreshold" type="number" value="85" style="width:90px;" oninput="runAlerts()">
+        <label>التهدئة (دقيقة):</label>
+        <input class="lab-input" id="alCooldown" type="number" value="30" min="5" step="5" style="width:90px;" oninput="runAlerts()">
+    </div>
+    <div class="lab-row">
+        <label>القراءات:</label>
+        <input class="lab-input" id="alReadings" style="flex:1; min-width:220px; direction:ltr;" oninput="runAlerts()"
+               value="72, 80, 88, 91, 93, 90, 89, 92, 94, 90, 86, 78, 74, 87, 70">
+    </div>
+    <div class="lab-console" id="alOut" style="direction:rtl; text-align:right;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> كيف يعمل SMTP، وإعدادات Gmail و Outlook، وكلمات مرور التطبيقات وملف .env.</li>
+                <li><i class="fas fa-check"></i> تجربة الإرسال بأمان على خادم بريد محلي بـ aiosmtpd.</li>
+                <li><i class="fas fa-check"></i> بناء رسائل نصية و HTML بالمرفقات بـ EmailMessage.</li>
+                <li><i class="fas fa-check"></i> الإرسال الجماعي المخصص مع وضع التجربة والتعامل مع الأخطاء وسجل النتائج.</li>
+                <li><i class="fas fa-check"></i> التنبيهات الفورية عبر Telegram و Slack و Discord بالـ Webhooks.</li>
+                <li><i class="fas fa-check"></i> نظام تنبيه ذكي بتغير الحالة وفترة التهدئة.</li>
+                <li><i class="fas fa-check"></i> قراءة البريد وتنزيل المرفقات بـ IMAP بأمان.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> جرّب دائمًا على خادم محلي أو على بريدك أنت قبل العملاء.</li>
+                <li><i class="fas fa-lightbulb"></i> أضف «رسالة آلية» في نص كل رسالة يرسلها سكربت.</li>
+                <li><i class="fas fa-lightbulb"></i> اجعل فشل التنبيه يُسجَّل ولا يُسقط السكربت.</li>
+                <li><i class="fas fa-lightbulb"></i> أرسل التنبيه عند تغير الحالة، لا عند كل قراءة.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>أتمتة الويب واستخراج البيانات</strong>: الواجهات البرمجية، و BeautifulSoup، وتسجيل الدخول، واحترام قواعد المواقع.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson4.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 4: معالجة النصوص والتعابير النمطية</span>
+        </a>
+        <a href="lesson6.html" class="nav-link next">
+            <span>الدرس التالي: أتمتة الويب واستخراج البيانات</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · البريد والتنبيهات
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '50%';
+            text.textContent = '50% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر التنبيه الذكي ========== */
+    function runAlerts() {
+        const threshold = parseFloat(document.getElementById('alThreshold').value);
+        const cooldown = Math.max(0, parseFloat(document.getElementById('alCooldown').value) || 0);
+        const values = document.getElementById('alReadings').value.split(/[,،\s]+/).filter(Boolean).map(Number);
+        const out = document.getElementById('alOut');
+        if (isNaN(threshold) || !values.length || values.some(isNaN)) {
+            out.innerHTML = '<span class="err">أدخل حدًا رقميًا وقراءات رقمية مفصولة بفواصل.</span>';
+            return;
+        }
+        let alerting = false, lastSent = null, sent = 0;
+        const lines = values.map((v, i) => {
+            const minutes = 9 * 60 + 5 * i;
+            const time = String(Math.floor(minutes / 60) % 24).padStart(2, '0') + ':' + String(minutes % 60).padStart(2, '0');
+            let status;
+            if (v >= threshold) {
+                if (!alerting) { status = '🚨 إرسال تنبيه'; lastSent = minutes; sent++; }
+                else if (minutes - lastSent >= cooldown) { status = '🔁 إرسال تذكير'; lastSent = minutes; sent++; }
+                else status = `🔕 مكتوم (التهدئة: بقي ${cooldown - (minutes - lastSent)} د)`;
+                alerting = true;
+            } else if (alerting) {
+                alerting = false; status = '✅ إرسال إشعار تعافٍ'; lastSent = minutes; sent++;
+            } else status = '— طبيعي';
+            const color = status.includes('إرسال') ? 'var(--gold)' : '#888';
+            return `<span style="color:${color}">${time}   ${escapeHtml(String(v)).padStart(5)}   ${status}</span>`;
+        });
+        const naive = values.filter(v => v >= threshold).length;
+        out.innerHTML = lines.join('\n') +
+            `\n\n<strong>التنبيه الساذج: ${naive} رسائل | التنبيه الذكي: ${sent} رسائل</strong>`;
+    }
+
+    document.addEventListener('DOMContentLoaded', runAlerts);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>واجهة المستخدم Templates في Django | CodeWay</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prism.js للتلوين -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-dark: #d4af37;
+            --primary-light: #ffed4a;
+            --dark: #0a0a0a;
+            --dark-light: #1a1a1a;
+            --dark-surface: #222;
+            --text: #ffffff;
+            --text-light: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --border-color: rgba(255, 215, 0, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #00c851;
+            --info: #00b4ff;
+            --warning: #ff8800;
+            --danger: #ff4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* شريط التقدم */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            z-index: 1001;
+            background: transparent;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.97);
+            backdrop-filter: blur(20px);
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .nav-links .back-home {
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary) !important;
+            border-radius: 50px;
+        }
+
+        .nav-links .back-home:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        /* زر العودة للأعلى */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+            z-index: 999;
+            border: none;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.6);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 20px 60px;
+            background: linear-gradient(135deg, var(--dark), var(--dark-light));
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05), transparent 70%);
+            border-radius: 50%;
+            animation: floatBubble 25s ease-in-out infinite;
+        }
+
+        @keyframes floatBubble {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, 30px) scale(1.1); }
+        }
+
+        .hero-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .hero-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 i {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .hero-meta i {
+            color: var(--primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+        }
+
+        /* بطاقات المحتوى */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .content-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .content-card h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .content-card h2 i {
+            font-size: 1.5rem;
+        }
+
+        .content-card h3 {
+            color: var(--primary-light);
+            font-size: 1.3rem;
+            margin: 25px 0 15px;
+        }
+
+        .content-card h4 {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin: 20px 0 10px;
+        }
+
+        .content-card p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .content-card ul, .content-card ol {
+            color: var(--text-light);
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+
+        .content-card li {
+            margin-bottom: 8px;
+        }
+
+        .content-card li strong {
+            color: var(--primary);
+        }
+
+        /* كود */
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+        }
+
+        .code-block .code-label {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--primary);
+            color: #000;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* صندوق المعلومة */
+        .info-box {
+            background: rgba(0, 180, 255, 0.08);
+            border-right: 4px solid var(--info);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .info-box i {
+            color: var(--info);
+            margin-left: 10px;
+        }
+
+        .warning-box {
+            background: rgba(255, 136, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning-box i {
+            color: var(--warning);
+            margin-left: 10px;
+        }
+
+        .success-box {
+            background: rgba(0, 200, 81, 0.08);
+            border-right: 4px solid var(--success);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .success-box i {
+            color: var(--success);
+            margin-left: 10px;
+        }
+
+        /* جدول المقارنة */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.08);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .comparison-table td {
+            color: var(--text-light);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(255, 215, 0, 0.03);
+        }
+
+        /* محاكي القوالب */
+        .template-simulator {
+            background: var(--dark-surface);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .template-simulator .simulator-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .template-simulator .simulator-tabs button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .template-simulator .simulator-tabs button.active {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--primary);
+        }
+
+        .template-simulator .simulator-tabs button:hover {
+            background: rgba(255, 215, 0, 0.05);
+            color: var(--text);
+        }
+
+        .template-simulator .simulator-content {
+            min-height: 150px;
+        }
+
+        .template-simulator .simulator-content .tab-panel {
+            display: none;
+        }
+
+        .template-simulator .simulator-content .tab-panel.active {
+            display: block;
+        }
+
+        /* عرض القالب المحاكي */
+        .template-preview {
+            background: var(--dark);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            margin: 10px 0;
+        }
+
+        .template-preview .post-item {
+            background: rgba(255, 215, 0, 0.03);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-right: 3px solid var(--primary);
+        }
+
+        .template-preview .post-item h3 {
+            color: var(--primary-light);
+            font-size: 1.1rem;
+            margin: 0 0 5px;
+        }
+
+        .template-preview .post-item p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .template-preview .post-item .post-meta {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        /* تذييل الدرس */
+        .lesson-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .lesson-footer .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .lesson-footer .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .lesson-footer .btn-primary:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .lesson-footer .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .lesson-footer .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .btn-complete {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-complete:hover {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        .btn-complete.done {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        /* الفوتر */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--dark-light);
+            border-top: 2px solid var(--primary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* التجاوب */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 100px 15px 40px;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .hero-meta {
+                gap: 15px;
+            }
+            
+            .content-card {
+                padding: 20px;
+            }
+            
+            .content-card h2 {
+                font-size: 1.4rem;
+            }
+            
+            .nav-links a {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+            
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .comparison-table {
+                font-size: 0.85rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 8px 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .content-card {
+                padding: 15px;
+            }
+            
+            .lesson-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .lesson-footer .btn {
+                justify-content: center;
+            }
+
+            .template-simulator .simulator-tabs {
+                flex-wrap: wrap;
+            }
+
+            .template-simulator .simulator-tabs button {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+        }
+
+        /* تأثير الظهور */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* التمرير السلس */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* أنماط Prism الإضافية */
+        .token.comment {
+            color: #6a9955;
+        }
+        .token.string {
+            color: #ce9178;
+        }
+        .token.keyword {
+            color: #569cd6;
+        }
+        .token.function {
+            color: #dcdcaa;
+        }
+        .token.tag {
+            color: #569cd6;
+        }
+        .token.attr-name {
+            color: #9cdcfe;
+        }
+        .token.attr-value {
+            color: #ce9178;
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التقدم -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <a href="../index.html" class="logo">
+            <i class="fab fa-django"></i>
+            <span>Django</span>
+        </a>
+        <div class="nav-links">
+            <a href="#content">الدرس</a>
+            <a href="#simulator">المحاكي</a>
+            <a href="../index.html" class="back-home">
+                <i class="fas fa-arrow-right"></i> العودة
+            </a>
+        </div>
+    </nav>
+
+    <!-- زر العودة للأعلى -->
+    <button class="back-to-top" id="backToTop" aria-label="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-breadcrumb">
+                <a href="../index.html">الرئيسية</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <a href="../django/index.html">Django</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <span style="color: var(--text);">الدرس الرابع</span>
+            </div>
+
+            <div class="hero-badge">
+                <i class="fas fa-code"></i> الدرس 4 من 10
+            </div>
+
+            <h1><i class="fas fa-paint-brush"></i> واجهة المستخدم Templates</h1>
+            <p>تعلم كيفية استخدام نظام القوالب في Django لعرض البيانات بشكل احترافي وإنشاء واجهات مستخدم ديناميكية.</p>
+
+            <div class="hero-meta">
+                <span><i class="far fa-clock"></i> مدة القراءة: 11 دقيقة</span>
+                <span><i class="fas fa-signal"></i> مستوى: مبتدئ</span>
+                <span><i class="fas fa-html5"></i> HTML + CSS</span>
+                <span><i class="fas fa-code"></i> Django Templates</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="container" id="content">
+        <!-- مقدمة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-info-circle"></i> ما هي القوالب (Templates)؟</h2>
+            <p>
+                <strong>القوالب (Templates)</strong> هي ملفات HTML تحتوي على كود Django الخاص لعرض البيانات الديناميكية. 
+                تسمح لك القوالب بفصل <strong>منطق التطبيق</strong> عن <strong>واجهة المستخدم</strong>، مما يجعل الكود أكثر نظافة وسهولة في الصيانة.
+            </p>
+            <p>
+                يستخدم Django <strong>نظام القوالب الخاص به</strong> (Django Template Language - DTL) والذي يوفر:
+            </p>
+            <ul>
+                <li><strong>المتغيرات:</strong> لعرض البيانات من الـ View.</li>
+                <li><strong>الوسوم (Tags):</strong> للتحكم في المنطق مثل الحلقات والشروط.</li>
+                <li><strong>الفلاتر (Filters):</strong> لتنسيق البيانات قبل عرضها.</li>
+                <li><strong>الوراثة (Inheritance):</strong> لإعادة استخدام القوالب.</li>
+            </ul>
+
+            <div class="info-box">
+                <i class="fas fa-lightbulb"></i>
+                <strong>المفهوم الأساسي:</strong> القوالب هي الجسر بين البيانات (من الـ View) والمستخدم (من خلال المتصفح).
+            </div>
+        </div>
+
+        <!-- إعداد القوالب -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-folder-open"></i> إعداد القوالب</h2>
+            <p>لإعداد القوالب في Django، تحتاج إلى:</p>
+
+            <h3>1. إنشاء مجلد templates</h3>
+            <div class="code-block">
+                <div class="code-label">هيكل المشروع</div>
+                <pre><code class="language-bash">myproject/
+├── manage.py
+├── myproject/
+│   ├── settings.py
+│   └── ...
+└── templates/          # مجلد القوالب الرئيسي
+    └── base.html       # القالب الأساسي</code></pre>
+            </div>
+
+            <h3>2. إعداد مسار القوالب في settings.py</h3>
+            <div class="code-block">
+                <div class="code-label">settings.py</div>
+                <pre><code class="language-python">import os
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # مسار القوالب
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]</code></pre>
+            </div>
+
+            <div class="success-box">
+                <i class="fas fa-check-circle"></i>
+                <strong>نصيحة:</strong> يمكنك أيضاً إنشاء مجلد <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">templates</code> داخل كل تطبيق لتخزين قوالب خاصة بالتطبيق.
+            </div>
+        </div>
+
+        <!-- لغة القوالب -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-language"></i> لغة قوالب Django</h2>
+            <p>تتكون لغة قوالب Django من ثلاثة عناصر رئيسية:</p>
+
+            <h3>1. المتغيرات (Variables)</h3>
+            <div class="code-block">
+                <div class="code-label">HTML Template</div>
+                <pre><code class="language-django">&lt;h1&gt;{{ post.title }}&lt;/h1&gt;
+&lt;p&gt;{{ post.content }}&lt;/p&gt;
+&lt;span&gt;تاريخ النشر: {{ post.created_at|date:"Y-m-d" }}&lt;/span&gt;</code></pre>
+            </div>
+            <p>تعرض المتغيرات بين <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">{{ }}</code>.</p>
+
+            <h3>2. الوسوم (Tags)</h3>
+            <div class="code-block">
+                <div class="code-label">HTML Template</div>
+                <pre><code class="language-django">&lt;!-- حلقة for --&gt;
+{% for post in posts %}
+    &lt;div class="post"&gt;
+        &lt;h2&gt;{{ post.title }}&lt;/h2&gt;
+        &lt;p&gt;{{ post.content }}&lt;/p&gt;
+    &lt;/div&gt;
+{% empty %}
+    &lt;p&gt;لا توجد منشورات!&lt;/p&gt;
+{% endfor %}
+
+&lt;!-- شرط if --&gt;
+{% if user.is_authenticated %}
+    &lt;p&gt;مرحباً {{ user.username }}!&lt;/p&gt;
+{% else %}
+    &lt;p&gt;الرجاء تسجيل الدخول&lt;/p&gt;
+{% endif %}</code></pre>
+            </div>
+            <p>الوسوم تستخدم بين <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">{% %}</code>.</p>
+
+            <h3>3. الفلاتر (Filters)</h3>
+            <div class="code-block">
+                <div class="code-label">HTML Template</div>
+                <pre><code class="language-django">&lt;p&gt;{{ post.content|truncatewords:30 }}&lt;/p&gt;
+&lt;p&gt;{{ post.created_at|date:"Y-m-d H:i" }}&lt;/p&gt;
+&lt;p&gt;{{ post.title|upper }}&lt;/p&gt;
+&lt;p&gt;{{ post.content|linebreaks }}&lt;/p&gt;
+&lt;p&gt;{{ post.content|safe }}&lt;/p&gt;</code></pre>
+            </div>
+            <p>الفلاتر تستخدم بعد <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">|</code>.</p>
+
+            <h3>جدول الفلاتر الشائعة</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>الفلاتر</th>
+                        <th>الوصف</th>
+                        <th>مثال</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">date</code></td>
+                        <td>تنسيق التاريخ</td>
+                        <td><code>{{ date|date:"Y-m-d" }}</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">truncatewords</code></td>
+                        <td>اختصار النص لعدد محدد من الكلمات</td>
+                        <td><code>{{ text|truncatewords:30 }}</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">upper</code></td>
+                        <td>تحويل النص إلى حروف كبيرة</td>
+                        <td><code>{{ text|upper }}</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">lower</code></td>
+                        <td>تحويل النص إلى حروف صغيرة</td>
+                        <td><code>{{ text|lower }}</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">linebreaks</code></td>
+                        <td>تحويل الأسطر الجديدة إلى &lt;br&gt;</td>
+                        <td><code>{{ text|linebreaks }}</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">safe</code></td>
+                        <td>عرض HTML دون ترميز</td>
+                        <td><code>{{ html|safe }}</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">default</code></td>
+                        <td>قيمة افتراضية إذا كان المتغير فارغاً</td>
+                        <td><code>{{ value|default:"لا يوجد" }}</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- الوراثة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-sitemap"></i> وراثة القوالب (Template Inheritance)</h2>
+            <p>
+                تسمح وراثة القوالب بإنشاء <strong>قالب أساسي</strong> (Base Template) يحتوي على الهيكل العام للموقع، 
+                ثم توريثه في قوالب أخرى لإضافة محتوى خاص.
+            </p>
+
+            <h3>القالب الأساسي (base.html)</h3>
+            <div class="code-block">
+                <div class="code-label">templates/base.html</div>
+                <pre><code class="language-django">&lt;!DOCTYPE html&gt;
+&lt;html lang="ar" dir="rtl"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;{% block title %}موقعي{% endblock %}&lt;/title&gt;
+    &lt;link rel="stylesheet" href="{% static 'css/style.css' %}"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;h1&gt;مدونتي&lt;/h1&gt;
+        &lt;nav&gt;
+            &lt;a href="/"&gt;الرئيسية&lt;/a&gt;
+            &lt;a href="/about/"&gt;عن الموقع&lt;/a&gt;
+        &lt;/nav&gt;
+    &lt;/header&gt;
+
+    &lt;main&gt;
+        {% block content %}
+        &lt;!-- المحتوى الرئيسي --&gt;
+        {% endblock %}
+    &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;© 2026 مدونتي&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+
+            <h3>وراثة القالب</h3>
+            <div class="code-block">
+                <div class="code-label">templates/blog/post_list.html</div>
+                <pre><code class="language-django">{% extends 'base.html' %}
+
+{% block title %}قائمة المنشورات - مدونتي{% endblock %}
+
+{% block content %}
+    &lt;h2&gt;جميع المنشورات&lt;/h2&gt;
+    {% for post in posts %}
+        &lt;div class="post"&gt;
+            &lt;h3&gt;&lt;a href="{% url 'post_detail' post.id %}"&gt;{{ post.title }}&lt;/a&gt;&lt;/h3&gt;
+            &lt;p&gt;{{ post.content|truncatewords:30 }}&lt;/p&gt;
+            &lt;small&gt;{{ post.created_at|date:"Y-m-d" }}&lt;/small&gt;
+        &lt;/div&gt;
+    {% empty %}
+        &lt;p&gt;لا توجد منشورات بعد.&lt;/p&gt;
+    {% endfor %}
+{% endblock %}</code></pre>
+            </div>
+
+            <div class="success-box">
+                <i class="fas fa-check-circle"></i>
+                <strong>نصيحة:</strong> استخدم الوراثة لتجنب تكرار الكود وجعل الصيانة أسهل.
+            </div>
+        </div>
+
+        <!-- الملفات الثابتة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-file-image"></i> الملفات الثابتة (Static Files)</h2>
+            <p>
+                الملفات الثابتة هي ملفات CSS، JavaScript، والصور التي لا تتغير ديناميكياً. 
+                في Django، تتم إدارة هذه الملفات من خلال مجلد <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">static</code>.
+            </p>
+
+            <h3>هيكل الملفات الثابتة</h3>
+            <div class="code-block">
+                <div class="code-label">هيكل المشروع</div>
+                <pre><code class="language-bash">myproject/
+├── manage.py
+├── myproject/
+│   └── settings.py
+├── templates/
+└── static/              # مجلد الملفات الثابتة
+    ├── css/
+    │   └── style.css
+    ├── js/
+    │   └── main.js
+    └── images/
+        └── logo.png</code></pre>
+            </div>
+
+            <h3>استخدام الملفات الثابتة في القالب</h3>
+            <div class="code-block">
+                <div class="code-label">HTML Template</div>
+                <pre><code class="language-django">{% load static %}
+
+&lt;link rel="stylesheet" href="{% static 'css/style.css' %}"&gt;
+&lt;script src="{% static 'js/main.js' %}"&gt;&lt;/script&gt;
+&lt;img src="{% static 'images/logo.png' %}" alt="شعار الموقع"&gt;</code></pre>
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>ملاحظة:</strong> لا تنسَ إضافة <code style="background:rgba(0,180,255,0.1);padding:2px 8px;border-radius:4px;color:var(--info);">{% load static %}</code> في بداية القالب لاستخدام الملفات الثابتة.
+            </div>
+        </div>
+
+        <!-- محاكي القوالب التفاعلي -->
+        <div class="content-card fade-in" id="simulator">
+            <h2><i class="fas fa-laptop-code"></i> محاكي القوالب التفاعلي</h2>
+            <p>جرب استخدام لغة قوالب Django في هذا المحاكي التفاعلي:</p>
+
+            <div class="template-simulator">
+                <div class="simulator-tabs">
+                    <button class="active" data-tab="preview">معاينة القالب</button>
+                    <button data-tab="code">كود القالب</button>
+                    <button data-tab="data">البيانات</button>
+                </div>
+
+                <div class="simulator-content">
+                    <!-- تبويب المعاينة -->
+                    <div class="tab-panel active" id="tab-preview">
+                        <div class="template-preview" id="templatePreview">
+                            <!-- سيتم عرض القالب هنا -->
+                        </div>
+                    </div>
+
+                    <!-- تبويب الكود -->
+                    <div class="tab-panel" id="tab-code">
+                        <div class="code-block" style="margin:0;">
+                            <div class="code-label">Django Template</div>
+                            <pre><code class="language-django" id="templateCodeDisplay">&lt;!-- سيتم عرض الكود هنا --&gt;</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- تبويب البيانات -->
+                    <div class="tab-panel" id="tab-data">
+                        <div class="code-block" style="margin:0;">
+                            <div class="code-label">بيانات السياق (Context)</div>
+                            <pre><code class="language-python" id="contextDataDisplay">{
+    'posts': [
+        {'title': 'أول منشور', 'content': 'محتوى المنشور الأول...'},
+        {'title': 'منشور ثاني', 'content': 'محتوى المنشور الثاني...'}
+    ]
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الخلاصة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-flag-checkered"></i> خلاصة الدرس</h2>
+            <ul>
+                <li>✅ القوالب هي <strong>ملفات HTML</strong> تحتوي على كود Django الخاص.</li>
+                <li>✅ تستخدم <strong>المتغيرات</strong> (<code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">{{ }}</code>) لعرض البيانات.</li>
+                <li>✅ تستخدم <strong>الوسوم</strong> (<code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">{% %}</code>) للتحكم في المنطق.</li>
+                <li>✅ تستخدم <strong>الفلاتر</strong> (<code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">|</code>) لتنسيق البيانات.</li>
+                <li>✅ توفر <strong>وراثة القوالب</strong> لإعادة استخدام الكود.</li>
+                <li>✅ استخدم <strong>الملفات الثابتة</strong> لإدارة CSS و JavaScript والصور.</li>
+            </ul>
+        </div>
+
+        <!-- اختبار معرفة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-question"></i> اختبر معلوماتك</h2>
+            <div id="quizSection">
+                <p><strong>ما هو الاستخدام الصحيح لعرض متغير في قوالب Django؟</strong></p>
+                <div style="display:flex;flex-direction:column;gap:10px;margin:15px 0;">
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="double">
+                        <input type="radio" name="quiz" value="double" style="accent-color:var(--primary);width:18px;height:18px;">
+                        <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">{{ variable }}</code>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="percent">
+                        <input type="radio" name="quiz" value="percent" style="accent-color:var(--primary);width:18px;height:18px;">
+                        <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">{% variable %}</code>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="hash">
+                        <input type="radio" name="quiz" value="hash" style="accent-color:var(--primary);width:18px;height:18px;">
+                        <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">{# variable #}</code>
+                    </label>
+                </div>
+                <button id="checkQuizBtn" style="background:var(--primary);color:#000;border:none;padding:12px 30px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;transition:var(--transition);font-family:'Cairo',sans-serif;">
+                    <i class="fas fa-check"></i> تحقق الإجابة
+                </button>
+                <div id="quizResult" style="margin-top:15px;padding:15px;border-radius:10px;display:none;"></div>
+            </div>
+        </div>
+
+        <!-- تذييل الدرس -->
+        <div class="lesson-footer">
+            <div style="display:flex;gap:15px;flex-wrap:wrap;">
+                <button class="btn-complete" id="markCompleteBtn">
+                    <i class="fas fa-circle" id="completeIcon"></i>
+                    <span id="completeText">تحديد كمكتمل</span>
+                </button>
+                <a href="lesson3.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i> الدرس السابق
+                </a>
+            </div>
+            <a href="lesson5.html" class="btn btn-primary">
+                الدرس التالي <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- فوتر -->
+    <footer>
+        <p>© 2026 <a href="../index.html">CodeWay</a> — تخصص Django — الدرس الرابع: واجهة المستخدم Templates</p>
+    </footer>
+
+    <!-- Prism.js للتلوين -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-django.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+
+    <script>
+        // =============================================
+        // شريط التقدم
+        // =============================================
+        function updateProgressBar() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // =============================================
+        // زر العودة للأعلى
+        // =============================================
+        function toggleBackToTop() {
+            const btn = document.getElementById('backToTop');
+            if (document.documentElement.scrollTop > 300 || document.body.scrollTop > 300) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // =============================================
+        // تأثير الظهور التدريجي
+        // =============================================
+        function checkFadeIn() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 80) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        // =============================================
+        // محاكي القوالب
+        // =============================================
+        const templateData = {
+            posts: [
+                {
+                    title: 'أول منشور في Django',
+                    content: 'هذا هو محتوى أول منشور في Django. تعلم كيفية بناء واجهات مستخدم ديناميكية باستخدام قوالب Django.',
+                    created_at: '2026-01-15 14:30'
+                },
+                {
+                    title: 'فهم قوالب Django',
+                    content: 'تعتبر قوالب Django أداة قوية لفصل المنطق عن العرض. تعلم كيفية استخدام المتغيرات والوسوم والفلاتر.',
+                    created_at: '2026-01-16 10:20'
+                },
+                {
+                    title: 'وراثة القوالب',
+                    content: 'تتيح لك وراثة القوالب إعادة استخدام الكود وتجنب التكرار. أنشئ قالباً أساسياً وقم بتوريثه.',
+                    created_at: '2026-01-17 09:15'
+                }
+            ]
+        };
+
+        const templateCode = `{% extends 'base.html' %}
+
+{% block title %}قائمة المنشورات - مدونتي{% endblock %}
+
+{% block content %}
+    <div class="posts-container">
+        <h2>جميع المنشورات</h2>
+        
+        {% for post in posts %}
+            <div class="post-item">
+                <h3>{{ post.title }}</h3>
+                <p>{{ post.content|truncatewords:15 }}</p>
+                <div class="post-meta">
+                    <span>📅 {{ post.created_at|date:"Y-m-d" }}</span>
+                    <span>⏰ {{ post.created_at|date:"H:i" }}</span>
+                </div>
+            </div>
+        {% empty %}
+            <p>لا توجد منشورات بعد.</p>
+        {% endfor %}
+        
+        <div class="pagination">
+            <span>عرض {{ posts|length }} منشور</span>
+        </div>
+    </div>
+{% endblock %}`;
+
+        function renderTemplatePreview() {
+            const preview = document.getElementById('templatePreview');
+            let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
+            
+            templateData.posts.forEach((post, index) => {
+                const truncatedContent = post.content.length > 60 ? post.content.substring(0, 60) + '...' : post.content;
+                const date = new Date(post.created_at);
+                const formattedDate = date.toLocaleDateString('ar-EG', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                const formattedTime = date.toLocaleTimeString('ar-EG', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                html += `
+                    <div class="post-item">
+                        <h3>${post.title}</h3>
+                        <p>${truncatedContent}</p>
+                        <div class="post-meta">
+                            <span>📅 ${formattedDate}</span>
+                            <span>⏰ ${formattedTime}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                <div style="text-align:center;padding:10px;color:var(--text-secondary);font-size:0.9rem;border-top:1px solid var(--border-color);">
+                    <span>عرض ${templateData.posts.length} منشور</span>
+                </div>
+            </div>`;
+
+            preview.innerHTML = html;
+        }
+
+        function updateTemplateCode() {
+            document.getElementById('templateCodeDisplay').textContent = templateCode;
+            // إعادة تطبيق Prism للتلوين
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightElement(document.getElementById('templateCodeDisplay'));
+            }
+        }
+
+        function updateContextData() {
+            const dataDisplay = document.getElementById('contextDataDisplay');
+            dataDisplay.textContent = JSON.stringify(templateData, null, 4);
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightElement(dataDisplay);
+            }
+        }
+
+        // تبديل علامات التبويب في المحاكي
+        document.querySelectorAll('.simulator-tabs button').forEach(button => {
+            button.addEventListener('click', function() {
+                // إزالة الكلاس active من جميع الأزرار
+                document.querySelectorAll('.simulator-tabs button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // إخفاء جميع اللوحات
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+                // عرض اللوحة المحددة
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById('tab-' + tabId).classList.add('active');
+            });
+        });
+
+        // =============================================
+        // اختبار المعرفة
+        // =============================================
+        document.getElementById('checkQuizBtn').addEventListener('click', function() {
+            const selected = document.querySelector('input[name="quiz"]:checked');
+            const resultDiv = document.getElementById('quizResult');
+            
+            if (!selected) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> الرجاء اختيار إجابة أولاً.';
+                return;
+            }
+
+            const answer = selected.value;
+            resultDiv.style.display = 'block';
+            
+            if (answer === 'double') {
+                resultDiv.className = 'success-box';
+                resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ إجابة صحيحة! المتغيرات في قوالب Django تستخدم بين <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">{{ }}</code>.';
+            } else if (answer === 'percent') {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">{% %}</code> تستخدم للوسوم (Tags) مثل الحلقات والشروط، وليس للمتغيرات.`;
+            } else {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">{# #}</code> تستخدم للتعليقات (Comments) في القوالب.`;
+            }
+        });
+
+        // اختيار خيار الاختبار بالنقر على البطاقة
+        document.querySelectorAll('.quiz-option').forEach(label => {
+            label.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+
+        // =============================================
+        // إكمال الدرس - localStorage
+        // =============================================
+        const LESSON_ID = 4;
+        const STORAGE_KEY = 'django_lessons_completed';
+
+        function isLessonCompleted() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return false;
+            const completed = JSON.parse(saved);
+            return completed.includes(LESSON_ID);
+        }
+
+        function toggleLessonComplete() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            let completed = saved ? JSON.parse(saved) : [];
+            const index = completed.indexOf(LESSON_ID);
+            
+            if (index > -1) {
+                completed.splice(index, 1);
+            } else {
+                completed.push(LESSON_ID);
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+            updateCompleteButton();
+        }
+
+        function updateCompleteButton() {
+            const btn = document.getElementById('markCompleteBtn');
+            const icon = document.getElementById('completeIcon');
+            const text = document.getElementById('completeText');
+            
+            if (isLessonCompleted()) {
+                btn.classList.add('done');
+                icon.className = 'fas fa-check-circle';
+                text.textContent = 'مكتمل ✓';
+            } else {
+                btn.classList.remove('done');
+                icon.className = 'fas fa-circle';
+                text.textContent = 'تحديد كمكتمل';
+            }
+        }
+
+        document.getElementById('markCompleteBtn').addEventListener('click', toggleLessonComplete);
+
+        // =============================================
+        // الأحداث العامة
+        // =============================================
+        window.addEventListener('scroll', function() {
+            updateProgressBar();
+            toggleBackToTop();
+            checkFadeIn();
+        });
+
+        window.addEventListener('load', function() {
+            checkFadeIn();
+            updateCompleteButton();
+            renderTemplatePreview();
+            updateTemplateCode();
+            updateContextData();
+        });
+    </script>
+</body>
+</html>

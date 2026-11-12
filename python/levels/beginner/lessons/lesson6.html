@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 6: العمليات الحسابية والمنطقية | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --text: #fff;
+            --text-light: #dcdcdc;
+            --info: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 800;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .breadcrumb {
+            font-size: 0.82em;
+            color: #ccc;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+
+        .breadcrumb span { margin: 0 6px; color: #777; }
+
+        /* ===== الهيدر ===== */
+        .page-hero {
+            padding: 140px 30px 70px;
+            background: radial-gradient(circle at top, #1a1a1a 0%, #000 70%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .page-hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 16px;
+        }
+
+        .lesson-title {
+            font-size: 2.6em;
+            color: var(--gold);
+            margin-bottom: 14px;
+            text-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
+            line-height: 1.4;
+        }
+
+        .lesson-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            font-size: 0.85em;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lesson-meta-item i { color: var(--gold); }
+
+        /* ===== المحتوى (كامل العرض) ===== */
+        .content-wrapper {
+            width: 100%;
+            padding: 50px 40px 80px;
+            background: linear-gradient(180deg, #000 0%, #050505 100%);
+        }
+
+        .content-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .main-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 50px 55px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+        }
+
+        .main-card h2 {
+            font-size: 1.6em;
+            color: var(--gold);
+            margin: 40px 0 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+        }
+
+        .main-card h2:first-child { margin-top: 0; }
+
+        .main-card h2 i { font-size: 1.05rem; color: var(--gold-soft); }
+
+        .main-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 14px 0 18px;
+        }
+
+        .main-card ul.plain,
+        .main-card ol.plain {
+            padding-right: 24px;
+            margin: 14px 0;
+        }
+
+        .main-card ul.plain li,
+        .main-card ol.plain li {
+            margin-bottom: 10px;
+            color: var(--text-light);
+            font-size: 0.98em;
+        }
+
+        /* ===== صندوق مميز ===== */
+        .highlight-box {
+            margin: 25px 0;
+            background: #121212;
+            border-radius: 14px;
+            padding: 24px 28px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+        }
+
+        .highlight-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 14px;
+            font-size: 1.1em;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .highlight-box ul li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 9px 0;
+            color: var(--text-light);
+            font-size: 0.97em;
+        }
+
+        .highlight-box ul li i {
+            color: var(--gold);
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        /* ===== كتلة الكود ===== */
+        .code-block {
+            margin: 22px 0;
+            background: #050505;
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+        }
+
+        .code-label {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            font-size: 0.74em;
+            color: var(--gold-soft);
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        pre {
+            margin: 0;
+            padding-top: 26px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.95em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.75;
+        }
+
+        code.inline {
+            background: #1a1a1a;
+            color: var(--gold);
+            padding: 2px 9px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.9em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== ملاحظات ===== */
+        .note, .tip, .warning {
+            margin: 22px 0;
+            padding: 18px 22px;
+            border-radius: 12px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            line-height: 1.85;
+        }
+
+        .note {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+
+        .tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+
+        .warning {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+
+        .note i, .tip i, .warning i { font-size: 1.2em; margin-top: 5px; flex-shrink: 0; }
+        .note i { color: var(--info); }
+        .tip i { color: var(--success); }
+        .warning i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        table thead {
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        table th {
+            padding: 16px 18px;
+            color: var(--gold);
+            text-align: right;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        table td {
+            padding: 16px 18px;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table tr:last-child td { border-bottom: none; }
+        table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        /* ===== التمارين ===== */
+        .exercise-section {
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(15, 15, 15, 0.9));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+        }
+
+        .exercise-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+            color: #000;
+            font-weight: 800;
+            font-size: 1.05em;
+            flex-shrink: 0;
+        }
+
+        .exercise-title {
+            color: var(--gold);
+            font-size: 1.15em;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .exercise-question {
+            font-size: 1em;
+            color: var(--text-light);
+            margin-bottom: 18px;
+            line-height: 1.8;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option-item:hover {
+            border-color: rgba(255, 215, 0, 0.4);
+            background: #101010;
+            transform: translateX(-4px);
+        }
+
+        .option-item input[type="radio"],
+        .option-item input[type="checkbox"] {
+            accent-color: var(--gold);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .text-input-wrap {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .text-input {
+            flex: 1;
+            min-width: 220px;
+            padding: 13px 18px;
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .exercise-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 22px;
+            border-radius: 9px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 700;
+            font-size: 0.94em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .exercise-result {
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            display: none;
+            line-height: 1.8;
+        }
+
+        .exercise-result.success {
+            display: block;
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+
+        .exercise-result.partial {
+            display: block;
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+
+        .exercise-result.error {
+            display: block;
+            background: rgba(244, 67, 54, 0.15);
+            border-right: 4px solid var(--danger);
+            color: #ffcdd2;
+        }
+
+        /* ===== شريط التقدم ===== */
+        .progress-footer {
+            margin: 40px 0 0;
+            padding: 26px 28px;
+            background: #0a0a0a;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .progress-footer h3 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.85em;
+            color: #aaa;
+            text-align: center;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            margin-top: 45px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 260px;
+            font-size: 0.95em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.5);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        footer {
+            text-align: center;
+            padding: 28px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: #aaa;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 8px; padding: 10px 15px; }
+            .page-hero { padding: 160px 15px 50px; }
+            .lesson-title { font-size: 1.75em; }
+            .content-wrapper { padding: 30px 15px 50px; }
+            .main-card { padding: 26px 20px; }
+            .exercise-section { padding: 22px 18px; }
+            .lesson-meta { flex-direction: column; align-items: center; }
+            .nav-links { flex-direction: column; }
+            .nav-link { min-width: 100%; justify-content: center !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- شريط التنقل -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span>/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span>/</span>
+        <span>الدرس 6</span>
+    </div>
+</nav>
+
+<!-- الهيدر -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-calculator"></i>
+            الدرس 6 · العمليات الحسابية والمنطقية
+        </div>
+        <h1 class="lesson-title">العمليات الحسابية والمنطقية في بايثون</h1>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> المدة: 25 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> الهدف: إتقان جميع أنواع العمليات</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> المستوى: مبتدئ</div>
+            <div class="lesson-meta-item"><i class="fas fa-list-ol"></i> الدرس 6 من 15</div>
+        </div>
+    </div>
+</section>
+
+<!-- المحتوى -->
+<div class="content-wrapper">
+    <div class="content-inner">
+        <article class="main-card">
+
+            <!-- ===== مقدمة ===== -->
+            <h2><i class="fas fa-info-circle"></i> مقدمة إلى العمليات في بايثون</h2>
+            <p>
+                في لغة بايثون، تُعدّ <strong>العمليات (Operators)</strong> حجر الأساس لمعالجة البيانات
+                واتخاذ القرارات داخل البرامج. وسنركّز في هذا الدرس على <strong>ثلاثة أنواع رئيسية</strong> منها:
+            </p>
+            <ol class="plain">
+                <li><strong style="color:var(--gold)">العمليات الحسابية (Arithmetic):</strong> للعمليات الرياضية مثل الجمع والطرح.</li>
+                <li><strong style="color:var(--gold)">عمليات المقارنة (Comparison):</strong> لمقارنة قيمتين والحصول على True أو False.</li>
+                <li><strong style="color:var(--gold)">العوامل المنطقية (Logical):</strong> لدمج عدة شروط معًا.</li>
+            </ol>
+
+            <!-- ===== 1. العمليات الحسابية ===== -->
+            <h2><i class="fas fa-calculator"></i> 1. العمليات الحسابية (Arithmetic Operators)</h2>
+            <p>
+                تُستخدم لإجراء العمليات الرياضية الأساسية. بايثون تدعم كل هذه العمليات بشكل مباشر:
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>العملية</th>
+                            <th>الرمز</th>
+                            <th>مثال (a=10, b=3)</th>
+                            <th>الناتج</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>الجمع</td>
+                            <td><code class="inline">+</code></td>
+                            <td><code class="inline">a + b</code></td>
+                            <td><code class="inline">13</code></td>
+                        </tr>
+                        <tr>
+                            <td>الطرح</td>
+                            <td><code class="inline">-</code></td>
+                            <td><code class="inline">a - b</code></td>
+                            <td><code class="inline">7</code></td>
+                        </tr>
+                        <tr>
+                            <td>الضرب</td>
+                            <td><code class="inline">*</code></td>
+                            <td><code class="inline">a * b</code></td>
+                            <td><code class="inline">30</code></td>
+                        </tr>
+                        <tr>
+                            <td>القسمة العادية</td>
+                            <td><code class="inline">/</code></td>
+                            <td><code class="inline">a / b</code></td>
+                            <td><code class="inline">3.333…</code></td>
+                        </tr>
+                        <tr>
+                            <td>القسمة الصحيحة</td>
+                            <td><code class="inline">//</code></td>
+                            <td><code class="inline">a // b</code></td>
+                            <td><code class="inline">3</code></td>
+                        </tr>
+                        <tr>
+                            <td>باقي القسمة</td>
+                            <td><code class="inline">%</code></td>
+                            <td><code class="inline">a % b</code></td>
+                            <td><code class="inline">1</code></td>
+                        </tr>
+                        <tr>
+                            <td>الأس (القوة)</td>
+                            <td><code class="inline">**</code></td>
+                            <td><code class="inline">a ** b</code></td>
+                            <td><code class="inline">1000</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">مثال تطبيقي — العمليات الحسابية</div>
+<pre>
+a = 10
+b = 3
+
+print(a + b)   # 13
+print(a - b)   # 7
+print(a * b)   # 30
+print(a / b)   # 3.3333333333333335
+print(a // b)  # 3
+print(a % b)   # 1
+print(a ** b)  # 1000
+</pre>
+            </div>
+
+            <div class="tip">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>فروق مهمة:</strong> القسمة <code class="inline">/</code> تُرجع دائمًا عددًا عشريًا (float)،
+                    بينما <code class="inline">//</code> تُرجع الجزء الصحيح فقط. واستخدام <code class="inline">%</code> مفيد لمعرفة
+                    هل عدد زوجي أم فردي.
+                </div>
+            </div>
+
+            <!-- ===== 2. عمليات المقارنة ===== -->
+            <h2><i class="fas fa-balance-scale"></i> 2. عمليات المقارنة (Comparison Operators)</h2>
+            <p>
+                تُستخدم لمقارنة قيمتين، وتُرجع دائمًا إما <code class="inline">True</code> (صحيح) أو
+                <code class="inline">False</code> (خطأ). تُستخدَم بشكل أساسي في الشروط.
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>العملية</th>
+                            <th>الرمز</th>
+                            <th>مثال (x=5, y=10)</th>
+                            <th>الناتج</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>يساوي</td>
+                            <td><code class="inline">==</code></td>
+                            <td><code class="inline">x == y</code></td>
+                            <td><code class="inline">False</code></td>
+                        </tr>
+                        <tr>
+                            <td>لا يساوي</td>
+                            <td><code class="inline">!=</code></td>
+                            <td><code class="inline">x != y</code></td>
+                            <td><code class="inline">True</code></td>
+                        </tr>
+                        <tr>
+                            <td>أكبر من</td>
+                            <td><code class="inline">&gt;</code></td>
+                            <td><code class="inline">x &gt; y</code></td>
+                            <td><code class="inline">False</code></td>
+                        </tr>
+                        <tr>
+                            <td>أصغر من</td>
+                            <td><code class="inline">&lt;</code></td>
+                            <td><code class="inline">x &lt; y</code></td>
+                            <td><code class="inline">True</code></td>
+                        </tr>
+                        <tr>
+                            <td>أكبر من أو يساوي</td>
+                            <td><code class="inline">&gt;=</code></td>
+                            <td><code class="inline">x &gt;= y</code></td>
+                            <td><code class="inline">False</code></td>
+                        </tr>
+                        <tr>
+                            <td>أصغر من أو يساوي</td>
+                            <td><code class="inline">&lt;=</code></td>
+                            <td><code class="inline">x &lt;= y</code></td>
+                            <td><code class="inline">True</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">مثال تطبيقي — المقارنة</div>
+<pre>
+x = 5
+y = 10
+
+print(x == y)  # False
+print(x != y)  # True
+print(x > y)   # False
+print(x < y)   # True
+print(x >= y)  # False
+print(x <= y)  # True
+</pre>
+            </div>
+
+            <div class="warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>تنبيه:</strong> لا تخلط بين <code class="inline">=</code> (الإسناد) و <code class="inline">==</code> (المقارنة).
+                    الأول يُسند قيمة لمتغير، والثاني يقارن قيمتين.
+                </div>
+            </div>
+
+            <!-- ===== 3. العوامل المنطقية ===== -->
+            <h2><i class="fas fa-brain"></i> 3. العوامل المنطقية (Logical Operators)</h2>
+            <p>
+                تُستخدم للجمع بين عدة تعبيرات منطقية، وعندما يكون طرفاها قيمًا منطقية تُرجع <code class="inline">True</code> أو
+                <code class="inline">False</code>. بايثون توفر ثلاثة عوامل منطقية:
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>العامل</th>
+                            <th>المعنى</th>
+                            <th>يُرجع True عندما…</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="inline">and</code></td>
+                            <td>و (الاثنان معًا)</td>
+                            <td>كلا الشرطين <strong>صحيحان</strong></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">or</code></td>
+                            <td>أو (واحد على الأقل)</td>
+                            <td>على الأقل شرط واحد <strong>صحيح</strong></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">not</code></td>
+                            <td>النفي</td>
+                            <td>الشرط <strong>خاطئ</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">مثال تطبيقي — العوامل المنطقية</div>
+<pre>
+p = True
+q = False
+
+print(p and q)  # False
+print(p or q)   # True
+print(not p)    # False
+print(not q)    # True
+</pre>
+            </div>
+
+            <!-- ===== جدول الحقيقة ===== -->
+            <h3 style="color:var(--gold-soft);font-size:1.15em;margin:25px 0 12px;">
+                <i class="fas fa-table"></i> جدول الحقيقة (Truth Table)
+            </h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>p</th>
+                            <th>q</th>
+                            <th>p and q</th>
+                            <th>p or q</th>
+                            <th>not p</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>True</td>
+                            <td>True</td>
+                            <td style="color:var(--success)">True</td>
+                            <td style="color:var(--success)">True</td>
+                            <td style="color:var(--danger)">False</td>
+                        </tr>
+                        <tr>
+                            <td>True</td>
+                            <td>False</td>
+                            <td style="color:var(--danger)">False</td>
+                            <td style="color:var(--success)">True</td>
+                            <td style="color:var(--danger)">False</td>
+                        </tr>
+                        <tr>
+                            <td>False</td>
+                            <td>True</td>
+                            <td style="color:var(--danger)">False</td>
+                            <td style="color:var(--success)">True</td>
+                            <td style="color:var(--success)">True</td>
+                        </tr>
+                        <tr>
+                            <td>False</td>
+                            <td>False</td>
+                            <td style="color:var(--danger)">False</td>
+                            <td style="color:var(--danger)">False</td>
+                            <td style="color:var(--success)">True</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ===== أسبقية العوامل ===== -->
+            <h2><i class="fas fa-sort-numeric-down"></i> أسبقية العوامل (Operator Precedence)</h2>
+            <p>
+                عند وجود أكثر من عملية في نفس السطر، تُنفَّذ بترتيب معيّن. من الأعلى أسبقية إلى الأدنى:
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الترتيب</th>
+                            <th>العملية</th>
+                            <th>مثال</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1 (الأعلى)</td>
+                            <td>الأقواس</td>
+                            <td><code class="inline">( )</code></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>الأس</td>
+                            <td><code class="inline">**</code></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>الضرب، القسمة، باقي القسمة</td>
+                            <td><code class="inline">* / // %</code></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>الجمع والطرح</td>
+                            <td><code class="inline">+ -</code></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>المقارنة</td>
+                            <td><code class="inline">== != &lt; &gt;</code></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>النفي</td>
+                            <td><code class="inline">not</code></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>«و» المنطقية</td>
+                            <td><code class="inline">and</code></td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>«أو» المنطقية</td>
+                            <td><code class="inline">or</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">مثال على الأسبقية</div>
+<pre>
+result = 2 + 3 * 4       # 14 وليس 20
+print(result)
+
+result = (2 + 3) * 4     # 20 بسبب الأقواس
+print(result)
+
+result = 2 ** 3 ** 2     # 512 (يتم من اليمين لليسار)
+print(result)
+</pre>
+            </div>
+
+            <!-- ===== التطبيقات العملية ===== -->
+            <h2><i class="fas fa-lightbulb"></i> التطبيقات العملية</h2>
+            <p>هذه العمليات ليست مجرد نظريات — لها استخدامات عملية مهمة جدًا:</p>
+
+            <ul class="plain">
+                <li>🔢 <strong>معرفة إذا كان العدد زوجيًا أو فرديًا:</strong> <code class="inline">n % 2 == 0</code>.</li>
+                <li>🎂 <strong>حساب العمر:</strong> <code class="inline">2025 - year_of_birth</code>.</li>
+                <li>🔐 <strong>التحقق من كلمة مرور:</strong> <code class="inline">password == "secret" and username == "admin"</code>.</li>
+                <li>🎓 <strong>التحقق من النجاح:</strong> <code class="inline">grade >= 50 and attendance >= 75</code>.</li>
+                <li>🎯 <strong>حساب متوسط:</strong> <code class="inline">(a + b + c) / 3</code>.</li>
+            </ul>
+
+            <div class="code-block">
+                <div class="code-label">مثال عملي — التحقق من عدد زوجي</div>
+<pre>
+number = 8
+
+# التحقق من العدد الزوجي
+is_even = (number % 2 == 0)
+print(f"هل العدد {number} زوجي؟ {is_even}")
+
+# التحقق من النجاح
+grade = 75
+attendance = 80
+is_passed = (grade >= 50) and (attendance >= 75)
+print(f"هل نجح الطالب؟ {is_passed}")
+</pre>
+            </div>
+
+            <!-- ===== تمارين عملية ===== -->
+            <h2><i class="fas fa-laptop-code"></i> تمارين عملية للتطبيق</h2>
+            <p>أنشئ ملفًا جديدًا باسم <strong>operations_practice.py</strong> وجرّب ما يلي:</p>
+            <ol class="plain">
+                <li>أنشئ متغيرين <code class="inline">x = 20</code> و <code class="inline">y = 7</code>، ثم اطبع كل العمليات الحسابية بينهما.</li>
+                <li>تحقق هل <code class="inline">x</code> أكبر من <code class="inline">y</code> و <code class="inline">x</code> عدد زوجي، واطبع النتيجة.</li>
+                <li>اطبع ناتج <code class="inline">not (x &lt; 15)</code> وفسّر النتيجة.</li>
+            </ol>
+
+            <!-- ===== تمارين تفاعلية ===== -->
+            <h2><i class="fas fa-pencil-alt"></i> تمارين تفاعلية</h2>
+            <p>اختبر فهمك للعمليات من خلال التمارين التالية:</p>
+
+            <!-- تمرين 1 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">1</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — القسمة الصحيحة</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما هي نتيجة <code class="inline">17 // 5</code> في بايثون؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex1" value="a"> 3.4</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="b"> 3</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="c"> 2</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="d"> 4</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise1()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex1','result1')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result1"></div>
+            </div>
+
+            <!-- تمرين 2 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">2</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — باقي القسمة</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما هي نتيجة <code class="inline">17 % 5</code>؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex2" value="a"> 3</label>
+                    <label class="option-item"><input type="radio" name="ex2" value="b"> 2</label>
+                    <label class="option-item"><input type="radio" name="ex2" value="c"> 3.4</label>
+                    <label class="option-item"><input type="radio" name="ex2" value="d"> 5</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise2()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex2','result2')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result2"></div>
+            </div>
+
+            <!-- تمرين 3 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">3</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — الأسبقية</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما نتيجة <code class="inline">2 + 3 * 4</code> في بايثون؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex3" value="a"> 20</label>
+                    <label class="option-item"><input type="radio" name="ex3" value="b"> 14</label>
+                    <label class="option-item"><input type="radio" name="ex3" value="c"> 24</label>
+                    <label class="option-item"><input type="radio" name="ex3" value="d"> 9</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise3()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex3','result3')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result3"></div>
+            </div>
+
+            <!-- تمرين 4 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">4</div>
+                    <h3 class="exercise-title">تمرين صح أو خطأ — الإسناد والمقارنة</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> في بايثون، <code class="inline">=</code> تُستخدم للمقارنة بين قيمتين.
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex4" value="true"> ✔️ صح</label>
+                    <label class="option-item"><input type="radio" name="ex4" value="false"> ✖️ خطأ</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise4()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex4','result4')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result4"></div>
+            </div>
+
+            <!-- تمرين 5 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">5</div>
+                    <h3 class="exercise-title">تمرين إكمال الفراغ — العوامل المنطقية</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما نتيجة التعبير <code class="inline">True or False</code>؟
+                    (اكتب: True أو False)
+                </p>
+                <div class="text-input-wrap">
+                    <input type="text" class="text-input" id="ex5-input" placeholder="اكتب الإجابة..." autocomplete="off">
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise5()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex5','result5')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result5"></div>
+            </div>
+
+            <!-- تمرين 6 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">6</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — العامل المنطقي الصحيح</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> أي عامل منطقي يُرجع <code class="inline">True</code> فقط عندما
+                    يكون الشرطان <strong>صحيحين معًا</strong>؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex6" value="a"> or</label>
+                    <label class="option-item"><input type="radio" name="ex6" value="b"> not</label>
+                    <label class="option-item"><input type="radio" name="ex6" value="c"> and</label>
+                    <label class="option-item"><input type="radio" name="ex6" value="d"> xor</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise6()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex6','result6')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result6"></div>
+            </div>
+
+            <!-- تمرين 7 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">7</div>
+                    <h3 class="exercise-title">تمرين اختيار متعدد — العوامل المنطقية الصحيحة</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> اختر جميع العوامل المنطقية الصحيحة في بايثون
+                    (يمكنك اختيار أكثر من إجابة):
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="checkbox" name="ex7" value="and"> and</label>
+                    <label class="option-item"><input type="checkbox" name="ex7" value="or"> or</label>
+                    <label class="option-item"><input type="checkbox" name="ex7" value="not"> not</label>
+                    <label class="option-item"><input type="checkbox" name="ex7" value="xor"> xor</label>
+                    <label class="option-item"><input type="checkbox" name="ex7" value="nand"> nand</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise7()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex7','result7')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result7"></div>
+            </div>
+
+            <!-- ===== خلاصة ===== -->
+            <h2><i class="fas fa-tasks"></i> خلاصة الدرس</h2>
+            <ul class="plain">
+                <li>✔️ العمليات الحسابية: <code class="inline">+ - * / // % **</code>.</li>
+                <li>✔️ عمليات المقارنة: <code class="inline">== != &lt; &gt; &lt;= &gt;=</code> وتُرجع True/False.</li>
+                <li>✔️ العوامل المنطقية: <code class="inline">and</code>، <code class="inline">or</code>، <code class="inline">not</code>.</li>
+                <li>✔️ <code class="inline">=</code> للإسناد، و <code class="inline">==</code> للمقارنة — لا تخلط بينهما.</li>
+                <li>✔️ الأسبقية: الأقواس ← الأس ← الضرب/القسمة ← الجمع/الطرح ← المقارنة ← not ← and ← or.</li>
+                <li>✔️ هذه العمليات أساس كل برنامج بايثون، وسنستخدمها في الشروط والحلقات.</li>
+            </ul>
+
+            <!-- ===== شريط التقدم ===== -->
+            <div class="progress-footer">
+                <h3><i class="fas fa-chart-line"></i> تقدمك في المسار</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0% مكتمل</div>
+            </div>
+
+            <!-- ===== التنقل ===== -->
+            <div class="nav-links">
+                <a href="lesson5.html" class="nav-link prev">
+                    <i class="fas fa-arrow-right"></i>
+                    الدرس السابق: المتغيرات وأنواع البيانات
+                </a>
+                <a href="lesson7.html" class="nav-link next">
+                    الدرس التالي: الجمل الشرطية if / elif / else
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+
+        </article>
+    </div>
+</div>
+
+<footer>
+    © 2025 CodeWay — مسار Python · الدرس 6 من مستوى المبتدئين.
+</footer>
+
+<script>
+    /* شريط التقدم */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '40%';
+            text.textContent = '40% مكتمل';
+        }, 400);
+    });
+
+    /* ===== تمرين 1 ===== */
+    function checkExercise1() {
+        const selected = document.querySelector('input[name="ex1"]:checked');
+        const result = document.getElementById('result1');
+        result.className = 'exercise-result';
+
+        if (!selected) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (selected.value === 'b') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> <code class="inline">17 // 5 = 3</code> (الجزء الصحيح من القسمة).';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الإجابة الصحيحة هي <strong>3</strong>.';
+        }
+    }
+
+    /* ===== تمرين 2 ===== */
+    function checkExercise2() {
+        const selected = document.querySelector('input[name="ex2"]:checked');
+        const result = document.getElementById('result2');
+        result.className = 'exercise-result';
+
+        if (!selected) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (selected.value === 'b') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> <code class="inline">17 % 5 = 2</code> (باقي القسمة: 5×3=15، والباقي 2).';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الإجابة الصحيحة هي <strong>2</strong>.';
+        }
+    }
+
+    /* ===== تمرين 3 ===== */
+    function checkExercise3() {
+        const selected = document.querySelector('input[name="ex3"]:checked');
+        const result = document.getElementById('result3');
+        result.className = 'exercise-result';
+
+        if (!selected) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (selected.value === 'b') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة صحيحة!</strong> الضرب له أسبقية على الجمع، لذا <code class="inline">2 + 3 * 4 = 2 + 12 = 14</code>.'.replace('fa-times-circle', 'fa-check-circle');
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الإجابة الصحيحة هي <strong>14</strong> لأن الضرب يُنفَّذ قبل الجمع.';
+        }
+    }
+
+    /* ===== تمرين 4 ===== */
+    function checkExercise4() {
+        const selected = document.querySelector('input[name="ex4"]:checked');
+        const result = document.getElementById('result4');
+        result.className = 'exercise-result';
+
+        if (!selected) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (selected.value === 'false') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>صحيح تمامًا!</strong> <code class="inline">=</code> للإسناد، و <code class="inline">==</code> للمقارنة.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>للأسف خطأ.</strong> العبارة خاطئة — <code class="inline">=</code> للإسناد وليست للمقارنة.';
+        }
+    }
+
+    /* ===== تمرين 5 ===== */
+    function checkExercise5() {
+        const raw = document.getElementById('ex5-input').value.trim();
+        const input = raw.toLowerCase();
+        const result = document.getElementById('result5');
+        result.className = 'exercise-result';
+
+        if (!input) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تكتب أي إجابة.'; return; }
+
+        if (raw === 'True') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> <code class="inline">or</code> يُرجع True إذا كان أحد الطرفين صحيحًا على الأقل.';
+        } else if (input === 'true') {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>قريب جدًا!</strong> في بايثون تُكتب <strong>True</strong> بحرف T كبير؛ أما <code class="inline">true</code> فخطأ (NameError).';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة غير صحيحة.</strong> الإجابة الصحيحة هي <strong>True</strong>.';
+        }
+    }
+
+    /* ===== تمرين 6 ===== */
+    function checkExercise6() {
+        const selected = document.querySelector('input[name="ex6"]:checked');
+        const result = document.getElementById('result6');
+        result.className = 'exercise-result';
+
+        if (!selected) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (selected.value === 'c') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> <code class="inline">and</code> يُرجع True فقط عند صحة كلا الشرطين.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> العامل الصحيح هو <strong>and</strong>.';
+        }
+    }
+
+    /* ===== تمرين 7 ===== */
+    function checkExercise7() {
+        const correct = ['and', 'or', 'not'];
+        const wrong   = ['xor', 'nand'];
+        const checked = [...document.querySelectorAll('input[name="ex7"]:checked')].map(cb => cb.value);
+
+        const correctSelected = checked.filter(v => correct.includes(v)).length;
+        const wrongSelected   = checked.filter(v => wrong.includes(v)).length;
+
+        const result = document.getElementById('result7');
+        result.className = 'exercise-result';
+
+        if (checked.length === 0) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (correctSelected === correct.length && wrongSelected === 0) {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>ممتاز!</strong> العوامل المنطقية الثلاثة الصحيحة هي: <code class="inline">and</code>, <code class="inline">or</code>, <code class="inline">not</code>.';
+        } else if (wrongSelected > 0) {
+            result.classList.add('partial');
+            result.innerHTML = `<i class="fas fa-exclamation-triangle"></i> لديك <strong>${wrongSelected}</strong> إجابة خاطئة. <code class="inline">xor</code> و <code class="inline">nand</code> ليست عوامل منطقية في بايثون.`;
+        } else {
+            result.classList.add('partial');
+            result.innerHTML = `<i class="fas fa-info-circle"></i> اخترت <strong>${correctSelected}</strong> من <strong>${correct.length}</strong> إجابات صحيحة.`;
+        }
+    }
+
+    /* ===== إعادة تعيين ===== */
+    function resetExercise(name, resultId) {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(el => el.checked = false);
+        const input = document.getElementById(name + '-input');
+        if (input) input.value = '';
+        const result = document.getElementById(resultId);
+        if (result) { result.className = 'exercise-result'; result.innerHTML = ''; }
+    }
+</script>
+
+</body>
+</html>

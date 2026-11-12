@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 15: قراءة الأخطاء وتصحيحها (Debugging) | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span class="sep">/</span>
+        <span>تصحيح الأخطاء</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-bug"></i>
+            الدرس 15 · تصحيح الأخطاء
+        </div>
+        <h1 class="lesson-title">قراءة الأخطاء وتصحيحها (Debugging)</h1>
+        <p class="lesson-intro">
+            كل مبرمج — من المبتدئ إلى الخبير — يكتب أخطاء يوميًا. الفرق أن المحترف <strong>يقرأ رسالة الخطأ بهدوء</strong> ويعرف كيف يصل لسببها بسرعة. في هذا الدرس ستتعلم قراءة رسائل Python، والتعرف على أشهر الأخطاء، واستراتيجيات عملية <strong>لتصحيح الأخطاء (Debugging)</strong>.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 40 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 فهم رسائل الخطأ وإصلاحها</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 مبتدئ</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 14</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#intro">1. مقدمة</a>
+            <a href="#traceback">2. قراءة رسالة الخطأ</a>
+            <a href="#syntax">3. أخطاء الصياغة</a>
+            <a href="#runtime">4. أخطاء وقت التشغيل</a>
+            <a href="#logic">5. الأخطاء المنطقية</a>
+            <a href="#strategies">6. استراتيجيات التصحيح</a>
+            <a href="#try">7. لمحة عن try/except</a>
+            <a href="#practice">8. مثال تطبيقي</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="intro">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        الأخطاء جزء طبيعي من البرمجة
+    </h2>
+        <p>
+            عندما تظهر لك رسالة خطأ حمراء، لا تقلق! رسالة الخطأ ليست عدوك، بل هي <strong>صديق يخبرك بالضبط أين المشكلة</strong>.
+            كلمة <strong>Bug</strong> تعني «حشرة»، ويقال إن أصلها حشرة حقيقية علقت في أحد الحواسيب القديمة عام 1947 فعطّلته،
+            ومن هنا جاءت كلمة <strong>Debugging</strong> أي «إزالة الحشرات».
+        </p>
+        <p>تنقسم الأخطاء في Python إلى ثلاثة أنواع رئيسية:</p>
+
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-spell-check"></i> أخطاء الصياغة (Syntax)</h4>
+                <p>كتبت الكود بطريقة لا تفهمها Python، مثل نسيان <code>:</code> أو قوس. <strong>لا يعمل البرنامج أبدًا</strong>.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-bomb"></i> أخطاء وقت التشغيل (Runtime)</h4>
+                <p>الكود صحيح الصياغة لكنه يتوقف أثناء التشغيل، مثل القسمة على صفر. تسمى <strong>الاستثناءات (Exceptions)</strong>.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-brain"></i> الأخطاء المنطقية (Logic)</h4>
+                <p>البرنامج يعمل دون أي رسالة، لكن <strong>النتيجة خاطئة</strong>! وهي الأصعب لأن Python لا تنبهك إليها.</p>
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="traceback">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-search-location"></i>
+        كيف تقرأ رسالة الخطأ (Traceback)؟
+    </h2>
+        <p>
+            عندما يتوقف البرنامج، تطبع Python تقريرًا يسمى <strong>Traceback</strong> (تتبّع المسار).
+            لنأخذ هذا البرنامج الذي فيه خطأ:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>report.py</span>
+    </div>
+<pre><span class="kw">def</span> <span class="fn">average</span>(numbers):
+    <span class="kw">return</span> <span class="fn">sum</span>(numbers) / <span class="fn">len</span>(numbers)
+
+<span class="kw">def</span> <span class="fn">print_report</span>(student, marks):
+    avg = <span class="fn">average</span>(marks)
+    <span class="fn">print</span>(student, <span class="str">"معدله"</span>, avg)
+
+<span class="fn">print_report</span>(<span class="str">"علي"</span>, [<span class="num">90</span>, <span class="num">80</span>])
+<span class="fn">print_report</span>(<span class="str">"منى"</span>, [])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>علي معدله 85.0</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">Traceback (most recent call last):
+  File "report.py", line 9, in &lt;module&gt;
+    print_report("منى", [])
+    ~~~~~~~~~~~~^^^^^^^^^^^
+  File "report.py", line 5, in print_report
+    avg = average(marks)
+  File "report.py", line 2, in average
+    return sum(numbers) / len(numbers)
+           ~~~~~~~~~~~~~^~~~~~~~~~~~~~
+ZeroDivisionError: division by zero</pre>
+</div>
+
+        <p><strong>اقرأ الرسالة من الأسفل إلى الأعلى:</strong></p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الجزء</th><th>معناه</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>السطر الأخير</strong> <code>ZeroDivisionError: division by zero</code></td><td><strong>نوع الخطأ</strong> ووصفه — ابدأ القراءة من هنا دائمًا!</td></tr>
+                    <tr><td><code>File "report.py", line 2, in average</code></td><td><strong>المكان الذي حدث فيه الخطأ</strong> فعليًا: السطر 2 داخل الدالة <code>average</code>.</td></tr>
+                    <tr><td>علامات <code>~~~^~~~</code></td><td>تشير إلى الجزء المسؤول بالضبط داخل السطر.</td></tr>
+                    <tr><td>الأسطر الأعلى</td><td><strong>سلسلة الاستدعاءات</strong>: السطر 9 استدعى <code>print_report</code>، الذي استدعى <code>average</code> في السطر 5.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>الاستنتاج:</strong> لاحظ أن الطالب الأول طُبع بنجاح، والمشكلة ظهرت مع «منى» لأن قائمة درجاتها فارغة،
+                فأصبح <code>len(numbers)</code> صفرًا. الإصلاح: التحقق من أن القائمة ليست فارغة قبل القسمة.
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>ملاحظة:</strong> شكل رسائل الخطأ قد يختلف قليلًا حسب إصدار Python لديك (الإصدارات الحديثة أوضح وتضيف علامات
+                <code>^</code> واقتراحات مفيدة)، لكن نوع الخطأ ورقم السطر موجودان دائمًا.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="syntax">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-spell-check"></i>
+        أخطاء الصياغة (SyntaxError)
+    </h2>
+        <p>
+            تكتشفها Python <strong>قبل</strong> تشغيل أي سطر، لذلك لن يُنفَّذ شيء من البرنامج حتى تصلحها.
+            إليك أشهرها:
+        </p>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 1. نسيان النقطتين :</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>missing_colon.py</span>
+    </div>
+<pre>age = <span class="num">20</span>
+<span class="kw">if</span> age &gt;= <span class="num">18</span>
+    <span class="fn">print</span>(<span class="str">"بالغ"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">  File "missing_colon.py", line 2
+    if age &gt;= 18
+                ^
+SyntaxError: expected ':'</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 2. قوس أو علامة تنصيص غير مغلقة</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>unclosed.py</span>
+    </div>
+<pre><span class="fn">print</span>(<span class="str">"مرحبًا بك"</span>
+name = <span class="str">"سارة"</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">  File "unclosed.py", line 1
+    print("مرحبًا بك"
+         ^
+SyntaxError: '(' was never closed</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 3. استخدام = بدل == في الشرط</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>assign_in_if.py</span>
+    </div>
+<pre>x = <span class="num">5</span>
+<span class="kw">if</span> x = <span class="num">5</span>:
+    <span class="fn">print</span>(<span class="str">"خمسة"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">  File "assign_in_if.py", line 2
+    if x = 5:
+       ^^^^^
+SyntaxError: invalid syntax. Maybe you meant '==' or ':=' instead of '='?</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 4. أخطاء المسافات البادئة (IndentationError)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>indentation.py</span>
+    </div>
+<pre><span class="kw">def</span> <span class="fn">greet</span>():
+<span class="fn">print</span>(<span class="str">"أهلًا"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">  File "indentation.py", line 2
+    print("أهلًا")
+    ^^^^^
+IndentationError: expected an indented block after function definition on line 1</pre>
+</div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>مهم:</strong> في أخطاء الصياغة، قد تكون المشكلة الحقيقية <strong>في السطر الذي قبل</strong> السطر المذكور!
+                مثلًا قوس لم يُغلق في السطر 1 قد يجعل Python تشتكي من السطر 2. لا تخلط أيضًا بين المسافات (Spaces) وزر Tab.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="runtime">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-bomb"></i>
+        أشهر أخطاء وقت التشغيل
+    </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الخطأ</th><th>متى يحدث؟</th><th>مثال</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>NameError</code></td><td>استخدام اسم غير معرّف (أو خطأ إملائي فيه)</td><td><code>print(nmae)</code></td></tr>
+                    <tr><td><code>TypeError</code></td><td>عملية على نوع غير مناسب</td><td><code>"العمر: " + 25</code></td></tr>
+                    <tr><td><code>ValueError</code></td><td>النوع صحيح لكن القيمة غير مناسبة</td><td><code>int("abc")</code></td></tr>
+                    <tr><td><code>IndexError</code></td><td>فهرس خارج حدود القائمة</td><td><code>[1, 2][5]</code></td></tr>
+                    <tr><td><code>KeyError</code></td><td>مفتاح غير موجود في القاموس</td><td><code>{"a": 1}["b"]</code></td></tr>
+                    <tr><td><code>ZeroDivisionError</code></td><td>القسمة على صفر</td><td><code>10 / 0</code></td></tr>
+                    <tr><td><code>AttributeError</code></td><td>دالة أو خاصية غير موجودة لهذا النوع</td><td><code>(1, 2).append(3)</code></td></tr>
+                    <tr><td><code>ModuleNotFoundError</code></td><td>وحدة غير مثبتة أو اسمها خاطئ</td><td><code>import maths</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> NameError — غالبًا خطأ إملائي</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>name_error.py</span>
+    </div>
+<pre>username = <span class="str">"خالد"</span>
+<span class="fn">print</span>(usernme)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">Traceback (most recent call last):
+  File "name_error.py", line 2, in &lt;module&gt;
+    print(usernme)
+          ^^^^^^^
+NameError: name 'usernme' is not defined. Did you mean: 'username'?</pre>
+</div>
+        <p>لاحظ كيف تقترح Python الحديثة الاسم الصحيح: <em>Did you mean</em>. اقرأ الرسالة جيدًا!</p>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> TypeError — دمج نص مع رقم</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>type_error.py</span>
+    </div>
+<pre>age = <span class="num">25</span>
+<span class="fn">print</span>(<span class="str">"عمرك هو "</span> + age)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">Traceback (most recent call last):
+  File "type_error.py", line 2, in &lt;module&gt;
+    print("عمرك هو " + age)
+          ~~~~~~~~~~~^~~~~
+TypeError: can only concatenate str (not "int") to str</pre>
+</div>
+        <p>الإصلاح: حوّل الرقم إلى نص بـ <code>str(age)</code>، أو استخدم f-string:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>type_fix.py</span>
+    </div>
+<pre>age = <span class="num">25</span>
+<span class="fn">print</span>(<span class="str">"عمرك هو "</span> + <span class="fn">str</span>(age))
+<span class="fn">print</span>(<span class="str">f"عمرك هو {age}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>عمرك هو 25
+عمرك هو 25</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> ValueError — تحويل نص غير رقمي</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>value_error.py</span>
+    </div>
+<pre>text = <span class="str">"اثنا عشر"</span>
+number = <span class="fn">int</span>(text)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">Traceback (most recent call last):
+  File "value_error.py", line 2, in &lt;module&gt;
+    number = int(text)
+ValueError: invalid literal for int() with base 10: 'اثنا عشر'</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> IndexError — الخطأ بواحد (Off-by-one)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>index_error.py</span>
+    </div>
+<pre>items = [<span class="str">"أ"</span>, <span class="str">"ب"</span>, <span class="str">"ج"</span>]
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(items) + <span class="num">1</span>):
+    <span class="fn">print</span>(items[i])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>أ
+ب
+ج</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">Traceback (most recent call last):
+  File "index_error.py", line 3, in &lt;module&gt;
+    print(items[i])
+          ~~~~~^^^
+IndexError: list index out of range</pre>
+</div>
+        <p>
+            طُبعت العناصر الثلاثة ثم توقف البرنامج عند <code>i = 3</code>، لأن آخر فهرس هو 2.
+            هذا من أشهر الأخطاء ويسمى <strong>Off-by-one error</strong>. الحل الأفضل: <code>for item in items:</code>.
+        </p>
+</section>
+
+<section class="section-card" id="logic">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-brain"></i>
+        الأخطاء المنطقية
+    </h2>
+        <p>هذا البرنامج يعمل بدون أي رسالة خطأ… لكن هل النتيجة صحيحة؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>logic_bug.py</span>
+    </div>
+<pre>marks = [<span class="num">80</span>, <span class="num">90</span>, <span class="num">70</span>]
+total = <span class="num">0</span>
+<span class="kw">for</span> m <span class="kw">in</span> marks:
+    total = m          <span class="cm"># ← هنا المشكلة</span>
+average = total / <span class="fn">len</span>(marks)
+<span class="fn">print</span>(<span class="str">"المعدل:"</span>, average)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>المعدل: 23.333333333333332</pre>
+</div>
+        <p>
+            المعدل الصحيح هو 80، لكن البرنامج طبع 23.33! المشكلة أننا كتبنا <code>total = m</code> بدل
+            <code>total += m</code>، فكان المجموع يُستبدل في كل دورة بدل أن يتراكم.
+        </p>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> أداة التتبع بالطباعة (Print Debugging)</p>
+        <p>
+            أبسط وأقوى أداة لاكتشاف الأخطاء المنطقية: <strong>اطبع قيم المتغيرات</strong> في كل خطوة لترى ماذا يحدث فعلًا:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>print_debug.py</span>
+    </div>
+<pre>marks = [<span class="num">80</span>, <span class="num">90</span>, <span class="num">70</span>]
+total = <span class="num">0</span>
+<span class="kw">for</span> m <span class="kw">in</span> marks:
+    total = m
+    <span class="fn">print</span>(<span class="str">f"[DEBUG] m={m}, total={total}"</span>)   <span class="cm"># سطر مؤقت للتتبع</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>[DEBUG] m=80, total=80
+[DEBUG] m=90, total=90
+[DEBUG] m=70, total=70</pre>
+</div>
+        <p>
+            الآن واضح أن <code>total</code> لا يزداد! بعد الإصلاح (<code>total += m</code>) <strong>احذف أسطر DEBUG</strong>.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>logic_fixed.py</span>
+    </div>
+<pre>marks = [<span class="num">80</span>, <span class="num">90</span>, <span class="num">70</span>]
+total = <span class="num">0</span>
+<span class="kw">for</span> m <span class="kw">in</span> marks:
+    total += m
+average = total / <span class="fn">len</span>(marks)
+<span class="fn">print</span>(<span class="str">"المعدل:"</span>, average)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>المعدل: 80.0</pre>
+</div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>اختبر بقيم تعرف نتيجتها:</strong> قبل أن تثق ببرنامجك، جرّبه على أمثلة بسيطة تعرف إجابتها مسبقًا
+                (مثل [80, 90, 70] معدلها 80). إذا لم تتطابق النتيجة، فهناك خطأ منطقي.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="strategies">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-chess"></i>
+        استراتيجيات تصحيح الأخطاء
+    </h2>
+        <div class="note-box">
+            <strong>🧭 خطوات منهجية عند ظهور أي خطأ:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> <strong>1. اقرأ السطر الأخير</strong> من الرسالة: ما نوع الخطأ؟ وما وصفه؟</li>
+                <li><i class="fas fa-angle-left"></i> <strong>2. اذهب لرقم السطر</strong> المذكور (وللسطر الذي قبله في أخطاء الصياغة).</li>
+                <li><i class="fas fa-angle-left"></i> <strong>3. افهم قبل أن تعدّل:</strong> ما قيمة كل متغير في هذه اللحظة؟ اطبعها إن لم تكن متأكدًا.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>4. غيّر شيئًا واحدًا فقط</strong> ثم أعد التشغيل، حتى تعرف ما الذي أصلح المشكلة.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>5. صغّر المشكلة:</strong> انسخ الجزء المشكوك فيه إلى ملف صغير منفصل وجرّبه وحده.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>6. ابحث عن رسالة الخطأ:</strong> انسخ السطر الأخير وابحث عنه في Google أو Stack Overflow — غالبًا واجهه غيرك قبلك.</li>
+            </ul>
+        </div>
+
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-crow"></i> طريقة البطة المطاطية</h4>
+                <p>اشرح كودك سطرًا سطرًا بصوت عالٍ (لبطة أو صديق). كثيرًا ما تكتشف الخطأ وأنت تشرح!</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-pause-circle"></i> المصحّح في VS Code</h4>
+                <p>ضع <strong>نقطة توقف (Breakpoint)</strong> بالضغط بجانب رقم السطر، ثم شغّل بـ F5 لتوقف البرنامج وترى قيم كل المتغيرات.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-coffee"></i> خذ استراحة</h4>
+                <p>إذا علقت طويلًا، ابتعد 10 دقائق. العقل المرتاح يرى الحل بسرعة أكبر.</p>
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="try">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-shield-alt"></i>
+        لمحة: التعامل مع الأخطاء بـ try / except
+    </h2>
+        <p>
+            بعض الأخطاء لا يمكن منعها مسبقًا، مثل إدخال المستخدم لنص بدل رقم. بدل أن يتوقف البرنامج،
+            يمكننا <strong>التقاط الخطأ</strong> والتعامل معه بلطف:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>try_except.py</span>
+    </div>
+<pre>inputs = [<span class="str">"25"</span>, <span class="str">"عشرون"</span>, <span class="str">"30"</span>]   <span class="cm"># كأن المستخدم كتب هذه القيم</span>
+
+<span class="kw">for</span> text <span class="kw">in</span> inputs:
+    <span class="kw">try</span>:
+        age = <span class="fn">int</span>(text)
+        <span class="fn">print</span>(<span class="str">"✅ عمرك بعد 5 سنوات:"</span>, age + <span class="num">5</span>)
+    <span class="kw">except</span> ValueError:
+        <span class="fn">print</span>(<span class="str">f"❌ '{text}' ليس رقمًا صحيحًا، حاول مرة أخرى"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>✅ عمرك بعد 5 سنوات: 30
+❌ 'عشرون' ليس رقمًا صحيحًا، حاول مرة أخرى
+✅ عمرك بعد 5 سنوات: 35</pre>
+</div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>للتعمق:</strong> ستتعلم معالجة الاستثناءات بالتفصيل (<code>else</code>, <code>finally</code>,
+                <code>raise</code>، والاستثناءات المخصصة) في <strong>المستوى المتوسط</strong>. الآن يكفي أن تعرف الفكرة.
+            </div>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>لا تخفِ الأخطاء:</strong> تجنّب <code>except:</code> بدون تحديد نوع الخطأ، لأنها تبتلع كل الأخطاء —
+                حتى الأخطاء الإملائية في كودك — فيصبح اكتشافها مستحيلًا.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="practice">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-laptop-code"></i>
+        مثال تطبيقي: أصلح البرنامج!
+    </h2>
+        <p>هذا برنامج لحساب فاتورة مطعم، لكنه يحتوي على عدة أخطاء. لنصلحها خطوة بخطوة:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>bill_buggy.py</span>
+    </div>
+<pre>menu = {<span class="str">"برجر"</span>: <span class="num">25</span>, <span class="str">"بطاطس"</span>: <span class="num">10</span>, <span class="str">"عصير"</span>: <span class="num">8</span>}
+order = [<span class="str">"برجر"</span>, <span class="str">"عصير"</span>, <span class="str">"بيتزا"</span>]
+
+total = <span class="num">0</span>
+<span class="kw">for</span> item <span class="kw">in</span> order:
+    total += menu[item]
+<span class="fn">print</span>(<span class="str">"الإجمالي: "</span> + total)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">Traceback (most recent call last):
+  File "bill_buggy.py", line 6, in &lt;module&gt;
+    total += menu[item]
+             ~~~~^^^^^^
+KeyError: 'بيتزا'</pre>
+</div>
+
+        <p>
+            <strong>الخطأ 1:</strong> <code>KeyError: 'بيتزا'</code> ← البيتزا غير موجودة في القائمة.
+            الحل: نستخدم <code>in</code> للتحقق أولًا.
+            <br>بعد إصلاحه، سيظهر <strong>الخطأ 2:</strong> <code>TypeError</code> لأننا ندمج نصًا مع رقم.
+            الحل: f-string.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>bill_fixed.py</span>
+    </div>
+<pre>menu = {<span class="str">"برجر"</span>: <span class="num">25</span>, <span class="str">"بطاطس"</span>: <span class="num">10</span>, <span class="str">"عصير"</span>: <span class="num">8</span>}
+order = [<span class="str">"برجر"</span>, <span class="str">"عصير"</span>, <span class="str">"بيتزا"</span>]
+
+total = <span class="num">0</span>
+<span class="kw">for</span> item <span class="kw">in</span> order:
+    <span class="kw">if</span> item <span class="kw">in</span> menu:
+        total += menu[item]
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="str">f"⚠️ '{item}' غير متوفر في القائمة وتم تجاهله"</span>)
+<span class="fn">print</span>(<span class="str">f"الإجمالي: {total} ريال"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>⚠️ 'بيتزا' غير متوفر في القائمة وتم تجاهله
+الإجمالي: 33 ريال</pre>
+</div>
+
+        <div class="note-box">
+            <strong>🔍 الدروس المستفادة:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> البرنامج يتوقف عند <strong>أول</strong> خطأ، لذلك قد تظهر الأخطاء واحدًا تلو الآخر.</li>
+                <li><i class="fas fa-angle-left"></i> لكل نوع خطأ حل معتاد: <code>KeyError</code> ← <code>in</code> أو <code>get()</code>، <code>TypeError</code> ← تحويل النوع.</li>
+                <li><i class="fas fa-angle-left"></i> فكّر في الحالات غير المتوقعة (عنصر غير موجود، قائمة فارغة، إدخال خاطئ).</li>
+            </ul>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! آخر فهرس في القائمة هو 2، والفهرس 3 خارج الحدود." data-hint="القائمة فيها 3 عناصر فهارسها 0 و 1 و 2.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">نوع الخطأ</span>
+    </div>
+    <p class="exercise-question">ما نوع الخطأ الذي سيظهر عند تشغيل هذا الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>question.py</span>
+    </div>
+<pre>prices = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>]
+<span class="fn">print</span>(prices[<span class="num">3</span>])</pre>
+</div>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>KeyError</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> <code>IndexError</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> <code>ValueError</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>SyntaxError</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! لديك فهم جيد لأنواع الأخطاء." data-hint="الأخطاء المنطقية صامتة، و &lt;code&gt;int()&lt;/code&gt; لا تقبل نصًا فيه فاصلة عشرية.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">يجب قراءة رسالة الخطأ من السطر الأخير أولًا.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">الأخطاء المنطقية تُظهر دائمًا رسالة خطأ حمراء.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>"5" + 5</code> تسبب <code>TypeError</code>.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>int("12.5")</code> تعمل بدون مشاكل وتُرجع 12.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">في أخطاء الصياغة قد يكون السبب الحقيقي في السطر الذي قبل السطر المذكور.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="رائع! تعرف أشهر أخطاء Python بأسمائها." data-hint="انتبه لحالة الأحرف الكبيرة والصغيرة، مثل &lt;code&gt;ZeroDivisionError&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>سمِّ الخطأ</h4>
+        <span class="exercise-tag">اكتب اسم الخطأ</span>
+    </div>
+    <p class="exercise-question">اكتب <strong>اسم الخطأ</strong> الذي يسببه كل سطر (مثل <code>NameError</code>):</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="num">10</span> / <span class="num">0</span></span><span>  <span class="cm"># ←</span></span><input type="text" class="blank-input" data-answers="ZeroDivisionError" placeholder="..." style="min-width:268px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span>{<span class="str">'a'</span>: <span class="num">1</span>}[<span class="str">'b'</span>]</span><span>  <span class="cm"># ←</span></span><input type="text" class="blank-input" data-answers="KeyError" placeholder="..." style="min-width:142px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span><span class="fn">int</span>(<span class="str">'abc'</span>)</span><span>  <span class="cm"># ←</span></span><input type="text" class="blank-input" data-answers="ValueError" placeholder="..." style="min-width:170px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span><span class="fn">print</span>(undefined_var)</span><span>  <span class="cm"># ←</span></span><input type="text" class="blank-input" data-answers="NameError" placeholder="..." style="min-width:156px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! أضفت &lt;code&gt;:&lt;/code&gt; وحوّلت الرقم إلى نص." data-hint="سطر &lt;code&gt;if&lt;/code&gt; ينتهي دائمًا بنقطتين، والتحويل إلى نص يتم بالدالة &lt;code&gt;str&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أصلح الكود</h4>
+        <span class="exercise-tag">تصحيح</span>
+    </div>
+    <p class="exercise-question">هذا الكود فيه خطآن (نسيان النقطتين، ودمج نص مع رقم). أكمل الفراغات لإصلاحه:</p>
+    <div class="code-fill">
+        <div class="line"><span>score = <span class="num">85</span></span></div>
+        <div class="line"><span><span class="kw">if</span> score &gt;= <span class="num">50</span></span><input type="text" class="blank-input" data-answers=":" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span>    <span class="fn">print</span>(<span class="str">'نجحت بدرجة '</span> + </span><input type="text" class="blank-input" data-answers="str" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>(score))</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! هذه هي الطريقة المنهجية لتصحيح الأخطاء." data-hint="ابدأ دائمًا بقراءة الرسالة، وانتهِ بالتعديل والتجربة.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب خطوات التعامل مع خطأ في برنامجك حسب المنهجية الصحيحة. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="3" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">3) اطبع قيم المتغيرات لفهم ما يحدث</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="4" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">4) غيّر شيئًا واحدًا وأعد التشغيل</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">1) اقرأ السطر الأخير لمعرفة نوع الخطأ</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">2) اذهب إلى رقم السطر المذكور</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر صيّاد الأخطاء 🐞</div>
+    <p style="color:var(--text-light); font-size:0.95em;">لكل سطر من الأسطر التالية خطأ. اختر نوع الخطأ الذي ستظهره Python، ثم اضغط «افحص» لترى الإجابة مع الشرح.</p>
+    <div id="bugHunt"></div>
+    <div class="lab-row">
+        <button class="btn btn-primary" onclick="checkBugs()"><i class="fas fa-search"></i> افحص</button>
+        <button class="btn btn-secondary" onclick="renderBugs()"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="lab-console" id="bugConsole" style="direction:rtl; text-align:right; font-family:Cairo, sans-serif;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> أنواع الأخطاء الثلاثة: الصياغة، وقت التشغيل (الاستثناءات)، والأخطاء المنطقية.</li>
+                <li><i class="fas fa-check"></i> قراءة رسالة Traceback من الأسفل للأعلى: نوع الخطأ ← رقم السطر ← سلسلة الاستدعاءات.</li>
+                <li><i class="fas fa-check"></i> أخطاء الصياغة الشائعة: نسيان <code>:</code>، الأقواس غير المغلقة، <code>=</code> بدل <code>==</code>، والمسافات البادئة.</li>
+                <li><i class="fas fa-check"></i> أشهر الاستثناءات: <code>NameError</code>, <code>TypeError</code>, <code>ValueError</code>, <code>IndexError</code>, <code>KeyError</code>, <code>ZeroDivisionError</code>.</li>
+                <li><i class="fas fa-check"></i> اكتشاف الأخطاء المنطقية باستخدام الطباعة للتتبع والاختبار بقيم معروفة.</li>
+                <li><i class="fas fa-check"></i> منهجية خطوة بخطوة لتصحيح الأخطاء، والمصحّح في VS Code.</li>
+                <li><i class="fas fa-check"></i> لمحة عن التقاط الأخطاء باستخدام <code>try / except</code>.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> لا تخف من رسالة الخطأ — اقرأها كاملة، فهي تخبرك بالحل غالبًا.</li>
+                <li><i class="fas fa-lightbulb"></i> شغّل برنامجك كثيرًا أثناء الكتابة، ولا تكتب 100 سطر ثم تشغّل لأول مرة.</li>
+                <li><i class="fas fa-lightbulb"></i> احتفظ بقائمة الأخطاء التي واجهتها وحلولها، ستتكرر معك.</li>
+                <li><i class="fas fa-lightbulb"></i> عند البحث على الإنترنت، انسخ السطر الأخير من رسالة الخطأ كما هو.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> 🎉 <strong>مبروك! أنهيت دروس مستوى المبتدئين.</strong> الآن حان وقت التطبيق: ابدأ بـ <strong>المشروع الأول: لعبة تخمين الرقم</strong>، ثم انتقل إلى المستوى المتوسط.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson14.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 14: الوحدات والمكتبات</span>
+        </a>
+        <a href="project1.html" class="nav-link next">
+            <span>التالي: مشروع 1 — لعبة تخمين الرقم</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · تصحيح الأخطاء
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '100%';
+            text.textContent = '100% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر صيّاد الأخطاء ========== */
+    const BUGS = [
+        { code: 'print("Hello"', answer: 'SyntaxError', why: 'القوس لم يُغلق.' },
+        { code: 'total = 10 + "5"', answer: 'TypeError', why: 'لا يمكن جمع رقم مع نص؛ استخدم int("5").' },
+        { code: 'nums = [1, 2]\nnums[2]', answer: 'IndexError', why: 'آخر فهرس هو 1.' },
+        { code: 'age = int("twenty")', answer: 'ValueError', why: 'النص لا يمثل رقمًا.' },
+        { code: 'user = {"name": "Ali"}\nuser["age"]', answer: 'KeyError', why: 'المفتاح age غير موجود؛ استخدم get().' },
+        { code: 'Print("hi")', answer: 'NameError', why: 'Python حساسة لحالة الأحرف: الصحيح print.' },
+        { code: 'point = (1, 2)\npoint.append(3)', answer: 'AttributeError', why: 'الصفوف لا تملك append لأنها غير قابلة للتعديل.' },
+        { code: 'avg = 100 / 0', answer: 'ZeroDivisionError', why: 'لا يمكن القسمة على صفر.' },
+    ];
+    const BUG_TYPES = ['SyntaxError', 'TypeError', 'ValueError', 'IndexError', 'KeyError', 'NameError', 'AttributeError', 'ZeroDivisionError'];
+
+    function renderBugs() {
+        const box = document.getElementById('bugHunt');
+        box.innerHTML = BUGS.map((b, i) => `
+            <div class="lab-row" style="justify-content:space-between; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:9px; padding:8px 12px;">
+                <code style="white-space:pre; text-align:left;">${escapeHtml(b.code)}</code>
+                <select class="lab-select" id="bug${i}" style="direction:ltr;">
+                    <option value="">— اختر —</option>
+                    ${BUG_TYPES.map(t => `<option>${t}</option>`).join('')}
+                </select>
+            </div>`).join('');
+        document.getElementById('bugConsole').innerHTML = '';
+    }
+
+    function checkBugs() {
+        const out = document.getElementById('bugConsole');
+        let right = 0;
+        out.innerHTML = BUGS.map((b, i) => {
+            const pick = document.getElementById('bug' + i).value;
+            const ok = pick === b.answer;
+            if (ok) right++;
+            return (ok ? '✅ ' : '<span class="err">❌ </span>') + `السطر ${i + 1}: <strong>${b.answer}</strong> — ${b.why}`;
+        }).join('<br>') + `<br><br>🎯 النتيجة: ${right} من ${BUGS.length}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', renderBugs);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

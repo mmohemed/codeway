@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 2: NumPy بعمق | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص تحليل البيانات</a>
+        <span class="sep">/</span>
+        <span>NumPy بعمق</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-th"></i>
+            الدرس 2 · الحوسبة العددية
+        </div>
+        <h1 class="lesson-title">NumPy بعمق: المصفوفات والبث والعمليات المتجهة</h1>
+        <p class="lesson-intro">
+            NumPy هي الأساس الذي تُبنى عليه Pandas و scikit-learn وحتى مكتبات الذكاء الاصطناعي. في هذا الدرس ستتجاوز الأساسيات إلى <strong>الأبعاد وإعادة التشكيل</strong>، و<strong>الفهرسة المتقدمة</strong>، والفرق بين <strong>النسخة والعرض</strong>، وقاعدة <strong>البث (Broadcasting)</strong> الشهيرة، و<strong>الأرقام العشوائية</strong>، وعمليات <strong>الجبر الخطي</strong>.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 70 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 التفكير بالمصفوفات بدل الحلقات</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 1</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#why">1. لماذا NumPy؟</a>
+            <a href="#create">2. الإنشاء والتشكيل</a>
+            <a href="#indexing">3. الفهرسة المتقدمة</a>
+            <a href="#broadcasting">4. البث Broadcasting</a>
+            <a href="#ufuncs">5. الدوال والتجميع</a>
+            <a href="#random">6. الأرقام العشوائية</a>
+            <a href="#linalg">7. الجبر الخطي</a>
+            <a href="#practice">8. مثال تطبيقي</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="why">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-tachometer-alt"></i>
+        لماذا NumPy أسرع بكثير؟
+    </h2>
+        <p>
+            قائمة Python تخزّن <strong>مؤشرات</strong> إلى كائنات متفرقة في الذاكرة، وكل عنصر قد يكون من نوع مختلف.
+            أما مصفوفة NumPy فتخزّن أرقامًا من <strong>نوع واحد</strong> بشكل <strong>متتالٍ</strong> في الذاكرة،
+            وتُنفّذ العمليات عليها بكود مكتوب بلغة C. النتيجة: سرعة أكبر بعشرات المرات وذاكرة أقل.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>speed_test.py</span>
+    </div>
+<pre><span class="kw">import</span> time
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+numbers = <span class="fn">list</span>(<span class="fn">range</span>(<span class="num">1</span>_000_000))
+array = np.<span class="fn">arange</span>(<span class="num">1</span>_000_000)
+
+start = time.<span class="fn">perf_counter</span>()
+squares_list = [n * n <span class="kw">for</span> n <span class="kw">in</span> numbers]
+t_list = time.<span class="fn">perf_counter</span>() - start
+
+start = time.<span class="fn">perf_counter</span>()
+squares_array = array * array
+t_array = time.<span class="fn">perf_counter</span>() - start
+
+<span class="fn">print</span>(<span class="str">f"القائمة: {t_list * 1000:.1f} ms | NumPy: {t_array * 1000:.1f} ms | أسرع بـ {t_list / t_array:.0f} مرة"</span>)</pre>
+</div>
+        <p>مثال على النتيجة (تختلف حسب جهازك):</p>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>القائمة: 38.4 ms | NumPy: 1.1 ms | أسرع بـ 35 مرة</pre>
+</div>
+
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>dtypes_memory.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+a = np.<span class="fn">array</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+b = np.<span class="fn">array</span>([<span class="num">1.5</span>, <span class="num">2</span>, <span class="num">3</span>])
+c = np.<span class="fn">array</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>], dtype=np.int8)       <span class="cm"># نوع صغير لتوفير الذاكرة</span>
+
+<span class="fn">print</span>(a.dtype, b.dtype, c.dtype)
+<span class="fn">print</span>(<span class="str">"حجم العنصر بالبايت:"</span>, a.itemsize, b.itemsize, c.itemsize)
+<span class="fn">print</span>(<span class="str">"مليون رقم int64:"</span>, np.<span class="fn">zeros</span>(<span class="num">1</span>_000_000, dtype=np.int64).nbytes / <span class="num">1</span>e6, <span class="str">"MB"</span>)
+<span class="fn">print</span>(<span class="str">"مليون رقم float32:"</span>, np.<span class="fn">zeros</span>(<span class="num">1</span>_000_000, dtype=np.float32).nbytes / <span class="num">1</span>e6, <span class="str">"MB"</span>)
+<span class="fn">print</span>(np.<span class="fn">array</span>([<span class="num">1</span>, <span class="str">"2"</span>, <span class="num">3.0</span>]))               <span class="cm"># خليط ← تتحول كلها نصوصًا!</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>int64 float64 int8
+حجم العنصر بالبايت: 8 8 1
+مليون رقم int64: 8.0 MB
+مليون رقم float32: 4.0 MB
+['1' '2' '3.0']</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>انتبه لحدود الأنواع:</strong> <code>int8</code> يتسع فقط من -128 إلى 127. إذا تجاوزت الحد ستحصل على نتائج خاطئة بصمت
+                (Overflow). استخدم الأنواع الصغيرة فقط عندما تعرف مدى قيمك.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="create">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-plus-square"></i>
+        إنشاء المصفوفات وإعادة تشكيلها
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>creation.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="fn">print</span>(np.<span class="fn">ones</span>((<span class="num">2</span>, <span class="num">3</span>)))                 <span class="cm"># مصفوفة 2×3 من الآحاد</span>
+<span class="fn">print</span>(np.<span class="fn">full</span>((<span class="num">2</span>, <span class="num">2</span>), <span class="num">7</span>))              <span class="cm"># قيمة ثابتة</span>
+<span class="fn">print</span>(np.<span class="fn">eye</span>(<span class="num">3</span>, dtype=int))            <span class="cm"># مصفوفة الوحدة</span>
+<span class="fn">print</span>(np.<span class="fn">arange</span>(<span class="num">1</span>, <span class="num">13</span>).<span class="fn">reshape</span>(<span class="num">3</span>, <span class="num">4</span>))  <span class="cm"># 12 رقمًا في 3 صفوف و 4 أعمدة</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>[[1. 1. 1.]
+ [1. 1. 1.]]
+[[7 7]
+ [7 7]]
+[[1 0 0]
+ [0 1 0]
+ [0 0 1]]
+[[ 1  2  3  4]
+ [ 5  6  7  8]
+ [ 9 10 11 12]]</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الأبعاد والشكل</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الأبعاد <code>ndim</code></th><th>الاسم</th><th>الشكل <code>shape</code></th><th>مثال واقعي</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>متجه (Vector)</td><td><code>(5,)</code></td><td>درجات طالب في 5 مواد</td></tr>
+                    <tr><td>2</td><td>مصفوفة (Matrix)</td><td><code>(30, 5)</code></td><td>درجات 30 طالبًا في 5 مواد</td></tr>
+                    <tr><td>3</td><td>موتر (Tensor)</td><td><code>(100, 64, 64)</code></td><td>100 صورة رمادية بحجم 64×64</td></tr>
+                    <tr><td>4</td><td>—</td><td><code>(100, 64, 64, 3)</code></td><td>100 صورة ملونة (RGB)</td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>reshape.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+a = np.<span class="fn">arange</span>(<span class="num">12</span>)
+m = a.<span class="fn">reshape</span>(<span class="num">3</span>, <span class="num">4</span>)
+<span class="fn">print</span>(<span class="str">"الشكل:"</span>, m.shape, <span class="str">"| الأبعاد:"</span>, m.ndim, <span class="str">"| العناصر:"</span>, m.size)
+
+<span class="fn">print</span>(a.<span class="fn">reshape</span>(<span class="num">2</span>, -<span class="num">1</span>))        <span class="cm"># -1 تعني: احسبها أنت (هنا 6)</span>
+<span class="fn">print</span>(m.T)                     <span class="cm"># المنقول (Transpose): الصفوف تصبح أعمدة</span>
+<span class="fn">print</span>(m.<span class="fn">ravel</span>())               <span class="cm"># تسطيح إلى بُعد واحد</span>
+
+col = np.<span class="fn">array</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])[:, np.newaxis]   <span class="cm"># تحويل متجه إلى عمود</span>
+<span class="fn">print</span>(col.shape)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الشكل: (3, 4) | الأبعاد: 2 | العناصر: 12
+[[ 0  1  2  3  4  5]
+ [ 6  7  8  9 10 11]]
+[[ 0  4  8]
+ [ 1  5  9]
+ [ 2  6 10]
+ [ 3  7 11]]
+[ 0  1  2  3  4  5  6  7  8  9 10 11]
+(3, 1)</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>قاعدة reshape:</strong> عدد العناصر يجب أن يبقى ثابتًا. يمكنك تحويل 12 عنصرًا إلى <code>(3, 4)</code> أو
+                <code>(2, 6)</code> أو <code>(2, 2, 3)</code>، لكن ليس إلى <code>(5, 3)</code>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="indexing">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-crosshairs"></i>
+        الفهرسة المتقدمة
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>indexing_2d.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># صفوف = 4 طلاب، أعمدة = 3 اختبارات</span>
+scores = np.<span class="fn">array</span>([
+    [<span class="num">78</span>, <span class="num">85</span>, <span class="num">90</span>],
+    [<span class="num">92</span>, <span class="num">88</span>, <span class="num">95</span>],
+    [<span class="num">55</span>, <span class="num">61</span>, <span class="num">70</span>],
+    [<span class="num">83</span>, <span class="num">79</span>, <span class="num">88</span>],
+])
+
+<span class="fn">print</span>(scores[<span class="num">1</span>, <span class="num">2</span>])        <span class="cm"># الطالب 2، الاختبار 3</span>
+<span class="fn">print</span>(scores[:, <span class="num">0</span>])        <span class="cm"># كل الطلاب، الاختبار الأول</span>
+<span class="fn">print</span>(scores[<span class="num">1</span>:<span class="num">3</span>, :<span class="num">2</span>])     <span class="cm"># الطالبان 2 و 3، أول اختبارين</span>
+<span class="fn">print</span>(scores[-<span class="num">1</span>])          <span class="cm"># آخر طالب</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>95
+[78 92 55 83]
+[[92 88]
+ [55 61]]
+[83 79 88]</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الفهرسة بالقوائم (Fancy Indexing) وبالشروط (Boolean)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>fancy_boolean.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+scores = np.<span class="fn">array</span>([[<span class="num">78</span>, <span class="num">85</span>, <span class="num">90</span>], [<span class="num">92</span>, <span class="num">88</span>, <span class="num">95</span>], [<span class="num">55</span>, <span class="num">61</span>, <span class="num">70</span>], [<span class="num">83</span>, <span class="num">79</span>, <span class="num">88</span>]])
+names = np.<span class="fn">array</span>([<span class="str">"سارة"</span>, <span class="str">"علي"</span>, <span class="str">"منى"</span>, <span class="str">"خالد"</span>])
+
+<span class="fn">print</span>(names[[<span class="num">0</span>, <span class="num">3</span>]])                    <span class="cm"># اختيار عناصر محددة بقائمة فهارس</span>
+averages = scores.<span class="fn">mean</span>(axis=<span class="num">1</span>)
+<span class="fn">print</span>(averages.<span class="fn">round</span>(<span class="num">1</span>))
+
+mask = averages &gt;= <span class="num">80</span>                   <span class="cm"># مصفوفة True/False</span>
+<span class="fn">print</span>(mask)
+<span class="fn">print</span>(<span class="str">"المتفوقون:"</span>, names[mask])
+<span class="fn">print</span>(<span class="str">"درجات أقل من 60:"</span>, scores[scores &lt; <span class="num">60</span>])
+
+order = np.<span class="fn">argsort</span>(-averages)           <span class="cm"># فهارس الترتيب تنازليًا</span>
+<span class="fn">print</span>(<span class="str">"الترتيب:"</span>, names[order])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>['سارة' 'خالد']
+[84.3 91.7 62.  83.3]
+[ True  True False  True]
+المتفوقون: ['سارة' 'علي' 'خالد']
+درجات أقل من 60: [55]
+الترتيب: ['علي' 'سارة' 'خالد' 'منى']</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> العرض (View) أم النسخة (Copy)؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>view_copy.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+a = np.<span class="fn">arange</span>(<span class="num">6</span>)
+s = a[<span class="num">1</span>:<span class="num">4</span>]          <span class="cm"># التقطيع يُرجع «عرضًا» يشارك نفس الذاكرة</span>
+s[<span class="num">0</span>] = <span class="num">99</span>
+<span class="fn">print</span>(<span class="str">"a بعد تعديل التقطيع:"</span>, a)
+
+b = np.<span class="fn">arange</span>(<span class="num">6</span>)
+c = b[<span class="num">1</span>:<span class="num">4</span>].<span class="fn">copy</span>()   <span class="cm"># نسخة مستقلة</span>
+c[<span class="num">0</span>] = <span class="num">99</span>
+<span class="fn">print</span>(<span class="str">"b بعد تعديل النسخة:"</span>, b)
+
+f = b[[<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]]    <span class="cm"># الفهرسة بقائمة تُرجع نسخة دائمًا</span>
+f[<span class="num">0</span>] = <span class="num">99</span>
+<span class="fn">print</span>(<span class="str">"b بعد تعديل fancy:"</span>, b)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>a بعد تعديل التقطيع: [ 0 99  2  3  4  5]
+b بعد تعديل النسخة: [0 1 2 3 4 5]
+b بعد تعديل fancy: [0 1 2 3 4 5]</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>مصدر أخطاء شائع:</strong> التقطيع العادي <code>a[1:4]</code> لا ينسخ البيانات (لأجل السرعة)، فتعديله يغيّر الأصل.
+                إذا أردت العمل على جزء دون التأثير على الأصل، استخدم <code>.copy()</code>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="broadcasting">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-expand-arrows-alt"></i>
+        البث (Broadcasting)
+    </h2>
+        <p>
+            البث هو قدرة NumPy على إجراء عمليات بين مصفوفات <strong>بأشكال مختلفة</strong> دون نسخ البيانات.
+            أبسط مثال: <code>array * 2</code>، حيث «يُبث» الرقم 2 على كل العناصر.
+        </p>
+        <div class="note-box">
+            <strong>📏 قاعدة البث:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> قارن الأشكال من <strong>اليمين إلى اليسار</strong> (البُعد الأخير أولًا).</li>
+                <li><i class="fas fa-angle-left"></i> البُعدان متوافقان إذا كانا <strong>متساويين</strong> أو أحدهما يساوي <strong>1</strong>.</li>
+                <li><i class="fas fa-angle-left"></i> إذا كان لإحدى المصفوفتين أبعاد أقل، تُضاف لها أبعاد بطول 1 من اليسار.</li>
+            </ul>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الشكل A</th><th>الشكل B</th><th>النتيجة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>(4, 3)</code></td><td><code>(3,)</code></td><td>✅ <code>(4, 3)</code> — B تُطبق على كل صف</td></tr>
+                    <tr><td><code>(4, 3)</code></td><td><code>(4, 1)</code></td><td>✅ <code>(4, 3)</code> — B تُطبق على كل عمود</td></tr>
+                    <tr><td><code>(3, 1)</code></td><td><code>(1, 4)</code></td><td>✅ <code>(3, 4)</code> — جدول كل التوافيق</td></tr>
+                    <tr><td><code>(4, 3)</code></td><td><code>(4,)</code></td><td>❌ خطأ: 3 لا تساوي 4</td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>broadcasting.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+scores = np.<span class="fn">array</span>([[<span class="num">78</span>, <span class="num">85</span>, <span class="num">90</span>], [<span class="num">92</span>, <span class="num">88</span>, <span class="num">95</span>], [<span class="num">55</span>, <span class="num">61</span>, <span class="num">70</span>], [<span class="num">83</span>, <span class="num">79</span>, <span class="num">88</span>]])
+
+weights = np.<span class="fn">array</span>([<span class="num">0.2</span>, <span class="num">0.3</span>, <span class="num">0.5</span>])           <span class="cm"># وزن كل اختبار — شكل (3,)</span>
+<span class="fn">print</span>(<span class="str">"المعدل الموزون:"</span>, (scores * weights).<span class="fn">sum</span>(axis=<span class="num">1</span>))
+
+bonus = np.<span class="fn">array</span>([[<span class="num">5</span>], [<span class="num">0</span>], [<span class="num">10</span>], [<span class="num">0</span>]])       <span class="cm"># درجة إضافية لكل طالب — شكل (4, 1)</span>
+<span class="fn">print</span>(scores + bonus)
+
+<span class="cm"># توحيد المقياس (Z-score) لكل اختبار: كل عمود متوسطه 0 وانحرافه 1</span>
+z = (scores - scores.<span class="fn">mean</span>(axis=<span class="num">0</span>)) / scores.<span class="fn">std</span>(axis=<span class="num">0</span>)
+<span class="fn">print</span>(z.<span class="fn">round</span>(<span class="num">2</span>))
+
+<span class="cm"># جدول الضرب 1..5 بالبث (5,1) × (1,5)</span>
+<span class="fn">print</span>(np.<span class="fn">arange</span>(<span class="num">1</span>, <span class="num">6</span>)[:, np.newaxis] * np.<span class="fn">arange</span>(<span class="num">1</span>, <span class="num">6</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>المعدل الموزون: [86.1 92.3 64.3 84.3]
+[[83 90 95]
+ [92 88 95]
+ [65 71 80]
+ [83 79 88]]
+[[ 0.07  0.64  0.45]
+ [ 1.1   0.93  0.98]
+ [-1.61 -1.65 -1.67]
+ [ 0.44  0.07  0.24]]
+[[ 1  2  3  4  5]
+ [ 2  4  6  8 10]
+ [ 3  6  9 12 15]
+ [ 4  8 12 16 20]
+ [ 5 10 15 20 25]]</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>broadcast_error.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+scores = np.<span class="fn">ones</span>((<span class="num">4</span>, <span class="num">3</span>))
+scores + np.<span class="fn">array</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">Traceback (most recent call last):
+  File "broadcast_error.py", line 3, in &lt;module&gt;
+    scores + np.array([1, 2, 3, 4])
+    ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+ValueError: operands could not be broadcast together with shapes (4,3) (4,)</pre>
+</div>
+</section>
+
+<section class="section-card" id="ufuncs">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-calculator"></i>
+        الدوال الشاملة والتجميع
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>ufuncs.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+prices = np.<span class="fn">array</span>([<span class="num">19.99</span>, <span class="num">5.5</span>, <span class="num">120.0</span>, <span class="num">0.0</span>, <span class="num">47.25</span>])
+
+<span class="fn">print</span>(np.<span class="fn">round</span>(prices * <span class="num">1.15</span>, <span class="num">2</span>))       <span class="cm"># مع الضريبة</span>
+<span class="fn">print</span>(np.<span class="fn">sqrt</span>([<span class="num">4</span>, <span class="num">9</span>, <span class="num">16</span>]))
+<span class="fn">print</span>(np.<span class="fn">log1p</span>(prices).<span class="fn">round</span>(<span class="num">2</span>))        <span class="cm"># log(1+x): مفيد للبيانات المنحرفة</span>
+<span class="fn">print</span>(np.<span class="fn">clip</span>(prices, <span class="num">10</span>, <span class="num">100</span>))         <span class="cm"># حصر القيم بين حدين</span>
+<span class="fn">print</span>(np.<span class="fn">where</span>(prices &gt; <span class="num">20</span>, <span class="str">"غالٍ"</span>, <span class="str">"رخيص"</span>))
+
+grades = np.<span class="fn">array</span>([<span class="num">45</span>, <span class="num">72</span>, <span class="num">88</span>, <span class="num">95</span>, <span class="num">60</span>])
+labels = np.<span class="fn">select</span>([grades &gt;= <span class="num">90</span>, grades &gt;= <span class="num">75</span>, grades &gt;= <span class="num">60</span>], [<span class="str">"ممتاز"</span>, <span class="str">"جيد جدًا"</span>, <span class="str">"ناجح"</span>], default=<span class="str">"راسب"</span>)
+<span class="fn">print</span>(labels)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>[ 22.99   6.32 138.     0.    54.34]
+[2. 3. 4.]
+[3.04 1.87 4.8  0.   3.88]
+[ 19.99  10.   100.    10.    47.25]
+['رخيص' 'رخيص' 'غالٍ' 'رخيص' 'غالٍ']
+['راسب' 'ناجح' 'جيد جدًا' 'ممتاز' 'ناجح']</pre>
+</div>
+
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>aggregation.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+sales = np.<span class="fn">array</span>([           <span class="cm"># صفوف = 3 فروع، أعمدة = 4 أرباع</span>
+    [<span class="num">120</span>, <span class="num">135</span>, <span class="num">150</span>, <span class="num">170</span>],
+    [ <span class="num">90</span>,  <span class="num">95</span>, <span class="num">110</span>, <span class="num">100</span>],
+    [<span class="num">200</span>, <span class="num">180</span>, <span class="num">210</span>, <span class="num">240</span>],
+])
+<span class="fn">print</span>(<span class="str">"الإجمالي:"</span>, sales.<span class="fn">sum</span>())
+<span class="fn">print</span>(<span class="str">"لكل فرع (axis=1):"</span>, sales.<span class="fn">sum</span>(axis=<span class="num">1</span>))
+<span class="fn">print</span>(<span class="str">"لكل ربع (axis=0):"</span>, sales.<span class="fn">sum</span>(axis=<span class="num">0</span>))
+<span class="fn">print</span>(<span class="str">"أفضل ربع لكل فرع:"</span>, sales.<span class="fn">argmax</span>(axis=<span class="num">1</span>) + <span class="num">1</span>)
+<span class="fn">print</span>(<span class="str">"التراكمي للفرع الأول:"</span>, sales[<span class="num">0</span>].<span class="fn">cumsum</span>())
+<span class="fn">print</span>(<span class="str">"النمو بين الأرباع:"</span>, np.<span class="fn">diff</span>(sales, axis=<span class="num">1</span>)[<span class="num">0</span>])
+<span class="fn">print</span>(<span class="str">"المئين 90 لكل المبيعات:"</span>, np.<span class="fn">percentile</span>(sales, <span class="num">90</span>))
+<span class="fn">print</span>(<span class="str">"القيم الفريدة:"</span>, np.<span class="fn">unique</span>(np.<span class="fn">array</span>([<span class="num">3</span>, <span class="num">1</span>, <span class="num">3</span>, <span class="num">2</span>, <span class="num">1</span>]), return_counts=<span class="kw">True</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الإجمالي: 1800
+لكل فرع (axis=1): [575 395 830]
+لكل ربع (axis=0): [410 410 470 510]
+أفضل ربع لكل فرع: [4 3 4]
+التراكمي للفرع الأول: [120 255 405 575]
+النمو بين الأرباع: [15 15 20]
+المئين 90 لكل المبيعات: 209.0
+القيم الفريدة: (array([1, 2, 3]), array([2, 1, 2]))</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>تذكير axis:</strong> <code>axis=0</code> «ينهار» على الصفوف فتحصل على قيمة لكل <strong>عمود</strong>،
+                و <code>axis=1</code> «ينهار» على الأعمدة فتحصل على قيمة لكل <strong>صف</strong>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="random">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-dice"></i>
+        الأرقام العشوائية والمحاكاة
+    </h2>
+        <p>
+            الطريقة الحديثة الموصى بها هي إنشاء <strong>مولّد</strong> بـ <code>np.random.default_rng(seed)</code>.
+            الـ seed يجعل النتائج قابلة للتكرار، وهذا ضروري في التجارب العلمية.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>random_gen.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+rng = np.random.<span class="fn">default_rng</span>(seed=<span class="num">7</span>)
+
+<span class="fn">print</span>(rng.<span class="fn">integers</span>(<span class="num">1</span>, <span class="num">7</span>, size=<span class="num">10</span>))                 <span class="cm"># رمي نرد 10 مرات</span>
+<span class="fn">print</span>(rng.<span class="fn">random</span>(<span class="num">3</span>).<span class="fn">round</span>(<span class="num">3</span>))                      <span class="cm"># بين 0 و 1</span>
+heights = rng.<span class="fn">normal</span>(loc=<span class="num">170</span>, scale=<span class="num">8</span>, size=<span class="num">1000</span>)  <span class="cm"># توزيع طبيعي</span>
+<span class="fn">print</span>(<span class="str">"متوسط الأطوال:"</span>, heights.<span class="fn">mean</span>().<span class="fn">round</span>(<span class="num">1</span>), <span class="str">"| الانحراف:"</span>, heights.<span class="fn">std</span>().<span class="fn">round</span>(<span class="num">1</span>))
+<span class="fn">print</span>(rng.<span class="fn">choice</span>([<span class="str">"أحمر"</span>, <span class="str">"أخضر"</span>, <span class="str">"أزرق"</span>], size=<span class="num">5</span>, p=[<span class="num">0.5</span>, <span class="num">0.3</span>, <span class="num">0.2</span>]))
+deck = np.<span class="fn">arange</span>(<span class="num">1</span>, <span class="num">11</span>)
+rng.<span class="fn">shuffle</span>(deck)
+<span class="fn">print</span>(deck)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>[6 4 5 6 4 5 6 2 1 2]
+[0.874 0.005 0.821]
+متوسط الأطوال: 169.5 | الانحراف: 7.6
+['أزرق' 'أحمر' 'أخضر' 'أزرق' 'أخضر']
+[ 4  6  3  2  5 10  7  8  9  1]</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> محاكاة مونت كارلو: ما احتمال أن يكون مجموع نردين 7؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>monte_carlo.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+rng = np.random.<span class="fn">default_rng</span>(<span class="num">2025</span>)
+n = <span class="num">1</span>_000_000
+dice = rng.<span class="fn">integers</span>(<span class="num">1</span>, <span class="num">7</span>, size=(n, <span class="num">2</span>))     <span class="cm"># مليون رمية لنردين — بدون أي حلقة!</span>
+totals = dice.<span class="fn">sum</span>(axis=<span class="num">1</span>)
+
+<span class="fn">print</span>(<span class="str">"الاحتمال بالمحاكاة:"</span>, (totals == <span class="num">7</span>).<span class="fn">mean</span>().<span class="fn">round</span>(<span class="num">4</span>))
+<span class="fn">print</span>(<span class="str">"الاحتمال النظري:   "</span>, <span class="fn">round</span>(<span class="num">6</span> / <span class="num">36</span>, <span class="num">4</span>))
+values, counts = np.<span class="fn">unique</span>(totals, return_counts=<span class="kw">True</span>)
+<span class="kw">for</span> v, c <span class="kw">in</span> <span class="fn">zip</span>(values, counts):
+    <span class="fn">print</span>(<span class="str">f"{v:&gt;2} {'█' * int(c / n * 200)}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الاحتمال بالمحاكاة: 0.1667
+الاحتمال النظري:    0.1667
+ 2 █████
+ 3 ███████████
+ 4 ████████████████
+ 5 ██████████████████████
+ 6 ███████████████████████████
+ 7 █████████████████████████████████
+ 8 ███████████████████████████
+ 9 ██████████████████████
+10 ████████████████
+11 ███████████
+12 █████</pre>
+</div>
+</section>
+
+<section class="section-card" id="linalg">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-project-diagram"></i>
+        الجبر الخطي الأساسي
+    </h2>
+        <p>تعلم الآلة في جوهره عمليات على المصفوفات. إليك أهمها:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>linear_algebra.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># الكميات المطلوبة من 3 منتجات في طلبين، وأسعار المنتجات</span>
+orders = np.<span class="fn">array</span>([[<span class="num">2</span>, <span class="num">1</span>, <span class="num">0</span>],
+                   [<span class="num">1</span>, <span class="num">3</span>, <span class="num">2</span>]])
+prices = np.<span class="fn">array</span>([<span class="num">50</span>, <span class="num">20</span>, <span class="num">10</span>])
+
+<span class="fn">print</span>(<span class="str">"قيمة كل طلب:"</span>, orders @ prices)    <span class="cm"># ضرب مصفوفة × متجه (أو np.dot)</span>
+
+<span class="cm"># حل نظام معادلات:  2x + y = 7   و   x - y = -1</span>
+A = np.<span class="fn">array</span>([[<span class="num">2</span>, <span class="num">1</span>], [<span class="num">1</span>, -<span class="num">1</span>]])
+b = np.<span class="fn">array</span>([<span class="num">7</span>, -<span class="num">1</span>])
+<span class="fn">print</span>(<span class="str">"الحل x, y ="</span>, np.linalg.<span class="fn">solve</span>(A, b))
+
+M = np.<span class="fn">array</span>([[<span class="num">4</span>, <span class="num">7</span>], [<span class="num">2</span>, <span class="num">6</span>]])
+<span class="fn">print</span>(<span class="str">"المحدد:"</span>, <span class="fn">round</span>(np.linalg.<span class="fn">det</span>(M), <span class="num">2</span>))
+<span class="fn">print</span>(<span class="str">"المعكوس × الأصل = الوحدة؟"</span>, np.<span class="fn">allclose</span>(np.linalg.<span class="fn">inv</span>(M) @ M, np.<span class="fn">eye</span>(<span class="num">2</span>)))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>قيمة كل طلب: [120 130]
+الحل x, y = [2. 3.]
+المحدد: 10.0
+المعكوس × الأصل = الوحدة؟ True</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>* أم @؟</strong> العامل <code>*</code> يضرب <strong>عنصرًا بعنصر</strong>، أما <code>@</code> فهو
+                <strong>ضرب المصفوفات</strong> الرياضي (صف × عمود). الخلط بينهما من أشهر الأخطاء.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="practice">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-image"></i>
+        مثال تطبيقي: الصورة مصفوفة أرقام
+    </h2>
+        <p>
+            الصورة الرمادية ليست إلا مصفوفة ثنائية الأبعاد، كل رقم فيها يمثل سطوع بكسل (0 أسود ← 255 أبيض).
+            لنعالج «صورة» صغيرة 6×6 بعمليات NumPy فقط:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>image_array.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+img = np.<span class="fn">array</span>([
+    [ <span class="num">10</span>,  <span class="num">10</span>,  <span class="num">10</span>,  <span class="num">10</span>,  <span class="num">10</span>,  <span class="num">10</span>],
+    [ <span class="num">10</span>, <span class="num">200</span>, <span class="num">200</span>, <span class="num">200</span>, <span class="num">200</span>,  <span class="num">10</span>],
+    [ <span class="num">10</span>, <span class="num">200</span>,  <span class="num">60</span>,  <span class="num">60</span>, <span class="num">200</span>,  <span class="num">10</span>],
+    [ <span class="num">10</span>, <span class="num">200</span>,  <span class="num">60</span>,  <span class="num">60</span>, <span class="num">200</span>,  <span class="num">10</span>],
+    [ <span class="num">10</span>, <span class="num">200</span>, <span class="num">200</span>, <span class="num">200</span>, <span class="num">200</span>,  <span class="num">10</span>],
+    [ <span class="num">10</span>,  <span class="num">10</span>,  <span class="num">10</span>,  <span class="num">10</span>,  <span class="num">10</span>,  <span class="num">10</span>],
+], dtype=np.uint8)
+
+<span class="kw">def</span> <span class="fn">show</span>(a):
+    chars = <span class="str">" .:-=+*#%@"</span>
+    <span class="kw">for</span> row <span class="kw">in</span> a:
+        <span class="fn">print</span>(<span class="str">""</span>.<span class="fn">join</span>(chars[<span class="fn">int</span>(v) * (<span class="fn">len</span>(chars) - <span class="num">1</span>) // <span class="num">255</span>] * <span class="num">2</span> <span class="kw">for</span> v <span class="kw">in</span> row))
+    <span class="fn">print</span>()
+
+<span class="fn">show</span>(img)
+<span class="fn">show</span>(<span class="num">255</span> - img)                                          <span class="cm"># الصورة السالبة</span>
+<span class="fn">show</span>(np.<span class="fn">clip</span>(img.<span class="fn">astype</span>(int) + <span class="num">80</span>, <span class="num">0</span>, <span class="num">255</span>))              <span class="cm"># زيادة السطوع (مع تحويل النوع لتجنب الفيضان)</span>
+<span class="fn">show</span>(np.<span class="fn">fliplr</span>(img[:<span class="num">3</span>]))                                 <span class="cm"># قص النصف العلوي وقلبه أفقيًا</span>
+<span class="fn">print</span>(<span class="str">"متوسط السطوع:"</span>, img.<span class="fn">mean</span>().<span class="fn">round</span>(<span class="num">1</span>), <span class="str">"| نسبة البكسلات الساطعة:"</span>, (img &gt; <span class="num">128</span>).<span class="fn">mean</span>().<span class="fn">round</span>(<span class="num">2</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>            
+  ########  
+  ##::::##  
+  ##::::##  
+  ########  
+            
+
+%%%%%%%%%%%%
+%%........%%
+%%..****..%%
+%%..****..%%
+%%........%%
+%%%%%%%%%%%%
+
+------------
+--@@@@@@@@--
+--@@====@@--
+--@@====@@--
+--@@@@@@@@--
+------------
+
+            
+  ########  
+  ##::::##  
+
+متوسط السطوع: 78.9 | نسبة البكسلات الساطعة: 0.33</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>لاحظ <code>astype(int)</code>:</strong> نوع الصور <code>uint8</code> (0–255). لو أضفنا 80 مباشرة إلى 200
+                لحصلنا على 24 بدل 280 بسبب الفيضان! لذلك نحوّل لنوع أكبر، ثم نحصر القيم بـ <code>clip</code>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! نقارن من اليمين: 3 مقابل 5 — غير متساويين وليس أيهما 1." data-hint="قارن البُعد الأخير لكل شكل أولًا.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">البث</span>
+    </div>
+    <p class="exercise-question">أي عملية من التالية ستسبب خطأ <code>ValueError</code> بسبب عدم توافق الأشكال؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>np.ones((5, 3)) + np.ones(3)</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="2"> <code>np.ones((5, 3)) + np.ones((5, 1))</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="3"> <code>np.ones((5, 3)) + np.ones(5)</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>np.ones((5, 1)) + np.ones((1, 3))</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تفهم NumPy بعمق." data-hint="المصفوفة نوع واحد، و &lt;code&gt;*&lt;/code&gt; عنصر بعنصر بينما &lt;code&gt;@&lt;/code&gt; ضرب مصفوفات.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">مصفوفة NumPy يمكن أن تحتوي عناصر من أنواع مختلفة بكفاءة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>a[1:4]</code> يُرجع عرضًا (View)، وتعديله يغير المصفوفة الأصلية.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>reshape(2, -1)</code> يجعل NumPy يحسب البُعد الثاني تلقائيًا.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>A * B</code> و <code>A @ B</code> متطابقان دائمًا.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>np.random.default_rng(42)</code> يجعل النتائج العشوائية قابلة للتكرار.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="رائع! العمود الأول 0+4+8 = 12، والأرقام الأكبر من 8 هي 9 و 10 و 11." data-hint="الصفوف: [0..3]، [4..7]، [8..11].">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+a = np.<span class="fn">arange</span>(<span class="num">12</span>).<span class="fn">reshape</span>(<span class="num">3</span>, <span class="num">4</span>)
+<span class="fn">print</span>(a.shape)
+<span class="fn">print</span>(a[<span class="num">2</span>, <span class="num">1</span>])
+<span class="fn">print</span>(a.<span class="fn">sum</span>(axis=<span class="num">0</span>)[<span class="num">0</span>])
+<span class="fn">print</span>((a &gt; <span class="num">8</span>).<span class="fn">sum</span>())</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="(3, 4)" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="9" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثالث:</span><input type="text" class="blank-input" data-answers="12" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الرابع:</span><input type="text" class="blank-input" data-answers="3" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذه تقنية أساسية لتجهيز البيانات لتعلم الآلة." data-hint="نريد قيمة لكل عمود، فنستخدم &lt;code&gt;axis=0&lt;/code&gt;، ثم نطرح الأصغر ونقسم على المدى.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">تطبيع البيانات</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لتحويل كل عمود إلى مقياس من 0 إلى 1 (Min-Max Scaling) باستخدام البث:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">import</span> numpy <span class="kw">as</span> np</span></div>
+        <div class="line"><span>X = np.<span class="fn">array</span>([[<span class="num">1</span>, <span class="num">200</span>], [<span class="num">5</span>, <span class="num">400</span>], [<span class="num">3</span>, <span class="num">300</span>]])</span></div>
+        <div class="line"><span>mn = X.<span class="fn">min</span>(axis=</span><input type="text" class="blank-input" data-answers="0" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>)</span></div>
+        <div class="line"><span>mx = X.</span><input type="text" class="blank-input" data-answers="max" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>(axis=<span class="num">0</span>)</span></div>
+        <div class="line"><span>scaled = (X - </span><input type="text" class="blank-input" data-answers="mn" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>) / (mx - mn)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب صحيح! والناتج 0.666… لأن طالبين من ثلاثة فوق 80." data-hint="احسب المعدل لكل صف أولًا، ثم متوسط القيم المنطقية يعطي النسبة.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب الأسطر لحساب نسبة الطلاب الذين معدلهم أعلى من 80. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="3" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">avg = scores.mean(axis=1)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">print(ratio)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">import numpy as np</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="4" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">ratio = (avg &gt; 80).mean()</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">scores = np.array([[90, 80], [70, 60], [85, 95]])</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر البث: هل الشكلان متوافقان؟</div>
+    <p style="color:var(--text-light); font-size:0.95em;">اكتب شكلي مصفوفتين (مثل <code>4,3</code> و <code>3</code>) وشاهد كيف تطبق NumPy قاعدة البث خطوة بخطوة.</p>
+    <div class="lab-row">
+        <label>شكل A:</label><input type="text" class="lab-input" id="shA" value="4,3" style="max-width:120px; direction:ltr;">
+        <label>شكل B:</label><input type="text" class="lab-input" id="shB" value="3" style="max-width:120px; direction:ltr;">
+        <button class="btn btn-primary" onclick="bcRun()"><i class="fas fa-play"></i> افحص</button>
+    </div>
+    <div class="lab-row" style="gap:6px;">
+        <button class="btn btn-secondary" onclick="bcSet('4,3','4,1')">(4,3)+(4,1)</button>
+        <button class="btn btn-secondary" onclick="bcSet('3,1','1,4')">(3,1)+(1,4)</button>
+        <button class="btn btn-secondary" onclick="bcSet('4,3','4')">(4,3)+(4,)</button>
+        <button class="btn btn-secondary" onclick="bcSet('2,1,5','3,1')">(2,1,5)+(3,1)</button>
+    </div>
+    <div class="lab-console" id="bcConsole"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> سبب سرعة NumPy: نوع واحد وذاكرة متتالية وكود C، وأهمية <code>dtype</code> والفيضان.</li>
+                <li><i class="fas fa-check"></i> إنشاء المصفوفات وأبعادها و <code>reshape</code> و <code>T</code> و <code>ravel</code> و <code>newaxis</code>.</li>
+                <li><i class="fas fa-check"></i> الفهرسة ثنائية الأبعاد، و Fancy Indexing، والفلترة المنطقية، و <code>argsort</code>.</li>
+                <li><i class="fas fa-check"></i> الفرق بين العرض (View) والنسخة (Copy).</li>
+                <li><i class="fas fa-check"></i> قاعدة البث (Broadcasting) وتطبيقاتها: الأوزان، Z-score، جداول التوافيق.</li>
+                <li><i class="fas fa-check"></i> الدوال الشاملة <code>where/select/clip</code> والتجميع على المحاور.</li>
+                <li><i class="fas fa-check"></i> مولّد الأرقام العشوائية الحديث ومحاكاة مونت كارلو.</li>
+                <li><i class="fas fa-check"></i> أساسيات الجبر الخطي: <code>@</code> و <code>solve</code> و <code>inv</code> و <code>det</code>.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> كلما كتبت حلقة <code>for</code> على أرقام، اسأل نفسك: هل يمكن تنفيذها كعملية متجهة؟</li>
+                <li><i class="fas fa-lightbulb"></i> اطبع <code>.shape</code> كثيرًا؛ معظم أخطاء NumPy أخطاء أشكال.</li>
+                <li><i class="fas fa-lightbulb"></i> استخدم <code>default_rng(seed)</code> في كل تجربة تريد تكرار نتائجها.</li>
+                <li><i class="fas fa-lightbulb"></i> انتبه لـ <code>.copy()</code> عند تعديل جزء من مصفوفة.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستنتقل إلى <strong>Pandas المتقدم</strong>: دمج الجداول، وإعادة التشكيل، والسلاسل الزمنية، والنوافذ المتحركة.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson1.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 1: مدخل إلى علم البيانات</span>
+        </a>
+        <a href="lesson3.html" class="nav-link next">
+            <span>الدرس التالي: Pandas المتقدم</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · NumPy بعمق
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '17%';
+            text.textContent = '17% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر البث ========== */
+    function bcSet(a, b) {
+        document.getElementById('shA').value = a;
+        document.getElementById('shB').value = b;
+        bcRun();
+    }
+
+    function parseShape(s) {
+        const parts = s.split(',').map(x => x.trim()).filter(x => x !== '');
+        if (!parts.length || parts.some(x => !/^\d+$/.test(x) || +x === 0)) return null;
+        return parts.map(Number);
+    }
+
+    function fmt(shape) { return '(' + shape.join(', ') + (shape.length === 1 ? ',)' : ')'); }
+
+    function bcRun() {
+        const a = parseShape(document.getElementById('shA').value);
+        const b = parseShape(document.getElementById('shB').value);
+        const out = document.getElementById('bcConsole');
+        if (!a || !b) { out.innerHTML = '<span class="err">اكتب الأشكال كأرقام موجبة مفصولة بفواصل، مثل 4,3</span>'; return; }
+        const n = Math.max(a.length, b.length);
+        const pa = Array(n - a.length).fill(1).concat(a);
+        const pb = Array(n - b.length).fill(1).concat(b);
+        let lines = [`A${fmt(a)}  +  B${fmt(b)}`, '', `1) توحيد عدد الأبعاد بإضافة 1 من اليسار:`, `   A → ${fmt(pa)}`, `   B → ${fmt(pb)}`, '', '2) المقارنة من اليمين إلى اليسار:'];
+        const result = [];
+        let ok = true;
+        for (let i = n - 1; i >= 0; i--) {
+            const x = pa[i], y = pb[i];
+            if (x === y || x === 1 || y === 1) {
+                const r = Math.max(x, y);
+                result.unshift(r);
+                lines.push(`   البُعد ${i}: ${x} و ${y} ← ✅ ${x === y ? 'متساويان' : 'أحدهما 1 فيُمدّ'} ← ${r}`);
+            } else {
+                ok = false;
+                lines.push(`   البُعد ${i}: ${x} و ${y} ← ❌ غير متساويين وليس أيهما 1`);
+                break;
+            }
+        }
+        lines.push('');
+        out.innerHTML = escapeHtml(lines.join('\n')) + (ok
+            ? `<span style="color:#a5d6a7">✅ متوافقان — شكل الناتج: ${fmt(result)}</span>`
+            : `<span class="err">ValueError: operands could not be broadcast together with shapes ${fmt(a)} ${fmt(b)}</span>`);
+    }
+
+    document.addEventListener('DOMContentLoaded', bcRun);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

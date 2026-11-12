@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 10: القوائم (Lists) | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --text: #fff;
+            --text-light: #dcdcdc;
+            --info: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 800;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .breadcrumb {
+            font-size: 0.82em;
+            color: #ccc;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+
+        .breadcrumb span { margin: 0 6px; color: #777; }
+
+        /* ===== الهيدر ===== */
+        .page-hero {
+            padding: 140px 30px 70px;
+            background: radial-gradient(circle at top, #1a1a1a 0%, #000 70%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .page-hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 16px;
+        }
+
+        .lesson-title {
+            font-size: 2.6em;
+            color: var(--gold);
+            margin-bottom: 14px;
+            text-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
+            line-height: 1.4;
+        }
+
+        .lesson-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            font-size: 0.85em;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lesson-meta-item i { color: var(--gold); }
+
+        /* ===== المحتوى ===== */
+        .content-wrapper {
+            width: 100%;
+            padding: 50px 40px 80px;
+            background: linear-gradient(180deg, #000 0%, #050505 100%);
+        }
+
+        .content-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .main-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 50px 55px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+        }
+
+        .main-card h2 {
+            font-size: 1.6em;
+            color: var(--gold);
+            margin: 40px 0 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+        }
+
+        .main-card h2:first-child { margin-top: 0; }
+
+        .main-card h2 i { font-size: 1.05rem; color: var(--gold-soft); }
+
+        .main-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 14px 0 18px;
+        }
+
+        .main-card ul.plain,
+        .main-card ol.plain {
+            padding-right: 24px;
+            margin: 14px 0;
+        }
+
+        .main-card ul.plain li,
+        .main-card ol.plain li {
+            margin-bottom: 10px;
+            color: var(--text-light);
+            font-size: 0.98em;
+        }
+
+        /* ===== صندوق مميز ===== */
+        .highlight-box {
+            margin: 25px 0;
+            background: #121212;
+            border-radius: 14px;
+            padding: 24px 28px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+        }
+
+        .highlight-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 14px;
+            font-size: 1.1em;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .highlight-box ul li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 9px 0;
+            color: var(--text-light);
+            font-size: 0.97em;
+        }
+
+        .highlight-box ul li i {
+            color: var(--gold);
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        /* ===== كتلة الكود ===== */
+        .code-block {
+            margin: 22px 0;
+            background: #050505;
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+        }
+
+        .code-label {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            font-size: 0.74em;
+            color: var(--gold-soft);
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        pre {
+            margin: 0;
+            padding-top: 26px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.95em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.75;
+        }
+
+        code.inline {
+            background: #1a1a1a;
+            color: var(--gold);
+            padding: 2px 9px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.9em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== ملاحظات ===== */
+        .note, .tip, .warning {
+            margin: 22px 0;
+            padding: 18px 22px;
+            border-radius: 12px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            line-height: 1.85;
+        }
+
+        .note {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+
+        .tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+
+        .warning {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+
+        .note i, .tip i, .warning i { font-size: 1.2em; margin-top: 5px; flex-shrink: 0; }
+        .note i { color: var(--info); }
+        .tip i { color: var(--success); }
+        .warning i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        table thead {
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        table th {
+            padding: 16px 18px;
+            color: var(--gold);
+            text-align: right;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        table td {
+            padding: 16px 18px;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table tr:last-child td { border-bottom: none; }
+        table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        /* ===== بطاقات الميزات ===== */
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+            margin: 25px 0;
+        }
+
+        .feature-card {
+            background: #0a0a0a;
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 3px solid var(--gold);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .feature-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .feature-card p {
+            font-size: 0.94em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== تركيب القائمة البصري ===== */
+        .list-anatomy {
+            background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 14px;
+            padding: 26px 30px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .list-anatomy h3 {
+            color: var(--gold);
+            margin-bottom: 18px;
+            font-size: 1.15em;
+        }
+
+        .list-anatomy pre {
+            font-size: 1.05em;
+            padding-top: 0;
+            color: var(--gold-soft);
+        }
+
+        /* ===== التمارين ===== */
+        .exercise-section {
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(15, 15, 15, 0.9));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+        }
+
+        .exercise-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+            color: #000;
+            font-weight: 800;
+            font-size: 1.05em;
+            flex-shrink: 0;
+        }
+
+        .exercise-title {
+            color: var(--gold);
+            font-size: 1.15em;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .exercise-question {
+            font-size: 1em;
+            color: var(--text-light);
+            margin-bottom: 18px;
+            line-height: 1.8;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option-item:hover {
+            border-color: rgba(255, 215, 0, 0.4);
+            background: #101010;
+            transform: translateX(-4px);
+        }
+
+        .option-item input[type="radio"],
+        .option-item input[type="checkbox"] {
+            accent-color: var(--gold);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .text-input-wrap {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .text-input {
+            flex: 1;
+            min-width: 220px;
+            padding: 13px 18px;
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .exercise-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 22px;
+            border-radius: 9px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 700;
+            font-size: 0.94em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .exercise-result {
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            display: none;
+            line-height: 1.8;
+        }
+
+        .exercise-result.success {
+            display: block;
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+
+        .exercise-result.partial {
+            display: block;
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+
+        .exercise-result.error {
+            display: block;
+            background: rgba(244, 67, 54, 0.15);
+            border-right: 4px solid var(--danger);
+            color: #ffcdd2;
+        }
+
+        /* ===== شريط التقدم ===== */
+        .progress-footer {
+            margin: 40px 0 0;
+            padding: 26px 28px;
+            background: #0a0a0a;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .progress-footer h3 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.85em;
+            color: #aaa;
+            text-align: center;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            margin-top: 45px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 260px;
+            font-size: 0.95em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.5);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        footer {
+            text-align: center;
+            padding: 28px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: #aaa;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 8px; padding: 10px 15px; }
+            .page-hero { padding: 160px 15px 50px; }
+            .lesson-title { font-size: 1.75em; }
+            .content-wrapper { padding: 30px 15px 50px; }
+            .main-card { padding: 26px 20px; }
+            .exercise-section { padding: 22px 18px; }
+            .lesson-meta { flex-direction: column; align-items: center; }
+            .nav-links { flex-direction: column; }
+            .nav-link { min-width: 100%; justify-content: center !important; }
+            .feature-cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- شريط التنقل -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span>/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span>/</span>
+        <span>الدرس 10</span>
+    </div>
+</nav>
+
+<!-- الهيدر -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-list"></i>
+            الدرس 10 · القوائم (Lists)
+        </div>
+        <h1 class="lesson-title">القوائم (Lists) في بايثون</h1>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> المدة: 30 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> الهدف: إتقان التعامل مع القوائم</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> المستوى: مبتدئ</div>
+            <div class="lesson-meta-item"><i class="fas fa-list-ol"></i> الدرس 10 من 15</div>
+        </div>
+    </div>
+</section>
+
+<!-- المحتوى -->
+<div class="content-wrapper">
+    <div class="content-inner">
+        <article class="main-card">
+
+            <!-- ===== مقدمة ===== -->
+            <h2><i class="fas fa-info-circle"></i> مقدمة إلى القوائم</h2>
+            <p>
+                <strong>القوائم (Lists)</strong> في بايثون هي <strong>هياكل بيانات</strong> مرنة تُستخدم
+                لتخزين مجموعة من العناصر المرتّبة في متغير واحد. القوائم <strong>قابلة للتغيير (Mutable)</strong>
+                أي يمكن إضافة أو حذف أو تعديل عناصرها بعد إنشائها.
+            </p>
+
+            <div class="highlight-box">
+                <strong><i class="fas fa-star"></i> لماذا القوائم مهمة؟</strong>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> <strong>تخزين متعدد:</strong> تخزين عشرات أو آلاف القيم في متغير واحد.</li>
+                    <li><i class="fas fa-check-circle"></i> <strong>مرونة كاملة:</strong> إضافة، حذف، وتعديل في أي وقت.</li>
+                    <li><i class="fas fa-check-circle"></i> <strong>أنواع مختلطة:</strong> يمكن خلط النصوص والأرقام والقيم المنطقية في قائمة واحدة.</li>
+                    <li><i class="fas fa-check-circle"></i> <strong>دوال جاهزة:</strong> بايثون توفّر أكثر من 10 دوال للتعامل مع القوائم.</li>
+                </ul>
+            </div>
+
+            <!-- ===== تركيب القائمة ===== -->
+            <h2><i class="fas fa-puzzle-piece"></i> تركيب القائمة والفهرسة</h2>
+            <p>
+                تُعرَّف القائمة باستخدام <strong>الأقواس المربعة</strong> <code class="inline">[ ]</code>،
+                وكل عنصر يفصل بينه وبين التالي بفاصلة.
+                الفهرسة تبدأ من <strong>0</strong> كما في النصوص.
+            </p>
+
+            <div class="list-anatomy">
+                <h3><i class="fas fa-shapes"></i> شكل القائمة البصري</h3>
+<pre>
+my_list = [ "تفاح" , "موز" , "برتقال" ]
+#             0       1        2
+#            -3      -2       -1
+</pre>
+            </div>
+
+            <div class="note">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>ملاحظة:</strong> الفهرسة السالبة (مثل <code class="inline">-1</code>) تبدأ العد من نهاية القائمة،
+                    و <code class="inline">-1</code> يعني آخر عنصر.
+                </div>
+            </div>
+
+            <!-- ===== إنشاء قائمة ===== -->
+            <h2><i class="fas fa-plus-circle"></i> إنشاء القوائم بطرق مختلفة</h2>
+
+            <div class="code-block">
+                <div class="code-label">طرق إنشاء القوائم</div>
+<pre>
+# 1. قائمة مباشرة
+fruits = ["تفاح", "موز", "برتقال"]
+numbers = [1, 2, 3, 4, 5]
+mixed = ["نص", 42, True, 3.14]   # أنواع مختلطة
+
+# 2. قائمة فارغة
+empty_list = []
+also_empty = list()
+
+# 3. باستخدام list() constructor
+from_range = list(range(1, 6))    # [1, 2, 3, 4, 5]
+from_string = list("abc")          # ['a', 'b', 'c']
+</pre>
+            </div>
+
+            <!-- ===== الوصول والتعديل ===== -->
+            <h2><i class="fas fa-hand-pointer"></i> الوصول إلى العناصر وتعديلها</h2>
+
+            <div class="code-block">
+                <div class="code-label">الوصول والتعديل</div>
+<pre>
+fruits = ["تفاح", "موز", "برتقال"]
+
+# الوصول
+print(fruits[0])    # تفاح
+print(fruits[-1])   # برتقال
+
+# التعديل
+fruits[1] = "فراولة"
+print(fruits)       # ['تفاح', 'فراولة', 'برتقال']
+
+# الإضافة في نهاية القائمة
+fruits.append("عنب")
+print(fruits)       # ['تفاح', 'فراولة', 'برتقال', 'عنب']
+</pre>
+            </div>
+
+            <!-- ===== دوال القوائم ===== -->
+            <h2><i class="fas fa-cog"></i> دوال القوائم (List Methods)</h2>
+            <p>
+                بايثون توفّر مجموعة غنية من التوابع (Methods) الخاصة بالقوائم. نستدعيها على قائمة، مثل <code class="inline">my_list.append(5)</code>. إليك أشهرها:
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الدالة</th>
+                            <th>الوظيفة</th>
+                            <th>مثال</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="inline">append(x)</code></td>
+                            <td>إضافة عنصر في نهاية القائمة</td>
+                            <td><code class="inline">my_list.append(5)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">insert(i, x)</code></td>
+                            <td>إضافة عنصر في موضع محدد</td>
+                            <td><code class="inline">my_list.insert(2, 7)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">remove(x)</code></td>
+                            <td>حذف أول ظهور للعنصر</td>
+                            <td><code class="inline">my_list.remove(8)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">pop(i)</code></td>
+                            <td>حذف عنصر من موضع محدد وإرجاعه</td>
+                            <td><code class="inline">my_list.pop(0)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">clear()</code></td>
+                            <td>حذف جميع العناصر</td>
+                            <td><code class="inline">my_list.clear()</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">index(x)</code></td>
+                            <td>إرجاع موقع أول ظهور للعنصر</td>
+                            <td><code class="inline">my_list.index(5)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">count(x)</code></td>
+                            <td>عدد مرات تكرار العنصر</td>
+                            <td><code class="inline">my_list.count(3)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">sort()</code></td>
+                            <td>ترتيب القائمة تصاعديًا</td>
+                            <td><code class="inline">my_list.sort()</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">reverse()</code></td>
+                            <td>عكس ترتيب القائمة</td>
+                            <td><code class="inline">my_list.reverse()</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">copy()</code></td>
+                            <td>إنشاء نسخة من القائمة</td>
+                            <td><code class="inline">my_list.copy()</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">أمثلة عملية على دوال القوائم</div>
+<pre>
+numbers = [5, 2, 8, 1, 9]
+
+numbers.append(4)       # [5, 2, 8, 1, 9, 4]
+numbers.insert(2, 7)    # [5, 2, 7, 8, 1, 9, 4]
+numbers.remove(8)       # [5, 2, 7, 1, 9, 4]
+numbers.sort()          # [1, 2, 4, 5, 7, 9]
+numbers.reverse()       # [9, 7, 5, 4, 2, 1]
+
+print(numbers.index(7)) # 1
+print(numbers.count(5)) # 1
+print(len(numbers))     # 6
+</pre>
+            </div>
+
+            <!-- ===== عمليات القوائم ===== -->
+            <h2><i class="fas fa-tools"></i> العمليات على القوائم</h2>
+            <p>
+                بالإضافة إلى الدوال، تدعم القوائم عدة عمليات بلغة بايثون نفسها:
+            </p>
+
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <h4><i class="fas fa-cut"></i> التقطيع (Slicing)</h4>
+                    <p>استخراج جزء من القائمة باستخدام <code class="inline">[start:end:step]</code>.</p>
+                </div>
+                <div class="feature-card">
+                    <h4><i class="fas fa-plus"></i> الدمج (+)</h4>
+                    <p>دمج قائمتين معًا لإنشاء قائمة جديدة.</p>
+                </div>
+                <div class="feature-card">
+                    <h4><i class="fas fa-asterisk"></i> التكرار (*)</h4>
+                    <p>تكرار عناصر القائمة عددًا محددًا من المرات.</p>
+                </div>
+                <div class="feature-card">
+                    <h4><i class="fas fa-search"></i> الفحص (in)</h4>
+                    <p>معرفة هل عنصر موجود في القائمة أم لا.</p>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">العمليات على القوائم</div>
+<pre>
+numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# التقطيع
+print(numbers[2:6])     # [2, 3, 4, 5]
+print(numbers[:6])      # [0, 1, 2, 3, 4, 5]
+print(numbers[7:])      # [7, 8, 9]
+print(numbers[::2])     # [0, 2, 4, 6, 8]
+print(numbers[::-1])    # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+
+# الدمج والتكرار
+list1 = [1, 2, 3]
+list2 = [4, 5, 6]
+print(list1 + list2)    # [1, 2, 3, 4, 5, 6]
+print(list1 * 3)        # [1, 2, 3, 1, 2, 3, 1, 2, 3]
+
+# فحص الوجود والطول
+print(3 in list1)       # True
+print(7 in list1)       # False
+print(len(numbers))     # 10
+</pre>
+            </div>
+
+            <!-- ===== التكرار على القوائم ===== -->
+            <h2><i class="fas fa-redo-alt"></i> التكرار على القوائم</h2>
+            <p>
+                من أهم استخدامات القوائم هو المرور على عناصرها باستخدام الحلقات:
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">التكرار على القوائم</div>
+<pre>
+fruits = ["تفاح", "موز", "برتقال"]
+
+# الطريقة الأولى: بسيطة
+for fruit in fruits:
+    print(fruit)
+
+# الطريقة الثانية: مع الفهرس
+for i in range(len(fruits)):
+    print(f"{i}: {fruits[i]}")
+
+# الطريقة الثالثة: باستخدام enumerate
+for i, fruit in enumerate(fruits):
+    print(f"{i+1}. {fruit}")
+</pre>
+            </div>
+
+            <!-- ===== القوائم المتداخلة ===== -->
+            <h2><i class="fas fa-layer-group"></i> القوائم المتداخلة (Nested Lists)</h2>
+            <p>
+                يمكن أن تحتوي القائمة على قوائم أخرى بداخلها، مما يسمح بإنشاء هياكل بيانات
+                مثل الجداول والمصفوفات:
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">القوائم المتداخلة</div>
+<pre>
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+# الوصول إلى عنصر
+print(matrix[0][1])   # 2
+print(matrix[2][2])   # 9
+
+# التكرار على المصفوفة
+for row in matrix:
+    for element in row:
+        print(element, end=" ")
+    print()
+</pre>
+            </div>
+
+            <!-- ===== List Comprehension ===== -->
+            <h2><i class="fas fa-magic"></i> List Comprehension (اختصار ذكي)</h2>
+            <p>
+                هذه طريقة أنيقة ومختصرة لإنشاء قوائم جديدة من قوائم موجودة:
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">List Comprehension</div>
+<pre>
+# الطريقة التقليدية
+squares = []
+for x in range(1, 6):
+    squares.append(x ** 2)
+print(squares)   # [1, 4, 9, 16, 25]
+
+# باستخدام List Comprehension
+squares = [x ** 2 for x in range(1, 6)]
+print(squares)   # [1, 4, 9, 16, 25]
+
+# مع شرط
+evens = [x for x in range(1, 11) if x % 2 == 0]
+print(evens)     # [2, 4, 6, 8, 10]
+</pre>
+            </div>
+
+            <div class="tip">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>نصيحة:</strong> List Comprehension أسرع من الحلقات التقليدية، وتُستخدم كثيرًا في الكود الاحترافي.
+                    لكن لا تُفرِط في تعقيدها — إذا صارت صعبة القراءة، ارجع للحلقة التقليدية.
+                </div>
+            </div>
+
+            <!-- ===== تمارين عملية ===== -->
+            <h2><i class="fas fa-laptop-code"></i> تمارين عملية للتطبيق</h2>
+            <p>أنشئ ملفًا جديدًا باسم <strong>lists_practice.py</strong> وجرّب ما يلي:</p>
+            <ol class="plain">
+                <li>أنشئ قائمة بأسماء 5 من أصدقائك، ثم اطبع كل اسم في سطر.</li>
+                <li>أضف اسمًا جديدًا في نهاية القائمة باستخدام <code class="inline">append()</code>.</li>
+                <li>رتّب القائمة أبجديًا باستخدام <code class="inline">sort()</code>، ثم اطبعها.</li>
+                <li>اطبع عدد العناصر في القائمة باستخدام <code class="inline">len()</code>.</li>
+                <li>أنشئ قائمة جديدة تحتوي على مربعات الأعداد من 1 إلى 10 باستخدام List Comprehension.</li>
+            </ol>
+
+            <!-- ===== تمارين تفاعلية ===== -->
+            <h2><i class="fas fa-pencil-alt"></i> تمارين تفاعلية</h2>
+            <p>اختبر فهمك للقوائم من خلال التمارين التالية:</p>
+
+            <!-- تمرين 1 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">1</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — إنشاء القائمة</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما هي الطريقة الصحيحة لإنشاء قائمة في بايثون؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex1" value="a"> my_list = (1, 2, 3)</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="b"> my_list = [1, 2, 3]</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="c"> my_list = {1, 2, 3}</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="d"> my_list = "1, 2, 3"</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise1()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex1','result1')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result1"></div>
+            </div>
+
+            <!-- تمرين 2 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">2</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — الفهرسة السالبة</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما هو ناتج <code class="inline">[10, 20, 30, 40][-1]</code>؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex2" value="a"> 10</label>
+                    <label class="option-item"><input type="radio" name="ex2" value="b"> 40</label>
+                    <label class="option-item"><input type="radio" name="ex2" value="c"> خطأ</label>
+                    <label class="option-item"><input type="radio" name="ex2" value="d"> 30</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise2()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex2','result2')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result2"></div>
+            </div>
+
+            <!-- تمرين 3 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">3</div>
+                    <h3 class="exercise-title">تمرين إكمال الفراغ — الدالة الصحيحة</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> اكتب اسم الدالة التي تُستخدم لإضافة عنصر في نهاية القائمة
+                    (اكتب الاسم فقط بدون أقواس):
+                </p>
+                <div class="text-input-wrap">
+                    <input type="text" class="text-input" id="ex3-input" placeholder="اكتب اسم الدالة..." autocomplete="off">
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise3()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex3','result3')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result3"></div>
+            </div>
+
+            <!-- تمرين 4 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">4</div>
+                    <h3 class="exercise-title">تمرين صح أو خطأ — قابلية التغيير</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> القوائم في بايثون غير قابلة للتغيير (Immutable) مثل النصوص.
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex4" value="true"> ✔️ صح</label>
+                    <label class="option-item"><input type="radio" name="ex4" value="false"> ✖️ خطأ</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise4()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex4','result4')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result4"></div>
+            </div>
+
+            <!-- تمرين 5 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">5</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — التقطيع</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما هو ناتج <code class="inline">[10, 20, 30, 40, 50][1:4]</code>؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex5" value="a"> [10, 20, 30, 40]</label>
+                    <label class="option-item"><input type="radio" name="ex5" value="b"> [20, 30, 40]</label>
+                    <label class="option-item"><input type="radio" name="ex5" value="c"> [20, 30, 40, 50]</label>
+                    <label class="option-item"><input type="radio" name="ex5" value="d"> [10, 20, 30]</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise5()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex5','result5')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result5"></div>
+            </div>
+
+            <!-- تمرين 6 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">6</div>
+                    <h3 class="exercise-title">تمرين اختيار متعدد — عمليات القوائم</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> أي من التالي يُعدّ من عمليات القوائم في بايثون؟
+                    (يمكنك اختيار أكثر من إجابة):
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="checkbox" name="ex6" value="concat"> دمج قائمتين بـ +</label>
+                    <label class="option-item"><input type="checkbox" name="ex6" value="repeat"> تكرار القائمة بـ *</label>
+                    <label class="option-item"><input type="checkbox" name="ex6" value="in"> فحص الوجود بـ in</label>
+                    <label class="option-item"><input type="checkbox" name="ex6" value="divide"> قسمة قائمة على قائمة</label>
+                    <label class="option-item"><input type="checkbox" name="ex6" value="sub"> طرح قائمة من قائمة</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise6()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex6','result6')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result6"></div>
+            </div>
+
+            <!-- تمرين 7 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">7</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — List Comprehension</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما هو ناتج <code class="inline">[x*2 for x in range(3)]</code>؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex7" value="a"> [0, 2, 4]</label>
+                    <label class="option-item"><input type="radio" name="ex7" value="b"> [2, 4, 6]</label>
+                    <label class="option-item"><input type="radio" name="ex7" value="c"> [0, 1, 2]</label>
+                    <label class="option-item"><input type="radio" name="ex7" value="d"> [1, 2, 3]</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise7()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex7','result7')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result7"></div>
+            </div>
+
+            <!-- ===== خلاصة ===== -->
+            <h2><i class="fas fa-tasks"></i> خلاصة الدرس</h2>
+            <ul class="plain">
+                <li>✔️ القوائم هياكل بيانات <strong>مرنة وقابلة للتغيير</strong> تُعرَّف بـ <code class="inline">[ ]</code>.</li>
+                <li>✔️ <strong>الفهرسة</strong> تبدأ من 0، و <strong>-1</strong> يعني آخر عنصر.</li>
+                <li>✔️ دوال مهمة: <code class="inline">append</code>, <code class="inline">insert</code>, <code class="inline">remove</code>, <code class="inline">pop</code>, <code class="inline">sort</code>, <code class="inline">reverse</code>.</li>
+                <li>✔️ <strong>Slicing</strong> يتيح استخراج أجزاء: <code class="inline">[start:end:step]</code>.</li>
+                <li>✔️ يمكن <strong>دمج</strong> و <strong>تكرار</strong> القوائم بـ <code class="inline">+</code> و <code class="inline">*</code>.</li>
+                <li>✔️ <strong>List Comprehension</strong> طريقة أنيقة ومختصرة لإنشاء القوائم.</li>
+                <li>✔️ القوائم المتداخلة تسمح ببناء هياكل مثل المصفوفات.</li>
+            </ul>
+
+            <!-- ===== شريط التقدم ===== -->
+            <div class="progress-footer">
+                <h3><i class="fas fa-chart-line"></i> تقدمك في المسار</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0% مكتمل</div>
+            </div>
+
+            <!-- ===== التنقل ===== -->
+            <div class="nav-links">
+                <a href="lesson9.html" class="nav-link prev">
+                    <i class="fas fa-arrow-right"></i>
+                    الدرس السابق: الدوال (Functions)
+                </a>
+                <a href="lesson11.html" class="nav-link next">
+                    الدرس التالي: الصفوف (Tuples)
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+
+        </article>
+    </div>
+</div>
+
+<footer>
+    © 2025 CodeWay — مسار Python · الدرس 10 من مستوى المبتدئين.
+</footer>
+
+<script>
+    /* شريط التقدم */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '67%';
+            text.textContent = '67% مكتمل';
+        }, 400);
+    });
+
+    /* ===== تمرين 1 ===== */
+    function checkExercise1() {
+        const selected = document.querySelector('input[name="ex1"]:checked');
+        const result = document.getElementById('result1');
+        result.className = 'exercise-result';
+
+        if (!selected) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (selected.value === 'b') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> القوائم تُعرَّف بالأقواس المربعة <code class="inline">[ ]</code>. الأقواس <code class="inline">( )</code> للـ tuple، و <code class="inline">{ }</code> للـ set والـ dict.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الإجابة الصحيحة هي <code class="inline">my_list = [1, 2, 3]</code>.';
+        }
+    }
+
+    /* ===== تمرين 2 ===== */
+    function checkExercise2() {
+        const selected = document.querySelector('input[name="ex2"]:checked');
+        const result = document.getElementById('result2');
+        result.className = 'exercise-result';
+
+        if (!selected) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (selected.value === 'b') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> الفهرس <code class="inline">-1</code> يعني آخر عنصر، وهو 40.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الإجابة الصحيحة: <strong>40</strong>.';
+        }
+    }
+
+    /* ===== تمرين 3 ===== */
+    function checkExercise3() {
+        const input = document.getElementById('ex3-input').value.trim().toLowerCase().replace(/[.()]/g, '');
+        const result = document.getElementById('result3');
+        result.className = 'exercise-result';
+
+        if (!input) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تكتب أي إجابة.'; return; }
+
+        if (input === 'append') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> <code class="inline">append()</code> تضيف عنصرًا في نهاية القائمة.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة غير صحيحة.</strong> الدالة الصحيحة هي <code class="inline">append</code>.';
+        }
+    }
+
+    /* ===== تمرين 4 ===== */
+    function checkExercise4() {
+        const selected = document.querySelector('input[name="ex4"]:checked');
+        const result = document.getElementById('result4');
+        result.className = 'exercise-result';
+
+        if (!selected) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (selected.value === 'false') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>صحيح تمامًا!</strong> العبارة خاطئة — القوائم <strong>قابلة للتغيير (Mutable)</strong> ويمكن تعديل عناصرها.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>للأسف خطأ.</strong> القوائم قابلة للتغيير (Mutable) وليست ثابتة.';
+        }
+    }
+
+    /* ===== تمرين 5 ===== */
+    function checkExercise5() {
+        const selected = document.querySelector('input[name="ex5"]:checked');
+        const result = document.getElementById('result5');
+        result.className = 'exercise-result';
+
+        if (!selected) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (selected.value === 'b') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> <code class="inline">[1:4]</code> يأخذ العناصر من الفهرس 1 إلى 3 (بدون 4) = <strong>[20, 30, 40]</strong>.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الإجابة الصحيحة: <strong>[20, 30, 40]</strong>.';
+        }
+    }
+
+    /* ===== تمرين 6 ===== */
+    function checkExercise6() {
+        const correct = ['concat', 'repeat', 'in'];
+        const wrong   = ['divide', 'sub'];
+        const checked = [...document.querySelectorAll('input[name="ex6"]:checked')].map(cb => cb.value);
+
+        const correctSelected = checked.filter(v => correct.includes(v)).length;
+        const wrongSelected   = checked.filter(v => wrong.includes(v)).length;
+
+        const result = document.getElementById('result6');
+        result.className = 'exercise-result';
+
+        if (checked.length === 0) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (correctSelected === correct.length && wrongSelected === 0) {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>ممتاز!</strong> القوائم تدعم + و * و in. القسمة والطرح ليست من عملياتها.';
+        } else if (wrongSelected > 0) {
+            result.classList.add('partial');
+            result.innerHTML = `<i class="fas fa-exclamation-triangle"></i> لديك <strong>${wrongSelected}</strong> إجابة خاطئة. القسمة والطرح لا تنطبق على القوائم.`;
+        } else {
+            result.classList.add('partial');
+            result.innerHTML = `<i class="fas fa-info-circle"></i> اخترت <strong>${correctSelected}</strong> من <strong>${correct.length}</strong> إجابات صحيحة.`;
+        }
+    }
+
+    /* ===== تمرين 7 ===== */
+    function checkExercise7() {
+        const selected = document.querySelector('input[name="ex7"]:checked');
+        const result = document.getElementById('result7');
+        result.className = 'exercise-result';
+
+        if (!selected) { result.classList.add('error'); result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.'; return; }
+
+        if (selected.value === 'a') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> <code class="inline">range(3)</code> = 0, 1, 2. نضرب كل واحد × 2 → <strong>[0, 2, 4]</strong>.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الإجابة الصحيحة: <strong>[0, 2, 4]</strong>.';
+        }
+    }
+
+    /* ===== إعادة تعيين ===== */
+    function resetExercise(name, resultId) {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(el => el.checked = false);
+        const input = document.getElementById(name + '-input');
+        if (input) input.value = '';
+        const result = document.getElementById(resultId);
+        if (result) { result.className = 'exercise-result'; result.innerHTML = ''; }
+    }
+</script>
+
+</body>
+</html>

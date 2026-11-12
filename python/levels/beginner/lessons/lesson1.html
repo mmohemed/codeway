@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 1: ما هي Python ولماذا نستخدمها؟ | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+
+        .breadcrumb span.sep {
+            margin: 0 6px;
+            color: #666;
+        }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.4em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية الرئيسية (عرض كامل) ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس الدرس الأفقي ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i {
+            font-size: 1.1rem;
+            color: var(--gold);
+        }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        /* ===== صندوق المميزات ===== */
+        .feature-box {
+            margin: 16px 0;
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 24px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+        }
+
+        .feature-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-box li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 11px 0;
+            font-size: 0.98em;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .feature-box li:last-child { border-bottom: none; }
+
+        .feature-box li i {
+            color: var(--gold);
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        /* ===== شبكة الاستخدامات ===== */
+        .uses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .use-item {
+            background: var(--card-soft);
+            border-radius: 10px;
+            padding: 16px 18px;
+            border: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+
+        .use-item:hover {
+            border-color: rgba(255, 215, 0, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .use-item i {
+            font-size: 1.4em;
+            color: var(--gold);
+            width: 30px;
+            text-align: center;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== التمارين التفاعلية ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* تمرين صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* تمرين إكمال كود */
+        .code-fill {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 18px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2;
+            overflow-x: auto;
+        }
+
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            width: 110px;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل بين الدروس ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.8em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+        }
+
+        @media (max-width: 500px) {
+            .uses-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span class="sep">/</span>
+        <span>الدرس 1</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-play-circle"></i>
+            الدرس 1 · مقدمة إلى Python
+        </div>
+        <h1 class="lesson-title">ما هي لغة Python ولماذا نستخدمها؟</h1>
+        <p class="lesson-intro">
+            في هذا الدرس ستتعرف على واحدة من أشهر لغات البرمجة في العالم،
+            وستفهم لماذا يبدأ بها الملايين من المبرمجين، وما الذي يجعلها الخيار الأول
+            في مجالات مثل الذكاء الاصطناعي وتحليل البيانات.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 10–12 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 فهم أساسيات Python</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 مبتدئ جدًا</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> لا يتطلب خبرة سابقة</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#intro">1. ما هي Python؟</a>
+            <a href="#why">2. لماذا نستخدمها؟</a>
+            <a href="#uses">3. أين تُستخدم؟</a>
+            <a href="#code">4. شكل الكود</a>
+            <a href="#compare">5. مقارنة مع لغات أخرى</a>
+            <a href="#exercises">6. التمارين التفاعلية</a>
+            <a href="#summary">7. الخلاصة</a>
+        </div>
+    </div>
+
+    <!-- 1 -->
+    <section class="section-card" id="intro">
+        <h2 class="section-title">
+            <span class="num">1</span>
+            <i class="fas fa-question-circle"></i>
+            ما هي لغة Python؟
+        </h2>
+        <p>
+            <strong>Python</strong> هي لغة برمجة <strong>عالية المستوى</strong>،
+            صُممت لتكون سهلة القراءة والكتابة وقريبة من اللغة الإنجليزية،
+            مما يجعلها الخيار الأمثل لمن يبدأ رحلته في عالم البرمجة.
+        </p>
+        <p>
+            صدرت أول نسخة منها عام <strong>1991</strong> على يد <strong>جايدو فان روسم</strong>،
+            ومنذ ذلك الحين أصبحت واحدة من أكثر لغات البرمجة استخدامًا في العالم،
+            وتُستخدم اليوم في مشاريع ضخمة مثل <strong>YouTube</strong> و <strong>Instagram</strong>
+            و <strong>NASA</strong>.
+        </p>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>معلومة:</strong> اسم لغة Python لم يُستوحَ من الأفعى كما يعتقد البعض،
+                بل من فرقة كوميدية بريطانية اسمها
+                <em>Monty Python</em> كان يحبها مؤسس اللغة.
+            </div>
+        </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="section-card" id="why">
+        <h2 class="section-title">
+            <span class="num">2</span>
+            <i class="fas fa-star"></i>
+            لماذا نستخدم Python؟ (المميزات)
+        </h2>
+        <p>هناك أسباب عديدة تجعل Python الخيار المفضّل للمبتدئين والمحترفين على حد سواء:</p>
+
+        <div class="feature-box">
+            <ul>
+                <li><i class="fas fa-check-circle"></i><div><strong>سهلة التعلم:</strong> تركيبها بسيط وواضح، تشبه كتابة الإنجليزية العادية.</div></li>
+                <li><i class="fas fa-check-circle"></i><div><strong>مفتوحة المصدر ومجانية:</strong> يمكنك استخدامها وتعديلها دون أي تكلفة.</div></li>
+                <li><i class="fas fa-check-circle"></i><div><strong>متعددة الاستخدامات:</strong> من سكربت صغير لأتمتة مهمة، إلى أنظمة ذكاء اصطناعي ضخمة.</div></li>
+                <li><i class="fas fa-check-circle"></i><div><strong>مكتبات ضخمة:</strong> آلاف المكتبات الجاهزة (NumPy, Pandas, TensorFlow...) توفر عليك الوقت.</div></li>
+                <li><i class="fas fa-check-circle"></i><div><strong>مجتمع ضخم:</strong> أي مشكلة تواجهها، ستجد لها حلًا جاهزًا على الإنترنت.</div></li>
+                <li><i class="fas fa-check-circle"></i><div><strong>مطلوبة في سوق العمل:</strong> من أعلى اللغات طلبًا في مجالات البيانات والذكاء الاصطناعي.</div></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="section-card" id="uses">
+        <h2 class="section-title">
+            <span class="num">3</span>
+            <i class="fas fa-cogs"></i>
+            أين تُستخدم Python؟
+        </h2>
+        <p>تتميز Python بقدرتها على العمل في مجالات متنوعة جدًا. أشهر استخداماتها:</p>
+
+        <div class="uses-grid">
+            <div class="use-item"><i class="fas fa-brain"></i><span>الذكاء الاصطناعي وتعلم الآلة</span></div>
+            <div class="use-item"><i class="fas fa-chart-bar"></i><span>تحليل البيانات وعلوم البيانات</span></div>
+            <div class="use-item"><i class="fas fa-globe"></i><span>تطوير مواقع وتطبيقات الويب</span></div>
+            <div class="use-item"><i class="fas fa-robot"></i><span>أتمتة المهام المتكررة</span></div>
+            <div class="use-item"><i class="fas fa-shield-alt"></i><span>الأمن السيبراني واختبار الاختراق</span></div>
+            <div class="use-item"><i class="fas fa-gamepad"></i><span>برمجة الألعاب البسيطة</span></div>
+            <div class="use-item"><i class="fas fa-flask"></i><span>البحث العلمي والحسابات</span></div>
+            <div class="use-item"><i class="fas fa-desktop"></i><span>تطوير تطبيقات سطح المكتب</span></div>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>نصيحة:</strong> لا تحاول تعلم كل هذه المجالات في وقت واحد!
+                ابدأ بالأساسيات، ثم اختر مجالًا واحدًا يثير اهتمامك وتخصص فيه.
+            </div>
+        </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="section-card" id="code">
+        <h2 class="section-title">
+            <span class="num">4</span>
+            <i class="fas fa-code"></i>
+            كيف يبدو كود Python؟
+        </h2>
+        <p>
+            لنتعرف على شكل الكود في Python من خلال مثال صغير.
+            هذا البرنامج يطبع رسالة ترحيب، ثم يطلب منك اسمك ويُرد عليك:
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>hello.py</span>
+            </div>
+<pre><span class="cm"># أول برنامج لك بلغة بايثون</span>
+<span class="fn">print</span>(<span class="str">"مرحبًا بك في عالم بايثون!"</span>)
+
+<span class="cm"># نطلب من المستخدم إدخال اسمه</span>
+name = <span class="fn">input</span>(<span class="str">"ما هو اسمك؟ "</span>)
+
+<span class="cm"># نطبع رسالة ترحيب باسمه</span>
+<span class="fn">print</span>(<span class="str">"أهلًا يا"</span>, name, <span class="str">"سعيدون بوجودك هنا 👋"</span>)</pre>
+        </div>
+
+        <p><strong>شرح بسيط للكود:</strong></p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>الجزء</th><th>معناه</th></tr></thead>
+                <tbody>
+                    <tr><td><code>print()</code></td><td>دالة تطبع نصًا أو قيمة على الشاشة.</td></tr>
+                    <tr><td><code>input()</code></td><td>دالة تطلب من المستخدم إدخال قيمة.</td></tr>
+                    <tr><td><code>name</code></td><td>متغير يخزّن القيمة التي أدخلها المستخدم.</td></tr>
+                    <tr><td><code>#</code></td><td>تعني أن ما بعدها تعليق (لا يُنفّذ).</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="section-card" id="compare">
+        <h2 class="section-title">
+            <span class="num">5</span>
+            <i class="fas fa-balance-scale"></i>
+            مقارنة سريعة: Python ولغات أخرى
+        </h2>
+        <p>لماذا يُنصح المبتدئون بـ Python تحديدًا؟ إليك مقارنة بسيطة:</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>المعيار</th><th>Python</th><th>Java / C++</th></tr></thead>
+                <tbody>
+                    <tr><td>سهولة التعلم</td><td>سهلة جدًا ✅</td><td>أصعب نسبيًا ❌</td></tr>
+                    <tr><td>سرعة كتابة الكود</td><td>سريعة جدًا ✅</td><td>تحتاج كودًا أطول ❌</td></tr>
+                    <tr><td>سرعة التنفيذ</td><td>أبطأ نسبيًا ⚠️</td><td>أسرع ✅</td></tr>
+                    <tr><td>الاستخدام في AI</td><td>الأولى عالميًا ✅</td><td>محدود ❌</td></tr>
+                    <tr><td>المناسب للمبتدئين</td><td>نعم ✅</td><td>ليس الخيار الأول ❌</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 6. التمارين التفاعلية -->
+    <section class="section-card" id="exercises">
+        <h2 class="section-title">
+            <span class="num">6</span>
+            <i class="fas fa-pencil-alt"></i>
+            التمارين التفاعلية
+        </h2>
+        <p>اختبر فهمك للدرس من خلال ثلاثة تمارين متنوعة:</p>
+
+        <!-- تمرين 1: اختيار متعدد -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">1</span>
+                <h4>اختيار من متعدد</h4>
+                <span class="exercise-tag">تحديد الإجابات الصحيحة</span>
+            </div>
+            <p class="exercise-question">
+                في أي المجالات التالية تُستخدم Python بشكل واسع؟
+                <em>(اختر كل الإجابات الصحيحة)</em>
+            </p>
+            <div class="options-list" id="q1-options">
+                <label class="option"><input type="checkbox" name="q1" value="1"> الذكاء الاصطناعي وتعلم الآلة</label>
+                <label class="option"><input type="checkbox" name="q1" value="2"> تحليل البيانات</label>
+                <label class="option"><input type="checkbox" name="q1" value="3"> تطوير مواقع الويب</label>
+                <label class="option"><input type="checkbox" name="q1" value="4"> تصميم الأزياء والموضة</label>
+                <label class="option"><input type="checkbox" name="q1" value="5"> الأمن السيبراني</label>
+                <label class="option"><input type="checkbox" name="q1" value="6"> برمجة الألعاب</label>
+            </div>
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ1()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ1()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q1-result"></div>
+        </div>
+
+        <!-- تمرين 2: صح/خطأ -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">2</span>
+                <h4>صح أم خطأ</h4>
+                <span class="exercise-tag">اختر لكل عبارة</span>
+            </div>
+            <p class="exercise-question">
+                اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:
+            </p>
+            <div class="tf-list" id="q2-list">
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">Python لغة برمجة عالية المستوى وسهلة التعلم.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="false">
+                    <span class="tf-statement">اسم Python مستوحى من الأفعى الشهيرة.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">Python مجانية ومفتوحة المصدر.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="false">
+                    <span class="tf-statement">Python هي اللغة الأسرع في التنفيذ مقارنة بجميع اللغات.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ2()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ2()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q2-result"></div>
+        </div>
+
+        <!-- تمرين 3: أكمل الكود -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">3</span>
+                <h4>أكمل الكود</h4>
+                <span class="exercise-tag">املأ الفراغات</span>
+            </div>
+            <p class="exercise-question">
+                أكمل الكود التالي لطباعة رسالة ترحيب. استخدم:
+                <code>print</code> و <code>input</code>.
+            </p>
+
+            <div class="code-fill">
+                <span class="cm"># اطلب اسم المستخدم</span><br>
+                name = <input type="text" class="blank-input" id="b1" placeholder="...">(<span class="str">"ما اسمك؟ "</span>)<br>
+                <span class="cm"># اطبع الترحيب</span><br>
+                <input type="text" class="blank-input" id="b2" placeholder="...">(<span class="str">"أهلًا يا"</span>, name)
+            </div>
+
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ3()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ3()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q3-result"></div>
+        </div>
+
+    </section>
+
+    <!-- 7 -->
+    <section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">7</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس تعرّفت على:</p>
+        <div class="feature-box">
+            <ul>
+                <li><i class="fas fa-check"></i> ما هي لغة Python ومن ابتكرها.</li>
+                <li><i class="fas fa-check"></i> أهم مميزاتها التي تجعلها مثالية للمبتدئين.</li>
+                <li><i class="fas fa-check"></i> المجالات الواسعة التي تُستخدم فيها.</li>
+                <li><i class="fas fa-check"></i> شكل أول كود بلغة Python وشرحه.</li>
+                <li><i class="fas fa-check"></i> مقارنة سريعة بينها وبين لغات أخرى.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم كيف
+                <strong>تُثبّت Python على جهازك</strong> وتُجهّز محرر الأكواد
+                لتكتب أول برنامج حقيقي بنفسك.
+            </div>
+        </div>
+
+        <!-- شريط التقدم -->
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="../index.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى قائمة الوحدات</span>
+        </a>
+        <a href="lesson2.html" class="nav-link next">
+            <span>الدرس التالي: تثبيت Python و VS Code</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · الدرس 1: ما هي Python؟
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '7%';
+            text.textContent = '7% مكتمل';
+        }, 400);
+    });
+
+    /* ========== تمرين 1: اختيار متعدد ========== */
+    function checkQ1() {
+        const correct = ['1', '2', '3', '5', '6']; // كل ما عدا تصميم الأزياء
+        const boxes = document.querySelectorAll('input[name="q1"]');
+        let right = 0, wrong = 0, pickedWrong = 0;
+
+        boxes.forEach(b => {
+            const label = b.closest('.option');
+            label.classList.remove('correct', 'wrong');
+            if (b.checked) {
+                if (correct.includes(b.value)) {
+                    label.classList.add('correct');
+                    right++;
+                } else {
+                    label.classList.add('wrong');
+                    wrong++;
+                    pickedWrong++;
+                }
+            } else if (correct.includes(b.value)) {
+                // فاته إجابة صحيحة
+                wrong++;
+            }
+        });
+
+        const msg = document.getElementById('q1-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (![...boxes].some(b => b.checked)) {
+            msg.classList.add('mid');
+            msg.innerHTML = '<i class="fas fa-info-circle"></i> اختر إجابة واحدة على الأقل ثم اضغط «تحقق».';
+            return;
+        }
+
+        if (right === correct.length && wrong === 0) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> ممتاز! جميع الإجابات صحيحة 🎉';
+        } else if (right > 0) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${correct.length}${pickedWrong ? `، لكنك اخترت ${pickedWrong === 1 ? 'خيارًا خاطئًا' : pickedWrong === 2 ? 'خيارين خاطئين' : pickedWrong + ' خيارات خاطئة'} (باللون الأحمر)` : ''}. اختياراتك الصحيحة مميزة بالأخضر.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> لم تصب أي إجابة. الإجابات الصحيحة: الذكاء الاصطناعي، تحليل البيانات، الويب، الأمن السيبراني، الألعاب.';
+        }
+    }
+
+    function resetQ1() {
+        document.querySelectorAll('input[name="q1"]').forEach(b => b.checked = false);
+        document.querySelectorAll('#q1-options .option').forEach(l => l.classList.remove('correct', 'wrong'));
+        const msg = document.getElementById('q1-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== تمرين 2: صح/خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        // إزالة التحديد السابق
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkQ2() {
+        const items = document.querySelectorAll('#q2-list .tf-item');
+        let right = 0;
+        let answered = 0;
+
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+
+            if (selected === undefined) return;
+            answered++;
+
+            if ((selected === 'true') === correct) {
+                item.classList.add('correct');
+                right++;
+            } else {
+                item.classList.add('wrong');
+            }
+        });
+
+        const msg = document.getElementById('q2-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (answered < items.length) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`;
+        } else if (right === items.length) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> رائع! جميع إجاباتك صحيحة 🎉';
+        } else if (right > 0) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${items.length}. العبارات الخاطئة تظهر باللون الأحمر.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> لم تصب أي عبارة. راجع الدرس ثم أعد المحاولة.';
+        }
+    }
+
+    function resetQ2() {
+        document.querySelectorAll('#q2-list .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        const msg = document.getElementById('q2-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== تمرين 3: أكمل الكود ========== */
+    function checkQ3() {
+        const b1 = document.getElementById('b1');
+        const b2 = document.getElementById('b2');
+        // بدون toLowerCase: بايثون يميّز الحروف الكبيرة من الصغيرة (Print خطأ)
+        const v1 = b1.value.trim();
+        const v2 = b2.value.trim();
+
+        b1.classList.remove('correct', 'wrong');
+        b2.classList.remove('correct', 'wrong');
+
+        let right = 0;
+
+        if (v1 === 'input') { b1.classList.add('correct'); right++; }
+        else { b1.classList.add('wrong'); }
+
+        if (v2 === 'print') { b2.classList.add('correct'); right++; }
+        else { b2.classList.add('wrong'); }
+
+        const msg = document.getElementById('q3-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (right === 2) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> إجابة صحيحة تمامًا! 🎉 استخدمت <code>input</code> للإدخال و <code>print</code> للطباعة.';
+        } else if (right === 1) {
+            msg.classList.add('mid');
+            msg.innerHTML = '<i class="fas fa-info-circle"></i> أصبت في فراغ واحد. تذكّر: <code>input</code> للقراءة، و <code>print</code> للطباعة.';
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> حاول مرة أخرى. الفراغ الأول يحتاج <code>input</code>، والثاني <code>print</code>.';
+        }
+    }
+
+    function resetQ3() {
+        const b1 = document.getElementById('b1');
+        const b2 = document.getElementById('b2');
+        b1.value = ''; b2.value = '';
+        b1.classList.remove('correct', 'wrong');
+        b2.classList.remove('correct', 'wrong');
+        const msg = document.getElementById('q3-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>النماذج Forms في Django | CodeWay</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prism.js للتلوين -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-dark: #d4af37;
+            --primary-light: #ffed4a;
+            --dark: #0a0a0a;
+            --dark-light: #1a1a1a;
+            --dark-surface: #222;
+            --text: #ffffff;
+            --text-light: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --border-color: rgba(255, 215, 0, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #00c851;
+            --info: #00b4ff;
+            --warning: #ff8800;
+            --danger: #ff4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            z-index: 1001;
+            background: transparent;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.97);
+            backdrop-filter: blur(20px);
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .nav-links .back-home {
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary) !important;
+            border-radius: 50px;
+        }
+
+        .nav-links .back-home:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+            z-index: 999;
+            border: none;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.6);
+        }
+
+        .hero {
+            padding: 120px 20px 60px;
+            background: linear-gradient(135deg, var(--dark), var(--dark-light));
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05), transparent 70%);
+            border-radius: 50%;
+            animation: floatBubble 25s ease-in-out infinite;
+        }
+
+        @keyframes floatBubble {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, 30px) scale(1.1); }
+        }
+
+        .hero-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .hero-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 i {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .hero-meta i {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .content-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .content-card h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .content-card h2 i {
+            font-size: 1.5rem;
+        }
+
+        .content-card h3 {
+            color: var(--primary-light);
+            font-size: 1.3rem;
+            margin: 25px 0 15px;
+        }
+
+        .content-card h4 {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin: 20px 0 10px;
+        }
+
+        .content-card p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .content-card ul, .content-card ol {
+            color: var(--text-light);
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+
+        .content-card li {
+            margin-bottom: 8px;
+        }
+
+        .content-card li strong {
+            color: var(--primary);
+        }
+
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+        }
+
+        .code-block .code-label {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--primary);
+            color: #000;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: rgba(0, 180, 255, 0.08);
+            border-right: 4px solid var(--info);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .info-box i {
+            color: var(--info);
+            margin-left: 10px;
+        }
+
+        .warning-box {
+            background: rgba(255, 136, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning-box i {
+            color: var(--warning);
+            margin-left: 10px;
+        }
+
+        .success-box {
+            background: rgba(0, 200, 81, 0.08);
+            border-right: 4px solid var(--success);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .success-box i {
+            color: var(--success);
+            margin-left: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.08);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .comparison-table td {
+            color: var(--text-light);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(255, 215, 0, 0.03);
+        }
+
+        /* Form Simulator */
+        .form-simulator {
+            background: var(--dark-surface);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-simulator .form-preview {
+            background: var(--dark);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-simulator .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-simulator label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .form-simulator label .required {
+            color: var(--danger);
+            margin-right: 4px;
+        }
+
+        .form-simulator input,
+        .form-simulator select,
+        .form-simulator textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .form-simulator input:focus,
+        .form-simulator select:focus,
+        .form-simulator textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .form-simulator textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-simulator .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-simulator .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .form-simulator .form-actions button {
+            padding: 10px 28px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .form-simulator .form-actions .btn-submit {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .form-simulator .form-actions .btn-submit:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .form-simulator .form-actions .btn-reset {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-simulator .form-actions .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-simulator .form-errors {
+            background: rgba(255, 68, 68, 0.08);
+            border: 1px solid rgba(255, 68, 68, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 15px;
+            display: none;
+            color: var(--danger);
+        }
+
+        .form-simulator .form-errors.show {
+            display: block;
+        }
+
+        .form-simulator .form-errors ul {
+            margin: 5px 0 0 20px;
+            padding-right: 20px;
+        }
+
+        .form-simulator .form-success {
+            background: rgba(0, 200, 81, 0.08);
+            border: 1px solid rgba(0, 200, 81, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 15px;
+            display: none;
+            color: var(--success);
+        }
+
+        .form-simulator .form-success.show {
+            display: block;
+        }
+
+        .form-simulator .submitted-data {
+            background: var(--dark);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .form-simulator .submitted-data.show {
+            display: block;
+        }
+
+        .form-simulator .submitted-data .data-item {
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-simulator .submitted-data .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .form-simulator .submitted-data .data-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .form-simulator .submitted-data .data-value {
+            color: var(--text-light);
+        }
+
+        .lesson-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .lesson-footer .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .lesson-footer .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .lesson-footer .btn-primary:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .lesson-footer .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .lesson-footer .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .btn-complete {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-complete:hover {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        .btn-complete.done {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--dark-light);
+            border-top: 2px solid var(--primary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 { font-size: 2.4rem; }
+            .form-simulator .form-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .hero { padding: 100px 15px 40px; }
+            .hero h1 { font-size: 1.8rem; }
+            .hero p { font-size: 1rem; }
+            .hero-meta { gap: 15px; }
+            .content-card { padding: 20px; }
+            .content-card h2 { font-size: 1.4rem; }
+            .nav-links a { font-size: 0.85rem; padding: 6px 12px; }
+            .back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; }
+            .comparison-table { font-size: 0.85rem; }
+            .comparison-table th, .comparison-table td { padding: 8px 10px; }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 { font-size: 1.5rem; }
+            .content-card { padding: 15px; }
+            .lesson-footer { flex-direction: column; align-items: stretch; }
+            .lesson-footer .btn { justify-content: center; }
+            .form-simulator .form-actions { flex-direction: column; }
+            .form-simulator .form-actions button { width: 100%; }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .token.comment { color: #6a9955; }
+        .token.string { color: #ce9178; }
+        .token.keyword { color: #569cd6; }
+        .token.function { color: #dcdcaa; }
+        .token.class-name { color: #4ec9b0; }
+        .token.decorator { color: #c586c0; }
+    </style>
+</head>
+<body>
+    <!-- شريط التقدم -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <a href="../index.html" class="logo">
+            <i class="fab fa-django"></i>
+            <span>Django</span>
+        </a>
+        <div class="nav-links">
+            <a href="#content">الدرس</a>
+            <a href="#simulator">المحاكي</a>
+            <a href="../index.html" class="back-home">
+                <i class="fas fa-arrow-right"></i> العودة
+            </a>
+        </div>
+    </nav>
+
+    <!-- زر العودة للأعلى -->
+    <button class="back-to-top" id="backToTop" aria-label="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-breadcrumb">
+                <a href="../index.html">الرئيسية</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <a href="../django/index.html">Django</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <span style="color: var(--text);">الدرس السادس</span>
+            </div>
+
+            <div class="hero-badge">
+                <i class="fas fa-edit"></i> الدرس 6 من 10
+            </div>
+
+            <h1><i class="fas fa-edit"></i> النماذج Forms في Django</h1>
+            <p>تعلم كيفية إنشاء نماذج تفاعلية مع التحقق من صحة البيانات باستخدام Django Forms.</p>
+
+            <div class="hero-meta">
+                <span><i class="far fa-clock"></i> مدة القراءة: 11 دقيقة</span>
+                <span><i class="fas fa-signal"></i> مستوى: متوسط</span>
+                <span><i class="fas fa-forms"></i> Forms</span>
+                <span><i class="fas fa-check-double"></i> Validation</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="container" id="content">
+        <!-- مقدمة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-info-circle"></i> ما هي النماذج في Django؟</h2>
+            <p>
+                <strong>النماذج (Forms)</strong> في Django هي وسيلة لإنشاء نماذج HTML والتعامل مع البيانات المدخلة 
+                من المستخدمين. توفر النماذج:
+            </p>
+            <ul>
+                <li><strong>إنشاء حقول النموذج:</strong> تعريف الحقول مثل النصوص، الأرقام، التواريخ، إلخ.</li>
+                <li><strong>التحقق من صحة البيانات (Validation):</strong> التأكد من أن البيانات المدخلة صحيحة.</li>
+                <li><strong>عرض الأخطاء:</strong> عرض رسائل خطأ مفيدة للمستخدم.</li>
+                <li><strong>إعادة تعبئة النموذج:</strong> إعادة عرض البيانات المدخلة مع الأخطاء.</li>
+            </ul>
+
+            <div class="info-box">
+                <i class="fas fa-lightbulb"></i>
+                <strong>المفهوم الأساسي:</strong> النماذج في Django تعمل كجسر بين المستخدم وقاعدة البيانات، وتوفر طبقة أمان إضافية ضد البيانات الخبيثة.
+            </div>
+        </div>
+
+        <!-- إنشاء نموذج -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-plus-circle"></i> إنشاء نموذج</h2>
+            <p>هناك طريقتان رئيسيتان لإنشاء النماذج في Django:</p>
+
+            <h3>1. نموذج عادي (Form)</h3>
+            <div class="code-block">
+                <div class="code-label">forms.py</div>
+                <pre><code class="language-python">from django import forms
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100, label='الاسم')
+    email = forms.EmailField(label='البريد الإلكتروني')
+    subject = forms.CharField(max_length=200, label='الموضوع')
+    message = forms.CharField(widget=forms.Textarea, label='الرسالة')
+    priority = forms.ChoiceField(
+        choices=[('low', 'منخفض'), ('medium', 'متوسط'), ('high', 'عالي')],
+        label='الأولوية'
+    )</code></pre>
+            </div>
+
+            <h3>2. نموذج مرتبط بالنموذج (ModelForm)</h3>
+            <div class="code-block">
+                <div class="code-label">forms.py</div>
+                <pre><code class="language-python">from django import forms
+from .models import Post
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'content', 'published']
+        labels = {
+            'title': 'العنوان',
+            'content': 'المحتوى',
+            'published': 'منشور'
+        }
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 5}),
+        }</code></pre>
+            </div>
+
+            <div class="success-box">
+                <i class="fas fa-check-circle"></i>
+                <strong>نصيحة:</strong> استخدم <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">ModelForm</code> عندما يكون النموذج مرتبطاً بنموذج قاعدة بيانات لتوفير الوقت والجهد.
+            </div>
+        </div>
+
+        <!-- أنواع الحقول -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-list"></i> أنواع الحقول في النماذج</h2>
+            <p>يوفر Django مجموعة واسعة من الحقول للاستخدام في النماذج:</p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>الحقل</th>
+                        <th>الوصف</th>
+                        <th>المعلمات الشائعة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">CharField</code></td>
+                        <td>نص قصير</td>
+                        <td>max_length, min_length</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">EmailField</code></td>
+                        <td>بريد إلكتروني</td>
+                        <td>يتم التحقق من صحة البريد تلقائياً</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">IntegerField</code></td>
+                        <td>رقم صحيح</td>
+                        <td>min_value, max_value</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">FloatField</code></td>
+                        <td>رقم عشري</td>
+                        <td>min_value, max_value</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">BooleanField</code></td>
+                        <td>صحيح/خاطئ</td>
+                        <td>required, initial</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">DateField</code></td>
+                        <td>تاريخ</td>
+                        <td>input_formats</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">ChoiceField</code></td>
+                        <td>اختيار من قائمة</td>
+                        <td>choices</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">FileField</code></td>
+                        <td>رفع ملف</td>
+                        <td>allow_empty_file</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">URLField</code></td>
+                        <td>رابط</td>
+                        <td>يتم التحقق من صحة الرابط تلقائياً</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- التحقق من الصحة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-check-double"></i> التحقق من صحة البيانات (Validation)</h2>
+            <p>
+                يوفر Django عدة طرق للتحقق من صحة البيانات المدخلة:
+            </p>
+
+            <h3>1. التحقق التلقائي</h3>
+            <p>يتم التحقق تلقائياً بناءً على نوع الحقل (مثل EmailField يتحقق من صحة البريد).</p>
+
+            <h3>2. دوال التحقق المخصصة</h3>
+            <div class="code-block">
+                <div class="code-label">forms.py</div>
+                <pre><code class="language-python">from django import forms
+from django.core.exceptions import ValidationError
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    age = forms.IntegerField(min_value=18, max_value=120)
+    
+    # التحقق من حقل واحد
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if len(name) < 3:
+            raise ValidationError('الاسم يجب أن يكون 3 أحرف على الأقل')
+        return name
+    
+    # التحقق من عدة حقول معاً
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
+        age = cleaned_data.get('age')
+        
+        if age and age < 18:
+            raise ValidationError('يجب أن يكون العمر 18 سنة أو أكثر')
+        
+        return cleaned_data</code></pre>
+            </div>
+
+            <h3>3. معلمات الحقول</h3>
+            <div class="code-block">
+                <div class="code-label">forms.py</div>
+                <pre><code class="language-python">class ProductForm(forms.Form):
+    name = forms.CharField(
+        max_length=100,
+        min_length=3,
+        required=True,
+        error_messages={
+            'required': 'الاسم مطلوب',
+            'max_length': 'الاسم طويل جداً',
+            'min_length': 'الاسم قصير جداً'
+        }
+    )
+    price = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        min_value=0
+    )</code></pre>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>تنبيه:</strong> لا تثق أبداً بالبيانات المرسلة من العميل. قم دائماً بالتحقق من صحة البيانات على الخادم.
+            </div>
+        </div>
+
+        <!-- عرض النموذج -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-eye"></i> عرض النموذج في القالب</h2>
+            <p>هناك عدة طرق لعرض النموذج في قالب Django:</p>
+
+            <h3>1. عرض كامل</h3>
+            <div class="code-block">
+                <div class="code-label">template.html</div>
+                <pre><code class="language-django">&lt;form method="post" action="{% url 'submit' %}"&gt;
+    {% csrf_token %}
+    {{ form.as_p }}
+    &lt;button type="submit"&gt;إرسال&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+            </div>
+
+            <h3>2. عرض حقول محددة</h3>
+            <div class="code-block">
+                <div class="code-label">template.html</div>
+                <pre><code class="language-django">&lt;form method="post"&gt;
+    {% csrf_token %}
+    &lt;div class="form-group"&gt;
+        &lt;label for="{{ form.name.id_for_label }}"&gt;{{ form.name.label }}&lt;/label&gt;
+        {{ form.name }}
+        {% if form.name.errors %}
+            &lt;div class="error"&gt;{{ form.name.errors }}&lt;/div&gt;
+        {% endif %}
+    &lt;/div&gt;
+    &lt;!-- حقول أخرى --&gt;
+    &lt;button type="submit"&gt;إرسال&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>ملاحظة:</strong> استخدم <code style="background:rgba(0,180,255,0.1);padding:2px 8px;border-radius:4px;color:var(--info);">{% csrf_token %}</code> دائماً في النماذج التي تستخدم POST للحماية من هجمات CSRF.
+            </div>
+        </div>
+
+        <!-- محاكي النماذج التفاعلي -->
+        <div class="content-card fade-in" id="simulator">
+            <h2><i class="fas fa-laptop-code"></i> محاكي النماذج التفاعلي</h2>
+            <p>جرب إنشاء نموذج تواصل تفاعلي مع التحقق من صحة البيانات:</p>
+
+            <div class="form-simulator">
+                <div class="form-preview">
+                    <form id="simulatorForm" onsubmit="return false;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="simName">الاسم الكامل <span class="required">*</span></label>
+                                <input type="text" id="simName" placeholder="أدخل اسمك الكامل" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="simEmail">البريد الإلكتروني <span class="required">*</span></label>
+                                <input type="email" id="simEmail" placeholder="example@email.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="simSubject">الموضوع <span class="required">*</span></label>
+                            <input type="text" id="simSubject" placeholder="أدخل موضوع الرسالة" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="simPriority">الأولوية</label>
+                                <select id="simPriority">
+                                    <option value="low">منخفضة</option>
+                                    <option value="medium" selected>متوسطة</option>
+                                    <option value="high">عالية</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="simCategory">التصنيف</label>
+                                <select id="simCategory">
+                                    <option value="general">عام</option>
+                                    <option value="support">دعم فني</option>
+                                    <option value="feedback">ملاحظات</option>
+                                    <option value="bug">الإبلاغ عن خطأ</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="simMessage">الرسالة <span class="required">*</span></label>
+                            <textarea id="simMessage" rows="4" placeholder="أدخل رسالتك هنا..." required></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-submit" id="simSubmitBtn">
+                                <i class="fas fa-paper-plane"></i> إرسال
+                            </button>
+                            <button type="reset" class="btn-reset" id="simResetBtn">
+                                <i class="fas fa-undo"></i> إعادة تعيين
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="form-errors" id="simErrors">
+                        <i class="fas fa-exclamation-circle" style="margin-left: 8px;"></i>
+                        <span id="simErrorText">يرجى تصحيح الأخطاء التالية:</span>
+                        <ul id="simErrorList"></ul>
+                    </div>
+
+                    <div class="form-success" id="simSuccess">
+                        <i class="fas fa-check-circle" style="margin-left: 8px;"></i>
+                        ✅ تم إرسال النموذج بنجاح!
+                    </div>
+
+                    <div class="submitted-data" id="simSubmittedData">
+                        <h4 style="color: var(--primary); margin-bottom: 12px;"><i class="fas fa-receipt"></i> البيانات المرسلة:</h4>
+                        <div id="simDataDisplay"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الخلاصة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-flag-checkered"></i> خلاصة الدرس</h2>
+            <ul>
+                <li>✅ النماذج في Django توفر <strong>واجهة آمنة</strong> للتعامل مع بيانات المستخدم.</li>
+                <li>✅ هناك نوعان رئيسيان: <strong>Form</strong> و <strong>ModelForm</strong>.</li>
+                <li>✅ يوفر Django <strong>التحقق التلقائي</strong> من صحة البيانات حسب نوع الحقل.</li>
+                <li>✅ يمكنك إضافة <strong>تحقق مخصص</strong> باستخدام دوال <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">clean_*</code>.</li>
+                <li>✅ استخدم <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">{% csrf_token %}</code> للحماية من هجمات CSRF.</li>
+                <li>✅ قدم <strong>رسائل خطأ مفيدة</strong> للمستخدمين لتحسين تجربتهم.</li>
+            </ul>
+        </div>
+
+        <!-- اختبار معرفة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-question"></i> اختبر معلوماتك</h2>
+            <div id="quizSection">
+                <p><strong>ما هو الغرض من دالة <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">clean()</code> في نموذج Django؟</strong></p>
+                <div style="display:flex;flex-direction:column;gap:10px;margin:15px 0;">
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="multi">
+                        <input type="radio" name="quiz" value="multi" style="accent-color:var(--primary);width:18px;height:18px;">
+                        التحقق من صحة عدة حقول معاً
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="single">
+                        <input type="radio" name="quiz" value="single" style="accent-color:var(--primary);width:18px;height:18px;">
+                        التحقق من صحة حقل واحد فقط
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="render">
+                        <input type="radio" name="quiz" value="render" style="accent-color:var(--primary);width:18px;height:18px;">
+                        عرض النموذج في القالب
+                    </label>
+                </div>
+                <button id="checkQuizBtn" style="background:var(--primary);color:#000;border:none;padding:12px 30px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;transition:var(--transition);font-family:'Cairo',sans-serif;">
+                    <i class="fas fa-check"></i> تحقق الإجابة
+                </button>
+                <div id="quizResult" style="margin-top:15px;padding:15px;border-radius:10px;display:none;"></div>
+            </div>
+        </div>
+
+        <!-- تذييل الدرس -->
+        <div class="lesson-footer">
+            <div style="display:flex;gap:15px;flex-wrap:wrap;">
+                <button class="btn-complete" id="markCompleteBtn">
+                    <i class="fas fa-circle" id="completeIcon"></i>
+                    <span id="completeText">تحديد كمكتمل</span>
+                </button>
+                <a href="lesson5.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i> الدرس السابق
+                </a>
+            </div>
+            <a href="lesson7.html" class="btn btn-primary">
+                الدرس التالي <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- فوتر -->
+    <footer>
+        <p>© 2026 <a href="../index.html">CodeWay</a> — تخصص Django — الدرس السادس: النماذج Forms</p>
+    </footer>
+
+    <!-- Prism.js للتلوين -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-django.min.js"></script>
+
+    <script>
+        // =============================================
+        // شريط التقدم
+        // =============================================
+        function updateProgressBar() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // =============================================
+        // زر العودة للأعلى
+        // =============================================
+        function toggleBackToTop() {
+            const btn = document.getElementById('backToTop');
+            if (document.documentElement.scrollTop > 300 || document.body.scrollTop > 300) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // =============================================
+        // تأثير الظهور التدريجي
+        // =============================================
+        function checkFadeIn() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 80) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        // =============================================
+        // محاكي النماذج التفاعلي
+        // =============================================
+        function showSimError(message) {
+            const errorDiv = document.getElementById('simErrors');
+            const errorList = document.getElementById('simErrorList');
+            const errorText = document.getElementById('simErrorText');
+            
+            errorText.textContent = 'يرجى تصحيح الأخطاء التالية:';
+            errorList.innerHTML = `<li>${message}</li>`;
+            errorDiv.classList.add('show');
+            
+            document.getElementById('simSuccess').classList.remove('show');
+            document.getElementById('simSubmittedData').classList.remove('show');
+        }
+
+        function showSimSuccess() {
+            document.getElementById('simErrors').classList.remove('show');
+            document.getElementById('simSuccess').classList.add('show');
+        }
+
+        function showSimData(data) {
+            const display = document.getElementById('simDataDisplay');
+            const priorityMap = {
+                'low': 'منخفضة',
+                'medium': 'متوسطة',
+                'high': 'عالية'
+            };
+            const categoryMap = {
+                'general': 'عام',
+                'support': 'دعم فني',
+                'feedback': 'ملاحظات',
+                'bug': 'الإبلاغ عن خطأ'
+            };
+
+            display.innerHTML = `
+                <div class="data-item">
+                    <span class="data-label">الاسم:</span>
+                    <span class="data-value">${data.name}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">البريد الإلكتروني:</span>
+                    <span class="data-value">${data.email}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">الموضوع:</span>
+                    <span class="data-value">${data.subject}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">الأولوية:</span>
+                    <span class="data-value">${priorityMap[data.priority] || data.priority}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">التصنيف:</span>
+                    <span class="data-value">${categoryMap[data.category] || data.category}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">الرسالة:</span>
+                    <span class="data-value">${data.message}</span>
+                </div>
+            `;
+            
+            document.getElementById('simSubmittedData').classList.add('show');
+        }
+
+        document.getElementById('simSubmitBtn').addEventListener('click', function() {
+            const name = document.getElementById('simName').value.trim();
+            const email = document.getElementById('simEmail').value.trim();
+            const subject = document.getElementById('simSubject').value.trim();
+            const message = document.getElementById('simMessage').value.trim();
+            const priority = document.getElementById('simPriority').value;
+            const category = document.getElementById('simCategory').value;
+
+            // التحقق من الصحة
+            let errors = [];
+
+            if (!name) {
+                errors.push('الاسم الكامل مطلوب');
+            } else if (name.length < 3) {
+                errors.push('الاسم يجب أن يكون 3 أحرف على الأقل');
+            }
+
+            if (!email) {
+                errors.push('البريد الإلكتروني مطلوب');
+            } else if (!email.includes('@') || !email.includes('.')) {
+                errors.push('البريد الإلكتروني غير صحيح');
+            }
+
+            if (!subject) {
+                errors.push('الموضوع مطلوب');
+            } else if (subject.length < 3) {
+                errors.push('الموضوع يجب أن يكون 3 أحرف على الأقل');
+            }
+
+            if (!message) {
+                errors.push('الرسالة مطلوبة');
+            } else if (message.length < 10) {
+                errors.push('الرسالة يجب أن تكون 10 أحرف على الأقل');
+            }
+
+            if (errors.length > 0) {
+                showSimError(errors.join(' • '));
+                return;
+            }
+
+            // إرسال النموذج بنجاح
+            showSimSuccess();
+            
+            const data = { name, email, subject, message, priority, category };
+            showSimData(data);
+
+            // إعادة تعيين النموذج بعد 3 ثواني (اختياري)
+            // setTimeout(() => {
+            //     document.getElementById('simResetBtn').click();
+            // }, 5000);
+        });
+
+        // إعادة تعيين النموذج
+        document.getElementById('simResetBtn').addEventListener('click', function() {
+            document.getElementById('simName').value = '';
+            document.getElementById('simEmail').value = '';
+            document.getElementById('simSubject').value = '';
+            document.getElementById('simMessage').value = '';
+            document.getElementById('simPriority').value = 'medium';
+            document.getElementById('simCategory').value = 'general';
+            
+            document.getElementById('simErrors').classList.remove('show');
+            document.getElementById('simSuccess').classList.remove('show');
+            document.getElementById('simSubmittedData').classList.remove('show');
+        });
+
+        // التحقق الفوري عند فقدان التركيز
+        document.querySelectorAll('#simName, #simEmail, #simSubject, #simMessage').forEach(input => {
+            input.addEventListener('blur', function() {
+                // فقط إذا كان هناك خطأ سابق، قم بإزالته
+                if (this.value.trim()) {
+                    document.getElementById('simErrors').classList.remove('show');
+                }
+            });
+        });
+
+        // =============================================
+        // اختبار المعرفة
+        // =============================================
+        document.getElementById('checkQuizBtn').addEventListener('click', function() {
+            const selected = document.querySelector('input[name="quiz"]:checked');
+            const resultDiv = document.getElementById('quizResult');
+            
+            if (!selected) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> الرجاء اختيار إجابة أولاً.';
+                return;
+            }
+
+            const answer = selected.value;
+            resultDiv.style.display = 'block';
+            
+            if (answer === 'multi') {
+                resultDiv.className = 'success-box';
+                resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ إجابة صحيحة! دالة <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">clean()</code> تستخدم للتحقق من صحة عدة حقول معاً وإجراء تحقق شامل على النموذج بأكمله.';
+            } else if (answer === 'single') {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. دالة <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">clean_*()</code> (مثل <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">clean_name()</code>) هي التي تستخدم للتحقق من حقل واحد. <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">clean()</code> تستخدم للتحقق الشامل.`;
+            } else {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">clean()</code> لا علاقة لها بعرض النموذج في القالب. عرض النموذج يتم باستخدام <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">{{ form.as_p }}</code> أو طرق أخرى في القالب.`;
+            }
+        });
+
+        document.querySelectorAll('.quiz-option').forEach(label => {
+            label.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+
+        // =============================================
+        // إكمال الدرس - localStorage
+        // =============================================
+        const LESSON_ID = 6;
+        const STORAGE_KEY = 'django_lessons_completed';
+
+        function isLessonCompleted() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return false;
+            const completed = JSON.parse(saved);
+            return completed.includes(LESSON_ID);
+        }
+
+        function toggleLessonComplete() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            let completed = saved ? JSON.parse(saved) : [];
+            const index = completed.indexOf(LESSON_ID);
+            
+            if (index > -1) {
+                completed.splice(index, 1);
+            } else {
+                completed.push(LESSON_ID);
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+            updateCompleteButton();
+        }
+
+        function updateCompleteButton() {
+            const btn = document.getElementById('markCompleteBtn');
+            const icon = document.getElementById('completeIcon');
+            const text = document.getElementById('completeText');
+            
+            if (isLessonCompleted()) {
+                btn.classList.add('done');
+                icon.className = 'fas fa-check-circle';
+                text.textContent = 'مكتمل ✓';
+            } else {
+                btn.classList.remove('done');
+                icon.className = 'fas fa-circle';
+                text.textContent = 'تحديد كمكتمل';
+            }
+        }
+
+        document.getElementById('markCompleteBtn').addEventListener('click', toggleLessonComplete);
+
+        // =============================================
+        // الأحداث العامة
+        // =============================================
+        window.addEventListener('scroll', function() {
+            updateProgressBar();
+            toggleBackToTop();
+            checkFadeIn();
+        });
+
+        window.addEventListener('load', function() {
+            checkFadeIn();
+            updateCompleteButton();
+        });
+    </script>
+</body>
+</html>

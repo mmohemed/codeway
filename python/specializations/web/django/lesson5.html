@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام المصادقة Authentication في Django | CodeWay</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prism.js للتلوين -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-dark: #d4af37;
+            --primary-light: #ffed4a;
+            --dark: #0a0a0a;
+            --dark-light: #1a1a1a;
+            --dark-surface: #222;
+            --text: #ffffff;
+            --text-light: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --border-color: rgba(255, 215, 0, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #00c851;
+            --info: #00b4ff;
+            --warning: #ff8800;
+            --danger: #ff4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            z-index: 1001;
+            background: transparent;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.97);
+            backdrop-filter: blur(20px);
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .nav-links .back-home {
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary) !important;
+            border-radius: 50px;
+        }
+
+        .nav-links .back-home:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+            z-index: 999;
+            border: none;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.6);
+        }
+
+        .hero {
+            padding: 120px 20px 60px;
+            background: linear-gradient(135deg, var(--dark), var(--dark-light));
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05), transparent 70%);
+            border-radius: 50%;
+            animation: floatBubble 25s ease-in-out infinite;
+        }
+
+        @keyframes floatBubble {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-40px, 30px) scale(1.1); }
+        }
+
+        .hero-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .hero-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 i {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .hero-meta i {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .content-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .content-card h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .content-card h2 i {
+            font-size: 1.5rem;
+        }
+
+        .content-card h3 {
+            color: var(--primary-light);
+            font-size: 1.3rem;
+            margin: 25px 0 15px;
+        }
+
+        .content-card h4 {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin: 20px 0 10px;
+        }
+
+        .content-card p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .content-card ul, .content-card ol {
+            color: var(--text-light);
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+
+        .content-card li {
+            margin-bottom: 8px;
+        }
+
+        .content-card li strong {
+            color: var(--primary);
+        }
+
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+        }
+
+        .code-block .code-label {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--primary);
+            color: #000;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: rgba(0, 180, 255, 0.08);
+            border-right: 4px solid var(--info);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .info-box i {
+            color: var(--info);
+            margin-left: 10px;
+        }
+
+        .warning-box {
+            background: rgba(255, 136, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning-box i {
+            color: var(--warning);
+            margin-left: 10px;
+        }
+
+        .success-box {
+            background: rgba(0, 200, 81, 0.08);
+            border-right: 4px solid var(--success);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .success-box i {
+            color: var(--success);
+            margin-left: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.08);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .comparison-table td {
+            color: var(--text-light);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(255, 215, 0, 0.03);
+        }
+
+        /* Auth Simulator */
+        .auth-simulator {
+            background: var(--dark-surface);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-simulator .auth-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--dark);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-simulator .auth-status .status-icon {
+            font-size: 1.5rem;
+        }
+
+        .auth-simulator .auth-status .status-text {
+            flex: 1;
+        }
+
+        .auth-simulator .auth-status .status-text .user-name {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .auth-simulator .auth-forms {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .auth-simulator .auth-form {
+            background: var(--dark);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-simulator .auth-form h4 {
+            color: var(--primary-light);
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .auth-simulator .auth-form .form-group {
+            margin-bottom: 12px;
+        }
+
+        .auth-simulator .auth-form label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .auth-simulator .auth-form input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .auth-simulator .auth-form input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .auth-simulator .auth-form button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            margin-top: 5px;
+        }
+
+        .auth-simulator .auth-form button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .auth-simulator .auth-form .btn-logout {
+            background: rgba(255, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(255, 68, 68, 0.2);
+        }
+
+        .auth-simulator .auth-form .btn-logout:hover {
+            background: rgba(255, 68, 68, 0.25);
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.2);
+        }
+
+        .auth-simulator .auth-message {
+            margin-top: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .auth-simulator .auth-message.show {
+            display: block;
+        }
+
+        .auth-simulator .auth-message.success {
+            background: rgba(0, 200, 81, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .auth-simulator .auth-message.error {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .auth-simulator .auth-message.info {
+            background: rgba(0, 180, 255, 0.1);
+            border: 1px solid var(--info);
+            color: var(--info);
+        }
+
+        .lesson-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .lesson-footer .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .lesson-footer .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .lesson-footer .btn-primary:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .lesson-footer .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .lesson-footer .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .btn-complete {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-complete:hover {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        .btn-complete.done {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--dark-light);
+            border-top: 2px solid var(--primary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 { font-size: 2.4rem; }
+            .auth-simulator .auth-forms { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .hero { padding: 100px 15px 40px; }
+            .hero h1 { font-size: 1.8rem; }
+            .hero p { font-size: 1rem; }
+            .hero-meta { gap: 15px; }
+            .content-card { padding: 20px; }
+            .content-card h2 { font-size: 1.4rem; }
+            .nav-links a { font-size: 0.85rem; padding: 6px 12px; }
+            .back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; }
+            .comparison-table { font-size: 0.85rem; }
+            .comparison-table th, .comparison-table td { padding: 8px 10px; }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 { font-size: 1.5rem; }
+            .content-card { padding: 15px; }
+            .lesson-footer { flex-direction: column; align-items: stretch; }
+            .lesson-footer .btn { justify-content: center; }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .token.comment { color: #6a9955; }
+        .token.string { color: #ce9178; }
+        .token.keyword { color: #569cd6; }
+        .token.function { color: #dcdcaa; }
+        .token.class-name { color: #4ec9b0; }
+    </style>
+</head>
+<body>
+    <!-- شريط التقدم -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <a href="../index.html" class="logo">
+            <i class="fab fa-django"></i>
+            <span>Django</span>
+        </a>
+        <div class="nav-links">
+            <a href="#content">الدرس</a>
+            <a href="#simulator">المحاكي</a>
+            <a href="../index.html" class="back-home">
+                <i class="fas fa-arrow-right"></i> العودة
+            </a>
+        </div>
+    </nav>
+
+    <!-- زر العودة للأعلى -->
+    <button class="back-to-top" id="backToTop" aria-label="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-breadcrumb">
+                <a href="../index.html">الرئيسية</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <a href="../django/index.html">Django</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <span style="color: var(--text);">الدرس الخامس</span>
+            </div>
+
+            <div class="hero-badge">
+                <i class="fas fa-lock"></i> الدرس 5 من 10
+            </div>
+
+            <h1><i class="fas fa-user-shield"></i> نظام المصادقة Authentication</h1>
+            <p>تعلم كيفية تطبيق نظام تسجيل دخول متكامل باستخدام نظام المصادقة المدمج في Django.</p>
+
+            <div class="hero-meta">
+                <span><i class="far fa-clock"></i> مدة القراءة: 12 دقيقة</span>
+                <span><i class="fas fa-signal"></i> مستوى: متوسط</span>
+                <span><i class="fas fa-user"></i> Django Auth</span>
+                <span><i class="fas fa-shield-alt"></i> أمان</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="container" id="content">
+        <!-- مقدمة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-info-circle"></i> ما هو نظام المصادقة في Django؟</h2>
+            <p>
+                يوفر Django نظام <strong>مصادقة متكامل</strong> وقوي (Authentication System) يمكن استخدامه مباشرة 
+                أو تخصيصه حسب احتياجات التطبيق. يشمل النظام:
+            </p>
+            <ul>
+                <li><strong>نموذج المستخدم (User Model):</strong> نموذج مدمج لإدارة المستخدمين.</li>
+                <li><strong>المصادقة (Authentication):</strong> التحقق من هوية المستخدم.</li>
+                <li><strong>الصلاحيات (Permissions):</strong> التحكم في الوصول إلى الموارد.</li>
+                <li><strong>المجموعات (Groups):</strong> تنظيم المستخدمين في مجموعات.</li>
+                <li><strong>الجلسات (Sessions):</strong> إدارة حالة تسجيل الدخول.</li>
+            </ul>
+
+            <div class="info-box">
+                <i class="fas fa-lightbulb"></i>
+                <strong>ملاحظة:</strong> نظام المصادقة في Django آمن ومتكامل، ويستخدم تقنيات مثل التجزئة (Hashing) لتخزين كلمات المرور بشكل آمن.
+            </div>
+        </div>
+
+        <!-- نموذج المستخدم -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-user"></i> نموذج المستخدم (User Model)</h2>
+            <p>
+                يوفر Django نموذج <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">User</code> مدمج يحتوي على الحقول التالية:
+            </p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>الحقل</th>
+                        <th>الوصف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">username</code></td>
+                        <td>اسم المستخدم (فريد)</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">password</code></td>
+                        <td>كلمة المرور (مشفرة)</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">email</code></td>
+                        <td>البريد الإلكتروني</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">first_name</code></td>
+                        <td>الاسم الأول</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">last_name</code></td>
+                        <td>الاسم الأخير</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">is_active</code></td>
+                        <td>هل الحساب نشط؟</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">is_staff</code></td>
+                        <td>هل لديه صلاحيات الإدارة؟</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">is_superuser</code></td>
+                        <td>هل هو مدير كامل؟</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">date_joined</code></td>
+                        <td>تاريخ التسجيل</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">last_login</code></td>
+                        <td>آخر تسجيل دخول</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="success-box">
+                <i class="fas fa-check-circle"></i>
+                <strong>نصيحة:</strong> يمكنك تخصيص نموذج المستخدم عن طريق إنشاء نموذج مخصص يرث من <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">AbstractUser</code>.
+            </div>
+        </div>
+
+        <!-- دوال المصادقة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-code"></i> دوال المصادقة الأساسية</h2>
+            <p>يوفر Django مجموعة من الدوال الجاهزة للتعامل مع المصادقة:</p>
+
+            <h3>1. إنشاء مستخدم</h3>
+            <div class="code-block">
+                <div class="code-label">views.py</div>
+                <pre><code class="language-python">from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+
+# إنشاء مستخدم جديد
+def register_user(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        
+        # إنشاء المستخدم
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        # تسجيل الدخول تلقائياً
+        login(request, user)
+        return redirect('home')</code></pre>
+            </div>
+
+            <h3>2. تسجيل الدخول</h3>
+            <div class="code-block">
+                <div class="code-label">views.py</div>
+                <pre><code class="language-python">def login_user(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        
+        # التحقق من المستخدم
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            # رسالة خطأ
+            return render(request, 'login.html', {'error': 'بيانات غير صحيحة'})</code></pre>
+            </div>
+
+            <h3>3. تسجيل الخروج</h3>
+            <div class="code-block">
+                <div class="code-label">views.py</div>
+                <pre><code class="language-python">def logout_user(request):
+    logout(request)
+    return redirect('home')</code></pre>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>تنبيه:</strong> استخدم <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">create_user()</code> بدلاً من <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">create()</code> لأنها تقوم بتشفير كلمة المرور تلقائياً.
+            </div>
+        </div>
+
+        <!-- نماذج المصادقة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-forms"></i> نماذج المصادقة المدمجة</h2>
+            <p>يوفر Django نماذج جاهزة للمصادقة يمكن استخدامها مباشرة:</p>
+
+            <h3>نموذج تسجيل الدخول</h3>
+            <div class="code-block">
+                <div class="code-label">forms.py</div>
+                <pre><code class="language-python">from django.contrib.auth.forms import AuthenticationForm
+
+# استخدام النموذج المدمج
+# في views.py
+from django.contrib.auth.forms import AuthenticationForm
+
+def login_view(request):
+    form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})</code></pre>
+            </div>
+
+            <h3>نموذج إنشاء مستخدم</h3>
+            <div class="code-block">
+                <div class="code-label">forms.py</div>
+                <pre><code class="language-python">from django.contrib.auth.forms import UserCreationForm
+
+# استخدام النموذج المدمج
+# في views.py
+from django.contrib.auth.forms import UserCreationForm
+
+def register_view(request):
+    form = UserCreationForm()
+    return render(request, 'register.html', {'form': form})</code></pre>
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>ملاحظة:</strong> يمكنك تخصيص هذه النماذج عن طريق وراثتها وإضافة حقول إضافية.
+            </div>
+        </div>
+
+        <!-- الصلاحيات -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-key"></i> الصلاحيات (Permissions)</h2>
+            <p>
+                نظام الصلاحيات في Django يسمح لك بالتحكم في <strong>من يمكنه الوصول إلى ماذا</strong>. 
+                هناك ثلاثة أنواع رئيسية من الصلاحيات:
+            </p>
+            <ul>
+                <li><strong>إضافة (add):</strong> يمكن للمستخدم إضافة كائنات جديدة.</li>
+                <li><strong>تغيير (change):</strong> يمكن للمستخدم تعديل الكائنات الموجودة.</li>
+                <li><strong>حذف (delete):</strong> يمكن للمستخدم حذف الكائنات.</li>
+            </ul>
+
+            <h3>التحقق من الصلاحيات</h3>
+            <div class="code-block">
+                <div class="code-label">views.py / templates</div>
+                <pre><code class="language-python"># في الـ View
+if request.user.has_perm('app.add_post'):
+    # يمكنه إضافة منشور
+    pass
+
+# في القالب
+{% if perms.app.add_post %}
+    &lt;a href="{% url 'add_post' %}"&gt;إضافة منشور&lt;/a&gt;
+{% endif %}</code></pre>
+            </div>
+
+            <h3>إنشاء صلاحيات مخصصة</h3>
+            <div class="code-block">
+                <div class="code-label">models.py</div>
+                <pre><code class="language-python">class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    
+    class Meta:
+        permissions = [
+            ('can_publish_post', 'يمكنه نشر المنشورات'),
+            ('can_approve_post', 'يمكنه الموافقة على المنشورات'),
+        ]</code></pre>
+            </div>
+        </div>
+
+        <!-- محاكي المصادقة التفاعلي -->
+        <div class="content-card fade-in" id="simulator">
+            <h2><i class="fas fa-laptop-code"></i> محاكي المصادقة التفاعلي</h2>
+            <p>جرب نظام المصادقة في هذا المحاكي التفاعلي:</p>
+
+            <div class="auth-simulator">
+                <div class="auth-status" id="authStatus">
+                    <div class="status-icon" id="statusIcon">
+                        <i class="fas fa-user-circle" style="color: var(--text-secondary); font-size: 2rem;"></i>
+                    </div>
+                    <div class="status-text" id="statusText">
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">الحالة:</div>
+                        <div style="font-weight: 700; font-size: 1.1rem;" id="statusMessage">غير مسجل الدخول</div>
+                    </div>
+                    <div id="statusAction">
+                        <button id="logoutBtn" class="btn-logout" style="display:none; padding: 8px 20px; border-radius: 8px; border: 1px solid rgba(255,68,68,0.2); background: rgba(255,68,68,0.15); color: var(--danger); cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 700;">
+                            <i class="fas fa-sign-out-alt"></i> تسجيل خروج
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-forms">
+                    <!-- نموذج تسجيل الدخول -->
+                    <div class="auth-form" id="loginForm">
+                        <h4><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</h4>
+                        <div class="form-group">
+                            <label>اسم المستخدم</label>
+                            <input type="text" id="loginUsername" placeholder="أدخل اسم المستخدم" value="admin">
+                        </div>
+                        <div class="form-group">
+                            <label>كلمة المرور</label>
+                            <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور" value="admin123">
+                        </div>
+                        <button id="loginBtn"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</button>
+                    </div>
+
+                    <!-- نموذج التسجيل -->
+                    <div class="auth-form" id="registerForm">
+                        <h4><i class="fas fa-user-plus"></i> إنشاء حساب</h4>
+                        <div class="form-group">
+                            <label>اسم المستخدم</label>
+                            <input type="text" id="registerUsername" placeholder="اختر اسم مستخدم">
+                        </div>
+                        <div class="form-group">
+                            <label>البريد الإلكتروني</label>
+                            <input type="email" id="registerEmail" placeholder="example@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>كلمة المرور</label>
+                            <input type="password" id="registerPassword" placeholder="أدخل كلمة مرور قوية">
+                        </div>
+                        <button id="registerBtn"><i class="fas fa-user-plus"></i> إنشاء حساب</button>
+                    </div>
+                </div>
+
+                <div class="auth-message" id="authMessage"></div>
+
+                <div style="margin-top: 20px; padding: 15px; background: var(--dark); border-radius: 10px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        <i class="fas fa-info-circle" style="color: var(--info); margin-left: 8px;"></i>
+                        <strong>بيانات تجريبية:</strong> استخدم <span style="color: var(--primary);">admin</span> / <span style="color: var(--primary);">admin123</span> لتسجيل الدخول، أو قم بإنشاء حساب جديد.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الخلاصة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-flag-checkered"></i> خلاصة الدرس</h2>
+            <ul>
+                <li>✅ Django يوفر <strong>نظام مصادقة متكامل</strong> جاهز للاستخدام.</li>
+                <li>✅ نموذج <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">User</code> يدير بيانات المستخدمين.</li>
+                <li>✅ دوال <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">authenticate()</code>, <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">login()</code>, <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">logout()</code> للتعامل مع الجلسات.</li>
+                <li>✅ استخدم <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">UserCreationForm</code> و <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">AuthenticationForm</code> للنماذج الجاهزة.</li>
+                <li>✅ نظام <strong>الصلاحيات</strong> يسمح بالتحكم الدقيق في الوصول.</li>
+                <li>✅ استخدم <strong>المجموعات</strong> لتنظيم المستخدمين وتوزيع الصلاحيات.</li>
+            </ul>
+        </div>
+
+        <!-- اختبار معرفة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-question"></i> اختبر معلوماتك</h2>
+            <div id="quizSection">
+                <p><strong>ما هي الدالة الصحيحة للتحقق من صحة المستخدم وتسجيل الدخول؟</strong></p>
+                <div style="display:flex;flex-direction:column;gap:10px;margin:15px 0;">
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="auth_login">
+                        <input type="radio" name="quiz" value="auth_login" style="accent-color:var(--primary);width:18px;height:18px;">
+                        <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">authenticate()</code> ثم <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">login()</code>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="direct_login">
+                        <input type="radio" name="quiz" value="direct_login" style="accent-color:var(--primary);width:18px;height:18px;">
+                        <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">login()</code> مباشرة
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="auth_only">
+                        <input type="radio" name="quiz" value="auth_only" style="accent-color:var(--primary);width:18px;height:18px;">
+                        <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">authenticate()</code> فقط
+                    </label>
+                </div>
+                <button id="checkQuizBtn" style="background:var(--primary);color:#000;border:none;padding:12px 30px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;transition:var(--transition);font-family:'Cairo',sans-serif;">
+                    <i class="fas fa-check"></i> تحقق الإجابة
+                </button>
+                <div id="quizResult" style="margin-top:15px;padding:15px;border-radius:10px;display:none;"></div>
+            </div>
+        </div>
+
+        <!-- تذييل الدرس -->
+        <div class="lesson-footer">
+            <div style="display:flex;gap:15px;flex-wrap:wrap;">
+                <button class="btn-complete" id="markCompleteBtn">
+                    <i class="fas fa-circle" id="completeIcon"></i>
+                    <span id="completeText">تحديد كمكتمل</span>
+                </button>
+                <a href="lesson4.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i> الدرس السابق
+                </a>
+            </div>
+            <a href="lesson6.html" class="btn btn-primary">
+                الدرس التالي <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- فوتر -->
+    <footer>
+        <p>© 2026 <a href="../index.html">CodeWay</a> — تخصص Django — الدرس الخامس: نظام المصادقة Authentication</p>
+    </footer>
+
+    <!-- Prism.js للتلوين -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <script>
+        // =============================================
+        // شريط التقدم
+        // =============================================
+        function updateProgressBar() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // =============================================
+        // زر العودة للأعلى
+        // =============================================
+        function toggleBackToTop() {
+            const btn = document.getElementById('backToTop');
+            if (document.documentElement.scrollTop > 300 || document.body.scrollTop > 300) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // =============================================
+        // تأثير الظهور التدريجي
+        // =============================================
+        function checkFadeIn() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 80) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        // =============================================
+        // محاكي المصادقة
+        // =============================================
+        let currentUser = null;
+        const users = {};
+
+        // مستخدم تجريبي
+        users['admin'] = {
+            username: 'admin',
+            password: 'admin123',
+            email: 'admin@example.com',
+            is_staff: true,
+            is_superuser: true
+        };
+
+        function updateAuthUI() {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusMessage = document.getElementById('statusMessage');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+
+            if (currentUser) {
+                statusIcon.innerHTML = `<i class="fas fa-user-check" style="color: var(--success); font-size: 2rem;"></i>`;
+                statusMessage.innerHTML = `
+                    <span style="color: var(--primary); font-weight: 700;">${currentUser.username}</span>
+                    <span style="color: var(--text-secondary); font-size: 0.9rem; margin-right: 10px;">
+                        (${currentUser.email})
+                    </span>
+                    ${currentUser.is_superuser ? '<span style="color: var(--warning); font-size: 0.8rem; background: rgba(255,136,0,0.1); padding: 2px 10px; border-radius: 12px;">مدير</span>' : ''}
+                `;
+                logoutBtn.style.display = 'inline-block';
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'none';
+            } else {
+                statusIcon.innerHTML = `<i class="fas fa-user-circle" style="color: var(--text-secondary); font-size: 2rem;"></i>`;
+                statusMessage.innerHTML = `
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">الحالة:</div>
+                    <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-secondary);">غير مسجل الدخول</div>
+                `;
+                logoutBtn.style.display = 'none';
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'block';
+            }
+        }
+
+        function showAuthMessage(message, type) {
+            const msgDiv = document.getElementById('authMessage');
+            msgDiv.textContent = message;
+            msgDiv.className = 'auth-message show ' + type;
+            
+            setTimeout(() => {
+                msgDiv.className = 'auth-message';
+            }, 4000);
+        }
+
+        // تسجيل الدخول
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!username || !password) {
+                showAuthMessage('الرجاء إدخال اسم المستخدم وكلمة المرور', 'error');
+                return;
+            }
+
+            const user = users[username];
+            if (user && user.password === password) {
+                currentUser = {
+                    username: user.username,
+                    email: user.email,
+                    is_staff: user.is_staff || false,
+                    is_superuser: user.is_superuser || false
+                };
+                updateAuthUI();
+                showAuthMessage(`✅ مرحباً ${username}! تم تسجيل الدخول بنجاح.`, 'success');
+            } else {
+                showAuthMessage('❌ اسم المستخدم أو كلمة المرور غير صحيحة.', 'error');
+            }
+        });
+
+        // تسجيل الخروج
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            const username = currentUser.username;
+            currentUser = null;
+            updateAuthUI();
+            showAuthMessage(`👋 تم تسجيل الخروج بنجاح.`, 'info');
+        });
+
+        // إنشاء حساب جديد
+        document.getElementById('registerBtn').addEventListener('click', function() {
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value.trim();
+
+            if (!username || !email || !password) {
+                showAuthMessage('الرجاء ملء جميع الحقول.', 'error');
+                return;
+            }
+
+            if (users[username]) {
+                showAuthMessage('❌ اسم المستخدم موجود بالفعل. اختر اسم آخر.', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showAuthMessage('❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل.', 'error');
+                return;
+            }
+
+            users[username] = {
+                username: username,
+                password: password,
+                email: email,
+                is_staff: false,
+                is_superuser: false
+            };
+
+            showAuthMessage(`✅ تم إنشاء حساب ${username} بنجاح! يمكنك الآن تسجيل الدخول.`, 'success');
+            
+            // مسح حقول التسجيل
+            document.getElementById('registerUsername').value = '';
+            document.getElementById('registerEmail').value = '';
+            document.getElementById('registerPassword').value = '';
+        });
+
+        // الضغط على Enter في حقول تسجيل الدخول
+        document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginBtn').click();
+            }
+        });
+        document.getElementById('loginUsername').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginBtn').click();
+            }
+        });
+
+        // الضغط على Enter في حقول التسجيل
+        document.getElementById('registerPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('registerBtn').click();
+            }
+        });
+
+        // =============================================
+        // اختبار المعرفة
+        // =============================================
+        document.getElementById('checkQuizBtn').addEventListener('click', function() {
+            const selected = document.querySelector('input[name="quiz"]:checked');
+            const resultDiv = document.getElementById('quizResult');
+            
+            if (!selected) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> الرجاء اختيار إجابة أولاً.';
+                return;
+            }
+
+            const answer = selected.value;
+            resultDiv.style.display = 'block';
+            
+            if (answer === 'auth_login') {
+                resultDiv.className = 'success-box';
+                resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ إجابة صحيحة! يجب استخدام <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">authenticate()</code> للتحقق من صحة المستخدم، ثم <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">login()</code> لتسجيل الدخول.';
+            } else if (answer === 'direct_login') {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">login()</code> لا يمكن استخدامها مباشرة، بل تحتاج إلى التحقق من صحة المستخدم أولاً باستخدام <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">authenticate()</code>.`;
+            } else {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">authenticate()</code> فقط تقوم بالتحقق ولا تقوم بتسجيل الدخول. تحتاج أيضاً إلى <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">login()</code>.`;
+            }
+        });
+
+        document.querySelectorAll('.quiz-option').forEach(label => {
+            label.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+
+        // =============================================
+        // إكمال الدرس - localStorage
+        // =============================================
+        const LESSON_ID = 5;
+        const STORAGE_KEY = 'django_lessons_completed';
+
+        function isLessonCompleted() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return false;
+            const completed = JSON.parse(saved);
+            return completed.includes(LESSON_ID);
+        }
+
+        function toggleLessonComplete() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            let completed = saved ? JSON.parse(saved) : [];
+            const index = completed.indexOf(LESSON_ID);
+            
+            if (index > -1) {
+                completed.splice(index, 1);
+            } else {
+                completed.push(LESSON_ID);
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+            updateCompleteButton();
+        }
+
+        function updateCompleteButton() {
+            const btn = document.getElementById('markCompleteBtn');
+            const icon = document.getElementById('completeIcon');
+            const text = document.getElementById('completeText');
+            
+            if (isLessonCompleted()) {
+                btn.classList.add('done');
+                icon.className = 'fas fa-check-circle';
+                text.textContent = 'مكتمل ✓';
+            } else {
+                btn.classList.remove('done');
+                icon.className = 'fas fa-circle';
+                text.textContent = 'تحديد كمكتمل';
+            }
+        }
+
+        document.getElementById('markCompleteBtn').addEventListener('click', toggleLessonComplete);
+
+        // =============================================
+        // الأحداث العامة
+        // =============================================
+        window.addEventListener('scroll', function() {
+            updateProgressBar();
+            toggleBackToTop();
+            checkFadeIn();
+        });
+
+        window.addEventListener('load', function() {
+            checkFadeIn();
+            updateCompleteButton();
+            updateAuthUI();
+        });
+    </script>
+</body>
+</html>

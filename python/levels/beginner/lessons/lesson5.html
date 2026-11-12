@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 5: المتغيرات وأنواع البيانات الأساسية | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+
+        .breadcrumb span.sep {
+            margin: 0 6px;
+            color: #666;
+        }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية الرئيسية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس الدرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i {
+            font-size: 1.1rem;
+            color: var(--gold);
+        }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        /* ===== قوائم ===== */
+        .list {
+            list-style: none;
+            padding: 0;
+            margin: 14px 0;
+        }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i {
+            color: var(--gold);
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        /* ===== التمارين التفاعلية ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 110px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل بين الدروس ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span class="sep">/</span>
+        <span>الدرس 5</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-cube"></i>
+            الدرس 5 · الأساسيات
+        </div>
+        <h1 class="lesson-title">المتغيرات وأنواع البيانات الأساسية</h1>
+        <p class="lesson-intro">
+            في هذا الدرس ستتعلم كيف تخزّن القيم في الذاكرة باستخدام المتغيرات،
+            وتتعرف على أهم أنواع البيانات في Python: الأعداد، النصوص، القيم المنطقية،
+            وكيفية التحقق منها وتحويلها من نوع لآخر.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 25 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 فهم المتغيرات والأنواع</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 مبتدئ</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 4</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#what">1. ما هو المتغير؟</a>
+            <a href="#rules">2. قواعد التسمية</a>
+            <a href="#types">3. أنواع البيانات</a>
+            <a href="#check">4. التحقق من النوع</a>
+            <a href="#cast">5. تحويل الأنواع</a>
+            <a href="#input">6. الإدخال من المستخدم</a>
+            <a href="#exercises">7. تمارين تفاعلية</a>
+            <a href="#summary">8. الخلاصة</a>
+        </div>
+    </div>
+
+    <!-- 1 -->
+    <section class="section-card" id="what">
+        <h2 class="section-title">
+            <span class="num">1</span>
+            <i class="fas fa-cube"></i>
+            ما هو المتغير (Variable)؟
+        </h2>
+        <p>
+            المتغير هو <strong>صندوق</strong> نخزن فيه قيمة معينة (رقم، نص، قيمة منطقية، ...)،
+            ويمكن تغيير هذه القيمة أثناء تشغيل البرنامج. نختار اسمًا للمتغير حتى نستطيع
+            الوصول إلى القيمة التي بداخله لاحقًا.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>example.py</span>
+            </div>
+<pre><span class="cm"># تعريف متغيرات بسيطة</span>
+age = <span class="num">20</span>
+name = <span class="str">"محمد"</span>
+is_student = <span class="kw">True</span>
+
+<span class="cm"># طباعة قيمها</span>
+<span class="fn">print</span>(age)
+<span class="fn">print</span>(name)
+<span class="fn">print</span>(is_student)</pre>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>ملاحظة:</strong> في بايثون لا نحتاج لكتابة نوع المتغير قبل اسمه.
+                فقط نكتب: <code>الاسم = القيمة</code> و Python تستنتج النوع تلقائيًا.
+            </div>
+        </div>
+
+        <p><strong>فكّر في المتغير كأنه:</strong></p>
+        <div class="note-box">
+            <ul>
+                <li><i class="fas fa-tag"></i> <strong>مُلصق (Label):</strong> الاسم الذي نضعه على القيمة.</li>
+                <li><i class="fas fa-box-open"></i> <strong>صندوق (Box):</strong> يحتوي على القيمة داخل الذاكرة.</li>
+                <li><i class="fas fa-sync"></i> <strong>قابل للتغيير:</strong> يمكن استبدال قيمته في أي وقت.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="section-card" id="rules">
+        <h2 class="section-title">
+            <span class="num">2</span>
+            <i class="fas fa-spell-check"></i>
+            قواعد تسمية المتغيرات
+        </h2>
+        <p>حتى تعمل المتغيرات بشكل صحيح، يجب أن تتبع هذه القواعد:</p>
+
+        <ul class="list">
+            <li>يجب أن يبدأ الاسم بحرف أو <code>_</code>، ولا يبدأ برقم. (تقبل بايثون الحروف العربية أيضًا، لكن المتعارف عليه استخدام الحروف الإنجليزية a-z و A-Z.)</li>
+            <li>يمكن أن يحتوي على حروف وأرقام و <code>_</code> فقط.</li>
+            <li>لا يُسمح بالمسافات في اسم المتغير.</li>
+            <li>الأسماء <strong>حساسة لحالة الأحرف</strong>: <code>name</code> يختلف عن <code>Name</code>.</li>
+            <li>تجنّب الكلمات المحجوزة مثل: <code>if</code>، <code>for</code>، <code>while</code>، <code>class</code>، <code>def</code>.</li>
+        </ul>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>أمثلة صحيحة وخاطئة</span>
+            </div>
+<pre><span class="cm"># ✅ أمثلة صحيحة:</span>
+user_name = <span class="str">"Ali"</span>
+age2 = <span class="num">25</span>
+_total = <span class="num">100</span>
+
+<span class="cm"># ❌ أمثلة خاطئة:</span>
+<span class="num">2</span>age = <span class="num">20</span>          <span class="cm"># يبدأ برقم</span>
+user name = <span class="str">"Ali"</span>   <span class="cm"># يحتوي على مسافة</span>
+class = <span class="str">"A"</span>        <span class="cm"># class كلمة محجوزة</span></pre>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>نصيحة:</strong> اختر أسماء واضحة ومعبّرة. الأفضل أن تقرأ الكود لاحقًا
+                وتفهمه فورًا. استخدم <code>user_age</code> بدل <code>x</code>.
+            </div>
+        </div>
+
+        <p><strong>نمط التسمية المفضّل في Python:</strong> <code>snake_case</code> أي كلمات صغيرة مفصولة بشرطة سفلية:</p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>snake_case</span>
+            </div>
+<pre>first_name = <span class="str">"Ahmed"</span>
+total_price = <span class="num">150.5</span>
+is_logged_in = <span class="kw">False</span></pre>
+        </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="section-card" id="types">
+        <h2 class="section-title">
+            <span class="num">3</span>
+            <i class="fas fa-shapes"></i>
+            أنواع البيانات الأساسية في Python
+        </h2>
+        <p>أهم أربعة أنواع ستحتاجها في كل برنامج تقريبًا:</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>النوع</th><th>الاسم</th><th>أمثلة</th><th>الوصف</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>int</code></td>
+                        <td>عدد صحيح</td>
+                        <td><code>1, 0, -5, 100</code></td>
+                        <td>أعداد بدون فاصلة عشرية.</td>
+                    </tr>
+                    <tr>
+                        <td><code>float</code></td>
+                        <td>عدد عشري</td>
+                        <td><code>3.14, -0.5, 19.99</code></td>
+                        <td>أعداد بفاصلة عشرية.</td>
+                    </tr>
+                    <tr>
+                        <td><code>str</code></td>
+                        <td>نص</td>
+                        <td><code>"محمد", 'Hello'</code></td>
+                        <td>سلسلة من الحروف بين تنصيص.</td>
+                    </tr>
+                    <tr>
+                        <td><code>bool</code></td>
+                        <td>منطقي</td>
+                        <td><code>True, False</code></td>
+                        <td>قيمتان فقط: صح أو خطأ.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>types.py</span>
+            </div>
+<pre><span class="cm"># أمثلة على كل نوع</span>
+age = <span class="num">21</span>              <span class="cm"># int</span>
+price = <span class="num">19.99</span>         <span class="cm"># float</span>
+title = <span class="str">"CodeWay"</span>     <span class="cm"># str</span>
+is_active = <span class="kw">True</span>      <span class="cm"># bool</span></pre>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>الفرق بين int و float:</strong> <code>5</code> عدد صحيح،
+                بينما <code>5.0</code> عدد عشري (float) — حتى لو كان الجزء العشري صفرًا.
+            </div>
+        </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="section-card" id="check">
+        <h2 class="section-title">
+            <span class="num">4</span>
+            <i class="fas fa-search"></i>
+            التحقق من النوع باستخدام type()
+        </h2>
+        <p>
+            الدالة <code>type()</code> تُرجع نوع القيمة المخزّنة في المتغير.
+            مفيدة جدًا عند عدم التأكد من نوع بيانات معيّن.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>type_check.py</span>
+            </div>
+<pre>age = <span class="num">21</span>
+price = <span class="num">19.99</span>
+title = <span class="str">"CodeWay"</span>
+is_active = <span class="kw">True</span>
+
+<span class="fn">print</span>(<span class="fn">type</span>(age))         <span class="cm"># &lt;class 'int'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(price))       <span class="cm"># &lt;class 'float'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(title))       <span class="cm"># &lt;class 'str'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(is_active))   <span class="cm"># &lt;class 'bool'&gt;</span></pre>
+        </div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>انتبه:</strong> عند طباعة <code>type()</code> سترى الناتج بصيغة
+                <code>&lt;class 'int'&gt;</code> — أي أن الكلمة المهمة هي ما بين العلامتين:
+                <code>int</code>، <code>float</code>، <code>str</code>، <code>bool</code>.
+            </div>
+        </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="section-card" id="cast">
+        <h2 class="section-title">
+            <span class="num">5</span>
+            <i class="fas fa-exchange-alt"></i>
+            تحويل الأنواع (Type Casting)
+        </h2>
+        <p>
+            أحيانًا نحتاج لتحويل نوع البيانات، مثلًا من نص إلى رقم لنجري عملية حسابية،
+            أو من رقم إلى نص لندمجه مع جملة.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الدالة</th><th>الوظيفة</th><th>مثال</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>int()</code></td><td>تحويل إلى عدد صحيح</td><td><code>int("25")</code> → <code>25</code></td></tr>
+                    <tr><td><code>float()</code></td><td>تحويل إلى عدد عشري</td><td><code>float("3.14")</code> → <code>3.14</code></td></tr>
+                    <tr><td><code>str()</code></td><td>تحويل إلى نص</td><td><code>str(100)</code> → <code>"100"</code></td></tr>
+                    <tr><td><code>bool()</code></td><td>تحويل إلى قيمة منطقية</td><td><code>bool(0)</code> → <code>False</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>casting.py</span>
+            </div>
+<pre><span class="cm"># تحويل من نص إلى عدد صحيح:</span>
+age_str = <span class="str">"25"</span>
+age_int = <span class="fn">int</span>(age_str)
+
+<span class="cm"># تحويل من عدد إلى نص:</span>
+price = <span class="num">19.99</span>
+price_str = <span class="fn">str</span>(price)
+
+<span class="fn">print</span>(age_int, <span class="fn">type</span>(age_int))       <span class="cm"># 25 &lt;class 'int'&gt;</span>
+<span class="fn">print</span>(price_str, <span class="fn">type</span>(price_str))   <span class="cm"># 19.99 &lt;class 'str'&gt;</span></pre>
+        </div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>تحذير:</strong> لا يمكن تحويل نص غير رقمي إلى int.
+                مثلًا <code>int("Hello")</code> سيُنتج خطأ <code>ValueError</code>.
+            </div>
+        </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="section-card" id="input">
+        <h2 class="section-title">
+            <span class="num">6</span>
+            <i class="fas fa-keyboard"></i>
+            الإدخال من المستخدم (input)
+        </h2>
+        <p>
+            الدالة <code>input()</code> تسمح للبرنامج بالتفاعل مع المستخدم،
+            لكن انتبه: <strong>ترجع دائمًا نصًا (str)</strong>، حتى لو أدخل المستخدم رقمًا.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>input.py</span>
+            </div>
+<pre>name = <span class="fn">input</span>(<span class="str">"ما هو اسمك؟ "</span>)
+age  = <span class="fn">input</span>(<span class="str">"كم عمرك؟ "</span>)
+
+<span class="fn">print</span>(<span class="str">"مرحبًا يا"</span>, name)
+<span class="fn">print</span>(<span class="str">"عمرك هو:"</span>, age)
+
+<span class="cm"># تحويل العمر إلى عدد صحيح:</span>
+age_int = <span class="fn">int</span>(age)
+<span class="fn">print</span>(<span class="str">"بعد سنتين، سيكون عمرك:"</span>, age_int + <span class="num">2</span>)</pre>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>نصيحة احترافية:</strong> عند قراءة أرقام من المستخدم،
+                من الشائع كتابة: <code>age = int(input("..."))</code>
+                في سطر واحد، لتحويل النص فورًا إلى عدد.
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. التمارين التفاعلية -->
+    <section class="section-card" id="exercises">
+        <h2 class="section-title">
+            <span class="num">7</span>
+            <i class="fas fa-pencil-alt"></i>
+            التمارين التفاعلية
+        </h2>
+        <p>اختبر فهمك للدرس من خلال ثلاثة تمارين متنوعة:</p>
+
+        <!-- تمرين 1 -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">1</span>
+                <h4>اختيار من متعدد</h4>
+                <span class="exercise-tag">أسماء صحيحة</span>
+            </div>
+            <p class="exercise-question">
+                أي من أسماء المتغيرات التالية <strong>صحيح</strong> في Python؟
+                <em>(اختر كل الإجابات الصحيحة)</em>
+            </p>
+            <div class="options-list" id="q1-options">
+                <label class="option"><input type="checkbox" name="q1" value="1"> <code>user_name</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="2"> <code>2age</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="3"> <code>_total</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="4"> <code>user name</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="5"> <code>age2</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="6"> <code>class</code></label>
+            </div>
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ1()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ1()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q1-result"></div>
+        </div>
+
+        <!-- تمرين 2 -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">2</span>
+                <h4>صح أم خطأ</h4>
+                <span class="exercise-tag">اختر لكل عبارة</span>
+            </div>
+            <p class="exercise-question">
+                اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:
+            </p>
+            <div class="tf-list" id="q2-list">
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">في Python لا نحتاج لكتابة نوع المتغير قبل اسمه.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="false">
+                    <span class="tf-statement">يمكن أن يبدأ اسم المتغير برقم.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="false">
+                    <span class="tf-statement">الدالة <code>input()</code> ترجع دائمًا رقمًا.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">القيمة <code>3.14</code> من نوع <code>float</code>.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">الأسماء في Python حساسة لحالة الأحرف: <code>Name</code> ≠ <code>name</code>.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ2()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ2()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q2-result"></div>
+        </div>
+
+        <!-- تمرين 3 -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">3</span>
+                <h4>أكمل الكود</h4>
+                <span class="exercise-tag">حدد النوع أو الدالة</span>
+            </div>
+            <p class="exercise-question">
+                املأ الفراغات التالية بالدالة أو النوع المناسب:
+            </p>
+
+            <div class="code-fill">
+                <div class="line"><span class="cm"># 1) ما نوع المتغير التالي؟</span></div>
+                <div class="line">
+                    price = <span class="num">19.99</span>
+                    <span class="cm">→ النوع:</span>
+                    <input type="text" class="blank-input" id="b1" placeholder="...">
+                </div>
+
+                <div class="line" style="margin-top:10px;"><span class="cm"># 2) حوّل النص إلى عدد صحيح</span></div>
+                <div class="line">
+                    number = <input type="text" class="blank-input" id="b2" placeholder="...">(<span class="str">"42"</span>)
+                </div>
+
+                <div class="line" style="margin-top:10px;"><span class="cm"># 3) ما دالة معرفة النوع؟</span></div>
+                <div class="line">
+                    <input type="text" class="blank-input" id="b3" placeholder="...">(age)
+                </div>
+            </div>
+
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ3()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ3()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q3-result"></div>
+        </div>
+
+    </section>
+
+    <!-- 8 -->
+    <section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">8</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> فهم معنى المتغير وكيفية تعريفه.</li>
+                <li><i class="fas fa-check"></i> قواعد تسمية المتغيرات بشكل صحيح.</li>
+                <li><i class="fas fa-check"></i> أنواع البيانات الأساسية: int, float, str, bool.</li>
+                <li><i class="fas fa-check"></i> استخدام <code>type()</code> للتحقق من النوع.</li>
+                <li><i class="fas fa-check"></i> تحويل الأنواع باستخدام <code>int()</code>, <code>str()</code>, <code>float()</code>.</li>
+                <li><i class="fas fa-check"></i> قراءة المدخلات من المستخدم بـ <code>input()</code>.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> اختر أسماء معبّرة مثل <code>user_age</code> بدل <code>x</code>.</li>
+                <li><i class="fas fa-lightbulb"></i> جرّب تحويل الأنواع بين int و float و str بنفسك.</li>
+                <li><i class="fas fa-lightbulb"></i> اطلب من المستخدم إدخال بيانات ثم حوّلها لأرقام.</li>
+                <li><i class="fas fa-lightbulb"></i> احفظ ملف تجاربك لتعود إليه لاحقًا.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس 6 ستتعلم العمليات الحسابية
+                والمنطقية، وكيف تجمع بين الأرقام والنصوص لبناء برامج أكثر ذكاءً.
+            </div>
+        </div>
+
+        <!-- شريط التقدم -->
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson4.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 4: التعامل مع النصوص</span>
+        </a>
+        <a href="lesson6.html" class="nav-link next">
+            <span>الدرس التالي: العمليات الحسابية والمنطقية</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · الدرس 5: المتغيرات وأنواع البيانات
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '33%';
+            text.textContent = '33% مكتمل';
+        }, 400);
+    });
+
+    /* ========== تمرين 1 ========== */
+    function checkQ1() {
+        const correct = ['1', '3', '5']; // user_name, _total, age2
+        const boxes = document.querySelectorAll('input[name="q1"]');
+        let right = 0, wrong = 0, pickedWrong = 0;
+
+        boxes.forEach(b => {
+            const label = b.closest('.option');
+            label.classList.remove('correct', 'wrong');
+            if (b.checked) {
+                if (correct.includes(b.value)) {
+                    label.classList.add('correct');
+                    right++;
+                } else {
+                    label.classList.add('wrong');
+                    wrong++;
+                    pickedWrong++;
+                }
+            } else if (correct.includes(b.value)) {
+                wrong++;
+            }
+        });
+
+        const msg = document.getElementById('q1-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (![...boxes].some(b => b.checked)) {
+            msg.classList.add('mid');
+            msg.innerHTML = '<i class="fas fa-info-circle"></i> اختر إجابة واحدة على الأقل ثم اضغط «تحقق».';
+            return;
+        }
+
+        if (right === correct.length && wrong === 0) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> ممتاز! الأسماء الصحيحة: <code>user_name</code>، <code>_total</code>، <code>age2</code> 🎉';
+        } else if (right > 0) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${correct.length}${pickedWrong ? `، لكنك اخترت ${pickedWrong === 1 ? 'خيارًا خاطئًا' : pickedWrong === 2 ? 'خيارين خاطئين' : pickedWrong + ' خيارات خاطئة'} (باللون الأحمر)` : ''}. تذكّر: لا يبدأ برقم ولا يحتوي مسافة ولا يكون كلمة محجوزة.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> لم تصب أي إجابة. الصحيح: <code>user_name</code>، <code>_total</code>، <code>age2</code>.';
+        }
+    }
+
+    function resetQ1() {
+        document.querySelectorAll('input[name="q1"]').forEach(b => b.checked = false);
+        document.querySelectorAll('#q1-options .option').forEach(l => l.classList.remove('correct', 'wrong'));
+        const msg = document.getElementById('q1-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== تمرين 2 ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkQ2() {
+        const items = document.querySelectorAll('#q2-list .tf-item');
+        let right = 0, answered = 0;
+
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+
+            if (selected === undefined) return;
+            answered++;
+
+            if ((selected === 'true') === correct) {
+                item.classList.add('correct');
+                right++;
+            } else {
+                item.classList.add('wrong');
+            }
+        });
+
+        const msg = document.getElementById('q2-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (answered < items.length) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`;
+        } else if (right === items.length) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> رائع! جميع إجاباتك صحيحة 🎉';
+        } else if (right > 0) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${items.length}. العبارات الخاطئة باللون الأحمر.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> لم تصب أي عبارة. راجع الدرس ثم أعد المحاولة.';
+        }
+    }
+
+    function resetQ2() {
+        document.querySelectorAll('#q2-list .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        const msg = document.getElementById('q2-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== تمرين 3 ========== */
+    function checkQ3() {
+        const b1 = document.getElementById('b1');
+        const b2 = document.getElementById('b2');
+        const b3 = document.getElementById('b3');
+
+        const v1 = b1.value.trim().toLowerCase();
+        const v2 = b2.value.trim().toLowerCase();
+        const v3 = b3.value.trim().toLowerCase();
+
+        [b1, b2, b3].forEach(b => b.classList.remove('correct', 'wrong'));
+
+        let right = 0;
+
+        // 1) float
+        if (v1 === 'float') { b1.classList.add('correct'); right++; }
+        else { b1.classList.add('wrong'); }
+
+        // 2) int
+        if (v2 === 'int') { b2.classList.add('correct'); right++; }
+        else { b2.classList.add('wrong'); }
+
+        // 3) type
+        if (v3 === 'type') { b3.classList.add('correct'); right++; }
+        else { b3.classList.add('wrong'); }
+
+        const msg = document.getElementById('q3-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (right === 3) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> إجابة صحيحة تمامًا! 🎉 <code>float</code> ، <code>int</code> ، <code>type</code>.';
+        } else if (right >= 1) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> أصبت في ${right} من 3. راجع الفراغات المميزة بالأحمر.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> حاول مرة أخرى. تلميح: النوع العشري <code>float</code>، التحويل <code>int</code>، الدالة <code>type</code>.';
+        }
+    }
+
+    function resetQ3() {
+        ['b1', 'b2', 'b3'].forEach(id => {
+            const el = document.getElementById(id);
+            el.value = '';
+            el.classList.remove('correct', 'wrong');
+        });
+        const msg = document.getElementById('q3-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

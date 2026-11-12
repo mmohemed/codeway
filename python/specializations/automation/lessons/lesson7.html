@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 7: الجدولة والسكربتات الموثوقة | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص الأتمتة</a>
+        <span class="sep">/</span>
+        <span>الجدولة</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-clock"></i>
+            الدرس 7 · التشغيل التلقائي
+        </div>
+        <h1 class="lesson-title">الجدولة والسكربتات الموثوقة</h1>
+        <p class="lesson-intro">
+            السكربت الذي تشغّله بيدك ليس أتمتة كاملة بعد. في هذا الدرس سيعمل سكربتك <strong>وحده في موعده</strong>: بمكتبة <strong>schedule</strong>، و<strong>cron</strong> في Linux و macOS، و<strong>مجدول المهام</strong> في Windows. ثم نجعله <strong>موثوقًا</strong> وهو يعمل بلا رقيب: سجلات دائمة، وإعادة محاولة، ومعالجة لا تتكرر، وقفل يمنع تشغيل نسختين معًا، و<strong>نبض</strong> ينبهك إذا توقف السكربت بصمت.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 75 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 سكربت يعمل وحده بأمان</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 6</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#options">1. خيارات الجدولة</a>
+            <a href="#schedule">2. مكتبة schedule</a>
+            <a href="#cron">3. cron</a>
+            <a href="#windows">4. Windows</a>
+            <a href="#reliable">5. الموثوقية</a>
+            <a href="#heartbeat">6. النبض</a>
+            <a href="#exercises">7. تمارين تفاعلية</a>
+            <a href="#summary">8. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="options">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-calendar-alt"></i>
+        خيارات الجدولة
+    </h2>
+        <p>
+            هناك طريقتان أساسيتان: إما أن <strong>يبقى سكربتك يعمل</strong> وينتظر المواعيد بنفسه، أو أن <strong>يشغّله نظام التشغيل</strong> في كل موعد ثم ينتهي.
+            الطريقة الثانية أكثر موثوقية: إذا أُعيد تشغيل الجهاز أو تعطل السكربت مرة، سيعمل في الموعد التالي تلقائيًا.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الأداة</th><th>أين</th><th>متى تختارها</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>مكتبة <code>schedule</code></td><td>داخل سكربت بايثون يعمل باستمرار</td><td>تجارب سريعة، أو خدمة تعمل دائمًا أصلًا</td></tr>
+                    <tr><td><code>cron</code></td><td>Linux و macOS والخوادم</td><td>المعيار للخوادم: بسيط ومجرب منذ عقود</td></tr>
+                    <tr><td>مجدول المهام Task Scheduler</td><td>Windows</td><td>أجهزة المكاتب التي تعمل بـ Windows</td></tr>
+                    <tr><td>systemd timers</td><td>Linux الحديث</td><td>عندما تريد سجلات وإعادة تشغيل مدمجة</td></tr>
+                    <tr><td>GitHub Actions وخدمات السحابة</td><td>خارج جهازك</td><td>سكربت لا يحتاج ملفات جهازك ويجب أن يعمل حتى لو أُطفئ</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="schedule">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-hourglass-half"></i>
+        مكتبة schedule
+    </h2>
+        <p>
+            <code>pip install schedule</code> تتيح كتابة المواعيد بلغة قريبة من الإنجليزية. السكربت يبقى يعمل ويستدعي <code>run_pending()</code> في حلقة:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>scheduler.py</span>
+    </div>
+<pre><span class="kw">import</span> time
+
+<span class="kw">import</span> schedule
+
+
+<span class="kw">def</span> <span class="fn">daily_report</span>():
+    <span class="fn">print</span>(<span class="str">"📊 إنشاء التقرير اليومي وإرساله..."</span>)
+
+
+<span class="kw">def</span> <span class="fn">backup</span>():
+    <span class="fn">print</span>(<span class="str">"💾 نسخ احتياطي..."</span>)
+
+
+schedule.<span class="fn">every</span>().day.<span class="fn">at</span>(<span class="str">"08:00"</span>).<span class="fn">do</span>(daily_report)
+schedule.<span class="fn">every</span>().sunday.<span class="fn">at</span>(<span class="str">"07:30"</span>).<span class="fn">do</span>(daily_report)        <span class="cm"># أول أيام الأسبوع</span>
+schedule.<span class="fn">every</span>(<span class="num">2</span>).hours.<span class="fn">do</span>(backup)
+schedule.<span class="fn">every</span>().day.<span class="fn">at</span>(<span class="str">"23:00"</span>, <span class="str">"Asia/Riyadh"</span>).<span class="fn">do</span>(backup)   <span class="cm"># بتوقيت محدد (يتطلب pytz)</span>
+
+<span class="kw">while</span> <span class="kw">True</span>:
+    schedule.<span class="fn">run_pending</span>()
+    time.<span class="fn">sleep</span>(<span class="num">30</span>)          <span class="cm"># افحص كل نصف دقيقة: لا داعي لإرهاق المعالج</span></pre>
+</div>
+        <p>لنرَ الآلية في عرض سريع: مهمة كل ثانية، نشغّل الحلقة ثلاث ثوانٍ تقريبًا ثم نوقفها:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>schedule_demo.py</span>
+    </div>
+<pre><span class="kw">import</span> time
+
+<span class="kw">import</span> schedule
+
+runs = []
+
+
+<span class="kw">def</span> <span class="fn">job</span>(name):
+    runs.<span class="fn">append</span>(name)
+    <span class="fn">print</span>(<span class="str">f"⚙️ تشغيل رقم {len(runs)}: {name}"</span>)
+    <span class="kw">if</span> <span class="fn">len</span>(runs) == <span class="num">3</span>:
+        <span class="kw">return</span> schedule.CancelJob        <span class="cm"># إلغاء المهمة بعد 3 مرات</span>
+
+
+task = schedule.<span class="fn">every</span>(<span class="num">1</span>).seconds.<span class="fn">do</span>(job, name=<span class="str">"فحص البريد"</span>)
+<span class="fn">print</span>(<span class="str">"الوحدة:"</span>, task.unit, <span class="str">"| الفاصل:"</span>, task.interval)
+
+deadline = time.<span class="fn">monotonic</span>() + <span class="num">3.5</span>
+<span class="kw">while</span> time.<span class="fn">monotonic</span>() &lt; deadline <span class="kw">and</span> schedule.<span class="fn">get_jobs</span>():
+    schedule.<span class="fn">run_pending</span>()
+    time.<span class="fn">sleep</span>(<span class="num">0.1</span>)
+<span class="fn">print</span>(<span class="str">"المهام المتبقية:"</span>, <span class="fn">len</span>(schedule.<span class="fn">get_jobs</span>()))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الوحدة: seconds | الفاصل: 1
+⚙️ تشغيل رقم 1: فحص البريد
+⚙️ تشغيل رقم 2: فحص البريد
+⚙️ تشغيل رقم 3: فحص البريد
+المهام المتبقية: 0</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>حدود schedule:</strong> المهام تعمل فقط ما دام السكربت يعمل؛ إذا أُغلقت النافذة أو أُعيد تشغيل الجهاز توقف كل شيء.
+                والمهام تعمل بالتتابع، فمهمة تستغرق ساعة تؤخر غيرها. لذلك للمهام المهمة استخدم مجدول نظام التشغيل.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="cron">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-terminal"></i>
+        cron في Linux و macOS
+    </h2>
+        <p>
+            <code>cron</code> خدمة في النظام تقرأ جدولًا يسمى <strong>crontab</strong>، كل سطر فيه: <strong>خمس خانات للوقت</strong> ثم الأمر.
+            افتحه للتعديل بالأمر <code>crontab -e</code>، واعرض محتواه بـ <code>crontab -l</code>.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الخانة</th><th>القيم</th><th>أمثلة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1. الدقيقة</td><td>0–59</td><td><code>0</code>، <code>*/15</code> كل ربع ساعة</td></tr>
+                    <tr><td>2. الساعة</td><td>0–23</td><td><code>8</code>، <code>9-17</code> ساعات الدوام</td></tr>
+                    <tr><td>3. يوم الشهر</td><td>1–31</td><td><code>1</code> أول الشهر</td></tr>
+                    <tr><td>4. الشهر</td><td>1–12</td><td><code>1,4,7,10</code> بداية كل ربع</td></tr>
+                    <tr><td>5. يوم الأسبوع</td><td>0–6 (0 = الأحد)</td><td><code>0-4</code> من الأحد إلى الخميس</td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+        <span>crontab</span>
+    </div>
+<pre><span class="cm"># الدقيقة الساعة يوم-الشهر الشهر يوم-الأسبوع   الأمر</span>
+<span class="num">0</span> <span class="num">8</span> * * <span class="num">0</span>-<span class="num">4</span>      cd /home/sara/reports &amp;&amp; /home/sara/reports/.venv/bin/python daily_report.py &gt;&gt; logs/cron.log <span class="num">2</span>&gt;&amp;<span class="num">1</span>
+*/<span class="num">15</span> <span class="num">9</span>-<span class="num">17</span> * * *  /home/sara/reports/.venv/bin/python /home/sara/reports/check_prices.py
+<span class="num">30</span> <span class="num">2</span> <span class="num">1</span> * *       /home/sara/reports/.venv/bin/python /home/sara/reports/monthly_backup.py</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>أشهر سبب لفشل سكربتات cron:</strong> cron يشغّل الأمر في بيئة فقيرة: مجلد العمل هو مجلد المستخدم، و <code>PATH</code> شبه فارغ، ولا يقرأ إعدادات الطرفية.
+                لذلك: استخدم <strong>مسارات كاملة</strong> لبايثون البيئة الافتراضية وللسكربت، وابنِ مسارات الملفات داخل السكربت من
+                <code>Path(__file__).parent</code>، ووجّه المخرجات إلى ملف بـ <code>&gt;&gt; log 2&gt;&amp;1</code> لترى الأخطاء.
+            </div>
+        </div>
+        <p>
+            كيف نعرف المواعيد القادمة لتعبير cron؟ هذه دالة مبسطة تحسبها (تدعم <code>*</code> و <code>,</code> و <code>-</code> و <code>/</code>)،
+            وهي نفس المنطق الذي يستخدمه المختبر في آخر الدرس:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>cron_next.py</span>
+    </div>
+<pre><span class="kw">from</span> datetime <span class="kw">import</span> datetime, timedelta
+
+
+<span class="kw">def</span> <span class="fn">parse_field</span>(field, low, high):
+    values = <span class="fn">set</span>()
+    <span class="kw">for</span> part <span class="kw">in</span> field.<span class="fn">split</span>(<span class="str">","</span>):
+        rng, _, step = part.<span class="fn">partition</span>(<span class="str">"/"</span>)
+        <span class="kw">if</span> rng == <span class="str">"*"</span>:
+            start, end = low, high
+        <span class="kw">elif</span> <span class="str">"-"</span> <span class="kw">in</span> rng:
+            start, end = <span class="fn">map</span>(int, rng.<span class="fn">split</span>(<span class="str">"-"</span>))
+        <span class="kw">else</span>:
+            start = end = <span class="fn">int</span>(rng)
+        values.<span class="fn">update</span>(<span class="fn">range</span>(start, end + <span class="num">1</span>, <span class="fn">int</span>(step <span class="kw">or</span> <span class="num">1</span>)))
+    <span class="kw">return</span> values
+
+
+<span class="kw">def</span> <span class="fn">next_runs</span>(expr, start, count=<span class="num">3</span>):
+    minute, hour, dom, month, dow = expr.<span class="fn">split</span>()
+    m, h = <span class="fn">parse_field</span>(minute, <span class="num">0</span>, <span class="num">59</span>), <span class="fn">parse_field</span>(hour, <span class="num">0</span>, <span class="num">23</span>)
+    days, months, weekdays = <span class="fn">parse_field</span>(dom, <span class="num">1</span>, <span class="num">31</span>), <span class="fn">parse_field</span>(month, <span class="num">1</span>, <span class="num">12</span>), <span class="fn">parse_field</span>(dow, <span class="num">0</span>, <span class="num">6</span>)
+    t = start.<span class="fn">replace</span>(second=<span class="num">0</span>, microsecond=<span class="num">0</span>) + <span class="fn">timedelta</span>(minutes=<span class="num">1</span>)
+    runs = []
+    <span class="kw">while</span> <span class="fn">len</span>(runs) &lt; count:
+        cron_dow = (t.<span class="fn">weekday</span>() + <span class="num">1</span>) % <span class="num">7</span>                     <span class="cm"># بايثون: الاثنين=0 | cron: الأحد=0</span>
+        <span class="kw">if</span> dom != <span class="str">"*"</span> <span class="kw">and</span> dow != <span class="str">"*"</span>:                        <span class="cm"># cron: يكفي تطابق أحدهما</span>
+            day_ok = t.day <span class="kw">in</span> days <span class="kw">or</span> cron_dow <span class="kw">in</span> weekdays
+        <span class="kw">else</span>:
+            day_ok = t.day <span class="kw">in</span> days <span class="kw">and</span> cron_dow <span class="kw">in</span> weekdays
+        <span class="kw">if</span> <span class="kw">not</span> (t.month <span class="kw">in</span> months <span class="kw">and</span> day_ok):
+            t = (t + <span class="fn">timedelta</span>(days=<span class="num">1</span>)).<span class="fn">replace</span>(hour=<span class="num">0</span>, minute=<span class="num">0</span>)
+        <span class="kw">elif</span> t.hour <span class="kw">not</span> <span class="kw">in</span> h:
+            t = (t + <span class="fn">timedelta</span>(hours=<span class="num">1</span>)).<span class="fn">replace</span>(minute=<span class="num">0</span>)
+        <span class="kw">elif</span> t.minute <span class="kw">not</span> <span class="kw">in</span> m:
+            t += <span class="fn">timedelta</span>(minutes=<span class="num">1</span>)
+        <span class="kw">else</span>:
+            runs.<span class="fn">append</span>(t)
+            t += <span class="fn">timedelta</span>(minutes=<span class="num">1</span>)
+    <span class="kw">return</span> runs
+
+
+now = <span class="fn">datetime</span>(<span class="num">2025</span>, <span class="num">3</span>, <span class="num">13</span>, <span class="num">22</span>, <span class="num">10</span>)        <span class="cm"># الخميس ليلًا</span>
+DAYS = [<span class="str">"الاثنين"</span>, <span class="str">"الثلاثاء"</span>, <span class="str">"الأربعاء"</span>, <span class="str">"الخميس"</span>, <span class="str">"الجمعة"</span>, <span class="str">"السبت"</span>, <span class="str">"الأحد"</span>]
+<span class="kw">for</span> expr <span class="kw">in</span> [<span class="str">"0 8 * * 0-4"</span>, <span class="str">"*/15 9-17 * * *"</span>, <span class="str">"30 2 1 * *"</span>]:
+    <span class="fn">print</span>(<span class="str">f"{expr:&lt;16}→"</span>, <span class="str">" | "</span>.<span class="fn">join</span>(<span class="str">f"{DAYS[r.weekday()]} {r:%m-%d %H:%M}"</span> <span class="kw">for</span> r <span class="kw">in</span> <span class="fn">next_runs</span>(expr, now)))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>0 8 * * 0-4     → الأحد 03-16 08:00 | الاثنين 03-17 08:00 | الثلاثاء 03-18 08:00
+*/15 9-17 * * * → الجمعة 03-14 09:00 | الجمعة 03-14 09:15 | الجمعة 03-14 09:30
+30 2 1 * *      → الثلاثاء 04-01 02:30 | الخميس 05-01 02:30 | الأحد 06-01 02:30</pre>
+</div>
+        <p>
+            لاحظ أن <code>0 8 * * 0-4</code> قفز من ليلة الخميس إلى <strong>الأحد</strong> متجاوزًا عطلة نهاية الأسبوع، وأن تقرير الشهر ينتظر أول أبريل.
+        </p>
+</section>
+
+<section class="section-card" id="windows">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-windows"></i>
+        مجدول المهام في Windows
+    </h2>
+        <p>
+            في Windows افتح «Task Scheduler» من قائمة ابدأ ← <strong>Create Basic Task</strong> ← اختر الاسم والتوقيت ← <strong>Start a program</strong>، ثم املأ:
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الحقل</th><th>القيمة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Program/script</td><td><code>C:\Users\Sara\reports\.venv\Scripts\python.exe</code></td></tr>
+                    <tr><td>Add arguments</td><td><code>daily_report.py</code></td></tr>
+                    <tr><td>Start in</td><td><code>C:\Users\Sara\reports</code> (مهم! وإلا لن يجد السكربت ملفاته)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>أو أنشئ المهمة بأمر واحد من موجه الأوامر (يمكنك حتى تشغيله من بايثون بـ <code>subprocess</code> كما سنرى في الدرس القادم):</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+        <span>cmd</span>
+    </div>
+<pre>schtasks /Create /TN <span class="str">"CodeWay\DailyReport"</span> /SC WEEKLY /D SUN,MON,TUE,WED,THU /ST <span class="num">08</span>:<span class="num">00</span> ^
+    /TR <span class="str">"C:\Users\Sara\reports\.venv\Scripts\pythonw.exe C:\Users\Sara\reports\daily_report.py"</span>
+
+schtasks /Run /TN <span class="str">"CodeWay\DailyReport"</span>      &amp;:: تشغيل فوري للتجربة
+schtasks /Query /TN <span class="str">"CodeWay\DailyReport"</span>    &amp;:: عرض حالة المهمة وآخر تشغيل</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <code>pythonw.exe</code> يشغّل السكربت بلا نافذة سوداء تظهر للمستخدم. وفي خصائص المهمة فعّل «Run whether user is logged on or not»
+                و«Run task as soon as possible after a scheduled start is missed» حتى لا يفوتك تشغيل إذا كان الجهاز مطفأً.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="reliable">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-shield-alt"></i>
+        سكربت يعمل بلا رقيب
+    </h2>
+        <p>
+            عندما يعمل السكربت في الثالثة فجرًا لن تكون هناك لترى الخطأ. هذا القالب الذي يجب أن يبدأ منه كل سكربت مجدول:
+            <strong>سجل دائم في ملف</strong>، و<strong>مسارات مبنية من موقع السكربت</strong>، و<strong>رمز خروج</strong> يخبر المجدول بالنجاح أو الفشل، و<strong>تنبيه عند الفشل</strong>:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>nightly_job.py</span>
+    </div>
+<pre><span class="kw">import</span> logging
+<span class="kw">import</span> sys
+<span class="kw">from</span> logging.handlers <span class="kw">import</span> RotatingFileHandler
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+BASE = <span class="fn">Path</span>(__file__).<span class="fn">resolve</span>().parent            <span class="cm"># لا تعتمد على مجلد العمل الحالي</span>
+(BASE / <span class="str">"logs"</span>).<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+
+log = logging.<span class="fn">getLogger</span>(<span class="str">"nightly"</span>)
+log.<span class="fn">setLevel</span>(logging.INFO)
+file_handler = <span class="fn">RotatingFileHandler</span>(BASE / <span class="str">"logs"</span> / <span class="str">"nightly.log"</span>, maxBytes=<span class="num">1</span>_000_000, backupCount=<span class="num">5</span>, encoding=<span class="str">"utf-8"</span>)
+file_handler.<span class="fn">setFormatter</span>(logging.<span class="fn">Formatter</span>(<span class="str">"%(asctime)s %(levelname)s %(message)s"</span>))
+console = logging.<span class="fn">StreamHandler</span>(sys.stdout)
+console.<span class="fn">setFormatter</span>(logging.<span class="fn">Formatter</span>(<span class="str">"%(levelname)-7s %(message)s"</span>))
+log.<span class="fn">addHandler</span>(file_handler)
+log.<span class="fn">addHandler</span>(console)
+
+
+<span class="kw">def</span> <span class="fn">notify_failure</span>(error):
+    log.<span class="fn">info</span>(<span class="str">"📨 (هنا نرسل تنبيه Telegram أو بريد — الدرس 5)"</span>)
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    log.<span class="fn">info</span>(<span class="str">"بدء المهمة الليلية"</span>)
+    <span class="kw">try</span>:
+        rows = [<span class="num">120</span>, <span class="num">95</span>, <span class="str">"N/A"</span>, <span class="num">80</span>]
+        total = <span class="fn">sum</span>(rows)                         <span class="cm"># سيفشل بسبب "N/A"</span>
+        log.<span class="fn">info</span>(<span class="str">"الإجمالي %s"</span>, total)
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        log.<span class="fn">exception</span>(<span class="str">"فشلت المهمة: %s"</span>, e)     <span class="cm"># يحفظ التتبع الكامل في الملف</span>
+        <span class="fn">notify_failure</span>(e)
+        <span class="kw">return</span> <span class="num">1</span>                                  <span class="cm"># رمز خروج غير صفري = فشل</span>
+    log.<span class="fn">info</span>(<span class="str">"انتهت بنجاح"</span>)
+    <span class="kw">return</span> <span class="num">0</span>
+
+
+code = <span class="fn">main</span>()
+<span class="fn">print</span>(<span class="str">"رمز الخروج:"</span>, code)
+sys.<span class="fn">exit</span>(code)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>INFO    بدء المهمة الليلية
+ERROR   فشلت المهمة: unsupported operand type(s) for +: 'int' and 'str'
+Traceback (most recent call last):
+  File "nightly_job.py", line 27, in main
+    total = sum(rows)                         # سيفشل بسبب "N/A"
+TypeError: unsupported operand type(s) for +: 'int' and 'str'
+INFO    📨 (هنا نرسل تنبيه Telegram أو بريد — الدرس 5)
+رمز الخروج: 1</pre>
+</div>
+        <ul>
+            <li><code>RotatingFileHandler</code> يبدأ ملفًا جديدًا عند 1 ميجابايت ويحتفظ بخمسة ملفات قديمة فقط، فلا يملأ السجل القرص بعد سنة.</li>
+            <li><code>log.exception</code> تسجل التتبع الكامل (Traceback) — ستحتاجه لتعرف ما حدث في الثالثة فجرًا.</li>
+            <li>رمز الخروج <code>1</code> يظهر في مجدول المهام كـ «Last Run Result: 0x1»، وفي أنظمة المراقبة كفشل.</li>
+        </ul>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> إعادة المحاولة بمزخرف (Decorator)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>retry_decorator.py</span>
+    </div>
+<pre><span class="kw">import</span> functools
+<span class="kw">import</span> time
+
+
+<span class="kw">def</span> <span class="fn">retry</span>(times=<span class="num">3</span>, wait=<span class="num">0.1</span>, exceptions=(Exception,)):
+    <span class="kw">def</span> <span class="fn">decorator</span>(func):
+        @functools.<span class="fn">wraps</span>(func)
+        <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+            <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, times + <span class="num">1</span>):
+                <span class="kw">try</span>:
+                    <span class="kw">return</span> <span class="fn">func</span>(*args, **kwargs)
+                <span class="kw">except</span> exceptions <span class="kw">as</span> e:
+                    <span class="kw">if</span> attempt == times:
+                        <span class="kw">raise</span>
+                    <span class="fn">print</span>(<span class="str">f"  ⚠️ {func.__name__}: المحاولة {attempt} فشلت ({e}) — إعادة بعد {wait * attempt:.1f} ث"</span>)
+                    time.<span class="fn">sleep</span>(wait * attempt)
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+
+calls = <span class="num">0</span>
+
+
+@<span class="fn">retry</span>(times=<span class="num">3</span>, exceptions=(ConnectionError,))
+<span class="kw">def</span> <span class="fn">download_rates</span>():
+    <span class="kw">global</span> calls
+    calls += <span class="num">1</span>
+    <span class="kw">if</span> calls &lt; <span class="num">3</span>:
+        <span class="kw">raise</span> <span class="fn">ConnectionError</span>(<span class="str">"الخادم لا يستجيب"</span>)
+    <span class="kw">return</span> {<span class="str">"USD"</span>: <span class="num">3.75</span>, <span class="str">"EUR"</span>: <span class="num">4.05</span>}
+
+
+<span class="fn">print</span>(<span class="str">"✅"</span>, <span class="fn">download_rates</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>  ⚠️ download_rates: المحاولة 1 فشلت (الخادم لا يستجيب) — إعادة بعد 0.1 ث
+  ⚠️ download_rates: المحاولة 2 فشلت (الخادم لا يستجيب) — إعادة بعد 0.2 ث
+✅ {'USD': 3.75, 'EUR': 4.05}</pre>
+</div>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> معالجة لا تتكرر (Idempotency)</p>
+        <p>
+            ماذا لو عمل السكربت مرتين، أو توقف في المنتصف ثم أعيد تشغيله؟ يجب ألا يرسل الفاتورة نفسها مرتين. الحل: <strong>ملف حالة</strong> يحفظ ما تمت معالجته،
+            ويُكتب <strong>بشكل ذري</strong> (ملف مؤقت ثم استبدال) حتى لا يتلف إذا انقطع السكربت أثناء الكتابة:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>idempotent.py</span>
+    </div>
+<pre><span class="kw">import</span> json
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+inbox = <span class="fn">Path</span>(<span class="str">"inbox"</span>)
+inbox.<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+<span class="kw">for</span> name <span class="kw">in</span> [<span class="str">"inv_001.csv"</span>, <span class="str">"inv_002.csv"</span>]:
+    (inbox / name).<span class="fn">write_text</span>(<span class="str">"data"</span>, encoding=<span class="str">"utf-8"</span>)
+
+STATE = <span class="fn">Path</span>(<span class="str">"processed.json"</span>)
+
+
+<span class="kw">def</span> <span class="fn">load_state</span>():
+    <span class="kw">return</span> <span class="fn">set</span>(json.<span class="fn">loads</span>(STATE.<span class="fn">read_text</span>(encoding=<span class="str">"utf-8"</span>))) <span class="kw">if</span> STATE.<span class="fn">exists</span>() <span class="kw">else</span> <span class="fn">set</span>()
+
+
+<span class="kw">def</span> <span class="fn">save_state</span>(done):
+    tmp = STATE.<span class="fn">with_suffix</span>(<span class="str">".tmp"</span>)
+    tmp.<span class="fn">write_text</span>(json.<span class="fn">dumps</span>(<span class="fn">sorted</span>(done)), encoding=<span class="str">"utf-8"</span>)
+    tmp.<span class="fn">replace</span>(STATE)                     <span class="cm"># استبدال ذري: إما القديم كاملًا أو الجديد كاملًا</span>
+
+
+<span class="kw">def</span> <span class="fn">run</span>():
+    done = <span class="fn">load_state</span>()
+    new = [f <span class="kw">for</span> f <span class="kw">in</span> <span class="fn">sorted</span>(inbox.<span class="fn">glob</span>(<span class="str">"*.csv"</span>)) <span class="kw">if</span> f.name <span class="kw">not</span> <span class="kw">in</span> done]
+    <span class="kw">for</span> f <span class="kw">in</span> new:
+        <span class="fn">print</span>(<span class="str">"   ⚙️ معالجة"</span>, f.name)
+        done.<span class="fn">add</span>(f.name)
+        <span class="fn">save_state</span>(done)                   <span class="cm"># بعد كل ملف، لا في النهاية فقط</span>
+    <span class="fn">print</span>(<span class="str">f"تشغيل: {len(new)} جديد | {len(done)} إجمالي"</span>)
+
+
+<span class="fn">run</span>()
+<span class="fn">run</span>()                                      <span class="cm"># التشغيل الثاني لا يكرر شيئًا</span>
+(inbox / <span class="str">"inv_003.csv"</span>).<span class="fn">write_text</span>(<span class="str">"data"</span>, encoding=<span class="str">"utf-8"</span>)
+<span class="fn">run</span>()</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   ⚙️ معالجة inv_001.csv
+   ⚙️ معالجة inv_002.csv
+تشغيل: 2 جديد | 2 إجمالي
+تشغيل: 0 جديد | 2 إجمالي
+   ⚙️ معالجة inv_003.csv
+تشغيل: 1 جديد | 3 إجمالي</pre>
+</div>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> قفل يمنع تشغيل نسختين معًا</p>
+        <p>
+            مهمة كل 15 دقيقة استغرقت 20 دقيقة بسبب بطء الشبكة؟ ستبدأ نسخة ثانية فوق الأولى وتتضاربان. ملف قفل يُنشأ بشكل حصري يمنع ذلك:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>single_instance.py</span>
+    </div>
+<pre><span class="kw">import</span> os
+<span class="kw">from</span> contextlib <span class="kw">import</span> contextmanager
+
+
+@contextmanager
+<span class="kw">def</span> <span class="fn">single_instance</span>(path=<span class="str">"report.lock"</span>):
+    <span class="kw">try</span>:
+        fd = os.<span class="fn">open</span>(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)   <span class="cm"># يفشل إذا كان الملف موجودًا</span>
+    <span class="kw">except</span> FileExistsError:
+        <span class="kw">raise</span> <span class="fn">SystemExit</span>(<span class="str">f"⛔ نسخة أخرى تعمل الآن ({path} موجود) — خروج"</span>)
+    <span class="kw">try</span>:
+        os.<span class="fn">write</span>(fd, <span class="fn">str</span>(os.<span class="fn">getpid</span>()).<span class="fn">encode</span>())                    <span class="cm"># رقم العملية للتشخيص</span>
+        <span class="kw">yield</span>
+    <span class="kw">finally</span>:
+        os.<span class="fn">close</span>(fd)
+        os.<span class="fn">remove</span>(path)                                            <span class="cm"># يُحذف حتى عند حدوث خطأ</span>
+
+
+<span class="kw">with</span> <span class="fn">single_instance</span>():
+    <span class="fn">print</span>(<span class="str">"✅ حصلنا على القفل، نعمل..."</span>)
+    <span class="kw">try</span>:
+        <span class="kw">with</span> <span class="fn">single_instance</span>():            <span class="cm"># محاكاة نسخة ثانية بدأت في الوقت نفسه</span>
+            <span class="fn">print</span>(<span class="str">"لن يُطبع هذا"</span>)
+    <span class="kw">except</span> SystemExit <span class="kw">as</span> e:
+        <span class="fn">print</span>(e)
+<span class="fn">print</span>(<span class="str">"القفل حُرر:"</span>, <span class="kw">not</span> os.path.<span class="fn">exists</span>(<span class="str">"report.lock"</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>✅ حصلنا على القفل، نعمل...
+⛔ نسخة أخرى تعمل الآن (report.lock موجود) — خروج
+القفل حُرر: True</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                إذا انقطعت الكهرباء أثناء العمل سيبقى ملف القفل «يتيمًا» ويمنع كل تشغيل لاحق. الحل في السكربتات المهمة: اقرأ رقم العملية المحفوظ، وإذا لم تكن تلك العملية
+                تعمل أو كان الملف أقدم من مدة معقولة فاحذفه. وفي Linux يمكنك استخدام <code>flock</code> الذي يُحرر تلقائيًا عند موت العملية.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="heartbeat">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-heartbeat"></i>
+        النبض: اكتشف السكربت الذي توقف بصمت
+    </h2>
+        <p>
+            أخطر عطل ليس الخطأ الذي يرسل تنبيهًا، بل السكربت الذي <strong>لم يعمل أصلًا</strong>: جهاز أُطفئ، أو مهمة حُذفت، أو كلمة مرور انتهت. لا خطأ، ولا تنبيه، ولا تقرير!
+            الحل: بعد كل نجاح يسجل السكربت «نبضة» (وقت آخر نجاح)، وسكربت مراقبة مستقل يتحقق أن النبضة حديثة:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>heartbeat.py</span>
+    </div>
+<pre><span class="kw">import</span> json
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime, timedelta
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+BEATS = <span class="fn">Path</span>(<span class="str">"heartbeats.json"</span>)
+
+
+<span class="kw">def</span> <span class="fn">beat</span>(job, when):
+    data = json.<span class="fn">loads</span>(BEATS.<span class="fn">read_text</span>()) <span class="kw">if</span> BEATS.<span class="fn">exists</span>() <span class="kw">else</span> {}
+    data[job] = when.<span class="fn">isoformat</span>()
+    BEATS.<span class="fn">write_text</span>(json.<span class="fn">dumps</span>(data, indent=<span class="num">2</span>))
+
+
+<span class="kw">def</span> <span class="fn">check</span>(now, limits):
+    data = json.<span class="fn">loads</span>(BEATS.<span class="fn">read_text</span>())
+    <span class="kw">for</span> job, max_age <span class="kw">in</span> limits.<span class="fn">items</span>():
+        last = data.<span class="fn">get</span>(job)
+        age = now - datetime.<span class="fn">fromisoformat</span>(last) <span class="kw">if</span> last <span class="kw">else</span> <span class="kw">None</span>
+        limit = <span class="str">f"الحد {max_age / timedelta(hours=1):.0f} س"</span>
+        <span class="kw">if</span> age <span class="kw">is</span> <span class="kw">None</span>:
+            <span class="fn">print</span>(<span class="str">f"🚨 {job}: لم يعمل أبدًا! ({limit})"</span>)
+        <span class="kw">elif</span> age &gt; max_age:
+            <span class="fn">print</span>(<span class="str">f"🚨 {job}: آخر نجاح قبل {age / timedelta(hours=1):.0f} س ({limit})"</span>)
+        <span class="kw">else</span>:
+            <span class="fn">print</span>(<span class="str">f"✅ {job}: آخر نجاح قبل {age / timedelta(hours=1):.0f} س ({limit})"</span>)
+
+
+<span class="fn">beat</span>(<span class="str">"daily_report"</span>, <span class="fn">datetime</span>(<span class="num">2025</span>, <span class="num">3</span>, <span class="num">14</span>, <span class="num">8</span>, <span class="num">1</span>))
+<span class="fn">beat</span>(<span class="str">"nightly_backup"</span>, <span class="fn">datetime</span>(<span class="num">2025</span>, <span class="num">3</span>, <span class="num">11</span>, <span class="num">2</span>, <span class="num">30</span>))     <span class="cm"># توقف منذ أيام!</span>
+<span class="fn">check</span>(<span class="fn">datetime</span>(<span class="num">2025</span>, <span class="num">3</span>, <span class="num">14</span>, <span class="num">12</span>, <span class="num">0</span>), {
+    <span class="str">"daily_report"</span>: <span class="fn">timedelta</span>(hours=<span class="num">26</span>),                 <span class="cm"># يومي + هامش ساعتين</span>
+    <span class="str">"nightly_backup"</span>: <span class="fn">timedelta</span>(hours=<span class="num">26</span>),
+    <span class="str">"monthly_invoices"</span>: <span class="fn">timedelta</span>(days=<span class="num">32</span>),
+})</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>✅ daily_report: آخر نجاح قبل 4 س (الحد 26 س)
+🚨 nightly_backup: آخر نجاح قبل 82 س (الحد 26 س)
+🚨 monthly_invoices: لم يعمل أبدًا! (الحد 768 س)</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                توجد خدمات جاهزة لهذا النمط (تسمى <strong>Dead man's switch</strong>) مثل Healthchecks.io: يرسل سكربتك طلبًا لرابط خاص بعد كل نجاح
+                (<code>requests.get(PING_URL, timeout=10)</code>)، وإذا لم يصل الطلب في موعده ترسل لك الخدمة تنبيهًا.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! الدقيقة أولًا ثم الساعة، و &lt;code&gt;0-4&lt;/code&gt; في الخانة الخامسة من الأحد إلى الخميس." data-hint="ترتيب الخانات: دقيقة، ساعة، يوم الشهر، شهر، يوم الأسبوع.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">تعبير cron</span>
+    </div>
+    <p class="exercise-question">أي تعبير cron يشغّل السكربت <strong>الساعة 7:30 صباحًا من الأحد إلى الخميس</strong>؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>7 30 * * 0-4</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> <code>30 7 * * 0-4</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> <code>30 7 0-4 * *</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>*/30 7 * * *</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تفهم ما يجعل السكربت المجدول موثوقًا." data-hint="السكربت الذي لم يعمل أصلًا لا يرسل أي خطأ.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">المهام في مكتبة <code>schedule</code> تستمر بعد إغلاق السكربت.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">cron يشغّل السكربت في بيئة فيها PATH محدود ومجلد عمل مختلف.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">رمز الخروج غير الصفري يعني أن السكربت فشل.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">ملف الحالة يمنع معالجة الملف نفسه مرتين عند إعادة التشغيل.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">إذا لم تصلك رسالة خطأ فالسكربت المجدول يعمل بالتأكيد.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! كل ملف يُعالج مرة واحدة فقط مهما تكرر التشغيل." data-hint="&lt;code&gt;done&lt;/code&gt; تتذكر ما تمت معالجته بين الاستدعاءات.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">Idempotency</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre>done = <span class="fn">set</span>()
+<span class="kw">def</span> <span class="fn">run</span>(files):
+    new = [f <span class="kw">for</span> f <span class="kw">in</span> files <span class="kw">if</span> f <span class="kw">not</span> <span class="kw">in</span> done]
+    done.<span class="fn">update</span>(new)
+    <span class="kw">return</span> <span class="fn">len</span>(new)
+<span class="fn">print</span>(<span class="fn">run</span>([<span class="str">"a"</span>, <span class="str">"b"</span>]))
+<span class="fn">print</span>(<span class="fn">run</span>([<span class="str">"a"</span>, <span class="str">"b"</span>, <span class="str">"c"</span>]))
+<span class="fn">print</span>(<span class="fn">run</span>([<span class="str">"c"</span>]))
+<span class="fn">print</span>(<span class="fn">len</span>(done))</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر 1:</span><input type="text" class="blank-input" data-answers="2" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 2:</span><input type="text" class="blank-input" data-answers="1" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 3:</span><input type="text" class="blank-input" data-answers="0" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 4:</span><input type="text" class="blank-input" data-answers="3" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! &lt;code&gt;run_pending&lt;/code&gt; تشغّل المهام التي حان وقتها فقط." data-hint="every().day.at(...).do(...) ثم run_pending في الحلقة.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">schedule</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لتشغيل <code>report</code> يوميًا الساعة 8 صباحًا:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">import</span> time, schedule</span></div>
+        <div class="line"><span>schedule.<span class="fn">every</span>().</span><input type="text" class="blank-input" data-answers="day" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>.</span><input type="text" class="blank-input" data-answers="at" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'08:00'</span>).</span><input type="text" class="blank-input" data-answers="do" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>(report)</span></div>
+        <div class="line"><span><span class="kw">while</span> <span class="kw">True</span>:</span></div>
+        <div class="line"><span>    schedule.</span><input type="text" class="blank-input" data-answers="run_pending" placeholder="..." style="min-width:184px;" autocomplete="off" spellcheck="false"><span>()</span></div>
+        <div class="line"><span>    time.<span class="fn">sleep</span>(<span class="num">30</span>)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! هذا هيكل كل سكربت إنتاجي تقريبًا." data-hint="السجل أولًا كي يُسجَّل كل ما يحدث بعده.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب الخطوات داخل سكربت مجدول موثوق. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) عند الخطأ: تسجيل التتبع وإرسال تنبيه والخروج برمز 1</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">1) إعداد السجل في ملف بمسار مبني من موقع السكربت</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">5) عند النجاح: تسجيل النبضة والخروج برمز 0</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">3) معالجة العناصر الجديدة فقط وحفظ الحالة بعد كل عنصر</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) أخذ القفل لمنع تشغيل نسختين</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر تعابير cron</div>
+    <p style="color:var(--text-light); font-size:0.95em;">اكتب تعبير cron أو اختر واحدًا جاهزًا، لترى شرح كل خانة بالعربية وأقرب 6 مواعيد تشغيل بدءًا من وقت تختاره. المنطق مطابق لدالة <code>next_runs</code> في الدرس.</p>
+    <div class="lab-row">
+        <label>تعبير جاهز:</label>
+        <select class="lab-select" id="cronPreset" onchange="document.getElementById('cronExpr').value=this.value; runCron()">
+            <option value="0 8 * * 0-4">تقرير أيام الدوام 8 صباحًا</option>
+            <option value="*/15 9-17 * * *">كل ربع ساعة في الدوام</option>
+            <option value="30 2 1 * *">أول كل شهر 2:30 فجرًا</option>
+            <option value="0 */6 * * *">كل 6 ساعات</option>
+            <option value="0 9 1,15 * 5">يوم 1 و 15 أو كل جمعة</option>
+        </select>
+    </div>
+    <div class="lab-row">
+        <label>التعبير:</label>
+        <input class="lab-input" id="cronExpr" value="0 8 * * 0-4" style="width:180px; direction:ltr; font-family:monospace;" oninput="runCron()" spellcheck="false">
+        <label>ابدأ من:</label>
+        <input class="lab-input" id="cronStart" type="datetime-local" value="2025-03-13T22:10" style="direction:ltr;" oninput="runCron()">
+    </div>
+    <div class="lab-console" id="cronOut" style="direction:rtl; text-align:right;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">8</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> خيارات الجدولة: schedule و cron و Task Scheduler والسحابة، ومتى تختار كلًا منها.</li>
+                <li><i class="fas fa-check"></i> كتابة المواعيد بمكتبة schedule وحدودها.</li>
+                <li><i class="fas fa-check"></i> صيغة cron بخاناتها الخمس، وأخطاء البيئة والمسارات الشائعة.</li>
+                <li><i class="fas fa-check"></i> إنشاء مهام Windows من الواجهة أو بأمر schtasks.</li>
+                <li><i class="fas fa-check"></i> قالب السكربت المجدول: سجل دائم دوّار، ورمز خروج، وتنبيه عند الفشل.</li>
+                <li><i class="fas fa-check"></i> إعادة المحاولة بمزخرف، والمعالجة غير المتكررة بملف حالة ذري، وقفل التشغيل الفردي.</li>
+                <li><i class="fas fa-check"></i> النبض لاكتشاف السكربت الذي توقف بصمت.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> جرّب الأمر المجدول يدويًا من مجلد آخر قبل الاعتماد عليه.</li>
+                <li><i class="fas fa-lightbulb"></i> استخدم دائمًا بايثون البيئة الافتراضية بمسار كامل.</li>
+                <li><i class="fas fa-lightbulb"></i> سجّل بداية ونهاية كل تشغيل، لا الأخطاء فقط.</li>
+                <li><i class="fas fa-lightbulb"></i> راقب آخر نجاح، لا آخر خطأ.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>التعامل مع نظام التشغيل والعمليات</strong>: تشغيل البرامج الأخرى من بايثون بأمان، ومراقبة النظام، وكتابة سكربتات تعمل على كل الأنظمة.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson6.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 6: أتمتة الويب واستخراج البيانات</span>
+        </a>
+        <a href="lesson8.html" class="nav-link next">
+            <span>الدرس التالي: نظام التشغيل والعمليات</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · الجدولة
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '70%';
+            text.textContent = '70% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر cron ========== */
+    const CRON_FIELDS = [['الدقيقة', 0, 59], ['الساعة', 0, 23], ['يوم الشهر', 1, 31], ['الشهر', 1, 12], ['يوم الأسبوع', 0, 6]];
+    const CRON_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+    function cronField(field, low, high) {
+        const values = new Set();
+        for (const part of field.split(',')) {
+            const [rng, stepText] = part.split('/');
+            const step = stepText === undefined ? 1 : Number(stepText);
+            let start, end;
+            if (rng === '*') { start = low; end = high; }
+            else if (rng.includes('-')) { [start, end] = rng.split('-').map(Number); }
+            else { start = end = Number(rng); }
+            if (![start, end, step].every(Number.isInteger) || step < 1 || start < low || end > high || start > end)
+                throw new Error(`قيمة غير صالحة "${part}" (المسموح ${low}–${high})`);
+            for (let v = start; v <= end; v += step) values.add(v);
+        }
+        return values;
+    }
+
+    function describeField(field, name, low, high) {
+        if (field === '*') return `كل ${name}`;
+        if (/^\*\/\d+$/.test(field)) return `كل ${field.slice(2)} (${name})`;
+        const show = v => name === 'يوم الأسبوع' ? CRON_DAYS[v] : v;
+        return field.split(',').map(p => p.includes('-') && !p.includes('/')
+            ? `من ${show(+p.split('-')[0])} إلى ${show(+p.split('-')[1])}` : (/^\d+$/.test(p) ? show(+p) : p)).join(' و ');
+    }
+
+    function runCron() {
+        const out = document.getElementById('cronOut');
+        const parts = document.getElementById('cronExpr').value.trim().split(/\s+/);
+        try {
+            if (parts.length !== 5) throw new Error(`التعبير يحتاج 5 خانات، وكتبت ${parts.length}`);
+            const sets = parts.map((p, i) => cronField(p, CRON_FIELDS[i][1], CRON_FIELDS[i][2]));
+            const desc = parts.map((p, i) => `${CRON_FIELDS[i][0].padEnd(12)} ${p.padEnd(8)} ← ${escapeHtml(String(describeField(p, ...CRON_FIELDS[i])))}`);
+            const startVal = document.getElementById('cronStart').value || '2025-03-13T22:10';
+            let t = new Date(startVal); t.setSeconds(0, 0); t = new Date(t.getTime() + 60000);
+            const runs = [];
+            let guard = 0;
+            while (runs.length < 6 && guard++ < 200000) {
+                const dow = t.getDay();
+                const dayOk = (parts[2] !== '*' && parts[4] !== '*')
+                    ? (sets[2].has(t.getDate()) || sets[4].has(dow))
+                    : (sets[2].has(t.getDate()) && sets[4].has(dow));
+                if (!(sets[3].has(t.getMonth() + 1) && dayOk)) { t.setDate(t.getDate() + 1); t.setHours(0, 0); }
+                else if (!sets[1].has(t.getHours())) { t.setHours(t.getHours() + 1, 0); }
+                else if (!sets[0].has(t.getMinutes())) { t.setMinutes(t.getMinutes() + 1); }
+                else { runs.push(new Date(t)); t.setMinutes(t.getMinutes() + 1); }
+            }
+            const pad = n => String(n).padStart(2, '0');
+            const fmt = d => `${CRON_DAYS[d.getDay()].padEnd(9)} ${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            out.innerHTML = desc.join('\n') + '\n\n<strong style="color:var(--gold)">المواعيد القادمة:</strong>\n' +
+                (runs.length ? runs.map((r, i) => `${i + 1}. ${fmt(r)}`).join('\n') : 'لا يوجد موعد قريب (تحقق من التعبير)');
+        } catch (e) {
+            out.innerHTML = `<span class="err">${escapeHtml(e.message)}</span>`;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', runCron);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

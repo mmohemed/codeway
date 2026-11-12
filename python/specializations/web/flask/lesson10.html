@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نشر تطبيقات Flask | الدرس العاشر | CodeWay</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prism.js للتلوين -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-dark: #d4af37;
+            --primary-light: #ffed4a;
+            --dark: #0a0a0a;
+            --dark-light: #1a1a1a;
+            --dark-surface: #222;
+            --text: #ffffff;
+            --text-light: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --border-color: rgba(255, 215, 0, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #00c851;
+            --info: #00b4ff;
+            --warning: #ff8800;
+            --danger: #ff1744;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            z-index: 1001;
+            background: transparent;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.97);
+            backdrop-filter: blur(20px);
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .nav-links .back-home {
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary) !important;
+            border-radius: 50px;
+        }
+
+        .nav-links .back-home:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+            z-index: 999;
+            border: none;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.6);
+        }
+
+        .hero {
+            padding: 120px 20px 60px;
+            background: linear-gradient(135deg, var(--dark), var(--dark-light));
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05), transparent 70%);
+            border-radius: 50%;
+            animation: floatBubble 25s ease-in-out infinite;
+        }
+
+        @keyframes floatBubble {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-40px, 30px) scale(1.1); }
+        }
+
+        .hero-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .hero-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 i {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .hero-meta i {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .content-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .content-card h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .content-card h2 i {
+            font-size: 1.5rem;
+        }
+
+        .content-card h3 {
+            color: var(--primary-light);
+            font-size: 1.3rem;
+            margin: 25px 0 15px;
+        }
+
+        .content-card h4 {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin: 20px 0 10px;
+        }
+
+        .content-card p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .content-card ul, .content-card ol {
+            color: var(--text-light);
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+
+        .content-card li {
+            margin-bottom: 8px;
+        }
+
+        .content-card li strong {
+            color: var(--primary);
+        }
+
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+        }
+
+        .code-block .code-label {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--primary);
+            color: #000;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: rgba(0, 180, 255, 0.08);
+            border-right: 4px solid var(--info);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .info-box i {
+            color: var(--info);
+            margin-left: 10px;
+        }
+
+        .warning-box {
+            background: rgba(255, 136, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning-box i {
+            color: var(--warning);
+            margin-left: 10px;
+        }
+
+        .success-box {
+            background: rgba(0, 200, 81, 0.08);
+            border-right: 4px solid var(--success);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .success-box i {
+            color: var(--success);
+            margin-left: 10px;
+        }
+
+        .danger-box {
+            background: rgba(255, 23, 68, 0.08);
+            border-right: 4px solid var(--danger);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .danger-box i {
+            color: var(--danger);
+            margin-left: 10px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: rgba(255, 215, 0, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .feature-item:hover {
+            background: rgba(255, 215, 0, 0.08);
+            transform: translateY(-5px);
+        }
+
+        .feature-item i {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .feature-item h4 {
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .feature-item p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .deploy-simulator {
+            background: var(--dark-surface);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .deploy-simulator .deploy-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .deploy-simulator .deploy-step {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            background: var(--dark);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .deploy-simulator .deploy-step:hover {
+            border-color: var(--primary);
+        }
+
+        .deploy-simulator .deploy-step .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .deploy-simulator .deploy-step .step-number.done {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .deploy-simulator .deploy-step .step-content {
+            flex: 1;
+        }
+
+        .deploy-simulator .deploy-step .step-content .step-title {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .deploy-simulator .deploy-step .step-content .step-desc {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .deploy-simulator .deploy-step .step-status {
+            font-size: 1.2rem;
+        }
+
+        .deploy-simulator .deploy-step .step-status.pending {
+            color: var(--text-secondary);
+        }
+
+        .deploy-simulator .deploy-step .step-status.running {
+            color: var(--warning);
+            animation: spin 1s linear infinite;
+        }
+
+        .deploy-simulator .deploy-step .step-status.done {
+            color: var(--success);
+        }
+
+        .deploy-simulator .deploy-step .step-status.error {
+            color: var(--danger);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .deploy-simulator .deploy-progress {
+            margin-top: 16px;
+        }
+
+        .deploy-simulator .deploy-progress .progress-track {
+            background: rgba(255, 255, 255, 0.05);
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .deploy-simulator .deploy-progress .progress-track .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .deploy-simulator .deploy-progress .progress-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .deploy-simulator .deploy-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .deploy-simulator .deploy-controls button {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .deploy-simulator .deploy-controls .btn-deploy {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .deploy-simulator .deploy-controls .btn-deploy:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .deploy-simulator .deploy-controls .btn-deploy:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .deploy-simulator .deploy-controls .btn-reset {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .deploy-simulator .deploy-controls .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .deploy-simulator .deploy-result {
+            margin-top: 16px;
+            padding: 16px 20px;
+            border-radius: 10px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .deploy-simulator .deploy-result.show {
+            display: block;
+        }
+
+        .deploy-simulator .deploy-result.success {
+            background: rgba(0, 200, 81, 0.08);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .deploy-simulator .deploy-result.error {
+            background: rgba(255, 23, 68, 0.08);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .lesson-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .lesson-footer .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .lesson-footer .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .lesson-footer .btn-primary:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .lesson-footer .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .lesson-footer .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .btn-complete {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-complete:hover {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        .btn-complete.done {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--dark-light);
+            border-top: 2px solid var(--primary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 100px 15px 40px;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .hero-meta {
+                gap: 15px;
+            }
+            
+            .content-card {
+                padding: 20px;
+            }
+            
+            .content-card h2 {
+                font-size: 1.4rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .nav-links a {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+            
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .deploy-simulator .deploy-step {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-card {
+                padding: 15px;
+            }
+            
+            .lesson-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .lesson-footer .btn {
+                justify-content: center;
+            }
+
+            .deploy-simulator .deploy-controls {
+                flex-direction: column;
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .token.comment {
+            color: #6a9955;
+        }
+        .token.string {
+            color: #ce9178;
+        }
+        .token.keyword {
+            color: #569cd6;
+        }
+        .token.function {
+            color: #dcdcaa;
+        }
+        .token.class-name {
+            color: #4ec9b0;
+        }
+        .token.decorator {
+            color: #c586c0;
+        }
+
+        .platforms-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--dark);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .platforms-table thead {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .platforms-table th {
+            padding: 14px 18px;
+            text-align: right;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            font-weight: 700;
+        }
+
+        .platforms-table td {
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+        }
+
+        .platforms-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .platforms-table .platform-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 215, 0, 0.08);
+            color: var(--primary);
+        }
+
+        .platforms-table .platform-badge.heroku {
+            background: rgba(100, 65, 164, 0.15);
+            color: #a78bfa;
+        }
+
+        .platforms-table .platform-badge.aws {
+            background: rgba(255, 153, 0, 0.15);
+            color: #f59e0b;
+        }
+
+        .platforms-table .platform-badge.digitalocean {
+            background: rgba(0, 105, 255, 0.15);
+            color: #60a5fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="../index.html" class="logo">
+            <i class="fas fa-flask"></i>
+            <span>Flask</span>
+        </a>
+        <div class="nav-links">
+            <a href="#content">الدرس</a>
+            <a href="#interactive">تفاعل</a>
+            <a href="../flask.html" class="back-home">
+                <i class="fas fa-arrow-right"></i> العودة
+            </a>
+        </div>
+    </nav>
+
+    <button class="back-to-top" id="backToTop" aria-label="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-breadcrumb">
+                <a href="../index.html">الرئيسية</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <a href="../flask.html">Flask</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <span style="color: var(--text);">الدرس العاشر</span>
+            </div>
+
+            <div class="hero-badge">
+                <i class="fas fa-graduation-cap"></i> الدرس 10 من 10
+            </div>
+
+            <h1><i class="fas fa-cloud-upload-alt"></i> نشر تطبيقات Flask</h1>
+            <p>تعلم كيفية نشر تطبيقات Flask على منصات السحابة المختلفة مثل Heroku و PythonAnywhere و AWS.</p>
+
+            <div class="hero-meta">
+                <span><i class="far fa-clock"></i> مدة القراءة: 16 دقيقة</span>
+                <span><i class="fas fa-signal"></i> مستوى: متوسط</span>
+                <span><i class="fas fa-cloud"></i> نشر / استضافة</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="container" id="content">
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-question-circle"></i> ما الذي سنتعلمه؟</h2>
+            <p>
+                في هذا الدرس الأخير، سنتعلم كيفية نشر تطبيقات Flask على منصات الاستضافة المختلفة،
+                من التحضير إلى النشر الفعلي.
+            </p>
+            <ul>
+                <li>✅ <strong>تحضير التطبيق للنشر</strong> – إعداد الكود والمتغيرات البيئية.</li>
+                <li>✅ <strong>اختيار منصة النشر</strong> – مقارنة بين المنصات المختلفة.</li>
+                <li>✅ <strong>النشر على Heroku</strong> – خطوات نشر التطبيق مجاناً.</li>
+                <li>✅ <strong>النشر على PythonAnywhere</strong> – منصة مبسطة لتطبيقات بايثون.</li>
+                <li>✅ <strong>النشر على AWS</strong> – استخدام EC2 و Elastic Beanstalk.</li>
+                <li>✅ <strong>أفضل ممارسات النشر</strong> – نصائح لتطبيق آمن ومستقر.</li>
+            </ul>
+        </div>
+
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-tools"></i> تحضير التطبيق للنشر</h2>
+            <p>
+                قبل النشر، تحتاج إلى تحضير التطبيق باتباع هذه الخطوات:
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">ملف requirements.txt</div>
+                <pre><code class="language-bash">
+# إنشاء ملف التبعيات
+pip freeze > requirements.txt
+
+# مثال على محتوى الملف
+Flask==2.3.3
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.2
+Flask-WTF==1.1.1
+gunicorn==21.2.0
+python-dotenv==1.0.0
+                </code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">ملف Procfile (لـ Heroku)</div>
+                <pre><code class="language-text">
+web: gunicorn app:app
+                </code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">ملف .env (متغيرات البيئة)</div>
+                <pre><code class="language-bash">
+SECRET_KEY=your-secret-key-here
+DATABASE_URL=postgresql://user:pass@localhost/db
+FLASK_ENV=production
+                </code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">استخدام متغيرات البيئة في الكود</div>
+                <pre><code class="language-python">
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'default-key'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
+    FLASK_ENV = os.environ.get('FLASK_ENV') or 'development'
+                </code></pre>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>تنبيه:</strong> لا تضع أبداً المفاتيح السرية وكلمات المرور في الكود. استخدم متغيرات البيئة دائماً.
+            </div>
+        </div>
+
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-server"></i> مقارنة منصات النشر</h2>
+            <p>
+                هناك العديد من المنصات لنشر تطبيقات Flask. إليك مقارنة بين أشهرها:
+            </p>
+
+            <table class="platforms-table">
+                <thead>
+                    <tr>
+                        <th>المنصة</th>
+                        <th>المميزات</th>
+                        <th>السعر</th>
+                        <th>المناسب لـ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="platform-badge heroku">Heroku</span></td>
+                        <td>سهل الاستخدام، تكامل مع Git، إضافات متعددة</td>
+                        <td>مجاني (مع قيود) / مدفوع</td>
+                        <td>المشاريع الصغيرة والمتوسطة</td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-badge">PythonAnywhere</span></td>
+                        <td>مخصص لبايثون، واجهة ويب سهلة، دعم Flask</td>
+                        <td>مجاني (مع قيود) / مدفوع</td>
+                        <td>المبتدئين والمشاريع البسيطة</td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-badge aws">AWS</span></td>
+                        <td>مرونة عالية، خيارات متعددة (EC2, EB, Lambda)</td>
+                        <td>مدفوع (حسب الاستخدام)</td>
+                        <td>المشاريع الكبيرة والمؤسسات</td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-badge digitalocean">DigitalOcean</span></td>
+                        <td>خوادم App Platform، Droplets، سهولة الاستخدام</td>
+                        <td>مدفوع (بأسعار معقولة)</td>
+                        <td>المطورين والشركات الناشئة</td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-badge">Fly.io</span></td>
+                        <td>نشر سريع، دعم Docker، خوادم عالمية</td>
+                        <td>مجاني (مع قيود) / مدفوع</td>
+                        <td>المشاريع الحديثة</td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-badge">Render</span></td>
+                        <td>سهل الاستخدام، دعم Git، شبكة CDN</td>
+                        <td>مجاني (مع قيود) / مدفوع</td>
+                        <td>المشاريع الصغيرة والمتوسطة</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-card fade-in">
+            <h2><i class="fab fa-heroku"></i> النشر على Heroku</h2>
+            <p>
+                <strong>Heroku</strong> هو منصة سحابية سهلة الاستخدام لنشر تطبيقات الويب. اتبع هذه الخطوات:
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">خطوات النشر على Heroku</div>
+                <pre><code class="language-bash">
+# 1. تثبيت Heroku CLI
+# قم بتحميله من الموقع الرسمي
+
+# 2. تسجيل الدخول
+heroku login
+
+# 3. إنشاء تطبيق جديد
+heroku create my-flask-app
+
+# 4. إضافة قاعدة بيانات (PostgreSQL)
+heroku addons:create heroku-postgresql:hobby-dev
+
+# 5. تعيين متغيرات البيئة
+heroku config:set SECRET_KEY=your-secret-key
+heroku config:set FLASK_ENV=production
+
+# 6. النشر
+git push heroku main
+
+# 7. فتح التطبيق
+heroku open
+
+# 8. عرض السجلات
+heroku logs --tail
+                </code></pre>
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-lightbulb"></i>
+                <strong>نصيحة:</strong> Heroku يتطلب وجود ملف <code>Procfile</code> و <code>requirements.txt</code> في جذر المشروع.
+            </div>
+        </div>
+
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-globe"></i> النشر على PythonAnywhere</h2>
+            <p>
+                <strong>PythonAnywhere</strong> هو منصة مبسطة لنشر تطبيقات بايثون، مثالية للمبتدئين.
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">خطوات النشر على PythonAnywhere</div>
+                <pre><code class="language-bash">
+# 1. إنشاء حساب على PythonAnywhere
+
+# 2. رفع الملفات عبر FTP أو باستخدام Git
+# يمكنك استخدام Bash Console
+
+# 3. إعداد البيئة الافتراضية
+mkvirtualenv my-flask-app --python=/usr/bin/python3.10
+
+# 4. تثبيت التبعيات
+pip install -r requirements.txt
+
+# 5. إعداد WSGI
+# قم بتحرير ملف wsgi.py في دليل التطبيق
+
+# 6. إعادة تحميل التطبيق من الواجهة
+                </code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">ملف wsgi.py</div>
+                <pre><code class="language-python">
+import sys
+import os
+
+# إضافة مسار المشروع
+path = '/home/username/my-flask-app'
+if path not in sys.path:
+    sys.path.append(path)
+
+# استيراد التطبيق
+from app import app as application
+                </code></pre>
+            </div>
+        </div>
+
+        <div class="content-card fade-in">
+            <h2><i class="fab fa-aws"></i> النشر على AWS</h2>
+            <p>
+                <strong>AWS (Amazon Web Services)</strong> يوفر خيارات متعددة لنشر تطبيقات Flask.
+            </p>
+
+            <h3>النشر باستخدام Elastic Beanstalk</h3>
+            <div class="code-block">
+                <div class="code-label">Elastic Beanstalk</div>
+                <pre><code class="language-bash">
+# 1. تثبيت EB CLI
+pip install awsebcli
+
+# 2. تهيئة التطبيق
+eb init -p python-3.10 my-flask-app
+
+# 3. إنشاء البيئة
+eb create my-flask-env
+
+# 4. تعيين متغيرات البيئة
+eb setenv SECRET_KEY=your-key DATABASE_URL=postgresql://...
+
+# 5. النشر
+eb deploy
+
+# 6. فتح التطبيق
+eb open
+                </code></pre>
+            </div>
+
+            <h3>النشر باستخدام EC2</h3>
+            <div class="code-block">
+                <div class="code-label">EC2 - الخطوات الأساسية</div>
+                <pre><code class="language-bash">
+# 1. إنشاء مثيل EC2 (Ubuntu)
+
+# 2. الاتصال بالمثيل
+ssh -i key.pem ubuntu@ip-address
+
+# 3. تثبيت المتطلبات
+sudo apt update
+sudo apt install python3-pip python3-venv nginx
+
+# 4. نسخ المشروع
+git clone https://github.com/user/my-flask-app.git
+
+# 5. إعداد البيئة
+cd my-flask-app
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 6. تثبيت وتكوين Gunicorn و Nginx
+# (استخدم إعدادات Gunicorn و Nginx المناسبة)
+                </code></pre>
+            </div>
+        </div>
+
+        <div class="content-card fade-in" id="interactive">
+            <h2><i class="fas fa-laptop-code"></i> محاكي النشر التفاعلي</h2>
+            <p>
+                جرب محاكاة عملية نشر تطبيق Flask خطوة بخطوة:
+            </p>
+
+            <div class="deploy-simulator">
+                <div class="deploy-steps">
+                    <div class="deploy-step" data-step="1">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <div class="step-title">تحضير الملفات</div>
+                            <div class="step-desc">إنشاء requirements.txt و Procfile</div>
+                        </div>
+                        <span class="step-status pending"><i class="fas fa-circle"></i></span>
+                    </div>
+                    <div class="deploy-step" data-step="2">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <div class="step-title">دفع الكود إلى Git</div>
+                            <div class="step-desc">رفع التغييرات إلى المستودع</div>
+                        </div>
+                        <span class="step-status pending"><i class="fas fa-circle"></i></span>
+                    </div>
+                    <div class="deploy-step" data-step="3">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <div class="step-title">النشر على المنصة</div>
+                            <div class="step-desc">git push heroku main / eb deploy</div>
+                        </div>
+                        <span class="step-status pending"><i class="fas fa-circle"></i></span>
+                    </div>
+                    <div class="deploy-step" data-step="4">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <div class="step-title">تهيئة قاعدة البيانات</div>
+                            <div class="step-desc">تطبيق الترحيلات وإعداد البيانات</div>
+                        </div>
+                        <span class="step-status pending"><i class="fas fa-circle"></i></span>
+                    </div>
+                    <div class="deploy-step" data-step="5">
+                        <span class="step-number">5</span>
+                        <div class="step-content">
+                            <div class="step-title">التطبيق يعمل! 🎉</div>
+                            <div class="step-desc">التطبيق متاح للمستخدمين</div>
+                        </div>
+                        <span class="step-status pending"><i class="fas fa-circle"></i></span>
+                    </div>
+                </div>
+
+                <div class="deploy-progress">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="deployProgressFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="progress-text" id="deployProgressText">0% مكتمل</div>
+                </div>
+
+                <div class="deploy-result" id="deployResult"></div>
+
+                <div class="deploy-controls">
+                    <button class="btn-deploy" id="startDeployBtn"><i class="fas fa-play"></i> بدء النشر</button>
+                    <button class="btn-reset" onclick="resetDeploy()"><i class="fas fa-undo"></i> إعادة تعيين</button>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>تنبيه:</strong> هذا المحاكي يوضح عملية النشر بشكل تعليمي. النشر الحقيقي يتطلب إعدادات إضافية حسب المنصة.
+            </div>
+        </div>
+
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-shield-alt"></i> أفضل ممارسات النشر</h2>
+            <ul>
+                <li>
+                    <strong>استخدم متغيرات البيئة:</strong>
+                    لا تخزن المفاتيح السرية في الكود. استخدم متغيرات البيئة دائماً.
+                </li>
+                <li>
+                    <strong>قاعدة بيانات منفصلة:</strong>
+                    استخدم قاعدة بيانات منفصلة للإنتاج (PostgreSQL, MySQL) بدلاً من SQLite.
+                </li>
+                <li>
+                    <strong>خادم ويب احترافي:</strong>
+                    استخدم Gunicorn أو uWSGI مع Nginx كخادم وكيل عكسي.
+                </li>
+                <li>
+                    <strong>HTTPS:</strong>
+                    قم بتفعيل SSL/TLS لتشفير الاتصالات (استخدم Let's Encrypt).
+                </li>
+                <li>
+                    <strong>مراقبة الأخطاء:</strong>
+                    استخدم أدوات مثل Sentry أو Rollbar لتتبع الأخطاء في الإنتاج.
+                </li>
+                <li>
+                    <strong>نسخ احتياطية:</strong>
+                    قم بعمل نسخ احتياطية لقاعدة البيانات بشكل دوري.
+                </li>
+                <li>
+                    <strong>التحديثات:</strong>
+                    حافظ على تحديث المكتبات وإصدار بايثون.
+                </li>
+            </ul>
+
+            <div class="success-box">
+                <i class="fas fa-check-circle"></i>
+                <strong>نصيحة اليوم:</strong> "النشر الجيد هو مزيج من الأمان والأداء والمراقبة. لا تهمل أي جانب منها."
+            </div>
+        </div>
+
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-flag-checkered"></i> خلاصة الدرس</h2>
+            <ul>
+                <li>✅ تعلمنا <strong>تحضير التطبيق للنشر</strong> باستخدام متغيرات البيئة.</li>
+                <li>✅ قارنا بين <strong>منصات النشر</strong> المختلفة (Heroku, PythonAnywhere, AWS).</li>
+                <li>✅ تعلمنا <strong>النشر على Heroku</strong> باستخدام Git و Procfile.</li>
+                <li>✅ تعلمنا <strong>النشر على PythonAnywhere</strong> باستخدام WSGI.</li>
+                <li>✅ تعرفنا على <strong>النشر على AWS</strong> باستخدام Elastic Beanstalk و EC2.</li>
+                <li>✅ استعرضنا <strong>أفضل ممارسات النشر</strong> لتطبيقات آمنة ومستقرة.</li>
+            </ul>
+        </div>
+
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-question"></i> اختبر معلوماتك</h2>
+            <div id="quizSection">
+                <p><strong>ما هو الملف المطلوب في Heroku لتحديد كيفية تشغيل التطبيق؟</strong></p>
+                <div style="display:flex;flex-direction:column;gap:10px;margin:15px 0;">
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="procfile">
+                        <input type="radio" name="quiz" value="procfile" style="accent-color:var(--primary);width:18px;height:18px;">
+                        Procfile
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="dockerfile">
+                        <input type="radio" name="quiz" value="dockerfile" style="accent-color:var(--primary);width:18px;height:18px;">
+                        Dockerfile
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="wsgi">
+                        <input type="radio" name="quiz" value="wsgi" style="accent-color:var(--primary);width:18px;height:18px;">
+                        wsgi.py
+                    </label>
+                </div>
+                <button id="checkQuizBtn" style="background:var(--primary);color:#000;border:none;padding:12px 30px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;transition:var(--transition);font-family:'Cairo',sans-serif;">
+                    <i class="fas fa-check"></i> تحقق الإجابة
+                </button>
+                <div id="quizResult" style="margin-top:15px;padding:15px;border-radius:10px;display:none;"></div>
+            </div>
+        </div>
+
+        <div class="lesson-footer">
+            <div style="display:flex;gap:15px;flex-wrap:wrap;">
+                <button class="btn-complete" id="markCompleteBtn">
+                    <i class="fas fa-circle" id="completeIcon"></i>
+                    <span id="completeText">تحديد كمكتمل</span>
+                </button>
+                <a href="../flask.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i> العودة للدروس
+                </a>
+            </div>
+            <a href="../index.html" class="btn btn-primary">
+                <i class="fas fa-home"></i> العودة للرئيسية
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 <a href="../index.html">CodeWay</a> — تخصص Flask — الدرس العاشر: نشر تطبيقات Flask</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <script>
+        function updateProgressBar() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function toggleBackToTop() {
+            const btn = document.getElementById('backToTop');
+            if (document.documentElement.scrollTop > 300 || document.body.scrollTop > 300) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        function checkFadeIn() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 80) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        // =============================================
+        // محاكي النشر
+        // =============================================
+        let isDeploying = false;
+        let deployInterval = null;
+        let currentStep = 0;
+
+        const stepMessages = {
+            1: '✅ تحضير الملفات... تم إنشاء requirements.txt و Procfile',
+            2: '✅ دفع الكود إلى Git... تم رفع التغييرات بنجاح',
+            3: '✅ النشر على المنصة... جاري بناء التطبيق ونشره',
+            4: '✅ تهيئة قاعدة البيانات... تم تطبيق الترحيلات',
+            5: '🎉 تم النشر بنجاح! التطبيق جاهز للاستخدام'
+        };
+
+        function startDeploy() {
+            if (isDeploying) return;
+            
+            const btn = document.getElementById('startDeployBtn');
+            btn.disabled = true;
+            btn.textContent = 'جاري النشر...';
+            isDeploying = true;
+            currentStep = 0;
+
+            // إعادة تعيين الحالة
+            document.querySelectorAll('.deploy-step').forEach(step => {
+                const status = step.querySelector('.step-status');
+                status.className = 'step-status pending';
+                status.innerHTML = '<i class="fas fa-circle"></i>';
+                const number = step.querySelector('.step-number');
+                number.className = 'step-number';
+            });
+
+            document.getElementById('deployResult').className = 'deploy-result';
+            document.getElementById('deployProgressFill').style.width = '0%';
+            document.getElementById('deployProgressText').textContent = '0% مكتمل';
+
+            // محاكاة خطوات النشر
+            let progress = 0;
+            deployInterval = setInterval(() => {
+                if (currentStep < 5) {
+                    currentStep++;
+                    const step = document.querySelector(`.deploy-step[data-step="${currentStep}"]`);
+                    const status = step.querySelector('.step-status');
+                    const number = step.querySelector('.step-number');
+                    
+                    // تحديث الحالة
+                    status.className = 'step-status running';
+                    status.innerHTML = '<i class="fas fa-spinner"></i>';
+                    
+                    // محاكاة وقت المعالجة
+                    setTimeout(() => {
+                        status.className = 'step-status done';
+                        status.innerHTML = '<i class="fas fa-check"></i>';
+                        number.className = 'step-number done';
+                        
+                        // تحديث التقدم
+                        progress = (currentStep / 5) * 100;
+                        document.getElementById('deployProgressFill').style.width = progress + '%';
+                        document.getElementById('deployProgressText').textContent = 
+                            `${Math.round(progress)}% مكتمل - ${stepMessages[currentStep]}`;
+                        
+                        if (currentStep === 5) {
+                            // اكتمل النشر
+                            clearInterval(deployInterval);
+                            isDeploying = false;
+                            btn.disabled = false;
+                            btn.textContent = '✅ اكتمل النشر';
+                            btn.style.background = 'var(--success)';
+                            btn.style.color = '#fff';
+                            
+                            const result = document.getElementById('deployResult');
+                            result.className = 'deploy-result show success';
+                            result.innerHTML = `
+                                <i class="fas fa-check-circle"></i> 
+                                🎉 تم نشر التطبيق بنجاح! 
+                                <br><small style="font-weight:400;">التطبيق متاح على: https://my-flask-app.herokuapp.com</small>
+                            `;
+                        }
+                    }, 800 + Math.random() * 400);
+                }
+            }, 1200 + Math.random() * 400);
+        }
+
+        function resetDeploy() {
+            if (deployInterval) {
+                clearInterval(deployInterval);
+                deployInterval = null;
+            }
+            
+            isDeploying = false;
+            currentStep = 0;
+            
+            const btn = document.getElementById('startDeployBtn');
+            btn.disabled = false;
+            btn.textContent = 'بدء النشر';
+            btn.style.background = '';
+            btn.style.color = '';
+            
+            document.querySelectorAll('.deploy-step').forEach(step => {
+                const status = step.querySelector('.step-status');
+                status.className = 'step-status pending';
+                status.innerHTML = '<i class="fas fa-circle"></i>';
+                const number = step.querySelector('.step-number');
+                number.className = 'step-number';
+            });
+
+            document.getElementById('deployResult').className = 'deploy-result';
+            document.getElementById('deployProgressFill').style.width = '0%';
+            document.getElementById('deployProgressText').textContent = '0% مكتمل';
+        }
+
+        document.getElementById('startDeployBtn').addEventListener('click', startDeploy);
+
+        // =============================================
+        // اختبار المعرفة
+        // =============================================
+        document.getElementById('checkQuizBtn').addEventListener('click', function() {
+            const selected = document.querySelector('input[name="quiz"]:checked');
+            const resultDiv = document.getElementById('quizResult');
+            
+            if (!selected) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> الرجاء اختيار إجابة أولاً.';
+                return;
+            }
+
+            const answer = selected.value;
+            resultDiv.style.display = 'block';
+            
+            if (answer === 'procfile') {
+                resultDiv.className = 'success-box';
+                resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ إجابة صحيحة! <strong>Procfile</strong> هو الملف المستخدم في Heroku لتحديد كيفية تشغيل التطبيق.';
+            } else {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. الملف الصحيح هو <strong>Procfile</strong>.`;
+            }
+        });
+
+        // =============================================
+        // إكمال الدرس - localStorage
+        // =============================================
+        const LESSON_ID = 10;
+        const STORAGE_KEY = 'flask_lessons_completed';
+
+        function isLessonCompleted() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return false;
+            const completed = JSON.parse(saved);
+            return completed.includes(LESSON_ID);
+        }
+
+        function toggleLessonComplete() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            let completed = saved ? JSON.parse(saved) : [];
+            const index = completed.indexOf(LESSON_ID);
+            
+            if (index > -1) {
+                completed.splice(index, 1);
+            } else {
+                completed.push(LESSON_ID);
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+            updateCompleteButton();
+        }
+
+        function updateCompleteButton() {
+            const btn = document.getElementById('markCompleteBtn');
+            const icon = document.getElementById('completeIcon');
+            const text = document.getElementById('completeText');
+            
+            if (isLessonCompleted()) {
+                btn.classList.add('done');
+                icon.className = 'fas fa-check-circle';
+                text.textContent = 'مكتمل ✓';
+            } else {
+                btn.classList.remove('done');
+                icon.className = 'fas fa-circle';
+                text.textContent = 'تحديد كمكتمل';
+            }
+        }
+
+        document.getElementById('markCompleteBtn').addEventListener('click', toggleLessonComplete);
+
+        window.addEventListener('scroll', function() {
+            updateProgressBar();
+            toggleBackToTop();
+            checkFadeIn();
+        });
+
+        window.addEventListener('load', function() {
+            checkFadeIn();
+            updateCompleteButton();
+        });
+
+        document.querySelectorAll('.quiz-option').forEach(label => {
+            label.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+    </script>
+</body>
+</html>

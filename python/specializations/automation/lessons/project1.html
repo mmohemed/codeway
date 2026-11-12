@@ -1,0 +1,2544 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مشروع 1: مساعد المكتب اليومي | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص الأتمتة</a>
+        <span class="sep">/</span>
+        <span>مساعد المكتب</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-user-tie"></i>
+            مشروع 1 · تطبيق متكامل
+        </div>
+        <h1 class="lesson-title">مشروع 1: مساعد المكتب اليومي</h1>
+        <p class="lesson-intro">
+            سارة مديرة مكتب تقضي <strong>25 دقيقة كل صباح</strong> في ترتيب مجلد التنزيلات، ودمج ملفات مبيعات الفروع في Excel، وإرسال التقرير للمدير. في هذا المشروع ستبني لها <strong>أداة سطر أوامر متكاملة</strong> تفعل ذلك كله وحدها كل صباح: إعدادات خارجية، وترتيب آمن مع وضع التجربة، وتقرير Excel يتجاهل الأسطر الخاطئة ولا يكرر الملفات، وبريد بملخص HTML ومرفق، وسجلات، وقفل، واختبارات آلية، ثم جدولتها.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 3–4 ساعات</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 أداة توفّر ساعتين أسبوعيًا</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 مشروع تطبيقي</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدروس 1–8</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#brief">1. موجز المشروع</a>
+            <a href="#data">2. البيانات والإعدادات</a>
+            <a href="#organize">3. ترتيب التنزيلات</a>
+            <a href="#report">4. تقرير المبيعات</a>
+            <a href="#mail">5. إرسال التقرير</a>
+            <a href="#cli">6. المنسّق</a>
+            <a href="#tests">7. الاختبارات</a>
+            <a href="#deploy">8. التشغيل التلقائي</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="brief">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-clipboard-list"></i>
+        موجز المشروع والمتطلبات
+    </h2>
+        <p>كل صباح تكرر سارة ثلاث مهام يدوية:</p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-folder-open"></i> ترتيب التنزيلات</h4>
+                <p>عشرات الفواتير والصور والبرامج في مجلد واحد، تنقلها يدويًا إلى مجلداتها.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-file-excel"></i> تقرير المبيعات</h4>
+                <p>كل فرع يرسل ملف CSV يوميًا؛ تدمجها في Excel وتحسب الإجماليات والنسب.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-envelope"></i> إرسال التقرير</h4>
+                <p>تكتب بريدًا للمدير بالأرقام الرئيسية وترفق الملف.</p>
+            </div>
+        </div>
+        <p><strong>متطلبات الأداة</strong> (هذه هي «معايير القبول» التي سنختبرها):</p>
+        <ul>
+            <li>كل الإعدادات (المجلدات، والفئات، والمستلمون، والخادم) في <code>config.json</code>، والأسرار في متغيرات البيئة فقط.</li>
+            <li>وضع <code>--dry-run</code> يعرض كل ما سيحدث دون نقل ملف أو إرسال رسالة.</li>
+            <li>لا تُستبدل الملفات عند تعارض الأسماء: <code>invoice.pdf</code> ← <code>invoice (1).pdf</code>.</li>
+            <li>السطر الخاطئ في CSV يُسجَّل ويُتجاهل، ولا يُسقط التقرير كله.</li>
+            <li>كل ملف مبيعات يدخل تقريرًا واحدًا فقط — <strong>بعد</strong> نجاح الإرسال، فإذا فشل الإرسال يُعاد المحاولة غدًا.</li>
+            <li>سجل دائم بالتتبع الكامل، ورموز خروج واضحة، ومنع تشغيل نسختين معًا.</li>
+            <li>اختبارات آلية للمنطق الأساسي.</li>
+        </ul>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الملف</th><th>المسؤولية</th><th>من الدرس</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>config.py</code></td><td>تحميل الإعدادات</td><td>1</td></tr>
+                    <tr><td><code>organizer.py</code></td><td>ترتيب المجلد</td><td>2</td></tr>
+                    <tr><td><code>reports.py</code></td><td>قراءة CSV والتحقق وتقرير Excel وملف الحالة</td><td>3، 7</td></tr>
+                    <tr><td><code>mailer.py</code></td><td>بناء الرسالة وإرسالها</td><td>5</td></tr>
+                    <tr><td><code>assistant.py</code></td><td>واجهة الأوامر، والسجل، والقفل، ورموز الخروج</td><td>1، 7</td></tr>
+                    <tr><td><code>test_assistant.py</code></td><td>الاختبارات الآلية</td><td>المستوى المتقدم</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>لماذا ملفات منفصلة؟</strong> كل وحدة تفعل شيئًا واحدًا ولا تعرف شيئًا عن الأخرى، و <code>assistant.py</code> وحده يربطها.
+                هكذا تختبر كل جزء وحده، وتستبدل البريد بـ Telegram مثلًا دون لمس التقرير.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="data">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-database"></i>
+        بيانات التجربة والإعدادات
+    </h2>
+        <p>
+            هذا السكربت ينشئ بيئة تجربة كاملة: ملف الإعدادات، ومجلد تنزيلات فيه ملف بنفس اسم ملف موجود (لاختبار التعارض)،
+            وثلاثة ملفات مبيعات يومية أحدها يحتوي <strong>سطرًا خاطئًا عمدًا</strong> (الكمية مكتوبة «ثلاثة»). كل أمثلة المشروع تبدأ منه:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>make_sample.py</span>
+    </div>
+<pre><span class="kw">import</span> json
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="fn">Path</span>(<span class="str">"config.json"</span>).<span class="fn">write_text</span>(json.<span class="fn">dumps</span>({
+    <span class="str">"downloads"</span>: <span class="str">"Downloads"</span>,
+    <span class="str">"inbox"</span>: <span class="str">"inbox"</span>,
+    <span class="str">"reports"</span>: <span class="str">"reports"</span>,
+    <span class="str">"state_file"</span>: <span class="str">"processed.json"</span>,
+    <span class="str">"categories"</span>: {
+        <span class="str">"Documents"</span>: [<span class="str">".pdf"</span>, <span class="str">".docx"</span>, <span class="str">".xlsx"</span>, <span class="str">".txt"</span>],
+        <span class="str">"Images"</span>: [<span class="str">".jpg"</span>, <span class="str">".jpeg"</span>, <span class="str">".png"</span>],
+        <span class="str">"Archives"</span>: [<span class="str">".zip"</span>, <span class="str">".rar"</span>],
+        <span class="str">"Installers"</span>: [<span class="str">".exe"</span>, <span class="str">".msi"</span>],
+    },
+    <span class="str">"report_to"</span>: [<span class="str">"manager@company.com"</span>],
+    <span class="str">"smtp"</span>: {<span class="str">"host"</span>: <span class="str">"localhost"</span>, <span class="str">"port"</span>: <span class="num">1025</span>, <span class="str">"starttls"</span>: <span class="kw">False</span>},
+}, ensure_ascii=<span class="kw">False</span>, indent=<span class="num">2</span>), encoding=<span class="str">"utf-8"</span>)
+
+downloads = <span class="fn">Path</span>(<span class="str">"Downloads"</span>)
+(downloads / <span class="str">"Documents"</span>).<span class="fn">mkdir</span>(parents=<span class="kw">True</span>, exist_ok=<span class="kw">True</span>)
+(downloads / <span class="str">"Documents"</span> / <span class="str">"invoice.pdf"</span>).<span class="fn">write_text</span>(<span class="str">"old"</span>)          <span class="cm"># موجود مسبقًا لاختبار تعارض الأسماء</span>
+<span class="kw">for</span> name <span class="kw">in</span> [<span class="str">"invoice.pdf"</span>, <span class="str">"budget.xlsx"</span>, <span class="str">"IMG_2041.JPG"</span>, <span class="str">"logo.png"</span>, <span class="str">"setup.exe"</span>, <span class="str">"backup.zip"</span>, <span class="str">"notes.txt"</span>, <span class="str">"song.mp3"</span>]:
+    (downloads / name).<span class="fn">write_text</span>(name)
+
+inbox = <span class="fn">Path</span>(<span class="str">"inbox"</span>)
+inbox.<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+SALES = {
+    <span class="str">"2025-03-12"</span>: [(<span class="str">"الرياض"</span>, <span class="str">"لابتوب"</span>, <span class="num">3</span>, <span class="num">3299</span>), (<span class="str">"جدة"</span>, <span class="str">"سماعة"</span>, <span class="num">10</span>, <span class="num">249.5</span>), (<span class="str">"الدمام"</span>, <span class="str">"شاشة"</span>, <span class="num">2</span>, <span class="num">1150</span>)],
+    <span class="str">"2025-03-13"</span>: [(<span class="str">"الرياض"</span>, <span class="str">"سماعة"</span>, <span class="num">6</span>, <span class="num">249.5</span>), (<span class="str">"جدة"</span>, <span class="str">"لابتوب"</span>, <span class="num">2</span>, <span class="num">3299</span>), (<span class="str">"الدمام"</span>, <span class="str">"فأرة"</span>, <span class="num">15</span>, <span class="num">79</span>),
+                   (<span class="str">"جدة"</span>, <span class="str">"شاشة"</span>, <span class="str">"ثلاثة"</span>, <span class="num">1150</span>)],                     <span class="cm"># سطر خاطئ عمدًا</span>
+    <span class="str">"2025-03-14"</span>: [(<span class="str">"الرياض"</span>, <span class="str">"شاشة"</span>, <span class="num">4</span>, <span class="num">1150</span>), (<span class="str">"جدة"</span>, <span class="str">"فأرة"</span>, <span class="num">20</span>, <span class="num">79</span>), (<span class="str">"الدمام"</span>, <span class="str">"لابتوب"</span>, <span class="num">1</span>, <span class="num">3299</span>)],
+}
+<span class="kw">for</span> day, rows <span class="kw">in</span> SALES.<span class="fn">items</span>():
+    lines = [<span class="str">"branch,product,qty,price"</span>] + [<span class="str">","</span>.<span class="fn">join</span>(<span class="fn">map</span>(str, r)) <span class="kw">for</span> r <span class="kw">in</span> rows]
+    (inbox / <span class="str">f"sales_{day}.csv"</span>).<span class="fn">write_text</span>(<span class="str">"\n"</span>.<span class="fn">join</span>(lines) + <span class="str">"\n"</span>, encoding=<span class="str">"utf-8"</span>)</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>config.py</span>
+    </div>
+<pre><span class="str">"""تحميل إعدادات المساعد من config.json ومتغيرات البيئة."""</span>
+<span class="kw">import</span> json
+<span class="kw">import</span> os
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+
+@dataclass
+<span class="kw">class</span> <span class="fn">Config</span>:
+    downloads: Path
+    inbox: Path
+    reports: Path
+    state_file: Path
+    categories: dict
+    report_to: list
+    smtp_host: str
+    smtp_port: int
+    smtp_starttls: bool
+    smtp_user: str | <span class="kw">None</span> = <span class="kw">None</span>
+    smtp_password: str | <span class="kw">None</span> = <span class="kw">None</span>
+
+    @classmethod
+    <span class="kw">def</span> <span class="fn">load</span>(cls, path=<span class="str">"config.json"</span>):
+        path = <span class="fn">Path</span>(path)
+        data = json.<span class="fn">loads</span>(path.<span class="fn">read_text</span>(encoding=<span class="str">"utf-8"</span>))
+        base = path.<span class="fn">resolve</span>().parent                  <span class="cm"># المسارات نسبةً لملف الإعدادات لا لمجلد العمل</span>
+        smtp = data[<span class="str">"smtp"</span>]
+        <span class="kw">return</span> <span class="fn">cls</span>(
+            downloads=base / data[<span class="str">"downloads"</span>],
+            inbox=base / data[<span class="str">"inbox"</span>],
+            reports=base / data[<span class="str">"reports"</span>],
+            state_file=base / data.<span class="fn">get</span>(<span class="str">"state_file"</span>, <span class="str">"processed.json"</span>),
+            categories={name: [e.<span class="fn">lower</span>() <span class="kw">for</span> e <span class="kw">in</span> exts] <span class="kw">for</span> name, exts <span class="kw">in</span> data[<span class="str">"categories"</span>].<span class="fn">items</span>()},
+            report_to=data[<span class="str">"report_to"</span>],
+            smtp_host=smtp[<span class="str">"host"</span>],
+            smtp_port=<span class="fn">int</span>(smtp[<span class="str">"port"</span>]),
+            smtp_starttls=<span class="fn">bool</span>(smtp.<span class="fn">get</span>(<span class="str">"starttls"</span>, <span class="kw">True</span>)),
+            smtp_user=os.environ.<span class="fn">get</span>(<span class="str">"SMTP_USER"</span>),            <span class="cm"># الأسرار من البيئة فقط</span>
+            smtp_password=os.environ.<span class="fn">get</span>(<span class="str">"SMTP_PASSWORD"</span>),
+        )</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>load_config.py</span>
+    </div>
+<pre><span class="kw">from</span> config <span class="kw">import</span> Config
+
+cfg = Config.<span class="fn">load</span>(<span class="str">"config.json"</span>)
+<span class="fn">print</span>(<span class="str">"المجلدات:"</span>, cfg.downloads.name, <span class="str">"|"</span>, cfg.inbox.name, <span class="str">"|"</span>, cfg.reports.name)
+<span class="fn">print</span>(<span class="str">"الفئات:"</span>, <span class="fn">list</span>(cfg.categories))
+<span class="fn">print</span>(<span class="str">"SMTP:"</span>, cfg.smtp_host, cfg.smtp_port, <span class="str">"| تشفير:"</span>, cfg.smtp_starttls, <span class="str">"| مستخدم:"</span>, cfg.smtp_user <span class="kw">or</span> <span class="str">"لا يوجد (خادم محلي)"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>المجلدات: Downloads | inbox | reports
+الفئات: ['Documents', 'Images', 'Archives', 'Installers']
+SMTP: localhost 1025 | تشفير: False | مستخدم: لا يوجد (خادم محلي)</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <code>base = path.resolve().parent</code> يجعل المسارات نسبةً لموقع ملف الإعدادات، فتعمل الأداة نفسها من cron أو مجدول Windows
+                مهما كان مجلد العمل (تذكّر الدرس 7). وفي التشغيل الحقيقي مع Gmail: <code>"host": "smtp.gmail.com", "port": 587, "starttls": true</code>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="organize">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-folder-tree"></i>
+        الوحدة 1: ترتيب التنزيلات
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>organizer.py</span>
+    </div>
+<pre><span class="str">"""ترتيب مجلد التنزيلات في مجلدات حسب نوع الملف."""</span>
+<span class="kw">import</span> logging
+<span class="kw">import</span> shutil
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+log = logging.<span class="fn">getLogger</span>(<span class="str">"assistant.organizer"</span>)
+
+
+<span class="kw">def</span> <span class="fn">category_for</span>(path, categories):
+    ext = <span class="fn">Path</span>(path).suffix.<span class="fn">lower</span>()
+    <span class="kw">for</span> name, extensions <span class="kw">in</span> categories.<span class="fn">items</span>():
+        <span class="kw">if</span> ext <span class="kw">in</span> extensions:
+            <span class="kw">return</span> name
+    <span class="kw">return</span> <span class="str">"Other"</span>
+
+
+<span class="kw">def</span> <span class="fn">unique_target</span>(target, taken=()):
+    <span class="str">"""اسم غير مستخدم: report.pdf ← report (1).pdf ← report (2).pdf"""</span>
+    candidate, n = target, <span class="num">1</span>
+    <span class="kw">while</span> candidate.<span class="fn">exists</span>() <span class="kw">or</span> candidate <span class="kw">in</span> taken:
+        candidate = target.<span class="fn">with_name</span>(<span class="str">f"{target.stem} ({n}){target.suffix}"</span>)
+        n += <span class="num">1</span>
+    <span class="kw">return</span> candidate
+
+
+<span class="kw">def</span> <span class="fn">organize</span>(folder, categories, dry_run=<span class="kw">False</span>):
+    folder = <span class="fn">Path</span>(folder)
+    moves, taken = [], <span class="fn">set</span>()
+    files = <span class="fn">sorted</span>(p <span class="kw">for</span> p <span class="kw">in</span> folder.<span class="fn">iterdir</span>() <span class="kw">if</span> p.<span class="fn">is_file</span>() <span class="kw">and</span> <span class="kw">not</span> p.name.<span class="fn">startswith</span>(<span class="str">"."</span>))
+    <span class="kw">for</span> f <span class="kw">in</span> files:
+        dest = <span class="fn">unique_target</span>(folder / <span class="fn">category_for</span>(f, categories) / f.name, taken)
+        taken.<span class="fn">add</span>(dest)
+        moves.<span class="fn">append</span>((f.name, dest.<span class="fn">relative_to</span>(folder).<span class="fn">as_posix</span>()))
+        <span class="kw">if</span> <span class="kw">not</span> dry_run:
+            dest.parent.<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+            shutil.<span class="fn">move</span>(f, dest)
+    log.<span class="fn">info</span>(<span class="str">"%s %d ملفات في %s"</span>, <span class="str">"سيُنقل (تجربة)"</span> <span class="kw">if</span> dry_run <span class="kw">else</span> <span class="str">"نُقل"</span>, <span class="fn">len</span>(moves), folder.name)
+    <span class="kw">return</span> moves</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>try_organizer.py</span>
+    </div>
+<pre><span class="kw">import</span> organizer
+<span class="kw">from</span> config <span class="kw">import</span> Config
+
+cfg = Config.<span class="fn">load</span>()
+<span class="fn">print</span>(<span class="str">"🧪 تجربة:"</span>)
+<span class="kw">for</span> name, dest <span class="kw">in</span> organizer.<span class="fn">organize</span>(cfg.downloads, cfg.categories, dry_run=<span class="kw">True</span>):
+    <span class="fn">print</span>(<span class="str">f"   {name:&lt;13} ← {dest}"</span>)
+<span class="fn">print</span>(<span class="str">"لم يتحرك شيء:"</span>, <span class="fn">sorted</span>(p.name <span class="kw">for</span> p <span class="kw">in</span> cfg.downloads.<span class="fn">iterdir</span>() <span class="kw">if</span> p.<span class="fn">is_file</span>())[:<span class="num">3</span>], <span class="str">"..."</span>)
+
+organizer.<span class="fn">organize</span>(cfg.downloads, cfg.categories)
+<span class="fn">print</span>(<span class="str">"\n✅ بعد التنفيذ، الجذر:"</span>, [p.name <span class="kw">for</span> p <span class="kw">in</span> cfg.downloads.<span class="fn">iterdir</span>() <span class="kw">if</span> p.<span class="fn">is_file</span>()])
+<span class="fn">print</span>(<span class="str">"Documents:"</span>, <span class="fn">sorted</span>(p.name <span class="kw">for</span> p <span class="kw">in</span> (cfg.downloads / <span class="str">"Documents"</span>).<span class="fn">iterdir</span>()))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>🧪 تجربة:
+   IMG_2041.JPG  ← Images/IMG_2041.JPG
+   backup.zip    ← Archives/backup.zip
+   budget.xlsx   ← Documents/budget.xlsx
+   invoice.pdf   ← Documents/invoice (1).pdf
+   logo.png      ← Images/logo.png
+   notes.txt     ← Documents/notes.txt
+   setup.exe     ← Installers/setup.exe
+   song.mp3      ← Other/song.mp3
+لم يتحرك شيء: ['IMG_2041.JPG', 'backup.zip', 'budget.xlsx'] ...
+
+✅ بعد التنفيذ، الجذر: []
+Documents: ['budget.xlsx', 'invoice (1).pdf', 'invoice.pdf', 'notes.txt']</pre>
+</div>
+        <p>
+            لاحظ <code>invoice (1).pdf</code>: الملف القديم لم يُستبدل. والمعامل <code>taken</code> في <code>unique_target</code> يمنع تعارضًا خفيًا في وضع التجربة:
+            ملفان بالاسم نفسه في الدفعة نفسها لن يأخذا الاسم الجديد ذاته، لأن الملف الأول لم يُنقل فعلًا بعد.
+        </p>
+</section>
+
+<section class="section-card" id="report">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-file-excel"></i>
+        الوحدة 2: تقرير المبيعات
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>reports.py</span>
+    </div>
+<pre><span class="str">"""دمج ملفات مبيعات الفروع اليومية في تقرير Excel واحد."""</span>
+<span class="kw">import</span> csv
+<span class="kw">import</span> json
+<span class="kw">import</span> logging
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+
+<span class="kw">from</span> openpyxl <span class="kw">import</span> Workbook
+<span class="kw">from</span> openpyxl.chart <span class="kw">import</span> BarChart, Reference
+<span class="kw">from</span> openpyxl.styles <span class="kw">import</span> Alignment, Font, PatternFill
+
+log = logging.<span class="fn">getLogger</span>(<span class="str">"assistant.reports"</span>)
+GOLD = <span class="fn">PatternFill</span>(<span class="str">"solid"</span>, fgColor=<span class="str">"D4AF37"</span>)
+
+
+<span class="kw">def</span> <span class="fn">read_sales</span>(files):
+    rows, bad = [], <span class="num">0</span>
+    <span class="kw">for</span> f <span class="kw">in</span> files:
+        <span class="kw">with</span> <span class="fn">open</span>(f, encoding=<span class="str">"utf-8-sig"</span>, newline=<span class="str">""</span>) <span class="kw">as</span> fh:
+            <span class="kw">for</span> line_no, r <span class="kw">in</span> <span class="fn">enumerate</span>(csv.<span class="fn">DictReader</span>(fh), start=<span class="num">2</span>):
+                <span class="kw">try</span>:
+                    qty, price = <span class="fn">int</span>(r[<span class="str">"qty"</span>]), <span class="fn">float</span>(r[<span class="str">"price"</span>])
+                    <span class="kw">if</span> qty &lt; <span class="num">0</span> <span class="kw">or</span> price &lt; <span class="num">0</span>:
+                        <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="str">"قيمة سالبة"</span>)
+                    rows.<span class="fn">append</span>({<span class="str">"branch"</span>: r[<span class="str">"branch"</span>].<span class="fn">strip</span>(), <span class="str">"product"</span>: r[<span class="str">"product"</span>].<span class="fn">strip</span>(), <span class="str">"total"</span>: qty * price})
+                <span class="kw">except</span> (ValueError, KeyError, TypeError, AttributeError):
+                    bad += <span class="num">1</span>
+                    log.<span class="fn">warning</span>(<span class="str">"سطر غير صالح %s:%d ← %s"</span>, f.name, line_no, <span class="str">","</span>.<span class="fn">join</span>(<span class="fn">str</span>(v) <span class="kw">for</span> v <span class="kw">in</span> r.<span class="fn">values</span>()))
+    <span class="kw">return</span> rows, bad
+
+
+<span class="kw">def</span> <span class="fn">summarize</span>(rows):
+    by_branch, by_product = <span class="fn">defaultdict</span>(float), <span class="fn">defaultdict</span>(float)
+    <span class="kw">for</span> r <span class="kw">in</span> rows:
+        by_branch[r[<span class="str">"branch"</span>]] += r[<span class="str">"total"</span>]
+        by_product[r[<span class="str">"product"</span>]] += r[<span class="str">"total"</span>]
+    ranked = <span class="kw">lambda</span> d: <span class="fn">dict</span>(<span class="fn">sorted</span>(d.<span class="fn">items</span>(), key=<span class="kw">lambda</span> kv: kv[<span class="num">1</span>], reverse=<span class="kw">True</span>))
+    <span class="kw">return</span> <span class="fn">ranked</span>(by_branch), <span class="fn">ranked</span>(by_product)
+
+
+<span class="kw">def</span> <span class="fn">write_sheet</span>(ws, title, data):
+    ws.sheet_view.rightToLeft = <span class="kw">True</span>
+    ws.<span class="fn">append</span>([title, <span class="str">"المبيعات (ر.س)"</span>, <span class="str">"النسبة"</span>])
+    total = <span class="fn">sum</span>(data.<span class="fn">values</span>())
+    <span class="kw">for</span> name, value <span class="kw">in</span> data.<span class="fn">items</span>():
+        ws.<span class="fn">append</span>([name, <span class="fn">round</span>(value, <span class="num">2</span>), value / total <span class="kw">if</span> total <span class="kw">else</span> <span class="num">0</span>])
+    ws.<span class="fn">append</span>([<span class="str">"الإجمالي"</span>, <span class="str">f"=SUM(B2:B{len(data) + 1})"</span>, <span class="kw">None</span>])
+    <span class="kw">for</span> cell <span class="kw">in</span> ws[<span class="num">1</span>]:
+        cell.font, cell.fill, cell.alignment = <span class="fn">Font</span>(bold=<span class="kw">True</span>), GOLD, <span class="fn">Alignment</span>(horizontal=<span class="str">"center"</span>)
+    <span class="kw">for</span> row <span class="kw">in</span> ws.<span class="fn">iter_rows</span>(min_row=<span class="num">2</span>):
+        row[<span class="num">1</span>].number_format, row[<span class="num">2</span>].number_format = <span class="str">"#,##0.00"</span>, <span class="str">"0.0%"</span>
+    ws[<span class="str">f"A{len(data) + 2}"</span>].font = <span class="fn">Font</span>(bold=<span class="kw">True</span>)
+    ws.column_dimensions[<span class="str">"A"</span>].width, ws.column_dimensions[<span class="str">"B"</span>].width = <span class="num">22</span>, <span class="num">16</span>
+
+
+<span class="kw">def</span> <span class="fn">write_excel</span>(by_branch, by_product, out_path):
+    wb = <span class="fn">Workbook</span>()
+    <span class="fn">write_sheet</span>(wb.active, <span class="str">"الفرع"</span>, by_branch)
+    wb.active.title = <span class="str">"حسب الفرع"</span>
+    <span class="fn">write_sheet</span>(wb.<span class="fn">create_sheet</span>(<span class="str">"حسب المنتج"</span>), <span class="str">"المنتج"</span>, by_product)
+    chart = <span class="fn">BarChart</span>()
+    chart.title = <span class="str">"المبيعات حسب الفرع"</span>
+    ws = wb[<span class="str">"حسب الفرع"</span>]
+    chart.<span class="fn">add_data</span>(<span class="fn">Reference</span>(ws, min_col=<span class="num">2</span>, min_row=<span class="num">1</span>, max_row=<span class="fn">len</span>(by_branch) + <span class="num">1</span>), titles_from_data=<span class="kw">True</span>)
+    chart.<span class="fn">set_categories</span>(<span class="fn">Reference</span>(ws, min_col=<span class="num">1</span>, min_row=<span class="num">2</span>, max_row=<span class="fn">len</span>(by_branch) + <span class="num">1</span>))
+    ws.<span class="fn">add_chart</span>(chart, <span class="str">"E2"</span>)
+    out_path.parent.<span class="fn">mkdir</span>(parents=<span class="kw">True</span>, exist_ok=<span class="kw">True</span>)
+    wb.<span class="fn">save</span>(out_path)
+
+
+<span class="kw">def</span> <span class="fn">load_state</span>(state_file):
+    <span class="kw">return</span> <span class="fn">set</span>(json.<span class="fn">loads</span>(state_file.<span class="fn">read_text</span>(encoding=<span class="str">"utf-8"</span>))) <span class="kw">if</span> state_file.<span class="fn">exists</span>() <span class="kw">else</span> <span class="fn">set</span>()
+
+
+<span class="kw">def</span> <span class="fn">save_state</span>(state_file, done):
+    tmp = state_file.<span class="fn">with_suffix</span>(<span class="str">".tmp"</span>)
+    tmp.<span class="fn">write_text</span>(json.<span class="fn">dumps</span>(<span class="fn">sorted</span>(done), ensure_ascii=<span class="kw">False</span>), encoding=<span class="str">"utf-8"</span>)
+    tmp.<span class="fn">replace</span>(state_file)
+
+
+<span class="kw">def</span> <span class="fn">build_report</span>(inbox, reports_dir, state_file, day, dry_run=<span class="kw">False</span>):
+    done = <span class="fn">load_state</span>(state_file)
+    new = [f <span class="kw">for</span> f <span class="kw">in</span> <span class="fn">sorted</span>(inbox.<span class="fn">glob</span>(<span class="str">"sales_*.csv"</span>)) <span class="kw">if</span> f.name <span class="kw">not</span> <span class="kw">in</span> done]
+    <span class="kw">if</span> <span class="kw">not</span> new:
+        log.<span class="fn">info</span>(<span class="str">"لا توجد ملفات مبيعات جديدة"</span>)
+        <span class="kw">return</span> <span class="kw">None</span>
+    rows, bad = <span class="fn">read_sales</span>(new)
+    by_branch, by_product = <span class="fn">summarize</span>(rows)
+    out = reports_dir / <span class="str">f"sales_report_{day}.xlsx"</span>
+    <span class="kw">if</span> <span class="kw">not</span> dry_run:
+        <span class="fn">write_excel</span>(by_branch, by_product, out)
+    log.<span class="fn">info</span>(<span class="str">"تقرير من %d ملفات و %d صفًا (%d مرفوض) ← %s"</span>, <span class="fn">len</span>(new), <span class="fn">len</span>(rows), bad, out.name)
+    <span class="kw">return</span> {<span class="str">"path"</span>: out, <span class="str">"files"</span>: [f.name <span class="kw">for</span> f <span class="kw">in</span> new], <span class="str">"rows"</span>: <span class="fn">len</span>(rows), <span class="str">"bad"</span>: bad,
+            <span class="str">"total"</span>: <span class="fn">sum</span>(by_branch.<span class="fn">values</span>()), <span class="str">"by_branch"</span>: by_branch, <span class="str">"top_product"</span>: <span class="fn">next</span>(<span class="fn">iter</span>(by_product))}
+
+
+<span class="kw">def</span> <span class="fn">mark_done</span>(state_file, names):
+    <span class="str">"""تُستدعى بعد نجاح المهمة كاملة (الكتابة والإرسال) فقط."""</span>
+    <span class="fn">save_state</span>(state_file, <span class="fn">load_state</span>(state_file) | <span class="fn">set</span>(names))</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>try_report.py</span>
+    </div>
+<pre><span class="kw">import</span> logging
+<span class="kw">import</span> sys
+
+<span class="kw">from</span> openpyxl <span class="kw">import</span> load_workbook
+
+<span class="kw">import</span> reports
+<span class="kw">from</span> config <span class="kw">import</span> Config
+
+handler = logging.<span class="fn">StreamHandler</span>(sys.stdout)
+handler.<span class="fn">setFormatter</span>(logging.<span class="fn">Formatter</span>(<span class="str">"%(levelname)-7s %(message)s"</span>))
+logging.<span class="fn">getLogger</span>(<span class="str">"assistant"</span>).<span class="fn">addHandler</span>(handler)       <span class="cm"># سجلات أداتنا فقط، لا سجلات المكتبات</span>
+logging.<span class="fn">getLogger</span>(<span class="str">"assistant"</span>).<span class="fn">setLevel</span>(logging.INFO)
+cfg = Config.<span class="fn">load</span>()
+
+summary = reports.<span class="fn">build_report</span>(cfg.inbox, cfg.reports, cfg.state_file, <span class="str">"2025-03-14"</span>)
+<span class="fn">print</span>(<span class="str">"الملفات:"</span>, summary[<span class="str">"files"</span>])
+<span class="fn">print</span>(<span class="str">f"الإجمالي: {summary['total']:,.2f} | الأعلى: {summary['top_product']} | مرفوض: {summary['bad']}"</span>)
+
+wb = <span class="fn">load_workbook</span>(summary[<span class="str">"path"</span>])
+<span class="fn">print</span>(<span class="str">"الأوراق:"</span>, wb.sheetnames)
+<span class="kw">for</span> row <span class="kw">in</span> wb[<span class="str">"حسب الفرع"</span>].<span class="fn">iter_rows</span>(values_only=<span class="kw">True</span>):
+    <span class="fn">print</span>(<span class="str">"  "</span>, row)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>WARNING سطر غير صالح sales_2025-03-13.csv:5 ← جدة,شاشة,ثلاثة,1150
+INFO    تقرير من 3 ملفات و 9 صفًا (1 مرفوض) ← sales_report_2025-03-14.xlsx
+الملفات: ['sales_2025-03-12.csv', 'sales_2025-03-13.csv', 'sales_2025-03-14.csv']
+الإجمالي: 33,451.00 | الأعلى: لابتوب | مرفوض: 1
+الأوراق: ['حسب الفرع', 'حسب المنتج']
+   ('الفرع', 'المبيعات (ر.س)', 'النسبة')
+   ('الرياض', 15994, 0.4781321933574482)
+   ('جدة', 10673, 0.3190637051209231)
+   ('الدمام', 6784, 0.2028041015216286)
+   ('الإجمالي', '=SUM(B2:B4)', None)</pre>
+</div>
+        <ul>
+            <li>السطر الخاطئ ظهر كتحذير برقمه ومحتواه، واستمر التقرير بالأسطر الصحيحة التسعة.</li>
+            <li>النسب (مثل 0.478…) تظهر في Excel كنسب مئوية لأننا ضبطنا <code>number_format</code>، والإجمالي معادلة يحسبها Excel.</li>
+            <li><code>build_report</code> <strong>لا</strong> تحفظ الحالة. الحفظ مهمة <code>mark_done</code> التي يستدعيها المنسّق بعد نجاح الإرسال — سنرى أهمية ذلك بعد قليل.</li>
+        </ul>
+</section>
+
+<section class="section-card" id="mail">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-envelope"></i>
+        الوحدة 3: إرسال التقرير
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>mailer.py</span>
+    </div>
+<pre><span class="str">"""إرسال التقرير بالبريد مع ملخص HTML ومرفق Excel."""</span>
+<span class="kw">import</span> logging
+<span class="kw">import</span> smtplib
+<span class="kw">from</span> email.message <span class="kw">import</span> EmailMessage
+
+log = logging.<span class="fn">getLogger</span>(<span class="str">"assistant.mailer"</span>)
+XLSX = (<span class="str">"application"</span>, <span class="str">"vnd.openxmlformats-officedocument.spreadsheetml.sheet"</span>)
+
+
+<span class="kw">def</span> <span class="fn">build_message</span>(summary, sender, recipients, day):
+    rows = <span class="str">""</span>.<span class="fn">join</span>(<span class="str">f"&lt;tr&gt;&lt;td&gt;{b}&lt;/td&gt;&lt;td style='text-align:left'&gt;{v:,.2f}&lt;/td&gt;&lt;/tr&gt;"</span>
+                   <span class="kw">for</span> b, v <span class="kw">in</span> summary[<span class="str">"by_branch"</span>].<span class="fn">items</span>())
+    msg = <span class="fn">EmailMessage</span>()
+    msg[<span class="str">"From"</span>], msg[<span class="str">"To"</span>] = sender, <span class="str">", "</span>.<span class="fn">join</span>(recipients)
+    msg[<span class="str">"Subject"</span>] = <span class="str">f"📊 تقرير المبيعات {day} — {summary['total']:,.0f} ر.س"</span>
+    msg.<span class="fn">set_content</span>(<span class="str">f"إجمالي المبيعات: {summary['total']:,.2f} ر.س\nالمنتج الأعلى: {summary['top_product']}\n"</span>
+                    <span class="str">f"التقرير الكامل مرفق.\n\nرسالة آلية من مساعد المكتب."</span>)
+    msg.<span class="fn">add_alternative</span>(<span class="str">f"""&lt;html dir="rtl"&gt;&lt;body style="font-family:Tahoma"&gt;
+        &lt;h3&gt;تقرير المبيعات {day}&lt;/h3&gt;
+        &lt;table border="1" cellpadding="5" style="border-collapse:collapse"&gt;
+        &lt;tr style="background:#f5d76e"&gt;&lt;th&gt;الفرع&lt;/th&gt;&lt;th&gt;المبيعات&lt;/th&gt;&lt;/tr&gt;{rows}&lt;/table&gt;
+        &lt;p&gt;الإجمالي: &lt;b&gt;{summary['total']:,.2f} ر.س&lt;/b&gt; | المنتج الأعلى: &lt;b&gt;{summary['top_product']}&lt;/b&gt;&lt;/p&gt;
+        &lt;p style="color:#888"&gt;رسالة آلية من مساعد المكتب.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;"""</span>, subtype=<span class="str">"html"</span>)
+    msg.<span class="fn">add_attachment</span>(summary[<span class="str">"path"</span>].<span class="fn">read_bytes</span>(), maintype=XLSX[<span class="num">0</span>], subtype=XLSX[<span class="num">1</span>], filename=summary[<span class="str">"path"</span>].name)
+    <span class="kw">return</span> msg
+
+
+<span class="kw">def</span> <span class="fn">send</span>(cfg, msg, dry_run=<span class="kw">False</span>):
+    <span class="kw">if</span> dry_run:
+        log.<span class="fn">info</span>(<span class="str">"(تجربة) لن تُرسل رسالة إلى %s"</span>, msg[<span class="str">"To"</span>])
+        <span class="kw">return</span>
+    <span class="kw">with</span> smtplib.<span class="fn">SMTP</span>(cfg.smtp_host, cfg.smtp_port, timeout=<span class="num">30</span>) <span class="kw">as</span> server:
+        <span class="kw">if</span> cfg.smtp_starttls:
+            server.<span class="fn">starttls</span>()
+        <span class="kw">if</span> cfg.smtp_user:
+            server.<span class="fn">login</span>(cfg.smtp_user, cfg.smtp_password)
+        server.<span class="fn">send_message</span>(msg)
+    log.<span class="fn">info</span>(<span class="str">"أُرسل التقرير إلى %s"</span>, msg[<span class="str">"To"</span>])</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>try_mailer.py</span>
+    </div>
+<pre><span class="kw">import</span> logging
+<span class="kw">import</span> sys
+
+<span class="kw">import</span> mailer
+<span class="kw">import</span> reports
+<span class="kw">from</span> config <span class="kw">import</span> Config
+
+handler = logging.<span class="fn">StreamHandler</span>(sys.stdout)
+handler.<span class="fn">setFormatter</span>(logging.<span class="fn">Formatter</span>(<span class="str">"%(levelname)-7s %(message)s"</span>))
+logging.<span class="fn">getLogger</span>(<span class="str">"assistant"</span>).<span class="fn">addHandler</span>(handler)       <span class="cm"># سجلات أداتنا فقط، لا سجلات المكتبات</span>
+logging.<span class="fn">getLogger</span>(<span class="str">"assistant"</span>).<span class="fn">setLevel</span>(logging.INFO)
+cfg = Config.<span class="fn">load</span>()
+summary = reports.<span class="fn">build_report</span>(cfg.inbox, cfg.reports, cfg.state_file, <span class="str">"2025-03-14"</span>)
+msg = mailer.<span class="fn">build_message</span>(summary, <span class="str">"assistant@company.com"</span>, cfg.report_to, <span class="str">"2025-03-14"</span>)
+<span class="fn">print</span>(<span class="str">"الموضوع:"</span>, msg[<span class="str">"Subject"</span>])
+<span class="fn">print</span>(<span class="str">"النص:"</span>, msg.<span class="fn">get_body</span>((<span class="str">"plain"</span>,)).<span class="fn">get_content</span>().<span class="fn">splitlines</span>()[:<span class="num">2</span>])
+mailer.<span class="fn">send</span>(cfg, msg)
+<span class="fn">print</span>(<span class="str">"✅ تم"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>WARNING سطر غير صالح sales_2025-03-13.csv:5 ← جدة,شاشة,ثلاثة,1150
+INFO    تقرير من 3 ملفات و 9 صفًا (1 مرفوض) ← sales_report_2025-03-14.xlsx
+الموضوع: 📊 تقرير المبيعات 2025-03-14 — 33,451 ر.س
+النص: ['إجمالي المبيعات: 33,451.00 ر.س', 'المنتج الأعلى: لابتوب']
+   📥 [خادم الاختبار] إلى: manager@company.com | الموضوع: 📊 تقرير المبيعات 2025-03-14 — 33,451 ر.س | الأجزاء: text/plain, text/html, 📎 sales_report_2025-03-14.xlsx
+INFO    أُرسل التقرير إلى manager@company.com
+✅ تم</pre>
+</div>
+</section>
+
+<section class="section-card" id="cli">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-terminal"></i>
+        المنسّق: assistant.py
+    </h2>
+        <p>
+            الآن نربط كل شيء في أداة سطر أوامر واحدة. ستشغّلها من الطرفية بـ <code>python assistant.py run-all</code>؛ وفي الأمثلة نستدعي
+            <code>main([...])</code> مباشرة، وهو الشيء نفسه.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>assistant.py</span>
+    </div>
+<pre><span class="str">"""مساعد المكتب اليومي — نقطة الدخول.
+
+الاستخدام:
+    python assistant.py organize [--dry-run]
+    python assistant.py report   [--dry-run] [--date 2025-03-14]
+    python assistant.py run-all  [--dry-run]
+"""</span>
+<span class="kw">import</span> argparse
+<span class="kw">import</span> logging
+<span class="kw">import</span> os
+<span class="kw">import</span> sys
+<span class="kw">from</span> contextlib <span class="kw">import</span> contextmanager
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+<span class="kw">from</span> logging.handlers <span class="kw">import</span> RotatingFileHandler
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+<span class="kw">import</span> mailer
+<span class="kw">import</span> organizer
+<span class="kw">import</span> reports
+<span class="kw">from</span> config <span class="kw">import</span> Config
+
+log = logging.<span class="fn">getLogger</span>(<span class="str">"assistant"</span>)
+
+
+<span class="kw">class</span> <span class="fn">ConsoleFormatter</span>(logging.Formatter):
+    <span class="str">"""سطر مختصر على الشاشة؛ التتبع الكامل يُحفظ في الملف فقط."""</span>
+
+    <span class="kw">def</span> <span class="fn">format</span>(self, record):
+        <span class="kw">return</span> <span class="str">f"{record.levelname:&lt;7} {record.getMessage()}"</span>
+
+
+<span class="kw">def</span> <span class="fn">setup_logging</span>(log_dir):
+    log_dir.<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+    root = logging.<span class="fn">getLogger</span>(<span class="str">"assistant"</span>)
+    root.<span class="fn">setLevel</span>(logging.INFO)
+    root.handlers.<span class="fn">clear</span>()
+    file_handler = <span class="fn">RotatingFileHandler</span>(log_dir / <span class="str">"assistant.log"</span>, maxBytes=<span class="num">1</span>_000_000, backupCount=<span class="num">5</span>, encoding=<span class="str">"utf-8"</span>)
+    file_handler.<span class="fn">setFormatter</span>(logging.<span class="fn">Formatter</span>(<span class="str">"%(asctime)s %(levelname)s %(name)s: %(message)s"</span>))
+    console = logging.<span class="fn">StreamHandler</span>(sys.stdout)
+    console.<span class="fn">setFormatter</span>(<span class="fn">ConsoleFormatter</span>())
+    root.<span class="fn">addHandler</span>(file_handler)
+    root.<span class="fn">addHandler</span>(console)
+
+
+@contextmanager
+<span class="kw">def</span> <span class="fn">single_instance</span>(lock_path):
+    <span class="kw">try</span>:
+        fd = os.<span class="fn">open</span>(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    <span class="kw">except</span> FileExistsError:
+        <span class="kw">raise</span> <span class="fn">SystemExit</span>(<span class="str">f"نسخة أخرى تعمل ({lock_path.name} موجود)"</span>)
+    <span class="kw">try</span>:
+        <span class="kw">yield</span>
+    <span class="kw">finally</span>:
+        os.<span class="fn">close</span>(fd)
+        os.<span class="fn">remove</span>(lock_path)
+
+
+<span class="kw">def</span> <span class="fn">do_organize</span>(cfg, args):
+    <span class="kw">for</span> name, dest <span class="kw">in</span> organizer.<span class="fn">organize</span>(cfg.downloads, cfg.categories, args.dry_run):
+        log.<span class="fn">debug</span>(<span class="str">"%s ← %s"</span>, name, dest)
+
+
+<span class="kw">def</span> <span class="fn">do_report</span>(cfg, args):
+    summary = reports.<span class="fn">build_report</span>(cfg.inbox, cfg.reports, cfg.state_file, args.date, args.dry_run)
+    <span class="kw">if</span> summary <span class="kw">is</span> <span class="kw">None</span>:
+        <span class="kw">return</span>
+    <span class="kw">if</span> summary[<span class="str">"bad"</span>]:
+        log.<span class="fn">warning</span>(<span class="str">"تنبيه: %d سطر مرفوض — راجع السجل"</span>, summary[<span class="str">"bad"</span>])
+    <span class="kw">if</span> args.dry_run:
+        log.<span class="fn">info</span>(<span class="str">"(تجربة) الإجمالي %s ر.س"</span>, <span class="str">f"{summary['total']:,.2f}"</span>)
+        <span class="kw">return</span>
+    msg = mailer.<span class="fn">build_message</span>(summary, <span class="str">"assistant@company.com"</span>, cfg.report_to, args.date)
+    mailer.<span class="fn">send</span>(cfg, msg, args.dry_run)
+    reports.<span class="fn">mark_done</span>(cfg.state_file, summary[<span class="str">"files"</span>])     <span class="cm"># فقط بعد نجاح الإرسال</span>
+
+
+<span class="kw">def</span> <span class="fn">parse_args</span>(argv):
+    p = argparse.<span class="fn">ArgumentParser</span>(prog=<span class="str">"assistant"</span>, description=<span class="str">"مساعد المكتب اليومي"</span>)
+    p.<span class="fn">add_argument</span>(<span class="str">"command"</span>, choices=[<span class="str">"organize"</span>, <span class="str">"report"</span>, <span class="str">"run-all"</span>])
+    p.<span class="fn">add_argument</span>(<span class="str">"--config"</span>, default=<span class="fn">Path</span>(__file__).<span class="fn">resolve</span>().parent / <span class="str">"config.json"</span>, type=Path)
+    p.<span class="fn">add_argument</span>(<span class="str">"--dry-run"</span>, action=<span class="str">"store_true"</span>, help=<span class="str">"اعرض ما سيحدث دون تنفيذه"</span>)
+    p.<span class="fn">add_argument</span>(<span class="str">"--date"</span>, default=date.<span class="fn">today</span>().<span class="fn">isoformat</span>(), help=<span class="str">"تاريخ التقرير YYYY-MM-DD"</span>)
+    <span class="kw">return</span> p.<span class="fn">parse_args</span>(argv)
+
+
+<span class="kw">def</span> <span class="fn">main</span>(argv=<span class="kw">None</span>):
+    args = <span class="fn">parse_args</span>(argv)
+    <span class="fn">load_dotenv</span>(args.config.<span class="fn">resolve</span>().parent / <span class="str">".env"</span>)     <span class="cm"># SMTP_USER و SMTP_PASSWORD إن وُجد الملف</span>
+    cfg = Config.<span class="fn">load</span>(args.config)
+    <span class="fn">setup_logging</span>(args.config.<span class="fn">resolve</span>().parent / <span class="str">"logs"</span>)
+    log.<span class="fn">info</span>(<span class="str">"▶ %s%s"</span>, args.command, <span class="str">" (تجربة)"</span> <span class="kw">if</span> args.dry_run <span class="kw">else</span> <span class="str">""</span>)
+    <span class="kw">try</span>:
+        <span class="kw">with</span> <span class="fn">single_instance</span>(args.config.<span class="fn">resolve</span>().parent / <span class="str">"assistant.lock"</span>):
+            <span class="kw">if</span> args.command <span class="kw">in</span> (<span class="str">"organize"</span>, <span class="str">"run-all"</span>):
+                <span class="fn">do_organize</span>(cfg, args)
+            <span class="kw">if</span> args.command <span class="kw">in</span> (<span class="str">"report"</span>, <span class="str">"run-all"</span>):
+                <span class="fn">do_report</span>(cfg, args)
+    <span class="kw">except</span> SystemExit <span class="kw">as</span> e:
+        log.<span class="fn">error</span>(<span class="str">"%s"</span>, e)
+        <span class="kw">return</span> <span class="num">2</span>
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        log.<span class="fn">exception</span>(<span class="str">"فشل غير متوقع: %s"</span>, e)
+        <span class="kw">return</span> <span class="num">1</span>
+    log.<span class="fn">info</span>(<span class="str">"✔ انتهى بنجاح"</span>)
+    <span class="kw">return</span> <span class="num">0</span>
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    sys.<span class="fn">exit</span>(<span class="fn">main</span>())</pre>
+</div>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> سيناريو أسبوع كامل</p>
+        <p>
+            نجرب الأداة كما ستعيش في الواقع: تجربة أولى، ثم صباح <strong>تعطّل فيه خادم البريد</strong>، ثم صباح عاد فيه، ثم صباح بلا ملفات جديدة، ثم نسخة تبدأ والأخرى تعمل:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>week_scenario.py</span>
+    </div>
+<pre><span class="kw">import</span> json
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">from</span> assistant <span class="kw">import</span> main
+
+DAY = [<span class="str">"--date"</span>, <span class="str">"2025-03-14"</span>]
+config = <span class="fn">Path</span>(<span class="str">"config.json"</span>)
+
+<span class="fn">print</span>(<span class="str">"── 1) تجربة أولى ──"</span>)
+<span class="fn">print</span>(<span class="str">"رمز الخروج:"</span>, <span class="fn">main</span>([<span class="str">"run-all"</span>, <span class="str">"--dry-run"</span>, *DAY]))
+
+<span class="fn">print</span>(<span class="str">"\n── 2) خادم البريد متوقف ──"</span>)
+settings = json.<span class="fn">loads</span>(config.<span class="fn">read_text</span>(encoding=<span class="str">"utf-8"</span>))
+settings[<span class="str">"smtp"</span>][<span class="str">"port"</span>] = <span class="num">1026</span>                       <span class="cm"># منفذ لا يعمل عليه خادم</span>
+config.<span class="fn">write_text</span>(json.<span class="fn">dumps</span>(settings), encoding=<span class="str">"utf-8"</span>)
+<span class="fn">print</span>(<span class="str">"رمز الخروج:"</span>, <span class="fn">main</span>([<span class="str">"run-all"</span>, *DAY]))
+<span class="fn">print</span>(<span class="str">"ملفات مُعلّمة كمنجزة:"</span>, <span class="fn">Path</span>(<span class="str">"processed.json"</span>).<span class="fn">exists</span>())
+
+<span class="fn">print</span>(<span class="str">"\n── 3) عاد الخادم: الملفات نفسها تُرسل الآن ──"</span>)
+settings[<span class="str">"smtp"</span>][<span class="str">"port"</span>] = <span class="num">1025</span>
+config.<span class="fn">write_text</span>(json.<span class="fn">dumps</span>(settings), encoding=<span class="str">"utf-8"</span>)
+<span class="fn">print</span>(<span class="str">"رمز الخروج:"</span>, <span class="fn">main</span>([<span class="str">"run-all"</span>, *DAY]))
+
+<span class="fn">print</span>(<span class="str">"\n── 4) الصباح التالي بلا ملفات جديدة ──"</span>)
+<span class="fn">print</span>(<span class="str">"رمز الخروج:"</span>, <span class="fn">main</span>([<span class="str">"report"</span>, <span class="str">"--date"</span>, <span class="str">"2025-03-15"</span>]))
+
+<span class="fn">print</span>(<span class="str">"\n── 5) نسخة ثانية بينما الأولى تعمل ──"</span>)
+<span class="fn">Path</span>(<span class="str">"assistant.lock"</span>).<span class="fn">touch</span>()
+<span class="fn">print</span>(<span class="str">"رمز الخروج:"</span>, <span class="fn">main</span>([<span class="str">"report"</span>]))
+<span class="fn">Path</span>(<span class="str">"assistant.lock"</span>).<span class="fn">unlink</span>()
+
+log_text = <span class="fn">Path</span>(<span class="str">"logs/assistant.log"</span>).<span class="fn">read_text</span>(encoding=<span class="str">"utf-8"</span>)
+<span class="fn">print</span>(<span class="str">"\nالسجل الدائم يحتوي التتبع الكامل للعطل:"</span>, <span class="str">"Traceback"</span> <span class="kw">in</span> log_text)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>── 1) تجربة أولى ──
+INFO    ▶ run-all (تجربة)
+INFO    سيُنقل (تجربة) 8 ملفات في Downloads
+WARNING سطر غير صالح sales_2025-03-13.csv:5 ← جدة,شاشة,ثلاثة,1150
+INFO    تقرير من 3 ملفات و 9 صفًا (1 مرفوض) ← sales_report_2025-03-14.xlsx
+WARNING تنبيه: 1 سطر مرفوض — راجع السجل
+INFO    (تجربة) الإجمالي 33,451.00 ر.س
+INFO    ✔ انتهى بنجاح
+رمز الخروج: 0
+
+── 2) خادم البريد متوقف ──
+INFO    ▶ run-all
+INFO    نُقل 8 ملفات في Downloads
+WARNING سطر غير صالح sales_2025-03-13.csv:5 ← جدة,شاشة,ثلاثة,1150
+INFO    تقرير من 3 ملفات و 9 صفًا (1 مرفوض) ← sales_report_2025-03-14.xlsx
+WARNING تنبيه: 1 سطر مرفوض — راجع السجل
+ERROR   فشل غير متوقع: [Errno 111] Connection refused
+رمز الخروج: 1
+ملفات مُعلّمة كمنجزة: False
+
+── 3) عاد الخادم: الملفات نفسها تُرسل الآن ──
+INFO    ▶ run-all
+INFO    نُقل 0 ملفات في Downloads
+WARNING سطر غير صالح sales_2025-03-13.csv:5 ← جدة,شاشة,ثلاثة,1150
+INFO    تقرير من 3 ملفات و 9 صفًا (1 مرفوض) ← sales_report_2025-03-14.xlsx
+WARNING تنبيه: 1 سطر مرفوض — راجع السجل
+   📥 [خادم الاختبار] إلى: manager@company.com | الموضوع: 📊 تقرير المبيعات 2025-03-14 — 33,451 ر.س | الأجزاء: text/plain, text/html, 📎 sales_report_2025-03-14.xlsx
+INFO    أُرسل التقرير إلى manager@company.com
+INFO    ✔ انتهى بنجاح
+رمز الخروج: 0
+
+── 4) الصباح التالي بلا ملفات جديدة ──
+INFO    ▶ report
+INFO    لا توجد ملفات مبيعات جديدة
+INFO    ✔ انتهى بنجاح
+رمز الخروج: 0
+
+── 5) نسخة ثانية بينما الأولى تعمل ──
+INFO    ▶ report
+ERROR   نسخة أخرى تعمل (assistant.lock موجود)
+رمز الخروج: 2
+
+السجل الدائم يحتوي التتبع الكامل للعطل: True</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>أهم درس في المشروع:</strong> في الصباح الثاني فشل الإرسال، فلم تُعلَّم الملفات كمنجزة، وفي الصباح الثالث أُرسل التقرير كاملًا.
+                لو حفظنا الحالة بعد كتابة Excel مباشرة، لضاع تقرير ذلك اليوم بصمت إلى الأبد. <strong>علّم العمل كمنجز فقط بعد نجاح آخر خطوة فيه.</strong>
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="tests">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-vial"></i>
+        الاختبارات الآلية
+    </h2>
+        <p>
+            قبل كل تعديل على الأداة، شغّل الاختبارات بالأمر <code>python -m unittest -v</code>. كل اختبار يعمل في مجلد مؤقت، فلا يلمس ملفاتك الحقيقية:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>test_assistant.py</span>
+    </div>
+<pre><span class="kw">import</span> json
+<span class="kw">import</span> tempfile
+<span class="kw">import</span> unittest
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">import</span> organizer
+<span class="kw">import</span> reports
+
+CATS = {<span class="str">"Documents"</span>: [<span class="str">".pdf"</span>], <span class="str">"Images"</span>: [<span class="str">".jpg"</span>, <span class="str">".png"</span>]}
+
+
+<span class="kw">class</span> <span class="fn">OrganizerTests</span>(unittest.TestCase):
+    <span class="kw">def</span> <span class="fn">setUp</span>(self):
+        self.tmp = tempfile.<span class="fn">TemporaryDirectory</span>()
+        self.dir = <span class="fn">Path</span>(self.tmp.name)
+
+    <span class="kw">def</span> <span class="fn">tearDown</span>(self):
+        self.tmp.<span class="fn">cleanup</span>()
+
+    <span class="kw">def</span> <span class="fn">test_category_is_case_insensitive</span>(self):
+        self.<span class="fn">assertEqual</span>(organizer.<span class="fn">category_for</span>(<span class="str">"A.PNG"</span>, CATS), <span class="str">"Images"</span>)
+        self.<span class="fn">assertEqual</span>(organizer.<span class="fn">category_for</span>(<span class="str">"song.mp3"</span>, CATS), <span class="str">"Other"</span>)
+
+    <span class="kw">def</span> <span class="fn">test_unique_target_adds_number</span>(self):
+        (self.dir / <span class="str">"a.pdf"</span>).<span class="fn">write_text</span>(<span class="str">"x"</span>)
+        self.<span class="fn">assertEqual</span>(organizer.<span class="fn">unique_target</span>(self.dir / <span class="str">"a.pdf"</span>).name, <span class="str">"a (1).pdf"</span>)
+
+    <span class="kw">def</span> <span class="fn">test_dry_run_moves_nothing</span>(self):
+        (self.dir / <span class="str">"a.pdf"</span>).<span class="fn">write_text</span>(<span class="str">"x"</span>)
+        moves = organizer.<span class="fn">organize</span>(self.dir, CATS, dry_run=<span class="kw">True</span>)
+        self.<span class="fn">assertEqual</span>(moves, [(<span class="str">"a.pdf"</span>, <span class="str">"Documents/a.pdf"</span>)])
+        self.<span class="fn">assertTrue</span>((self.dir / <span class="str">"a.pdf"</span>).<span class="fn">exists</span>())
+
+
+<span class="kw">class</span> <span class="fn">ReportTests</span>(unittest.TestCase):
+    <span class="kw">def</span> <span class="fn">setUp</span>(self):
+        self.tmp = tempfile.<span class="fn">TemporaryDirectory</span>()
+        self.dir = <span class="fn">Path</span>(self.tmp.name)
+        (self.dir / <span class="str">"sales_2025-03-01.csv"</span>).<span class="fn">write_text</span>(
+            <span class="str">"branch,product,qty,price\nالرياض,قلم,2,5\nجدة,دفتر,x,10\nجدة,قلم,-1,5\n"</span>, encoding=<span class="str">"utf-8"</span>)
+
+    <span class="kw">def</span> <span class="fn">tearDown</span>(self):
+        self.tmp.<span class="fn">cleanup</span>()
+
+    <span class="kw">def</span> <span class="fn">test_bad_rows_are_logged_not_fatal</span>(self):
+        <span class="kw">with</span> self.<span class="fn">assertLogs</span>(<span class="str">"assistant.reports"</span>, <span class="str">"WARNING"</span>) <span class="kw">as</span> logs:
+            rows, bad = reports.<span class="fn">read_sales</span>([self.dir / <span class="str">"sales_2025-03-01.csv"</span>])
+        self.<span class="fn">assertEqual</span>((<span class="fn">len</span>(rows), bad), (<span class="num">1</span>, <span class="num">2</span>))
+        self.<span class="fn">assertEqual</span>(rows[<span class="num">0</span>][<span class="str">"total"</span>], <span class="num">10</span>)
+        self.<span class="fn">assertIn</span>(<span class="str">":3"</span>, logs.output[<span class="num">0</span>])                    <span class="cm"># رقم السطر الخاطئ في السجل</span>
+
+    <span class="kw">def</span> <span class="fn">test_processed_files_are_skipped</span>(self):
+        state = self.dir / <span class="str">"state.json"</span>
+        <span class="kw">with</span> self.<span class="fn">assertLogs</span>(<span class="str">"assistant.reports"</span>):
+            first = reports.<span class="fn">build_report</span>(self.dir, self.dir / <span class="str">"out"</span>, state, <span class="str">"2025-03-01"</span>)
+            reports.<span class="fn">mark_done</span>(state, first[<span class="str">"files"</span>])
+            self.<span class="fn">assertIsNone</span>(reports.<span class="fn">build_report</span>(self.dir, self.dir / <span class="str">"out"</span>, state, <span class="str">"2025-03-02"</span>))
+        self.<span class="fn">assertEqual</span>(json.<span class="fn">loads</span>(state.<span class="fn">read_text</span>(encoding=<span class="str">"utf-8"</span>)), [<span class="str">"sales_2025-03-01.csv"</span>])
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    unittest.<span class="fn">main</span>()</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>run_tests.py</span>
+    </div>
+<pre><span class="kw">import</span> io
+<span class="kw">import</span> unittest
+
+stream = io.<span class="fn">StringIO</span>()
+result = unittest.<span class="fn">TextTestRunner</span>(stream=stream, verbosity=<span class="num">2</span>).<span class="fn">run</span>(
+    unittest.defaultTestLoader.<span class="fn">loadTestsFromName</span>(<span class="str">"test_assistant"</span>))
+<span class="kw">for</span> line <span class="kw">in</span> stream.<span class="fn">getvalue</span>().<span class="fn">splitlines</span>():
+    <span class="kw">if</span> <span class="str">" ... "</span> <span class="kw">in</span> line:
+        <span class="fn">print</span>(line)
+<span class="fn">print</span>(<span class="str">f"\nنُفّذ {result.testsRun} اختبارات | ناجح: {result.wasSuccessful()}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>test_category_is_case_insensitive (test_assistant.OrganizerTests.test_category_is_case_insensitive) ... ok
+test_dry_run_moves_nothing (test_assistant.OrganizerTests.test_dry_run_moves_nothing) ... ok
+test_unique_target_adds_number (test_assistant.OrganizerTests.test_unique_target_adds_number) ... ok
+test_bad_rows_are_logged_not_fatal (test_assistant.ReportTests.test_bad_rows_are_logged_not_fatal) ... ok
+test_processed_files_are_skipped (test_assistant.ReportTests.test_processed_files_are_skipped) ... ok
+
+نُفّذ 5 اختبارات | ناجح: True</pre>
+</div>
+</section>
+
+<section class="section-card" id="deploy">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-rocket"></i>
+        التشغيل اليومي التلقائي
+    </h2>
+        <p>المجلد النهائي للمشروع:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+        <span>terminal</span>
+    </div>
+<pre>office_assistant/
+├── .venv/                  <span class="cm"># البيئة الافتراضية</span>
+├── assistant.py  config.py  organizer.py  reports.py  mailer.py
+├── test_assistant.py
+├── config.json             <span class="cm"># الإعدادات (يمكن رفعه إلى Git)</span>
+├── .env                    <span class="cm"># SMTP_USER و SMTP_PASSWORD (لا يُرفع أبدًا)</span>
+├── logs/assistant.log      <span class="cm"># يُنشأ تلقائيًا</span>
+└── processed.json          <span class="cm"># يُنشأ تلقائيًا</span></pre>
+</div>
+        <p>جدوِل الأداة لتعمل الساعة 7:45 صباحًا من الأحد إلى الخميس:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+        <span>crontab</span>
+    </div>
+<pre><span class="num">45</span> <span class="num">7</span> * * <span class="num">0</span>-<span class="num">4</span>  cd /home/sara/office_assistant &amp;&amp; .venv/bin/python assistant.py run-all &gt;&gt; logs/cron.log <span class="num">2</span>&gt;&amp;<span class="num">1</span></pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+        <span>cmd</span>
+    </div>
+<pre>schtasks /Create /TN <span class="str">"OfficeAssistant"</span> /SC WEEKLY /D SUN,MON,TUE,WED,THU /ST <span class="num">07</span>:<span class="num">45</span> ^
+    /TR <span class="str">"C:\Users\Sara\office_assistant\.venv\Scripts\pythonw.exe C:\Users\Sara\office_assistant\assistant.py run-all"</span></pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>قائمة التحقق قبل الاعتماد على الأداة:</strong> شغّل <code>--dry-run</code> على المجلدات الحقيقية وراجع الخطة؛ اجعل المستلم بريدك أنت أسبوعًا كاملًا؛
+                تأكد من وصول تنبيه عند الفشل؛ وراجع <code>logs/assistant.log</code> بعد أول تشغيل مجدول.
+                و <code>main</code> تقرأ ملف <code>.env</code> من مجلد الأداة نفسه، فتصل كلمة مرور التطبيق حتى عندما يشغّلها المجدول من مجلد آخر.
+            </div>
+        </div>
+        <p><strong>تحديات لتطوير المشروع:</strong></p>
+        <ul>
+            <li>أضف أمر <code>undo</code> يقرأ آخر عمليات نقل من ملف ويعيد الملفات لأماكنها.</li>
+            <li>أرسل تنبيه Telegram (الدرس 5) عند رمز خروج غير صفري، وأضف «نبضة» بعد كل نجاح (الدرس 7).</li>
+            <li>قارن مبيعات اليوم بمتوسط الأسبوع، وأضف سطرًا أحمر في البريد إذا انخفضت أكثر من 20%.</li>
+            <li>انقل ملفات المبيعات المعالجة إلى <code>inbox/archive/YYYY-MM/</code> بدل تركها.</li>
+        </ul>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! الحالة تعني «اكتمل العمل كله»، فتُحفظ بعد آخر خطوة فيه." data-hint="تذكّر الصباح الثاني في سيناريو الأسبوع.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">التصميم</span>
+    </div>
+    <p class="exercise-question">لماذا تُعلَّم ملفات المبيعات كمنجزة <strong>بعد نجاح الإرسال</strong> لا بعد إنشاء ملف Excel؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> لأن كتابة ملف JSON أبطأ من Excel</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> حتى إذا فشل الإرسال تُعاد معالجة الملفات وإرسالها في التشغيل التالي بدل ضياعها</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> لأن openpyxl لا يسمح بكتابة ملفات أخرى قبله</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> لا فرق بين الطريقتين</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تعرف سلوك الأداة في كل الحالات." data-hint="التتبع الكامل يُكتب في الملف فقط، والشاشة سطر مختصر.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">المسارات في config.json تُحسب نسبةً لموقع الملف نفسه، لا لمجلد العمل.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">الشاشة والملف يعرضان نفس التفاصيل تمامًا في السجل.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>--dry-run</code> يجب ألا ينقل أي ملف ولا يرسل أي رسالة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">سطر CSV خاطئ واحد يوقف التقرير كله.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">الأداة تخرج برمز 2 إذا كانت نسخة أخرى تعمل.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! &lt;code&gt;suffix&lt;/code&gt; لـ archive.tar.gz هو &lt;code&gt;.gz&lt;/code&gt; فقط، وهو ليس في أي فئة." data-hint="&lt;code&gt;.lower()&lt;/code&gt; تجعل JPG و jpg متساويين.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">تصنيف الملفات</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+CATS = {<span class="str">"Images"</span>: [<span class="str">".jpg"</span>, <span class="str">".png"</span>], <span class="str">"Documents"</span>: [<span class="str">".pdf"</span>]}
+<span class="kw">def</span> <span class="fn">category_for</span>(name):
+    ext = <span class="fn">Path</span>(name).suffix.<span class="fn">lower</span>()
+    <span class="kw">return</span> <span class="fn">next</span>((c <span class="kw">for</span> c, exts <span class="kw">in</span> CATS.<span class="fn">items</span>() <span class="kw">if</span> ext <span class="kw">in</span> exts), <span class="str">"Other"</span>)
+<span class="fn">print</span>(<span class="fn">category_for</span>(<span class="str">"IMG_1.JPG"</span>))
+<span class="fn">print</span>(<span class="fn">category_for</span>(<span class="str">"cv.PDF"</span>))
+<span class="fn">print</span>(<span class="fn">category_for</span>(<span class="str">"song.mp3"</span>))
+<span class="fn">print</span>(<span class="fn">category_for</span>(<span class="str">"archive.tar.gz"</span>))</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر 1:</span><input type="text" class="blank-input" data-answers="Images" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 2:</span><input type="text" class="blank-input" data-answers="Documents" placeholder="..." style="min-width:156px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 3:</span><input type="text" class="blank-input" data-answers="Other" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 4:</span><input type="text" class="blank-input" data-answers="Other" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! &lt;code&gt;choices&lt;/code&gt; ترفض أي أمر غير معروف برسالة واضحة تلقائيًا." data-hint="الخيار الذي لا يأخذ قيمة يُعرَّف بـ &lt;code&gt;action=&#x27;store_true&#x27;&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">argparse</span>
+    </div>
+    <p class="exercise-question">أكمل تعريف واجهة الأوامر:</p>
+    <div class="code-fill">
+        <div class="line"><span>p = argparse.<span class="fn">ArgumentParser</span>(prog=<span class="str">'assistant'</span>)</span></div>
+        <div class="line"><span>p.<span class="fn">add_argument</span>(<span class="str">'command'</span>, </span><input type="text" class="blank-input" data-answers="choices" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"><span>=[<span class="str">'organize'</span>, <span class="str">'report'</span>, <span class="str">'run-all'</span>])</span></div>
+        <div class="line"><span>p.<span class="fn">add_argument</span>(<span class="str">'--dry-run'</span>, action=</span><input type="text" class="blank-input" data-answers="&#x27;store_true&#x27;" placeholder="..." style="min-width:198px;" autocomplete="off" spellcheck="false"><span>)</span></div>
+        <div class="line"><span>args = p.</span><input type="text" class="blank-input" data-answers="parse_args" placeholder="..." style="min-width:170px;" autocomplete="off" spellcheck="false"><span>(argv)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! والتعليم كمنجز آخر خطوة دائمًا." data-hint="لا يمكن الكتابة في السجل قبل إعداده.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب ما يفعله الأمر <code>run-all</code>. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) بناء التقرير من الملفات الجديدة وإرساله</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">1) تحميل الإعدادات وإعداد السجل</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">5) تعليم الملفات كمنجزة</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">3) ترتيب مجلد التنزيلات</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) أخذ القفل</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر التحقق من ملف المبيعات</div>
+    <p style="color:var(--text-light); font-size:0.95em;">الصق محتوى ملف مبيعات فرع (أو عدّل المثال) لترى ما ستفعله دالتا <code>read_sales</code> و <code>summarize</code>: الأسطر المرفوضة وسبب رفضها، والإجماليات حسب الفرع ونسبها، والمنتج الأعلى. جرّب كمية سالبة أو سعرًا فارغًا أو عمودًا ناقصًا.</p>
+    <textarea class="lab-input" id="svData" rows="8" style="width:100%; direction:ltr; font-family:monospace;" oninput="runSales()" spellcheck="false">branch,product,qty,price
+الرياض,لابتوب,3,3299
+جدة,سماعة,10,249.5
+الدمام,شاشة,2,1150
+جدة,شاشة,ثلاثة,1150
+الرياض,فأرة,-2,79
+الدمام,فأرة,15,79
+جدة,لابتوب</textarea>
+    <div class="lab-console" id="svOut" style="direction:rtl; text-align:right;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> تحويل مهمة مكتبية يدوية إلى متطلبات قابلة للاختبار.</li>
+                <li><i class="fas fa-check"></i> تقسيم الأداة إلى وحدات مستقلة يربطها منسّق واحد.</li>
+                <li><i class="fas fa-check"></i> إعدادات خارجية بمسارات نسبية لملف الإعدادات، والأسرار في البيئة.</li>
+                <li><i class="fas fa-check"></i> ترتيب آمن مع وضع التجربة وحل تعارض الأسماء.</li>
+                <li><i class="fas fa-check"></i> تقرير Excel يتجاهل الأسطر الخاطئة ويسجلها، وبريد بملخص HTML ومرفق.</li>
+                <li><i class="fas fa-check"></i> حفظ الحالة بعد نجاح آخر خطوة، والقفل، ورموز الخروج، وسجل الشاشة والملف.</li>
+                <li><i class="fas fa-check"></i> اختبارات آلية في مجلدات مؤقتة، وجدولة الأداة على Linux و Windows.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> ابدأ كل أداة أتمتة بقائمة «معايير قبول» مكتوبة.</li>
+                <li><i class="fas fa-lightbulb"></i> اجعل --dry-run أول خيار تبنيه لا آخره.</li>
+                <li><i class="fas fa-lightbulb"></i> شغّل الأداة أسبوعًا وأنت المستلم الوحيد قبل تسليمها.</li>
+                <li><i class="fas fa-lightbulb"></i> أضف اختبارًا لكل خطأ تكتشفه في الواقع.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في المشروع الأخير ستبني <strong>مراقب الأسعار والتنبيهات</strong>: يستخرج الأسعار من الويب، ويحفظ تاريخها، وينبّهك عند الانخفاض بذكاء.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson8.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 8: نظام التشغيل والعمليات</span>
+        </a>
+        <a href="project2.html" class="nav-link next">
+            <span>التالي: مشروع 2 — مراقب الأسعار والتنبيهات</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · مساعد المكتب
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '90%';
+            text.textContent = '90% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر التحقق من المبيعات ========== */
+    function runSales() {
+        const lines = document.getElementById('svData').value.split(/\r?\n/);
+        const out = document.getElementById('svOut');
+        const head = (lines[0] || '').split(',').map(s => s.trim());
+        const need = ['branch', 'product', 'qty', 'price'];
+        const missing = need.filter(c => !head.includes(c));
+        if (missing.length) {
+            out.innerHTML = `<span class="err">KeyError: الأعمدة الناقصة في العنوان: ${escapeHtml(missing.join(', '))}</span>`;
+            return;
+        }
+        const idx = Object.fromEntries(head.map((h, i) => [h, i]));
+        const byBranch = {}, byProduct = {}, warnings = [];
+        let good = 0;
+        lines.slice(1).forEach((line, i) => {
+            if (!line.trim()) return;                      // DictReader يتجاهل الأسطر الفارغة
+            const cells = line.split(',');
+            const get = c => cells[idx[c]];
+            const qtyText = get('qty'), priceText = get('price');
+            let reason = null;
+            if (qtyText === undefined || priceText === undefined) reason = 'أعمدة ناقصة';
+            else if (!/^\s*[+-]?\d+\s*$/.test(qtyText)) reason = `الكمية ليست عددًا صحيحًا: "${qtyText}"`;
+            else if (priceText.trim() === '' || !isFinite(Number(priceText))) reason = `السعر ليس رقمًا: "${priceText}"`;
+            else if (parseInt(qtyText, 10) < 0 || Number(priceText) < 0) reason = 'قيمة سالبة';
+            if (reason) { warnings.push(`⚠️ السطر ${i + 2}: ${reason}`); return; }
+            const total = parseInt(qtyText, 10) * Number(priceText);
+            const branch = (get('branch') || '').trim(), product = (get('product') || '').trim();
+            byBranch[branch] = (byBranch[branch] || 0) + total;
+            byProduct[product] = (byProduct[product] || 0) + total;
+            good++;
+        });
+        const sum = Object.values(byBranch).reduce((a, b) => a + b, 0);
+        const fmt = v => v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const ranked = Object.entries(byBranch).sort((a, b) => b[1] - a[1]);
+        const top = Object.entries(byProduct).sort((a, b) => b[1] - a[1])[0];
+        const res = [`مقبول: ${good} | مرفوض: ${warnings.length}`];
+        if (warnings.length) res.push(`<span class="err">${warnings.map(escapeHtml).join('\n')}</span>`);
+        res.push('', '<strong style="color:var(--gold)">حسب الفرع:</strong>');
+        ranked.forEach(([b, v]) => res.push(`${escapeHtml(b).padEnd(10)} ${fmt(v).padStart(12)}  ${(sum ? v / sum * 100 : 0).toFixed(1)}%`));
+        res.push(`الإجمالي: ${fmt(sum)} ر.س`);
+        if (top) res.push(`المنتج الأعلى: ${escapeHtml(top[0])}`);
+        out.innerHTML = res.join('\n');
+    }
+
+    document.addEventListener('DOMContentLoaded', runSales);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>النماذج و ORM في Django | CodeWay</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prism.js للتلوين -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-dark: #d4af37;
+            --primary-light: #ffed4a;
+            --dark: #0a0a0a;
+            --dark-light: #1a1a1a;
+            --dark-surface: #222;
+            --text: #ffffff;
+            --text-light: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --border-color: rgba(255, 215, 0, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #00c851;
+            --info: #00b4ff;
+            --warning: #ff8800;
+            --danger: #ff4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* شريط التقدم */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            z-index: 1001;
+            background: transparent;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.97);
+            backdrop-filter: blur(20px);
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .nav-links .back-home {
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary) !important;
+            border-radius: 50px;
+        }
+
+        .nav-links .back-home:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        /* زر العودة للأعلى */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+            z-index: 999;
+            border: none;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.6);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 20px 60px;
+            background: linear-gradient(135deg, var(--dark), var(--dark-light));
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05), transparent 70%);
+            border-radius: 50%;
+            animation: floatBubble 25s ease-in-out infinite;
+        }
+
+        @keyframes floatBubble {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-40px, 30px) scale(1.1); }
+        }
+
+        .hero-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .hero-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 i {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .hero-meta i {
+            color: var(--primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+        }
+
+        /* بطاقات المحتوى */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .content-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .content-card h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .content-card h2 i {
+            font-size: 1.5rem;
+        }
+
+        .content-card h3 {
+            color: var(--primary-light);
+            font-size: 1.3rem;
+            margin: 25px 0 15px;
+        }
+
+        .content-card h4 {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin: 20px 0 10px;
+        }
+
+        .content-card p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .content-card ul, .content-card ol {
+            color: var(--text-light);
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+
+        .content-card li {
+            margin-bottom: 8px;
+        }
+
+        .content-card li strong {
+            color: var(--primary);
+        }
+
+        /* كود */
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+        }
+
+        .code-block .code-label {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--primary);
+            color: #000;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* صندوق المعلومة */
+        .info-box {
+            background: rgba(0, 180, 255, 0.08);
+            border-right: 4px solid var(--info);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .info-box i {
+            color: var(--info);
+            margin-left: 10px;
+        }
+
+        .warning-box {
+            background: rgba(255, 136, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning-box i {
+            color: var(--warning);
+            margin-left: 10px;
+        }
+
+        .success-box {
+            background: rgba(0, 200, 81, 0.08);
+            border-right: 4px solid var(--success);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .success-box i {
+            color: var(--success);
+            margin-left: 10px;
+        }
+
+        .danger-box {
+            background: rgba(255, 68, 68, 0.08);
+            border-right: 4px solid var(--danger);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .danger-box i {
+            color: var(--danger);
+            margin-left: 10px;
+        }
+
+        /* جدول المقارنة */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.08);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .comparison-table td {
+            color: var(--text-light);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(255, 215, 0, 0.03);
+        }
+
+        /* نموذج تفاعلي */
+        .interactive-form {
+            background: var(--dark-surface);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .interactive-form .form-group {
+            margin-bottom: 18px;
+        }
+
+        .interactive-form label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-light);
+        }
+
+        .interactive-form input,
+        .interactive-form select,
+        .interactive-form textarea {
+            width: 100%;
+            background: var(--dark);
+            border: 1px solid var(--border-color);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .interactive-form input:focus,
+        .interactive-form select:focus,
+        .interactive-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .interactive-form textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .interactive-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .interactive-form button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .interactive-form button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .interactive-form .form-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .interactive-form .btn-danger {
+            background: rgba(255, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(255, 68, 68, 0.2);
+        }
+
+        .interactive-form .btn-danger:hover {
+            background: rgba(255, 68, 68, 0.25);
+            box-shadow: 0 4px 20px rgba(255, 68, 68, 0.2);
+        }
+
+        /* قائمة النماذج */
+        .model-list {
+            display: grid;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .model-item {
+            background: var(--dark);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-right: 3px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .model-item:hover {
+            border-color: var(--primary-light);
+            background: rgba(255, 215, 0, 0.03);
+        }
+
+        .model-item .model-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .model-item .model-title {
+            color: var(--text);
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .model-item .model-meta {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .model-item .model-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .model-item .model-actions button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .model-item .model-actions button:hover {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--text);
+        }
+
+        .model-item .model-actions .delete-btn:hover {
+            background: rgba(255, 68, 68, 0.15);
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* تذييل الدرس */
+        .lesson-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .lesson-footer .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .lesson-footer .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .lesson-footer .btn-primary:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .lesson-footer .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .lesson-footer .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .btn-complete {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-complete:hover {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        .btn-complete.done {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        /* الفوتر */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--dark-light);
+            border-top: 2px solid var(--primary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* التجاوب */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 100px 15px 40px;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .hero-meta {
+                gap: 15px;
+            }
+            
+            .content-card {
+                padding: 20px;
+            }
+            
+            .content-card h2 {
+                font-size: 1.4rem;
+            }
+            
+            .nav-links a {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+            
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .interactive-form .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-table {
+                font-size: 0.85rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 8px 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .content-card {
+                padding: 15px;
+            }
+            
+            .lesson-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .lesson-footer .btn {
+                justify-content: center;
+            }
+
+            .model-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .model-item .model-actions {
+                justify-content: flex-start;
+            }
+        }
+
+        /* تأثير الظهور */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* التمرير السلس */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* أنماط Prism الإضافية */
+        .token.comment {
+            color: #6a9955;
+        }
+        .token.string {
+            color: #ce9178;
+        }
+        .token.keyword {
+            color: #569cd6;
+        }
+        .token.function {
+            color: #dcdcaa;
+        }
+        .token.class-name {
+            color: #4ec9b0;
+        }
+        .token.decorator {
+            color: #c586c0;
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التقدم -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <a href="../index.html" class="logo">
+            <i class="fab fa-django"></i>
+            <span>Django</span>
+        </a>
+        <div class="nav-links">
+            <a href="#content">الدرس</a>
+            <a href="#interactive">تفاعل</a>
+            <a href="../index.html" class="back-home">
+                <i class="fas fa-arrow-right"></i> العودة
+            </a>
+        </div>
+    </nav>
+
+    <!-- زر العودة للأعلى -->
+    <button class="back-to-top" id="backToTop" aria-label="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-breadcrumb">
+                <a href="../index.html">الرئيسية</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <a href="../django/index.html">Django</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <span style="color: var(--text);">الدرس الثالث</span>
+            </div>
+
+            <div class="hero-badge">
+                <i class="fas fa-database"></i> الدرس 3 من 10
+            </div>
+
+            <h1><i class="fas fa-database"></i> النماذج و ORM</h1>
+            <p>تعلم كيفية إنشاء النماذج (Models) والتفاعل مع قاعدة البيانات باستخدام Django ORM باحترافية.</p>
+
+            <div class="hero-meta">
+                <span><i class="far fa-clock"></i> مدة القراءة: 12 دقيقة</span>
+                <span><i class="fas fa-signal"></i> مستوى: مبتدئ</span>
+                <span><i class="fas fa-database"></i> ORM</span>
+                <span><i class="fab fa-python"></i> بايثون + SQL</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="container" id="content">
+        <!-- مقدمة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-info-circle"></i> ما هي النماذج في Django؟</h2>
+            <p>
+                <strong>النماذج (Models)</strong> هي العمود الفقري لتطبيق Django. تمثل النماذج <strong>هيكل البيانات</strong> 
+                وتحدد كيفية تخزين البيانات في قاعدة البيانات. كل نموذج هو عبارة عن <strong>كلاس بايثون</strong> 
+                يرث من <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">django.db.models.Model</code>.
+            </p>
+            <p>
+                يقوم Django ORM (Object-Relational Mapping) بتحويل النماذج إلى جداول في قاعدة البيانات، 
+                ويوفر واجهة برمجية سهلة للتعامل مع البيانات باستخدام كائنات بايثون بدلاً من كتابة استعلامات SQL يدوياً.
+            </p>
+
+            <div class="info-box">
+                <i class="fas fa-lightbulb"></i>
+                <strong>المفهوم الأساسي:</strong> النموذج = جدول في قاعدة البيانات، وكل حقل في النموذج = عمود في الجدول.
+            </div>
+        </div>
+
+        <!-- إنشاء نموذج -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-plus-circle"></i> إنشاء نموذج</h2>
+            <p>لإنشاء نموذج في Django، تحتاج إلى إضافة كلاس جديد في ملف <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">models.py</code> داخل التطبيق:</p>
+
+            <div class="code-block">
+                <div class="code-label">models.py</div>
+                <pre><code class="language-python">from django.db import models
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name</code></pre>
+            </div>
+
+            <h3>أنواع الحقول الشائعة</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>الحقل</th>
+                        <th>الوصف</th>
+                        <th>مثال</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">CharField</code></td>
+                        <td>نص قصير (يحتاج إلى max_length)</td>
+                        <td><code>title = models.CharField(max_length=200)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">TextField</code></td>
+                        <td>نص طويل</td>
+                        <td><code>content = models.TextField()</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">IntegerField</code></td>
+                        <td>رقم صحيح</td>
+                        <td><code>age = models.IntegerField()</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">BooleanField</code></td>
+                        <td>قيمة صحيحة/خاطئة</td>
+                        <td><code>published = models.BooleanField(default=False)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">DateTimeField</code></td>
+                        <td>تاريخ ووقت</td>
+                        <td><code>created_at = models.DateTimeField(auto_now_add=True)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">ForeignKey</code></td>
+                        <td>علاقة واحد إلى متعدد</td>
+                        <td><code>category = models.ForeignKey(Category, on_delete=models.CASCADE)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">SlugField</code></td>
+                        <td>رابط قصير (URL-friendly)</td>
+                        <td><code>slug = models.SlugField(unique=True)</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- الترحيلات -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-arrows-spin"></i> الترحيلات (Migrations)</h2>
+            <p>
+                بعد إنشاء النماذج، تحتاج إلى إنشاء <strong>ملفات الترحيل</strong> وتطبيقها على قاعدة البيانات. 
+                الترحيلات هي طريقة Django لتتبع التغييرات في هيكل قاعدة البيانات.
+            </p>
+
+            <h3>خطوات الترحيل</h3>
+            <div class="code-block">
+                <div class="code-label">Terminal</div>
+                <pre><code class="language-bash"># إنشاء ملفات الترحيل
+python manage.py makemigrations
+
+# تطبيق الترحيلات على قاعدة البيانات
+python manage.py migrate</code></pre>
+            </div>
+
+            <div class="success-box">
+                <i class="fas fa-check-circle"></i>
+                <strong>نصيحة:</strong> قم دائماً بتنفيذ <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">makemigrations</code> أولاً لإنشاء ملفات الترحيل، ثم <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">migrate</code> لتطبيقها.
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>ملاحظة:</strong> يمكنك عرض استعلامات SQL التي ستنفذها الترحيلات باستخدام الأمر:
+                <code style="background:rgba(0,180,255,0.1);padding:2px 8px;border-radius:4px;color:var(--info);">python manage.py sqlmigrate app_name migration_number</code>
+            </div>
+        </div>
+
+        <!-- ORM الأساسي -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-code"></i> Django ORM - العمليات الأساسية</h2>
+            <p>يوفر Django ORM واجهة قوية للتعامل مع قاعدة البيانات باستخدام كود بايثون. إليك العمليات الأساسية:</p>
+
+            <h3>إنشاء (Create)</h3>
+            <div class="code-block">
+                <div class="code-label">Python Shell</div>
+                <pre><code class="language-python"># الطريقة الأولى
+post = Post(title="أول منشور", content="محتوى المنشور...")
+post.save()
+
+# الطريقة الثانية (المفضلة)
+post = Post.objects.create(
+    title="منشور جديد",
+    content="محتوى المنشور الجديد",
+    published=True
+)</code></pre>
+            </div>
+
+            <h3>قراءة (Read)</h3>
+            <div class="code-block">
+                <div class="code-label">Python Shell</div>
+                <pre><code class="language-python"># الحصول على جميع الكائنات
+all_posts = Post.objects.all()
+
+# الحصول على كائن واحد (يرفع استثناء إذا لم يوجد)
+post = Post.objects.get(id=1)
+
+# التصفية
+published_posts = Post.objects.filter(published=True)
+
+# استثناء الفلاتر
+draft_posts = Post.objects.exclude(published=True)
+
+# الترتيب
+recent_posts = Post.objects.order_by('-created_at')[:5]
+
+# البحث (يحتوي على)
+search_results = Post.objects.filter(title__contains="Django")</code></pre>
+            </div>
+
+            <h3>تحديث (Update)</h3>
+            <div class="code-block">
+                <div class="code-label">Python Shell</div>
+                <pre><code class="language-python"># تحديث كائن واحد
+post = Post.objects.get(id=1)
+post.title = "عنوان جديد"
+post.save()
+
+# تحديث مجموعة (دفعة واحدة)
+Post.objects.filter(published=False).update(published=True)</code></pre>
+            </div>
+
+            <h3>حذف (Delete)</h3>
+            <div class="code-block">
+                <div class="code-label">Python Shell</div>
+                <pre><code class="language-python"># حذف كائن واحد
+post = Post.objects.get(id=1)
+post.delete()
+
+# حذف مجموعة
+Post.objects.filter(published=False).delete()</code></pre>
+            </div>
+        </div>
+
+        <!-- العلاقات -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-link"></i> العلاقات بين النماذج</h2>
+            <p>يدعم Django ثلاثة أنواع رئيسية من العلاقات بين النماذج:</p>
+
+            <h3>1. واحد إلى متعدد (ForeignKey)</h3>
+            <div class="code-block">
+                <div class="code-label">models.py</div>
+                <pre><code class="language-python">class Author(models.Model):
+    name = models.CharField(max_length=100)
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')</code></pre>
+            </div>
+            <p><strong>الوصول العكسي:</strong> <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">author.books.all()</code></p>
+
+            <h3>2. واحد إلى واحد (OneToOneField)</h3>
+            <div class="code-block">
+                <div class="code-label">models.py</div>
+                <pre><code class="language-python">class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.TextField()
+    website = models.URLField(blank=True)</code></pre>
+            </div>
+
+            <h3>3. متعدد إلى متعدد (ManyToManyField)</h3>
+            <div class="code-block">
+                <div class="code-label">models.py</div>
+                <pre><code class="language-python">class Post(models.Model):
+    title = models.CharField(max_length=200)
+    tags = models.ManyToManyField('Tag', related_name='posts')
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50)</code></pre>
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>ملاحظة:</strong> <code style="background:rgba(0,180,255,0.1);padding:2px 8px;border-radius:4px;color:var(--info);">on_delete=models.CASCADE</code> يعني أنه عند حذف الكائن المرتبط، سيتم حذف جميع الكائنات المرتبطة به أيضاً.
+            </div>
+        </div>
+
+        <!-- مثال تفاعلي -->
+        <div class="content-card fade-in" id="interactive">
+            <h2><i class="fas fa-laptop-code"></i> مثال تفاعلي: إدارة المنشورات</h2>
+            <p>جرب إنشاء وعرض وتعديل وحذف المنشورات باستخدام محاكي ORM:</p>
+
+            <div class="interactive-form" id="postForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="postTitleInput">العنوان</label>
+                        <input type="text" id="postTitleInput" placeholder="أدخل عنوان المنشور">
+                    </div>
+                    <div class="form-group">
+                        <label for="postPublishedInput">منشور منشور</label>
+                        <select id="postPublishedInput">
+                            <option value="true">نعم</option>
+                            <option value="false" selected>لا</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="postContentInput">المحتوى</label>
+                    <textarea id="postContentInput" placeholder="أدخل محتوى المنشور..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button id="addPostBtn"><i class="fas fa-plus"></i> إضافة منشور</button>
+                    <button id="clearPostsBtn" class="btn-danger"><i class="fas fa-trash"></i> حذف الكل</button>
+                </div>
+            </div>
+
+            <div class="model-list" id="postList">
+                <!-- سيتم عرض المنشورات هنا -->
+                <div style="color: var(--text-secondary); text-align: center; padding: 30px;">
+                    <i class="fas fa-info-circle" style="color: var(--primary); margin-left: 10px;"></i>
+                    لا توجد منشورات. أضف منشوراً جديداً!
+                </div>
+            </div>
+        </div>
+
+        <!-- أفضل الممارسات -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-star"></i> أفضل الممارسات</h2>
+            <ul>
+                <li><strong>استخدم <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">__str__</code>:</strong> دائماً قم بتعريف <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">__str__</code> لتسهيل عرض الكائنات.</li>
+                <li><strong>استخدم <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">related_name</code>:</strong> في العلاقات لتسهيل الوصول العكسي.</li>
+                <li><strong>استخدم <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">auto_now_add</code> و <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">auto_now</code>:</strong> لتتبع تواريخ الإنشاء والتحديث.</li>
+                <li><strong>استخدم <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">indexes</code>:</strong> أضف فهارس إلى الحقول التي تبحث عنها كثيراً.</li>
+                <li><strong>استخدم <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">Meta</code>:</strong> لترتيب النتائج بشكل افتراضي.</li>
+            </ul>
+
+            <div class="code-block">
+                <div class="code-label">مثال متقدم</div>
+                <pre><code class="language-python">class Post(models.Model):
+    title = models.CharField(max_length=200, db_index=True)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']  # ترتيب افتراضي
+        indexes = [
+            models.Index(fields=['title', 'created_at']),
+        ]
+
+    def __str__(self):
+        return self.title</code></pre>
+            </div>
+        </div>
+
+        <!-- الخلاصة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-flag-checkered"></i> خلاصة الدرس</h2>
+            <ul>
+                <li>✅ النماذج تمثل <strong>هيكل البيانات</strong> في Django.</li>
+                <li>✅ كل نموذج هو كلاس بايثون يرث من <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">models.Model</code>.</li>
+                <li>✅ استخدم <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">makemigrations</code> و <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">migrate</code> لتطبيق التغييرات.</li>
+                <li>✅ ORM يوفر عمليات <strong>Create, Read, Update, Delete</strong>.</li>
+                <li>✅ هناك ثلاثة أنواع رئيسية من العلاقات: <strong>ForeignKey, OneToOne, ManyToMany</strong>.</li>
+                <li>✅ استخدم <strong>أفضل الممارسات</strong> لتحسين أداء تطبيقك.</li>
+            </ul>
+        </div>
+
+        <!-- اختبار معرفة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-question"></i> اختبر معلوماتك</h2>
+            <div id="quizSection">
+                <p><strong>ما هو الأمر الصحيح لإنشاء ترحيلات Django بعد تعديل النماذج؟</strong></p>
+                <div style="display:flex;flex-direction:column;gap:10px;margin:15px 0;">
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="migrate">
+                        <input type="radio" name="quiz" value="migrate" style="accent-color:var(--primary);width:18px;height:18px;">
+                        <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">python manage.py migrate</code>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="makemigrations">
+                        <input type="radio" name="quiz" value="makemigrations" style="accent-color:var(--primary);width:18px;height:18px;">
+                        <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">python manage.py makemigrations</code>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="both">
+                        <input type="radio" name="quiz" value="both" style="accent-color:var(--primary);width:18px;height:18px;">
+                        كلا الأمرين: <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">makemigrations</code> ثم <code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">migrate</code>
+                    </label>
+                </div>
+                <button id="checkQuizBtn" style="background:var(--primary);color:#000;border:none;padding:12px 30px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;transition:var(--transition);font-family:'Cairo',sans-serif;">
+                    <i class="fas fa-check"></i> تحقق الإجابة
+                </button>
+                <div id="quizResult" style="margin-top:15px;padding:15px;border-radius:10px;display:none;"></div>
+            </div>
+        </div>
+
+        <!-- تذييل الدرس -->
+        <div class="lesson-footer">
+            <div style="display:flex;gap:15px;flex-wrap:wrap;">
+                <button class="btn-complete" id="markCompleteBtn">
+                    <i class="fas fa-circle" id="completeIcon"></i>
+                    <span id="completeText">تحديد كمكتمل</span>
+                </button>
+                <a href="lesson2.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i> الدرس السابق
+                </a>
+            </div>
+            <a href="lesson4.html" class="btn btn-primary">
+                الدرس التالي <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- فوتر -->
+    <footer>
+        <p>© 2026 <a href="../index.html">CodeWay</a> — تخصص Django — الدرس الثالث: النماذج و ORM</p>
+    </footer>
+
+    <!-- Prism.js للتلوين -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <script>
+        // =============================================
+        // شريط التقدم
+        // =============================================
+        function updateProgressBar() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // =============================================
+        // زر العودة للأعلى
+        // =============================================
+        function toggleBackToTop() {
+            const btn = document.getElementById('backToTop');
+            if (document.documentElement.scrollTop > 300 || document.body.scrollTop > 300) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // =============================================
+        // تأثير الظهور التدريجي
+        // =============================================
+        function checkFadeIn() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 80) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        // =============================================
+        // إدارة المنشورات (محاكي ORM)
+        // =============================================
+        let posts = [];
+
+        function renderPosts() {
+            const postList = document.getElementById('postList');
+            
+            if (posts.length === 0) {
+                postList.innerHTML = `
+                    <div style="color: var(--text-secondary); text-align: center; padding: 30px;">
+                        <i class="fas fa-info-circle" style="color: var(--primary); margin-left: 10px;"></i>
+                        لا توجد منشورات. أضف منشوراً جديداً!
+                    </div>
+                `;
+                return;
+            }
+
+            postList.innerHTML = posts.map((post, index) => `
+                <div class="model-item">
+                    <div class="model-info">
+                        <div class="model-title">${post.title}</div>
+                        <div class="model-meta">
+                            <span style="color: ${post.published ? 'var(--success)' : 'var(--warning)'};">
+                                ${post.published ? '✅ منشور' : '📝 مسودة'}
+                            </span>
+                            <span style="margin-right: 15px;">
+                                <i class="far fa-calendar-alt" style="color: var(--text-secondary);"></i>
+                                ${post.created_at}
+                            </span>
+                            <span style="margin-right: 15px; color: var(--text-secondary);">
+                                محتوى: ${post.content.length > 50 ? post.content.substring(0, 50) + '...' : post.content}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="model-actions">
+                        <button onclick="togglePublish(${index})">
+                            <i class="fas ${post.published ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                            ${post.published ? 'إلغاء النشر' : 'نشر'}
+                        </button>
+                        <button class="delete-btn" onclick="deletePost(${index})">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addPost() {
+            const titleInput = document.getElementById('postTitleInput');
+            const contentInput = document.getElementById('postContentInput');
+            const publishedSelect = document.getElementById('postPublishedInput');
+            
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            const published = publishedSelect.value === 'true';
+
+            if (!title) {
+                alert('الرجاء إدخال عنوان المنشور');
+                titleInput.focus();
+                return;
+            }
+
+            if (!content) {
+                alert('الرجاء إدخال محتوى المنشور');
+                contentInput.focus();
+                return;
+            }
+
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('ar-EG', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            posts.unshift({
+                id: posts.length + 1,
+                title: title,
+                content: content,
+                published: published,
+                created_at: formattedDate
+            });
+
+            renderPosts();
+            titleInput.value = '';
+            contentInput.value = '';
+            publishedSelect.value = 'false';
+            titleInput.focus();
+        }
+
+        function deletePost(index) {
+            if (confirm('هل أنت متأكد من حذف هذا المنشور؟')) {
+                posts.splice(index, 1);
+                renderPosts();
+            }
+        }
+
+        function togglePublish(index) {
+            posts[index].published = !posts[index].published;
+            renderPosts();
+        }
+
+        document.getElementById('addPostBtn').addEventListener('click', addPost);
+        document.getElementById('clearPostsBtn').addEventListener('click', function() {
+            if (posts.length === 0) return;
+            if (confirm('هل أنت متأكد من حذف جميع المنشورات؟')) {
+                posts = [];
+                renderPosts();
+            }
+        });
+
+        // إضافة منشور بالضغط على Enter في أي حقل
+        document.querySelectorAll('#postTitleInput, #postContentInput').forEach(input => {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    addPost();
+                }
+            });
+        });
+
+        // =============================================
+        // اختبار المعرفة
+        // =============================================
+        document.getElementById('checkQuizBtn').addEventListener('click', function() {
+            const selected = document.querySelector('input[name="quiz"]:checked');
+            const resultDiv = document.getElementById('quizResult');
+            
+            if (!selected) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> الرجاء اختيار إجابة أولاً.';
+                return;
+            }
+
+            const answer = selected.value;
+            resultDiv.style.display = 'block';
+            
+            if (answer === 'both') {
+                resultDiv.className = 'success-box';
+                resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ إجابة صحيحة! يجب تنفيذ <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">makemigrations</code> أولاً لإنشاء ملفات الترحيل، ثم <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">migrate</code> لتطبيقها على قاعدة البيانات.';
+            } else if (answer === 'makemigrations') {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. الأمر <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">makemigrations</code> ينشئ ملفات الترحيل فقط. تحتاج أيضاً إلى <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">migrate</code> لتطبيقها.`;
+            } else {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. الأمر <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">migrate</code> يطبق التغييرات فقط. تحتاج أولاً إلى <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">makemigrations</code> لإنشاء ملفات الترحيل.`;
+            }
+        });
+
+        // اختيار خيار الاختبار بالنقر على البطاقة
+        document.querySelectorAll('.quiz-option').forEach(label => {
+            label.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+
+        // =============================================
+        // إكمال الدرس - localStorage
+        // =============================================
+        const LESSON_ID = 3;
+        const STORAGE_KEY = 'django_lessons_completed';
+
+        function isLessonCompleted() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return false;
+            const completed = JSON.parse(saved);
+            return completed.includes(LESSON_ID);
+        }
+
+        function toggleLessonComplete() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            let completed = saved ? JSON.parse(saved) : [];
+            const index = completed.indexOf(LESSON_ID);
+            
+            if (index > -1) {
+                completed.splice(index, 1);
+            } else {
+                completed.push(LESSON_ID);
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+            updateCompleteButton();
+        }
+
+        function updateCompleteButton() {
+            const btn = document.getElementById('markCompleteBtn');
+            const icon = document.getElementById('completeIcon');
+            const text = document.getElementById('completeText');
+            
+            if (isLessonCompleted()) {
+                btn.classList.add('done');
+                icon.className = 'fas fa-check-circle';
+                text.textContent = 'مكتمل ✓';
+            } else {
+                btn.classList.remove('done');
+                icon.className = 'fas fa-circle';
+                text.textContent = 'تحديد كمكتمل';
+            }
+        }
+
+        document.getElementById('markCompleteBtn').addEventListener('click', toggleLessonComplete);
+
+        // =============================================
+        // الأحداث العامة
+        // =============================================
+        window.addEventListener('scroll', function() {
+            updateProgressBar();
+            toggleBackToTop();
+            checkFadeIn();
+        });
+
+        window.addEventListener('load', function() {
+            checkFadeIn();
+            updateCompleteButton();
+            
+            // إضافة منشورات تجريبية
+            posts = [
+                {
+                    id: 1,
+                    title: 'أول منشور في Django',
+                    content: 'هذا هو محتوى أول منشور في Django. تعلم كيفية بناء نماذج قوية!',
+                    published: true,
+                    created_at: new Date().toLocaleDateString('ar-EG', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                },
+                {
+                    id: 2,
+                    title: 'فهم ORM في Django',
+                    content: 'ORM هو اختصار لـ Object-Relational Mapping، وهو أداة قوية للتعامل مع قاعدة البيانات باستخدام كائنات بايثون.',
+                    published: false,
+                    created_at: new Date().toLocaleDateString('ar-EG', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                }
+            ];
+            renderPosts();
+        });
+    </script>
+</body>
+</html>

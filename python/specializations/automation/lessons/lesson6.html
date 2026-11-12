@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 6: أتمتة الويب واستخراج البيانات | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص الأتمتة</a>
+        <span class="sep">/</span>
+        <span>أتمتة الويب</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-globe"></i>
+            الدرس 6 · الويب
+        </div>
+        <h1 class="lesson-title">أتمتة الويب واستخراج البيانات</h1>
+        <p class="lesson-intro">
+            أسعار تنسخها يدويًا من موقع كل صباح؟ تقرير تنزّله بعد تسجيل الدخول كل أسبوع؟ في هذا الدرس ستتعلم <strong>الطلبات بـ requests</strong> وقراءة <strong>الواجهات البرمجية (APIs)</strong> بالصفحات وإعادة المحاولة، و<strong>استخراج البيانات من HTML</strong> بـ BeautifulSoup، و<strong>تسجيل الدخول بالجلسات</strong>، و<strong>تنزيل الملفات</strong>، مع <strong>قواعد الاستخراج الأخلاقي</strong> و robots.txt — كل ذلك على متجر تجريبي تشغّله على جهازك.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 80 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 بيانات الويب في ملف CSV</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 5</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#rules">1. القواعد</a>
+            <a href="#site">2. المتجر التجريبي</a>
+            <a href="#requests">3. requests</a>
+            <a href="#api">4. الصفحات وإعادة المحاولة</a>
+            <a href="#bs4">5. BeautifulSoup</a>
+            <a href="#login">6. تسجيل الدخول</a>
+            <a href="#robots">7. robots وتنزيل الملفات</a>
+            <a href="#dynamic">8. المواقع الديناميكية</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="rules">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-balance-scale"></i>
+        قبل أن تبدأ: API أم استخراج؟ وما المسموح؟
+    </h2>
+        <p>
+            هناك طريقتان لأخذ البيانات من موقع: <strong>واجهة برمجية (API)</strong> يوفرها الموقع وتُرجع بيانات منظمة (JSON)،
+            أو <strong>استخراج من صفحات HTML (Web Scraping)</strong> المصممة للبشر. القاعدة: <strong>ابحث عن API أولًا</strong>.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th></th><th>واجهة برمجية API</th><th>استخراج HTML</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>شكل البيانات</td><td>JSON منظم وجاهز</td><td>نصوص داخل وسوم تحتاج تنظيفًا</td></tr>
+                    <tr><td>الثبات</td><td>موثقة ونادرًا ما تتغير</td><td>تنكسر عند أي تعديل في تصميم الموقع</td></tr>
+                    <tr><td>الإذن</td><td>صريح (مفتاح API وشروط استخدام)</td><td>راجع الشروط و robots.txt</td></tr>
+                    <tr><td>السرعة</td><td>طلب واحد لمئات السجلات</td><td>صفحة لكل مجموعة صغيرة</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>قواعد الاستخراج المسؤول:</strong>
+                <ul style="margin:6px 0 0;">
+                    <li>اقرأ شروط استخدام الموقع؛ بعض المواقع تمنع الاستخراج صراحة.</li>
+                    <li>احترم <code>robots.txt</code> والتأخير المطلوب بين الطلبات، ولا ترسل مئات الطلبات في الثانية.</li>
+                    <li>عرّف نفسك بـ <code>User-Agent</code> واضح فيه وسيلة تواصل.</li>
+                    <li>لا تجمع بيانات شخصية، ولا تتجاوز صفحات الدخول بحساب غير حسابك، ولا تعِد نشر محتوى محمي بحقوق.</li>
+                </ul>
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="site">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-store"></i>
+        المتجر التجريبي على جهازك
+    </h2>
+        <p>
+            حتى تتدرب بلا قلق، كل أمثلة الدرس تعمل على متجر صغير مبني بـ Flask (تعلمته في المستوى المتقدم): صفحات منتجات بترقيم،
+            وواجهة API، وصفحة دخول، وملف للتنزيل، و robots.txt، ونقطة «متعثرة» تفشل أحيانًا. احفظه باسم <code>shop_site.py</code>
+            وشغّله في نافذة طرفية منفصلة بالأمر <code>python shop_site.py</code>، ثم شغّل الأمثلة في نافذة أخرى:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>shop_site.py</span>
+    </div>
+<pre><span class="str">"""متجر تجريبي لتعلّم استخراج البيانات — شغّله بـ: python shop_site.py"""</span>
+<span class="kw">import</span> secrets
+
+<span class="kw">from</span> flask <span class="kw">import</span> Flask, abort, jsonify, request, session
+
+app = <span class="fn">Flask</span>(__name__)
+app.secret_key = <span class="str">"demo-only"</span>
+
+PRODUCTS = [
+    (<span class="num">1</span>, <span class="str">"لابتوب نور 14"</span>, <span class="str">"laptops"</span>, <span class="num">3299.0</span>, <span class="kw">True</span>), (<span class="num">2</span>, <span class="str">"سماعة هدى اللاسلكية"</span>, <span class="str">"audio"</span>, <span class="num">249.5</span>, <span class="kw">True</span>),
+    (<span class="num">3</span>, <span class="str">"شاشة أفق 27 بوصة"</span>, <span class="str">"monitors"</span>, <span class="num">1150.0</span>, <span class="kw">False</span>), (<span class="num">4</span>, <span class="str">"لوحة مفاتيح عربية"</span>, <span class="str">"accessories"</span>, <span class="num">189.0</span>, <span class="kw">True</span>),
+    (<span class="num">5</span>, <span class="str">"فأرة لاسلكية"</span>, <span class="str">"accessories"</span>, <span class="num">79.0</span>, <span class="kw">True</span>), (<span class="num">6</span>, <span class="str">"لابتوب نور 16 برو"</span>, <span class="str">"laptops"</span>, <span class="num">5499.0</span>, <span class="kw">True</span>),
+    (<span class="num">7</span>, <span class="str">"مكبر صوت محمول"</span>, <span class="str">"audio"</span>, <span class="num">399.0</span>, <span class="kw">False</span>), (<span class="num">8</span>, <span class="str">"كاميرا ويب 4K"</span>, <span class="str">"accessories"</span>, <span class="num">449.0</span>, <span class="kw">True</span>),
+    (<span class="num">9</span>, <span class="str">"شاشة أفق 32 منحنية"</span>, <span class="str">"monitors"</span>, <span class="num">1899.0</span>, <span class="kw">True</span>), (<span class="num">10</span>, <span class="str">"حقيبة لابتوب"</span>, <span class="str">"accessories"</span>, <span class="num">159.0</span>, <span class="kw">True</span>),
+]
+PER_PAGE = <span class="num">4</span>
+calls = {<span class="str">"flaky"</span>: <span class="num">0</span>}
+
+
+<span class="kw">def</span> <span class="fn">page_html</span>(title, body):
+    <span class="kw">return</span> <span class="str">f'&lt;!doctype html&gt;&lt;html lang="ar" dir="rtl"&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;title&gt;{title}&lt;/title&gt;&lt;/head&gt;&lt;body&gt;{body}&lt;/body&gt;&lt;/html&gt;'</span>
+
+
+<span class="kw">def</span> <span class="fn">as_dict</span>(p):
+    <span class="kw">return</span> {<span class="str">"id"</span>: p[<span class="num">0</span>], <span class="str">"name"</span>: p[<span class="num">1</span>], <span class="str">"category"</span>: p[<span class="num">2</span>], <span class="str">"price"</span>: p[<span class="num">3</span>], <span class="str">"in_stock"</span>: p[<span class="num">4</span>]}
+
+
+@app.<span class="fn">get</span>(<span class="str">"/robots.txt"</span>)
+<span class="kw">def</span> <span class="fn">robots</span>():
+    <span class="kw">return</span> <span class="str">"User-agent: *\nDisallow: /admin\nDisallow: /account\nCrawl-delay: 1\n"</span>, <span class="num">200</span>, {<span class="str">"Content-Type"</span>: <span class="str">"text/plain"</span>}
+
+
+@app.<span class="fn">get</span>(<span class="str">"/products"</span>)
+<span class="kw">def</span> <span class="fn">products</span>():
+    page = request.args.<span class="fn">get</span>(<span class="str">"page"</span>, <span class="num">1</span>, type=int)
+    items = PRODUCTS[(page - <span class="num">1</span>) * PER_PAGE: page * PER_PAGE]
+    <span class="kw">if</span> <span class="kw">not</span> items:
+        <span class="fn">abort</span>(<span class="num">404</span>)
+    cards = <span class="str">""</span>.<span class="fn">join</span>(
+        <span class="str">f'&lt;div class="product" data-id="{pid}"&gt;&lt;h2 class="name"&gt;&lt;a href="/product/{pid}"&gt;{name}&lt;/a&gt;&lt;/h2&gt;'</span>
+        <span class="str">f'&lt;span class="price"&gt;{price:,.2f} ر.س&lt;/span&gt;'</span>
+        <span class="str">f'&lt;span class="stock {"in" if stock else "out"}"&gt;{"متوفر" if stock else "نفد المخزون"}&lt;/span&gt;&lt;/div&gt;'</span>
+        <span class="kw">for</span> pid, name, _, price, stock <span class="kw">in</span> items)
+    nav = <span class="str">f'&lt;a class="next" href="/products?page={page + 1}"&gt;التالي&lt;/a&gt;'</span> <span class="kw">if</span> page * PER_PAGE &lt; <span class="fn">len</span>(PRODUCTS) <span class="kw">else</span> <span class="str">""</span>
+    <span class="kw">return</span> <span class="fn">page_html</span>(<span class="str">f"المنتجات - صفحة {page}"</span>, <span class="str">f'&lt;h1&gt;المنتجات&lt;/h1&gt;&lt;div class="grid"&gt;{cards}&lt;/div&gt;{nav}'</span>)
+
+
+@app.<span class="fn">get</span>(<span class="str">"/product/&lt;int:pid&gt;"</span>)
+<span class="kw">def</span> <span class="fn">product</span>(pid):
+    <span class="kw">match</span> = [p <span class="kw">for</span> p <span class="kw">in</span> PRODUCTS <span class="kw">if</span> p[<span class="num">0</span>] == pid] <span class="kw">or</span> <span class="fn">abort</span>(<span class="num">404</span>)
+    _, name, category, price, stock = <span class="kw">match</span>[<span class="num">0</span>]
+    specs = <span class="str">f"&lt;tr&gt;&lt;th&gt;الفئة&lt;/th&gt;&lt;td&gt;{category}&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th&gt;السعر&lt;/th&gt;&lt;td&gt;{price:,.2f}&lt;/td&gt;&lt;/tr&gt;"</span>
+    <span class="kw">return</span> <span class="fn">page_html</span>(name, <span class="str">f'&lt;h1&gt;{name}&lt;/h1&gt;&lt;table class="specs"&gt;{specs}&lt;/table&gt;'</span>)
+
+
+@app.<span class="fn">get</span>(<span class="str">"/api/products"</span>)
+<span class="kw">def</span> <span class="fn">api_products</span>():
+    page = request.args.<span class="fn">get</span>(<span class="str">"page"</span>, <span class="num">1</span>, type=int)
+    category = request.args.<span class="fn">get</span>(<span class="str">"category"</span>)
+    rows = [<span class="fn">as_dict</span>(p) <span class="kw">for</span> p <span class="kw">in</span> PRODUCTS <span class="kw">if</span> category <span class="kw">in</span> (<span class="kw">None</span>, p[<span class="num">2</span>])]
+    pages = <span class="fn">max</span>(<span class="num">1</span>, -(-<span class="fn">len</span>(rows) // PER_PAGE))
+    <span class="kw">return</span> <span class="fn">jsonify</span>(page=page, pages=pages, total=<span class="fn">len</span>(rows), items=rows[(page - <span class="num">1</span>) * PER_PAGE: page * PER_PAGE])
+
+
+@app.<span class="fn">get</span>(<span class="str">"/api/flaky"</span>)
+<span class="kw">def</span> <span class="fn">flaky</span>():
+    calls[<span class="str">"flaky"</span>] += <span class="num">1</span>
+    <span class="kw">if</span> calls[<span class="str">"flaky"</span>] % <span class="num">3</span>:
+        <span class="kw">return</span> <span class="fn">jsonify</span>(error=<span class="str">"server busy"</span>), <span class="num">503</span>
+    <span class="kw">return</span> <span class="fn">jsonify</span>(status=<span class="str">"ok"</span>, attempt=calls[<span class="str">"flaky"</span>])
+
+
+@app.<span class="fn">route</span>(<span class="str">"/login"</span>, methods=[<span class="str">"GET"</span>, <span class="str">"POST"</span>])
+<span class="kw">def</span> <span class="fn">login</span>():
+    <span class="kw">if</span> request.method == <span class="str">"GET"</span>:
+        session[<span class="str">"csrf"</span>] = secrets.<span class="fn">token_hex</span>(<span class="num">8</span>)
+        <span class="kw">return</span> <span class="fn">page_html</span>(<span class="str">"دخول"</span>, <span class="str">f'&lt;form method="post"&gt;&lt;input type="hidden" name="csrf" value="{session["csrf"]}"&gt;'</span>
+                                 <span class="str">'&lt;input name="username"&gt;&lt;input name="password" type="password"&gt;&lt;button&gt;دخول&lt;/button&gt;&lt;/form&gt;'</span>)
+    <span class="kw">if</span> request.form.<span class="fn">get</span>(<span class="str">"csrf"</span>) != session.<span class="fn">get</span>(<span class="str">"csrf"</span>):
+        <span class="fn">abort</span>(<span class="num">400</span>)
+    <span class="kw">if</span> request.form.<span class="fn">get</span>(<span class="str">"username"</span>) == <span class="str">"sara"</span> <span class="kw">and</span> request.form.<span class="fn">get</span>(<span class="str">"password"</span>) == <span class="str">"s3cret"</span>:
+        session[<span class="str">"user"</span>] = <span class="str">"sara"</span>
+        <span class="kw">return</span> <span class="fn">page_html</span>(<span class="str">"مرحبًا"</span>, <span class="str">"&lt;p&gt;تم الدخول&lt;/p&gt;"</span>)
+    <span class="kw">return</span> <span class="fn">page_html</span>(<span class="str">"خطأ"</span>, <span class="str">"&lt;p class='error'&gt;بيانات الدخول غير صحيحة&lt;/p&gt;"</span>), <span class="num">401</span>
+
+
+@app.<span class="fn">get</span>(<span class="str">"/account/orders"</span>)
+<span class="kw">def</span> <span class="fn">orders</span>():
+    <span class="kw">if</span> session.<span class="fn">get</span>(<span class="str">"user"</span>) != <span class="str">"sara"</span>:
+        <span class="kw">return</span> <span class="fn">page_html</span>(<span class="str">"دخول مطلوب"</span>, <span class="str">"&lt;p&gt;سجّل الدخول أولًا&lt;/p&gt;"</span>), <span class="num">403</span>
+    rows = <span class="str">""</span>.<span class="fn">join</span>(<span class="str">f"&lt;tr&gt;&lt;td&gt;{o}&lt;/td&gt;&lt;td&gt;{d}&lt;/td&gt;&lt;td&gt;{t}&lt;/td&gt;&lt;/tr&gt;"</span> <span class="kw">for</span> o, d, t <span class="kw">in</span>
+                   [(<span class="str">"A-1042"</span>, <span class="str">"2025-03-02"</span>, <span class="str">"3,548.50"</span>), (<span class="str">"A-1077"</span>, <span class="str">"2025-03-09"</span>, <span class="str">"189.00"</span>), (<span class="str">"A-1101"</span>, <span class="str">"2025-03-13"</span>, <span class="str">"1,150.00"</span>)])
+    <span class="kw">return</span> <span class="fn">page_html</span>(<span class="str">"طلباتي"</span>, <span class="str">f'&lt;table id="orders"&gt;&lt;tr&gt;&lt;th&gt;الطلب&lt;/th&gt;&lt;th&gt;التاريخ&lt;/th&gt;&lt;th&gt;المبلغ&lt;/th&gt;&lt;/tr&gt;{rows}&lt;/table&gt;'</span>)
+
+
+@app.<span class="fn">get</span>(<span class="str">"/files/report.csv"</span>)
+<span class="kw">def</span> <span class="fn">report</span>():
+    lines = [<span class="str">"id,name,price"</span>] + [<span class="str">f"{p[0]},{p[1]},{p[3]}"</span> <span class="kw">for</span> p <span class="kw">in</span> PRODUCTS] * <span class="num">200</span>
+    <span class="kw">return</span> <span class="str">"\n"</span>.<span class="fn">join</span>(lines), <span class="num">200</span>, {<span class="str">"Content-Type"</span>: <span class="str">"text/csv; charset=utf-8"</span>}
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    app.<span class="fn">run</span>(port=<span class="num">5005</span>)</pre>
+</div>
+</section>
+
+<section class="section-card" id="requests">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-exchange-alt"></i>
+        الطلبات بمكتبة requests
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>requests_basics.py</span>
+    </div>
+<pre><span class="kw">import</span> requests
+
+BASE = <span class="str">"http://127.0.0.1:5005"</span>
+HEADERS = {<span class="str">"User-Agent"</span>: <span class="str">"CodeWayBot/1.0 (learning@codeway.example)"</span>}
+
+r = requests.<span class="fn">get</span>(<span class="str">f"{BASE}/api/products"</span>, params={<span class="str">"category"</span>: <span class="str">"laptops"</span>}, headers=HEADERS, timeout=<span class="num">10</span>)
+<span class="fn">print</span>(r.status_code, r.reason, <span class="str">"|"</span>, r.headers[<span class="str">"Content-Type"</span>])
+<span class="fn">print</span>(<span class="str">"الرابط الفعلي:"</span>, r.url)
+
+data = r.<span class="fn">json</span>()
+<span class="fn">print</span>(<span class="str">"العدد:"</span>, data[<span class="str">"total"</span>])
+<span class="kw">for</span> item <span class="kw">in</span> data[<span class="str">"items"</span>]:
+    <span class="fn">print</span>(<span class="str">f"- {item['name']}: {item['price']:,.2f} ر.س"</span>)
+
+missing = requests.<span class="fn">get</span>(<span class="str">f"{BASE}/products"</span>, params={<span class="str">"page"</span>: <span class="num">99</span>}, headers=HEADERS, timeout=<span class="num">10</span>)
+<span class="fn">print</span>(missing.status_code, <span class="str">"ok ="</span>, missing.ok)
+<span class="kw">try</span>:
+    missing.<span class="fn">raise_for_status</span>()
+<span class="kw">except</span> requests.HTTPError <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="str">"HTTPError:"</span>, e)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>200 OK | application/json
+الرابط الفعلي: http://127.0.0.1:5005/api/products?category=laptops
+العدد: 2
+- لابتوب نور 14: 3,299.00 ر.س
+- لابتوب نور 16 برو: 5,499.00 ر.س
+404 ok = False
+HTTPError: 404 Client Error: NOT FOUND for url: http://127.0.0.1:5005/products?page=99</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الأداة</th><th>الفائدة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>params={...}</code></td><td>تبني <code>?category=laptops</code> وترمّز العربية والمسافات تلقائيًا</td></tr>
+                    <tr><td><code>headers={...}</code></td><td>User-Agent ومفاتيح API (<code>Authorization: Bearer ...</code>)</td></tr>
+                    <tr><td><code>timeout=10</code></td><td><strong>إلزامي عمليًا</strong>: بدونه قد ينتظر السكربت للأبد</td></tr>
+                    <tr><td><code>r.status_code</code> / <code>r.ok</code></td><td>200 نجاح، 404 غير موجود، 429 طلبات كثيرة، 5xx خطأ في الخادم</td></tr>
+                    <tr><td><code>r.json()</code> / <code>r.text</code> / <code>r.content</code></td><td>البيانات كقاموس / كنص / كبايتات (للملفات)</td></tr>
+                    <tr><td><code>r.raise_for_status()</code></td><td>تحوّل رموز الخطأ إلى استثناء <code>HTTPError</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="api">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-plug"></i>
+        الواجهات البرمجية: الصفحات وإعادة المحاولة
+    </h2>
+        <p>
+            الواجهات لا تُرجع آلاف السجلات دفعة واحدة، بل <strong>صفحة بصفحة</strong>. والخوادم تتعثر أحيانًا (503 «مشغول») — فبدل أن يفشل
+            سكربتك الليلي، <strong>أعد المحاولة بانتظار متزايد</strong> (Exponential Backoff)، لكن فقط للأخطاء المؤقتة:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>api_client.py</span>
+    </div>
+<pre><span class="kw">import</span> time
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> requests
+
+BASE = <span class="str">"http://127.0.0.1:5005"</span>
+RETRYABLE = {<span class="num">429</span>, <span class="num">500</span>, <span class="num">502</span>, <span class="num">503</span>, <span class="num">504</span>}          <span class="cm"># أخطاء مؤقتة تستحق إعادة المحاولة</span>
+session = requests.<span class="fn">Session</span>()
+session.headers[<span class="str">"User-Agent"</span>] = <span class="str">"CodeWayBot/1.0 (learning@codeway.example)"</span>
+
+
+<span class="kw">def</span> <span class="fn">get_json</span>(url, params=<span class="kw">None</span>, retries=<span class="num">4</span>, base_wait=<span class="num">0.1</span>):   <span class="cm"># في الواقع ابدأ بثانية</span>
+    <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, retries + <span class="num">1</span>):
+        <span class="kw">try</span>:
+            r = session.<span class="fn">get</span>(url, params=params, timeout=<span class="num">10</span>)
+            <span class="kw">if</span> r.status_code <span class="kw">not</span> <span class="kw">in</span> RETRYABLE:
+                r.<span class="fn">raise_for_status</span>()                 <span class="cm"># 404 مثلًا: لا فائدة من التكرار</span>
+                <span class="kw">return</span> r.<span class="fn">json</span>()
+            problem = <span class="str">f"HTTP {r.status_code}"</span>
+        <span class="kw">except</span> (requests.ConnectionError, requests.Timeout) <span class="kw">as</span> e:
+            problem = <span class="fn">type</span>(e).__name__
+        <span class="kw">if</span> attempt == retries:
+            <span class="kw">raise</span> <span class="fn">RuntimeError</span>(<span class="str">f"فشل بعد {retries} محاولات: {problem}"</span>)
+        wait = base_wait * <span class="num">2</span> ** (attempt - <span class="num">1</span>)
+        <span class="fn">print</span>(<span class="str">f"   ⏳ المحاولة {attempt}: {problem} — انتظار {wait:.1f} ث"</span>)
+        time.<span class="fn">sleep</span>(wait)
+
+
+<span class="fn">print</span>(<span class="str">"نقطة متعثرة:"</span>, <span class="fn">get_json</span>(<span class="str">f"{BASE}/api/flaky"</span>))
+
+<span class="cm"># جلب كل الصفحات</span>
+items, page = [], <span class="num">1</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    data = <span class="fn">get_json</span>(<span class="str">f"{BASE}/api/products"</span>, params={<span class="str">"page"</span>: page})
+    items += data[<span class="str">"items"</span>]
+    <span class="fn">print</span>(<span class="str">f"صفحة {page}/{data['pages']}: {len(data['items'])} منتجات"</span>)
+    <span class="kw">if</span> page &gt;= data[<span class="str">"pages"</span>]:
+        <span class="kw">break</span>
+    page += <span class="num">1</span>
+
+df = pd.<span class="fn">DataFrame</span>(items)
+<span class="fn">print</span>(df.<span class="fn">groupby</span>(<span class="str">"category"</span>)[<span class="str">"price"</span>].<span class="fn">agg</span>([<span class="str">"count"</span>, <span class="str">"mean"</span>]).<span class="fn">round</span>(<span class="num">1</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   ⏳ المحاولة 1: HTTP 503 — انتظار 0.1 ث
+   ⏳ المحاولة 2: HTTP 503 — انتظار 0.2 ث
+نقطة متعثرة: {'attempt': 3, 'status': 'ok'}
+صفحة 1/3: 4 منتجات
+صفحة 2/3: 4 منتجات
+صفحة 3/3: 2 منتجات
+             count    mean
+category                  
+accessories      4   219.0
+audio            2   324.2
+laptops          2  4399.0
+monitors         2  1524.5</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>Session أسرع وأنظف:</strong> <code>requests.Session()</code> تعيد استخدام الاتصال نفسه، وتحفظ الترويسات والكوكيز لكل الطلبات.
+                استخدمها دائمًا عند إرسال أكثر من طلب لنفس الموقع.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="bs4">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-code"></i>
+        استخراج البيانات من HTML بـ BeautifulSoup
+    </h2>
+        <p>
+            عندما لا توجد API، نحمّل الصفحة ونحللها. ثبّت المكتبة بـ <code>pip install beautifulsoup4</code>، وافتح «أدوات المطور» في المتصفح
+            (زر الفأرة الأيمن ← فحص) لترى الوسوم والأصناف (classes) التي تحيط بالبيانات. ثم نحدد العناصر بـ<strong>محددات CSS</strong>:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>bs4_basics.py</span>
+    </div>
+<pre><span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+html = <span class="str">"""
+&lt;div class="product" data-id="3"&gt;
+  &lt;h2 class="name"&gt;&lt;a href="/product/3"&gt;شاشة أفق 27 بوصة&lt;/a&gt;&lt;/h2&gt;
+  &lt;span class="price"&gt;1,150.00 ر.س&lt;/span&gt;
+  &lt;span class="stock out"&gt;نفد المخزون&lt;/span&gt;
+&lt;/div&gt;
+"""</span>
+soup = <span class="fn">BeautifulSoup</span>(html, <span class="str">"html.parser"</span>)
+card = soup.<span class="fn">select_one</span>(<span class="str">"div.product"</span>)
+
+<span class="fn">print</span>(card[<span class="str">"data-id"</span>])                          <span class="cm"># قيمة سمة</span>
+<span class="fn">print</span>(card.<span class="fn">select_one</span>(<span class="str">".name"</span>).<span class="fn">get_text</span>(strip=<span class="kw">True</span>))
+<span class="fn">print</span>(card.<span class="fn">select_one</span>(<span class="str">"a"</span>)[<span class="str">"href"</span>])
+<span class="fn">print</span>(card.<span class="fn">select_one</span>(<span class="str">".stock"</span>)[<span class="str">"class"</span>])       <span class="cm"># class قائمة لأن العنصر قد يحمل عدة أصناف</span>
+<span class="fn">print</span>(card.<span class="fn">find</span>(<span class="str">"span"</span>, class_=<span class="str">"price"</span>).text)   <span class="cm"># find بديل عن select_one</span>
+<span class="fn">print</span>(soup.<span class="fn">select_one</span>(<span class="str">".discount"</span>))             <span class="cm"># غير موجود ← None</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>3
+شاشة أفق 27 بوصة
+/product/3
+['stock', 'out']
+1,150.00 ر.س
+None</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المحدد</th><th>يختار</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>div</code></td><td>كل وسوم div</td></tr>
+                    <tr><td><code>.price</code></td><td>كل عنصر صنفه price</td></tr>
+                    <tr><td><code>#orders</code></td><td>العنصر الذي معرّفه orders</td></tr>
+                    <tr><td><code>div.product .price</code></td><td>price <strong>داخل</strong> product (بأي عمق)</td></tr>
+                    <tr><td><code>ul &gt; li</code></td><td>li الابن المباشر لـ ul</td></tr>
+                    <tr><td><code>.stock.out</code></td><td>عنصر يحمل الصنفين معًا</td></tr>
+                    <tr><td><code>[data-id="3"]</code> / <code>a[href^="/product"]</code></td><td>حسب قيمة سمة / سمة تبدأ بنص</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> مستخرج كامل يتنقل بين الصفحات</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>scrape_products.py</span>
+    </div>
+<pre><span class="kw">import</span> re
+<span class="kw">import</span> time
+<span class="kw">from</span> urllib.parse <span class="kw">import</span> urljoin
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> requests
+<span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+session = requests.<span class="fn">Session</span>()
+session.headers[<span class="str">"User-Agent"</span>] = <span class="str">"CodeWayBot/1.0 (learning@codeway.example)"</span>
+
+url, rows = <span class="str">"http://127.0.0.1:5005/products"</span>, []
+<span class="kw">while</span> url:
+    r = session.<span class="fn">get</span>(url, timeout=<span class="num">10</span>)
+    r.<span class="fn">raise_for_status</span>()
+    soup = <span class="fn">BeautifulSoup</span>(r.text, <span class="str">"html.parser"</span>)
+    <span class="fn">print</span>(<span class="str">"📄"</span>, soup.title.<span class="fn">get_text</span>())
+    <span class="kw">for</span> card <span class="kw">in</span> soup.<span class="fn">select</span>(<span class="str">"div.product"</span>):
+        price_text = card.<span class="fn">select_one</span>(<span class="str">".price"</span>).<span class="fn">get_text</span>(strip=<span class="kw">True</span>)     <span class="cm"># "3,299.00 ر.س"</span>
+        rows.<span class="fn">append</span>({
+            <span class="str">"id"</span>: <span class="fn">int</span>(card[<span class="str">"data-id"</span>]),
+            <span class="str">"name"</span>: card.<span class="fn">select_one</span>(<span class="str">".name"</span>).<span class="fn">get_text</span>(strip=<span class="kw">True</span>),
+            <span class="str">"price"</span>: <span class="fn">float</span>(re.<span class="fn">search</span>(<span class="str">r"[\d,.]*\d"</span>, price_text)[<span class="num">0</span>].<span class="fn">replace</span>(<span class="str">","</span>, <span class="str">""</span>)),  <span class="cm"># الرقم فقط</span>
+            <span class="str">"in_stock"</span>: <span class="str">"in"</span> <span class="kw">in</span> card.<span class="fn">select_one</span>(<span class="str">".stock"</span>)[<span class="str">"class"</span>],
+            <span class="str">"url"</span>: <span class="fn">urljoin</span>(url, card.<span class="fn">select_one</span>(<span class="str">"a"</span>)[<span class="str">"href"</span>]),          <span class="cm"># رابط نسبي ← كامل</span>
+        })
+    next_link = soup.<span class="fn">select_one</span>(<span class="str">"a.next"</span>)
+    url = <span class="fn">urljoin</span>(url, next_link[<span class="str">"href"</span>]) <span class="kw">if</span> next_link <span class="kw">else</span> <span class="kw">None</span>
+    time.<span class="fn">sleep</span>(<span class="num">0.2</span>)                                                     <span class="cm"># تأدّب مع الخادم</span>
+
+df = pd.<span class="fn">DataFrame</span>(rows)
+df.<span class="fn">to_csv</span>(<span class="str">"products.csv"</span>, index=<span class="kw">False</span>, encoding=<span class="str">"utf-8-sig"</span>)
+<span class="fn">print</span>(<span class="str">f"\n✅ {len(df)} منتجات في products.csv | مثال: {df.loc[0, 'url']}"</span>)
+<span class="fn">print</span>(<span class="str">"متوفر وأقل من 500 ر.س:"</span>, df.<span class="fn">query</span>(<span class="str">"in_stock and price &lt; 500"</span>)[<span class="str">"name"</span>].<span class="fn">tolist</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>📄 المنتجات - صفحة 1
+📄 المنتجات - صفحة 2
+📄 المنتجات - صفحة 3
+
+✅ 10 منتجات في products.csv | مثال: http://127.0.0.1:5005/product/1
+متوفر وأقل من 500 ر.س: ['سماعة هدى اللاسلكية', 'لوحة مفاتيح عربية', 'فأرة لاسلكية', 'كاميرا ويب 4K', 'حقيبة لابتوب']</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>فخ حقيقي وقعنا فيه أثناء كتابة هذا الدرس:</strong> الحل الأول كان حذف كل ما ليس رقمًا أو نقطة: <code>re.sub(r"[^\d.]", "", text)</code>.
+                لكن <code>"ر.س"</code> فيها نقطة! فصار النص <code>3299.00.</code> وفشل <code>float</code>. لذلك نستخرج «شكل الرقم» نفسه بنمط بحث بدل حذف ما حوله (الدرس 4).
+            </div>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>اجعل المستخرج يفشل بوضوح:</strong> إذا غيّر الموقع تصميمه سيُرجع <code>select_one</code> القيمة <code>None</code>، فيظهر
+                <code>AttributeError</code>. هذا أفضل من حفظ بيانات فارغة بصمت. في سكربت حقيقي تحقق من عدد المنتجات، وأرسل تنبيهًا (الدرس 5) إذا كان صفرًا.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="login">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-sign-in-alt"></i>
+        تسجيل الدخول والصفحات المحمية
+    </h2>
+        <p>
+            بعض البيانات (طلباتك، فواتيرك) خلف صفحة دخول. المتصفح يحفظ «كوكي الجلسة» بعد الدخول، و <code>Session</code> تفعل الشيء نفسه.
+            وكثير من النماذج تحتوي <strong>رمز CSRF</strong> مخفيًا يجب قراءته من الصفحة أولًا وإرساله مع البيانات:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>login_orders.py</span>
+    </div>
+<pre><span class="kw">import</span> os
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> requests
+<span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+BASE = <span class="str">"http://127.0.0.1:5005"</span>
+s = requests.<span class="fn">Session</span>()
+
+<span class="fn">print</span>(<span class="str">"قبل الدخول:"</span>, s.<span class="fn">get</span>(<span class="str">f"{BASE}/account/orders"</span>, timeout=<span class="num">10</span>).status_code)
+
+form = <span class="fn">BeautifulSoup</span>(s.<span class="fn">get</span>(<span class="str">f"{BASE}/login"</span>, timeout=<span class="num">10</span>).text, <span class="str">"html.parser"</span>)
+token = form.<span class="fn">select_one</span>(<span class="str">"input[name=csrf]"</span>)[<span class="str">"value"</span>]          <span class="cm"># الرمز المخفي في النموذج</span>
+r = s.<span class="fn">post</span>(<span class="str">f"{BASE}/login"</span>, timeout=<span class="num">10</span>, data={
+    <span class="str">"csrf"</span>: token,
+    <span class="str">"username"</span>: <span class="str">"sara"</span>,
+    <span class="str">"password"</span>: os.environ.<span class="fn">get</span>(<span class="str">"SHOP_PASSWORD"</span>, <span class="str">"s3cret"</span>),    <span class="cm"># من .env في الواقع</span>
+})
+<span class="fn">print</span>(<span class="str">"الدخول:"</span>, r.status_code, <span class="str">"| الكوكيز:"</span>, <span class="fn">list</span>(s.cookies.<span class="fn">keys</span>()))
+
+table = <span class="fn">BeautifulSoup</span>(s.<span class="fn">get</span>(<span class="str">f"{BASE}/account/orders"</span>, timeout=<span class="num">10</span>).text, <span class="str">"html.parser"</span>).<span class="fn">select_one</span>(<span class="str">"#orders"</span>)
+cells = [[c.<span class="fn">get_text</span>(strip=<span class="kw">True</span>) <span class="kw">for</span> c <span class="kw">in</span> tr.<span class="fn">find_all</span>([<span class="str">"th"</span>, <span class="str">"td"</span>])] <span class="kw">for</span> tr <span class="kw">in</span> table.<span class="fn">find_all</span>(<span class="str">"tr"</span>)]
+orders = pd.<span class="fn">DataFrame</span>(cells[<span class="num">1</span>:], columns=cells[<span class="num">0</span>])
+orders[<span class="str">"المبلغ"</span>] = orders[<span class="str">"المبلغ"</span>].str.<span class="fn">replace</span>(<span class="str">","</span>, <span class="str">""</span>).<span class="fn">astype</span>(float)
+<span class="fn">print</span>(orders.<span class="fn">to_string</span>(index=<span class="kw">False</span>))
+<span class="fn">print</span>(<span class="str">"الإجمالي:"</span>, orders[<span class="str">"المبلغ"</span>].<span class="fn">sum</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>قبل الدخول: 403
+الدخول: 200 | الكوكيز: ['session']
+ الطلب    التاريخ  المبلغ
+A-1042 2025-03-02  3548.5
+A-1077 2025-03-09   189.0
+A-1101 2025-03-13  1150.0
+الإجمالي: 4887.5</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                استخدم هذا فقط مع <strong>حسابك أنت</strong> وعلى مواقع تسمح بذلك. ولا تحاول تجاوز CAPTCHA أو التحقق بخطوتين — فهي موجودة تحديدًا لمنع البوتات،
+                وإذا ظهرت لك فابحث عن API رسمية أو خيار «تصدير» في الموقع.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="robots">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-robot"></i>
+        robots.txt وتنزيل الملفات
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>robots_download.py</span>
+    </div>
+<pre><span class="kw">from</span> urllib.robotparser <span class="kw">import</span> RobotFileParser
+
+<span class="kw">import</span> requests
+
+BASE = <span class="str">"http://127.0.0.1:5005"</span>
+BOT = <span class="str">"CodeWayBot"</span>
+
+rp = <span class="fn">RobotFileParser</span>(<span class="str">f"{BASE}/robots.txt"</span>)
+rp.<span class="fn">read</span>()
+<span class="kw">for</span> path <span class="kw">in</span> [<span class="str">"/products"</span>, <span class="str">"/account/orders"</span>, <span class="str">"/admin/users"</span>]:
+    <span class="fn">print</span>(<span class="str">f"{path:&lt;16}"</span>, <span class="str">"✅ مسموح"</span> <span class="kw">if</span> rp.<span class="fn">can_fetch</span>(BOT, BASE + path) <span class="kw">else</span> <span class="str">"⛔ ممنوع"</span>)
+<span class="fn">print</span>(<span class="str">"التأخير المطلوب بين الطلبات:"</span>, rp.<span class="fn">crawl_delay</span>(BOT), <span class="str">"ثانية"</span>)
+
+<span class="cm"># تنزيل ملف كبير على أجزاء دون تحميله كله في الذاكرة</span>
+size = <span class="num">0</span>
+<span class="kw">with</span> requests.<span class="fn">get</span>(<span class="str">f"{BASE}/files/report.csv"</span>, stream=<span class="kw">True</span>, timeout=<span class="num">30</span>) <span class="kw">as</span> r:
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="str">"report.csv"</span>, <span class="str">"wb"</span>) <span class="kw">as</span> f:
+        <span class="kw">for</span> chunk <span class="kw">in</span> r.<span class="fn">iter_content</span>(chunk_size=<span class="num">8192</span>):
+            f.<span class="fn">write</span>(chunk)
+            size += <span class="fn">len</span>(chunk)
+<span class="fn">print</span>(<span class="str">f"⬇️ report.csv: {size:,} بايت"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>/products        ✅ مسموح
+/account/orders  ⛔ ممنوع
+/admin/users     ⛔ ممنوع
+التأخير المطلوب بين الطلبات: 1 ثانية
+⬇️ report.csv: 73,013 بايت</pre>
+</div>
+        <p>
+            لاحظ أن المتجر يمنع <code>/account</code> في robots.txt، بينما سجلنا الدخول لصفحة طلباتنا في القسم السابق. robots.txt موجّه
+            لـ<strong>الزواحف الآلية التي تجوب الموقع</strong>؛ أما سكربت يقرأ صفحة حسابك أنت فالحكم فيه لشروط الخدمة. وعند الشك: اسأل الموقع أو استخدم التصدير الرسمي.
+        </p>
+</section>
+
+<section class="section-card" id="dynamic">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-desktop"></i>
+        المواقع التي تعتمد على JavaScript
+    </h2>
+        <p>
+            <code>requests</code> تجلب HTML كما أرسله الخادم، لكنها <strong>لا تشغّل JavaScript</strong>. إذا كانت البيانات تظهر في المتصفح ولا تجدها في <code>r.text</code>،
+            فالموقع يبنيها بـ JavaScript. قبل أن تلجأ لمتصفح آلي، افتح «أدوات المطور ← Network ← Fetch/XHR»: غالبًا ستجد الـ API التي يستدعيها الموقع، فتطلبها مباشرة.
+            وإن لم تجدها، استخدم <strong>Playwright</strong> الذي يتحكم بمتصفح حقيقي:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>playwright_demo.py</span>
+    </div>
+<pre><span class="cm"># pip install playwright  ثم:  playwright install chromium</span>
+<span class="kw">from</span> playwright.sync_api <span class="kw">import</span> sync_playwright
+
+<span class="kw">with</span> <span class="fn">sync_playwright</span>() <span class="kw">as</span> p:
+    browser = p.chromium.<span class="fn">launch</span>(headless=<span class="kw">True</span>)       <span class="cm"># بلا نافذة</span>
+    page = browser.<span class="fn">new_page</span>()
+    page.<span class="fn">goto</span>(<span class="str">"https://example.com/dashboard"</span>, timeout=<span class="num">30</span>_000)
+    page.<span class="fn">fill</span>(<span class="str">"#username"</span>, <span class="str">"sara"</span>)
+    page.<span class="fn">fill</span>(<span class="str">"#password"</span>, <span class="str">"..."</span>)
+    page.<span class="fn">click</span>(<span class="str">"button[type=submit]"</span>)
+    page.<span class="fn">wait_for_selector</span>(<span class="str">".report-table"</span>)          <span class="cm"># انتظر حتى تبنيه JavaScript</span>
+    rows = page.<span class="fn">locator</span>(<span class="str">".report-table tr"</span>).<span class="fn">all_inner_texts</span>()
+    page.<span class="fn">screenshot</span>(path=<span class="str">"dashboard.png"</span>, full_page=<span class="kw">True</span>)
+    browser.<span class="fn">close</span>()
+<span class="fn">print</span>(rows[:<span class="num">3</span>])</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الموقف</th><th>الأداة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>الموقع يوفر API</td><td><code>requests</code> + JSON</td></tr>
+                    <tr><td>البيانات موجودة في HTML</td><td><code>requests</code> + <code>BeautifulSoup</code></td></tr>
+                    <tr><td>البيانات تُبنى بـ JavaScript</td><td>ابحث عن API في Network، وإلا <code>Playwright</code></td></tr>
+                    <tr><td>جداول HTML بسيطة</td><td><code>pandas.read_html</code> (تحتاج lxml)</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! الـ API أولًا دائمًا: أسرع وأثبت وبإذن صريح." data-hint="أي الطريقتين لا تنكسر عند تغيير تصميم الصفحة؟">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">اختيار الطريقة</span>
+    </div>
+    <p class="exercise-question">موقع يعرض أسعار العملات في صفحة HTML، ويوفر أيضًا API موثقة تُرجع JSON. ماذا تختار لسكربت يعمل يوميًا؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> استخراج HTML بـ BeautifulSoup لأنه أكثر مرونة</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> الـ API، لأنها منظمة وثابتة ومسموح بها صراحة</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> Playwright لفتح متصفح كامل</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> نسخ الصفحة يدويًا كل يوم</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تعرف حدود الأدوات ومتى تعيد المحاولة." data-hint="404 يعني أن الصفحة غير موجودة — والتكرار لن يغيّر ذلك.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">بدون <code>timeout</code> قد يتوقف السكربت للأبد بانتظار خادم لا يرد.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>soup.select_one('.price')</code> تُرجع قائمة بكل الأسعار.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>requests</code> تشغّل JavaScript الموجود في الصفحة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>requests.Session()</code> تحتفظ بالكوكيز بين الطلبات.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">من المنطقي إعادة المحاولة عند الخطأ 404.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! &lt;code&gt;select&lt;/code&gt; تُرجع قائمة، و &lt;code&gt;select_one&lt;/code&gt; أول عنصر فقط." data-hint="هناك ثلاثة li، واثنان منها يحملان الصنف a.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">BeautifulSoup</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+html = <span class="str">'&lt;ul&gt;&lt;li class="a"&gt;قلم&lt;/li&gt;&lt;li&gt;دفتر&lt;/li&gt;&lt;li class="a"&gt;ممحاة&lt;/li&gt;&lt;/ul&gt;'</span>
+soup = <span class="fn">BeautifulSoup</span>(html, <span class="str">"html.parser"</span>)
+<span class="fn">print</span>(<span class="fn">len</span>(soup.<span class="fn">select</span>(<span class="str">"li"</span>)))
+<span class="fn">print</span>(soup.<span class="fn">select_one</span>(<span class="str">"li.a"</span>).<span class="fn">get_text</span>())
+<span class="fn">print</span>([li.<span class="fn">get_text</span>() <span class="kw">for</span> li <span class="kw">in</span> soup.<span class="fn">select</span>(<span class="str">".a"</span>)])</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر 1:</span><input type="text" class="blank-input" data-answers="3" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 2:</span><input type="text" class="blank-input" data-answers="قلم" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 3:</span><input type="text" class="blank-input" data-answers="[&#x27;قلم&#x27;, &#x27;ممحاة&#x27;]" placeholder="..." style="min-width:254px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذه الأسطر الأربعة أساس أي عميل API." data-hint="المهلة اسمها &lt;code&gt;timeout&lt;/code&gt;، وتحويل JSON بـ &lt;code&gt;.json()&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">requests</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لجلب الصفحة الثانية من API بأمان وتحويل الرد إلى قاموس:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">import</span> requests</span></div>
+        <div class="line"><span>r = requests.</span><input type="text" class="blank-input" data-answers="get" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>(url, params={<span class="str">'page'</span>: <span class="num">2</span>}, </span><input type="text" class="blank-input" data-answers="timeout" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"><span>=<span class="num">10</span>)</span></div>
+        <div class="line"><span>r.</span><input type="text" class="blank-input" data-answers="raise_for_status" placeholder="..." style="min-width:254px;" autocomplete="off" spellcheck="false"><span>()  <span class="cm"># خطأ واضح عند 404 أو 500</span></span></div>
+        <div class="line"><span>data = r.</span><input type="text" class="blank-input" data-answers="json" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"><span>()</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! الإذن أولًا، ثم الجلب، والتحليل، والتنظيف، والتأدب مع الخادم." data-hint="لا تبدأ الكود قبل التأكد من أن الاستخراج مسموح.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب خطوات بناء مستخرج بيانات مسؤول. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) تنظيف القيم وتحويلها (أسعار، تواريخ)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">1) البحث عن API ومراجعة الشروط و robots.txt</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">5) الانتقال للصفحة التالية بعد انتظار، ثم الحفظ في CSV</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">3) تحليلها بـ BeautifulSoup واختيار العناصر</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) طلب الصفحة مع User-Agent و timeout</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر محددات CSS</div>
+    <p style="color:var(--text-light); font-size:0.95em;">هذه صفحة منتجات مصغرة. اكتب محدد CSS (أو اختر واحدًا جاهزًا) لترى العناصر التي يختارها، والنص المستخرج، والكود المكافئ في BeautifulSoup. المختبر يستخدم محرك المتصفح، وهو يدعم المحددات نفسها التي تدعمها <code>soup.select</code> تقريبًا.</p>
+    <div class="lab-row">
+        <label>محدد جاهز:</label>
+        <select class="lab-select" id="cssPreset" onchange="document.getElementById('cssSel').value=this.value; runCss()">
+            <option value="div.product">div.product</option>
+            <option value=".price">.price</option>
+            <option value=".stock.out">.stock.out</option>
+            <option value="h2.name a">h2.name a</option>
+            <option value="div.product[data-id=&quot;3&quot;] .name">div.product[data-id="3"] .name</option>
+            <option value="a.next">a.next</option>
+        </select>
+        <label>السمة:</label>
+        <input class="lab-input" id="cssAttr" placeholder="مثل href" style="width:110px; direction:ltr;" oninput="runCss()">
+    </div>
+    <div class="lab-row">
+        <label>المحدد:</label>
+        <input class="lab-input" id="cssSel" value="div.product" style="flex:1; min-width:200px; direction:ltr; font-family:monospace;" oninput="runCss()" spellcheck="false">
+    </div>
+    <div class="lab-row" style="align-items:flex-start;">
+        <div style="flex:1; min-width:240px;"><div style="color:var(--gold); font-size:0.85em;">HTML الصفحة (العناصر المختارة مظللة)</div>
+            <div class="lab-console" id="cssSource" style="margin-top:4px; direction:ltr; text-align:left; font-size:0.8em;"></div></div>
+        <div style="flex:1; min-width:240px;"><div style="color:var(--gold); font-size:0.85em;">النتيجة</div>
+            <div class="lab-console" id="cssOut" style="margin-top:4px;"></div></div>
+    </div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> الفرق بين الواجهات البرمجية واستخراج HTML، وقواعد الاستخراج المسؤول.</li>
+                <li><i class="fas fa-check"></i> طلبات requests: params و headers و timeout ورموز الحالة و raise_for_status.</li>
+                <li><i class="fas fa-check"></i> قراءة API صفحة بصفحة وإعادة المحاولة بانتظار متزايد للأخطاء المؤقتة فقط.</li>
+                <li><i class="fas fa-check"></i> BeautifulSoup ومحددات CSS واستخراج النصوص والسمات وتنظيف الأسعار.</li>
+                <li><i class="fas fa-check"></i> مستخرج يتنقل بين الصفحات ويحفظ النتائج في CSV.</li>
+                <li><i class="fas fa-check"></i> تسجيل الدخول بالجلسات ورموز CSRF وقراءة جداول الصفحات المحمية.</li>
+                <li><i class="fas fa-check"></i> robots.txt وتنزيل الملفات الكبيرة على أجزاء، ومتى تحتاج Playwright.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> افتح أدوات المطور قبل كتابة أي مستخرج: قد تجد API جاهزة.</li>
+                <li><i class="fas fa-lightbulb"></i> ضع timeout في كل طلب بلا استثناء.</li>
+                <li><i class="fas fa-lightbulb"></i> احفظ الصفحات الخام أثناء التطوير لتجرب التحليل دون إعادة الطلب.</li>
+                <li><i class="fas fa-lightbulb"></i> تحقق من عدد النتائج وتنبّه عند الصفر بدل الفشل الصامت.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>الجدولة والسكربتات الموثوقة</strong>: تشغيل السكربتات تلقائيًا بـ schedule و cron ومجدول مهام Windows.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson5.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 5: البريد الإلكتروني والتنبيهات</span>
+        </a>
+        <a href="lesson7.html" class="nav-link next">
+            <span>الدرس التالي: الجدولة والسكربتات الموثوقة</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · أتمتة الويب
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '60%';
+            text.textContent = '60% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر محددات CSS ========== */
+    const CSS_PAGE = [
+        '<div class="grid">',
+        '  <div class="product" data-id="1">',
+        '    <h2 class="name"><a href="/product/1">لابتوب نور 14</a></h2>',
+        '    <span class="price">3,299.00 ر.س</span>',
+        '    <span class="stock in">متوفر</span>',
+        '  </div>',
+        '  <div class="product" data-id="2">',
+        '    <h2 class="name"><a href="/product/2">سماعة هدى</a></h2>',
+        '    <span class="price">249.50 ر.س</span>',
+        '    <span class="stock in">متوفر</span>',
+        '  </div>',
+        '  <div class="product" data-id="3">',
+        '    <h2 class="name"><a href="/product/3">شاشة أفق 27</a></h2>',
+        '    <span class="price">1,150.00 ر.س</span>',
+        '    <span class="stock out">نفد المخزون</span>',
+        '  </div>',
+        '</div>',
+        '<a class="next" href="/products?page=2">التالي</a>',
+    ];
+
+    function runCss() {
+        const sel = document.getElementById('cssSel').value.trim();
+        const attr = document.getElementById('cssAttr').value.trim();
+        const out = document.getElementById('cssOut'), src = document.getElementById('cssSource');
+        // نضع رقم السطر على أول وسم في كل سطر لنظلل الأسطر المختارة لاحقًا
+        const tagged = CSS_PAGE.map((l, i) => l.replace(/<(\w+)/, `<$1 data-l="${i}"`)).join('\n');
+        const doc = new DOMParser().parseFromString(tagged, 'text/html');
+        let matches = [];
+        try {
+            if (!sel) throw new Error('المحدد فارغ');
+            matches = [...doc.body.querySelectorAll(sel)];
+        } catch (e) {
+            src.textContent = CSS_PAGE.join('\n');
+            out.innerHTML = `<span class="err">محدد غير صالح: ${escapeHtml(sel || '(فارغ)')}</span>`;
+            return;
+        }
+        const lit = new Set(matches.map(m => Number(m.closest('[data-l]').dataset.l)));
+        src.innerHTML = CSS_PAGE.map((l, i) => lit.has(i)
+            ? `<mark style="background:rgba(255,215,0,0.35); color:inherit;">${escapeHtml(l)}</mark>` : escapeHtml(l)).join('\n');
+        const value = el => attr ? (el.getAttribute(attr) ?? 'None') : el.textContent.replace(/\s+/g, ' ').trim();
+        const code = attr ? `[el.get("${escapeHtml(attr)}") for el in soup.select("${escapeHtml(sel)}")]`
+                          : `[el.get_text(" ", strip=True) for el in soup.select("${escapeHtml(sel)}")]`;
+        out.innerHTML = `<span style="color:#888">${code}</span>\n\nعدد العناصر: ${matches.length}\n` +
+            matches.map((m, i) => `${i + 1}. &lt;${m.tagName.toLowerCase()}&gt; ${escapeHtml(value(m))}`).join('\n');
+    }
+
+    document.addEventListener('DOMContentLoaded', runCss);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

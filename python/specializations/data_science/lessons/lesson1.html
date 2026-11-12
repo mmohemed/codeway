@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 1: مدخل إلى علم البيانات وأدواته | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص تحليل البيانات</a>
+        <span class="sep">/</span>
+        <span>مدخل إلى علم البيانات</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-compass"></i>
+            الدرس 1 · تحليل البيانات و AI
+        </div>
+        <h1 class="lesson-title">مدخل إلى علم البيانات وأدواته</h1>
+        <p class="lesson-intro">
+            مرحبًا بك في تخصص <strong>تحليل البيانات والذكاء الاصطناعي</strong>! قبل أن نغوص في المكتبات، ستتعرف في هذا الدرس على <strong>ما هو علم البيانات</strong>، والفرق بين أدواره الوظيفية، و<strong>دورة حياة مشروع البيانات</strong>، وكيف تجهّز <strong>بيئة عمل احترافية</strong> بـ Jupyter، ثم تنفّذ أول تحليل متكامل صغير.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 45 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 فهم المجال وتجهيز البيئة</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد المستوى المتقدم</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#what">1. ما هو علم البيانات؟</a>
+            <a href="#roles">2. الأدوار الوظيفية</a>
+            <a href="#lifecycle">3. دورة حياة المشروع</a>
+            <a href="#setup">4. بيئة العمل</a>
+            <a href="#types">5. أنواع البيانات</a>
+            <a href="#first">6. أول تحليل</a>
+            <a href="#sources">7. مصادر البيانات</a>
+            <a href="#exercises">8. تمارين تفاعلية</a>
+            <a href="#summary">9. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="what">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        ما هو علم البيانات؟
+    </h2>
+        <p>
+            كل يوم تُنتج البشرية كميات هائلة من البيانات: عمليات شراء، نقرات على المواقع، قراءات أجهزة استشعار، سجلات طبية…
+            <strong>علم البيانات (Data Science)</strong> هو تحويل هذه البيانات الخام إلى <strong>معرفة وقرارات</strong>،
+            باستخدام البرمجة والإحصاء وفهم مجال العمل.
+        </p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-code"></i> البرمجة</h4>
+                <p>Python ومكتباتها لجمع البيانات وتنظيفها وتحليلها بكفاءة.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-square-root-alt"></i> الرياضيات والإحصاء</h4>
+                <p>لفهم الأنماط، وقياس الثقة في النتائج، وبناء النماذج.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-briefcase"></i> فهم المجال</h4>
+                <p>معرفة طبيعة العمل (تجارة، صحة، تعليم…) لطرح الأسئلة الصحيحة وتفسير النتائج.</p>
+            </div>
+        </div>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> أمثلة من الواقع</p>
+        <ul class="list">
+            <li>المتاجر الإلكترونية تقترح عليك منتجات بناءً على مشترياتك ومشتريات من يشبهونك.</li>
+            <li>البنوك تكتشف عمليات الاحتيال لحظيًا من أنماط غير معتادة.</li>
+            <li>المستشفيات تتنبأ بالمرضى الأكثر عرضة لإعادة الدخول لتتابعهم مبكرًا.</li>
+            <li>تطبيقات الخرائط تتوقع زمن الوصول من بيانات الحركة المرورية.</li>
+        </ul>
+</section>
+
+<section class="section-card" id="roles">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-users"></i>
+        الأدوار الوظيفية في مجال البيانات
+    </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الدور</th><th>ماذا يفعل؟</th><th>أهم الأدوات</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>محلل البيانات</strong> Data Analyst</td><td>يجيب عن أسئلة العمل بتقارير ولوحات معلومات: «لماذا انخفضت المبيعات؟»</td><td>Pandas، SQL، Excel، Power BI</td></tr>
+                    <tr><td><strong>عالم البيانات</strong> Data Scientist</td><td>يبني نماذج تنبؤية وتجارب إحصائية: «من العميل الذي سيلغي اشتراكه؟»</td><td>scikit-learn، الإحصاء، Python</td></tr>
+                    <tr><td><strong>مهندس البيانات</strong> Data Engineer</td><td>يبني خطوط نقل البيانات وتخزينها لتكون متاحة ونظيفة.</td><td>SQL، Spark، Airflow، السحابة</td></tr>
+                    <tr><td><strong>مهندس تعلم الآلة</strong> ML Engineer</td><td>ينقل النماذج من التجربة إلى منتجات تعمل لملايين المستخدمين.</td><td>PyTorch، APIs، Docker</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>هذا التخصص</strong> يركز على مهارات <strong>محلل البيانات</strong> ثم يمهد لعالم البيانات:
+                معالجة البيانات، والتصوير البياني، والإحصاء، ثم مقدمة قوية في تعلم الآلة، مع مشروعين متكاملين.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="lifecycle">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-sync-alt"></i>
+        دورة حياة مشروع البيانات
+    </h2>
+        <p>تمر مشاريع البيانات عادة بست مراحل، وغالبًا ما تعود من مرحلة لأخرى (عملية تكرارية):</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>#</th><th>المرحلة</th><th>السؤال الرئيسي</th><th>الدروس في التخصص</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>فهم المشكلة</td><td>ما القرار الذي نريد دعمه؟</td><td>هذا الدرس</td></tr>
+                    <tr><td>2</td><td>جمع البيانات</td><td>من أين نحصل عليها؟ ملفات، قواعد بيانات، APIs</td><td>الدرسان 2 و 3</td></tr>
+                    <tr><td>3</td><td>التنظيف والتجهيز</td><td>هل البيانات صحيحة ومكتملة؟</td><td>الدرس 4</td></tr>
+                    <tr><td>4</td><td>الاستكشاف (EDA)</td><td>ما الأنماط والعلاقات؟</td><td>الدروس 5–7</td></tr>
+                    <tr><td>5</td><td>النمذجة</td><td>هل يمكننا التنبؤ؟</td><td>الدروس 8–10</td></tr>
+                    <tr><td>6</td><td>التواصل والنشر</td><td>كيف نعرض النتائج لصاحب القرار؟</td><td>المشروعان</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>حقيقة يتفاجأ بها المبتدئون:</strong> معظم وقت محلل البيانات (60–80%) يذهب في <strong>الجمع والتنظيف</strong>،
+                وليس في بناء النماذج. لذلك خصصنا لهما دروسًا كاملة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="setup">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-tools"></i>
+        تجهيز بيئة العمل
+    </h2>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 1. البيئة الافتراضية والمكتبات</p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+                <span>التثبيت</span>
+            </div>
+<pre>python -m venv ds-env
+ds-env\Scripts\activate          <span class="cm"># Windows   (Linux/macOS: source ds-env/bin/activate)</span>
+pip install numpy pandas matplotlib seaborn scipy scikit-learn openpyxl jupyterlab
+jupyter lab                      <span class="cm"># يفتح بيئة Jupyter في المتصفح</span></pre>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 2. لماذا Jupyter؟</p>
+        <p>
+            في <strong>Jupyter Notebook</strong> تكتب الكود في <strong>خلايا</strong> صغيرة وتنفّذ كل خلية على حدة، فترى النتيجة فورًا
+            (جدولًا أو رسمًا) تحتها مباشرة، ويمكنك كتابة نصوص وشروحات بينها. هذا مثالي للاستكشاف والتجريب.
+        </p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-book-open"></i> JupyterLab</h4>
+                <p>على جهازك، بعد تثبيته بـ pip كما في الأعلى.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fab fa-google"></i> Google Colab</h4>
+                <p>مجاني في المتصفح، كل المكتبات مثبتة مسبقًا، ولا يحتاج أي إعداد. ممتاز للبداية.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-code"></i> VS Code</h4>
+                <p>يفتح ملفات <code>.ipynb</code> مباشرة مع إضافة Jupyter، فتجمع بين المحرر والنوتبوك.</p>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>اختصار Jupyter</th><th>الوظيفة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>Shift + Enter</code></td><td>تنفيذ الخلية والانتقال للتالية</td></tr>
+                    <tr><td><code>A</code> / <code>B</code></td><td>إضافة خلية فوق / تحت (في وضع الأوامر)</td></tr>
+                    <tr><td><code>M</code> / <code>Y</code></td><td>تحويل الخلية إلى نص (Markdown) / كود</td></tr>
+                    <tr><td><code>D D</code></td><td>حذف الخلية</td></tr>
+                    <tr><td><code>Tab</code> / <code>Shift + Tab</code></td><td>الإكمال التلقائي / عرض توثيق الدالة</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>فخ Jupyter الشهير:</strong> يمكنك تنفيذ الخلايا بأي ترتيب، فقد يعمل الكود عندك ويفشل عند غيرك.
+                قبل مشاركة أي نوتبوك اختر <em>Restart Kernel and Run All Cells</em> للتأكد أنه يعمل من البداية للنهاية.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="types">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-database"></i>
+        أنواع البيانات التي ستقابلها
+    </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>التصنيف</th><th>النوع</th><th>أمثلة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td rowspan="2">كمّية (رقمية)</td><td>متصلة Continuous</td><td>الطول، السعر، درجة الحرارة</td></tr>
+                    <tr><td>منفصلة Discrete</td><td>عدد الأطفال، عدد الطلبات</td></tr>
+                    <tr><td rowspan="2">نوعية (فئوية)</td><td>اسمية Nominal</td><td>المدينة، اللون، طريقة الدفع</td></tr>
+                    <tr><td>ترتيبية Ordinal</td><td>التقدير (مقبول/جيد/ممتاز)، مستوى الرضا</td></tr>
+                    <tr><td>زمنية</td><td>Time Series</td><td>المبيعات اليومية، سعر السهم</td></tr>
+                    <tr><td>غير مهيكلة</td><td>Unstructured</td><td>نصوص التغريدات، الصور، الصوت</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            لماذا يهمنا التصنيف؟ لأنه يحدد <strong>العمليات المسموحة</strong>: يمكنك حساب متوسط الأسعار، لكن «متوسط المدن» لا معنى له،
+            وللمدن نحسب التكرار بدلًا من ذلك. ويحدد أيضًا <strong>نوع الرسم</strong> المناسب كما ستتعلم لاحقًا.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>data_types.py</span>
+    </div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.<span class="fn">DataFrame</span>({
+    <span class="str">"price"</span>: [<span class="num">120.5</span>, <span class="num">89.0</span>, <span class="num">230.0</span>, <span class="num">45.5</span>],            <span class="cm"># كمي متصل</span>
+    <span class="str">"orders"</span>: [<span class="num">3</span>, <span class="num">1</span>, <span class="num">7</span>, <span class="num">2</span>],                          <span class="cm"># كمي منفصل</span>
+    <span class="str">"city"</span>: [<span class="str">"الرياض"</span>, <span class="str">"جدة"</span>, <span class="str">"الرياض"</span>, <span class="str">"الدمام"</span>],    <span class="cm"># اسمي</span>
+    <span class="str">"rating"</span>: [<span class="str">"جيد"</span>, <span class="str">"ممتاز"</span>, <span class="str">"مقبول"</span>, <span class="str">"ممتاز"</span>],    <span class="cm"># ترتيبي</span>
+})
+
+df[<span class="str">"rating"</span>] = pd.<span class="fn">Categorical</span>(df[<span class="str">"rating"</span>], categories=[<span class="str">"مقبول"</span>, <span class="str">"جيد"</span>, <span class="str">"ممتاز"</span>], ordered=<span class="kw">True</span>)
+
+<span class="fn">print</span>(<span class="str">"متوسط السعر:"</span>, df[<span class="str">"price"</span>].<span class="fn">mean</span>())
+<span class="fn">print</span>(<span class="str">"تكرار المدن:"</span>, df[<span class="str">"city"</span>].<span class="fn">value_counts</span>().<span class="fn">to_dict</span>())
+<span class="fn">print</span>(<span class="str">"أعلى تقييم:"</span>, df[<span class="str">"rating"</span>].<span class="fn">max</span>())        <span class="cm"># ممكن لأن الفئة مرتبة</span>
+<span class="fn">print</span>(df.<span class="fn">sort_values</span>(<span class="str">"rating"</span>)[[<span class="str">"city"</span>, <span class="str">"rating"</span>]])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>متوسط السعر: 121.25
+تكرار المدن: {'الرياض': 2, 'جدة': 1, 'الدمام': 1}
+أعلى تقييم: ممتاز
+     city rating
+2  الرياض  مقبول
+0  الرياض    جيد
+1     جدة  ممتاز
+3  الدمام  ممتاز</pre>
+</div>
+</section>
+
+<section class="section-card" id="first">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-rocket"></i>
+        أول تحليل متكامل في 20 سطرًا
+    </h2>
+        <p>
+            لنطبّق دورة الحياة كاملة بشكل مصغر. <strong>السؤال:</strong> «في متجر قهوة، هل يشتري الزبائن أكثر في عطلة نهاية الأسبوع؟ وما أفضل ساعة؟»
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>first_analysis.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1) جمع البيانات (هنا نولّد بيانات محاكاة لأسبوعين)</span>
+rng = np.random.<span class="fn">default_rng</span>(<span class="num">42</span>)
+days = pd.<span class="fn">date_range</span>(<span class="str">"2025-03-02"</span>, periods=<span class="num">14</span>)                 <span class="cm"># 14 يومًا</span>
+hours = pd.<span class="fn">DatetimeIndex</span>([d + pd.<span class="fn">Timedelta</span>(hours=h) <span class="kw">for</span> d <span class="kw">in</span> days <span class="kw">for</span> h <span class="kw">in</span> <span class="fn">range</span>(<span class="num">7</span>, <span class="num">21</span>)])
+sales = pd.<span class="fn">DataFrame</span>({<span class="str">"time"</span>: hours})
+weekend = sales[<span class="str">"time"</span>].dt.dayofweek.<span class="fn">isin</span>([<span class="num">4</span>, <span class="num">5</span>])          <span class="cm"># الجمعة والسبت</span>
+peak = sales[<span class="str">"time"</span>].dt.hour.<span class="fn">isin</span>([<span class="num">8</span>, <span class="num">9</span>, <span class="num">17</span>, <span class="num">18</span>])
+sales[<span class="str">"cups"</span>] = rng.<span class="fn">poisson</span>(lam=np.<span class="fn">where</span>(weekend, <span class="num">14</span>, <span class="num">10</span>) + np.<span class="fn">where</span>(peak, <span class="num">8</span>, <span class="num">0</span>))
+
+<span class="cm"># 2) التجهيز: أعمدة مشتقة</span>
+sales[<span class="str">"day_type"</span>] = np.<span class="fn">where</span>(weekend, <span class="str">"عطلة"</span>, <span class="str">"يوم عمل"</span>)
+sales[<span class="str">"hour"</span>] = sales[<span class="str">"time"</span>].dt.hour
+
+<span class="cm"># 3) التحليل</span>
+per_day = sales.<span class="fn">groupby</span>([sales[<span class="str">"time"</span>].dt.date, <span class="str">"day_type"</span>])[<span class="str">"cups"</span>].<span class="fn">sum</span>().<span class="fn">reset_index</span>()
+<span class="fn">print</span>(<span class="str">"متوسط الأكواب يوميًا:"</span>)
+<span class="fn">print</span>(per_day.<span class="fn">groupby</span>(<span class="str">"day_type"</span>)[<span class="str">"cups"</span>].<span class="fn">mean</span>().<span class="fn">round</span>(<span class="num">1</span>))
+
+by_hour = sales.<span class="fn">groupby</span>(<span class="str">"hour"</span>)[<span class="str">"cups"</span>].<span class="fn">mean</span>()
+<span class="fn">print</span>(<span class="str">"\nأفضل 3 ساعات:"</span>, by_hour.<span class="fn">nlargest</span>(<span class="num">3</span>).<span class="fn">round</span>(<span class="num">1</span>).<span class="fn">to_dict</span>())
+
+<span class="cm"># 4) التواصل: خلاصة بلغة بسيطة</span>
+diff = per_day.<span class="fn">groupby</span>(<span class="str">"day_type"</span>)[<span class="str">"cups"</span>].<span class="fn">mean</span>()
+change = (diff[<span class="str">"عطلة"</span>] / diff[<span class="str">"يوم عمل"</span>] - <span class="num">1</span>) * <span class="num">100</span>
+<span class="fn">print</span>(<span class="str">f"\n📢 الخلاصة: المبيعات في العطلة أعلى بنحو {change:.0f}%،"</span>)
+<span class="fn">print</span>(<span class="str">f"   وذروة الطلب عند الساعة {by_hour.idxmax()}:00 — جهّز موظفًا إضافيًا في هذا الوقت."</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>متوسط الأكواب يوميًا:
+day_type
+عطلة       223.8
+يوم عمل    171.2
+Name: cups, dtype: float64
+
+أفضل 3 ساعات: {8: 19.1, 9: 19.1, 18: 18.3}
+
+📢 الخلاصة: المبيعات في العطلة أعلى بنحو 31%،
+   وذروة الطلب عند الساعة 8:00 — جهّز موظفًا إضافيًا في هذا الوقت.</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>لاحظ الخطوة الأخيرة:</strong> صاحب المقهى لا يهتم بـ <code>groupby</code>، بل يريد <strong>توصية عملية</strong>.
+                التحليل الجيد ينتهي دائمًا بجملة يستطيع صاحب القرار التصرف بناءً عليها.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="sources">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-globe"></i>
+        من أين تحصل على بيانات للتدريب؟
+    </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المصدر</th><th>ماذا يقدم؟</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Kaggle</strong></td><td>آلاف مجموعات البيانات، ومسابقات، ونوتبوكات من محللين آخرين تتعلم منها.</td></tr>
+                    <tr><td><strong>البيانات المفتوحة الحكومية</strong></td><td>منصات البيانات المفتوحة في الدول العربية (إحصاءات السكان، الاقتصاد، التعليم…).</td></tr>
+                    <tr><td><strong>UCI ML Repository</strong></td><td>مجموعات بيانات كلاسيكية لتعلم الآلة.</td></tr>
+                    <tr><td><strong>مكتبات Python</strong></td><td><code>seaborn.load_dataset()</code> و <code>sklearn.datasets</code> فيها بيانات جاهزة للتجربة.</td></tr>
+                    <tr><td><strong>APIs</strong></td><td>بيانات الطقس، العملات، والمواقع عبر <code>requests</code>.</td></tr>
+                    <tr><td><strong>بياناتك أنت!</strong></td><td>مصروفاتك، ساعات نومك، تمارينك… أفضل مصدر لأنك تفهم سياقه.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>الأخلاقيات والخصوصية:</strong> لا تجمع بيانات شخصية دون إذن، واحذف المعلومات الحساسة (الأسماء، الهويات، أرقام الهواتف)
+                قبل مشاركة أي تحليل، والتزم بشروط استخدام كل مصدر.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! مهندس البيانات يبني البنية التي يعتمد عليها المحللون والعلماء." data-hint="فكّر في من يبني «الأنابيب» وليس من يحلل ما يمر فيها.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">الأدوار</span>
+    </div>
+    <p class="exercise-question">شخص مهمته بناء خطوط تنقل البيانات من الأنظمة المختلفة إلى مستودع مركزي نظيف. ما دوره؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> محلل بيانات</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> مهندس بيانات</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> مصمم واجهات</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> عالم بيانات</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! لديك تصور واضح عن المجال." data-hint="انتبه لأنواع المتغيرات ولأخلاقيات البيانات.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">معظم وقت محلل البيانات يذهب في جمع البيانات وتنظيفها.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">«المدينة» متغير كمّي يمكن حساب متوسطه.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">«مستوى الرضا: منخفض/متوسط/مرتفع» متغير ترتيبي.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">في Jupyter يجب دائمًا تنفيذ الخلايا بالترتيب من البداية قبل مشاركة النوتبوك.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يمكن نشر بيانات العملاء بأسمائهم وأرقامهم في تحليل عام.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="رائع! تصنيف المتغيرات صحيح بالكامل." data-hint="المتصل يقبل كسورًا، والمنفصل أعداد صحيحة، والاسمي بلا ترتيب، والترتيبي له ترتيب طبيعي.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>صنّف المتغير</h4>
+        <span class="exercise-tag">أنواع البيانات</span>
+    </div>
+    <p class="exercise-question">اكتب نوع كل متغير: <code>متصل</code> أو <code>منفصل</code> أو <code>اسمي</code> أو <code>ترتيبي</code>:</p>
+    <div class="code-fill">
+        <div class="line"><span class="cm">وزن الطرد بالكيلوغرام ←</span><input type="text" class="blank-input" data-answers="متصل" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">عدد الغرف في الشقة ←</span><input type="text" class="blank-input" data-answers="منفصل" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">فصيلة الدم ←</span><input type="text" class="blank-input" data-answers="اسمي" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">المرحلة الدراسية (ابتدائي/متوسط/ثانوي) ←</span><input type="text" class="blank-input" data-answers="ترتيبي" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="صحيح! الترتيب يأتي من &lt;code&gt;categories&lt;/code&gt; وليس من الحروف." data-hint="الفئات المرتبة تُقارن حسب ترتيبها في &lt;code&gt;categories&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+levels = pd.<span class="fn">Categorical</span>([<span class="str">"متوسط"</span>, <span class="str">"مرتفع"</span>, <span class="str">"منخفض"</span>],
+                        categories=[<span class="str">"منخفض"</span>, <span class="str">"متوسط"</span>, <span class="str">"مرتفع"</span>], ordered=<span class="kw">True</span>)
+<span class="fn">print</span>(levels.<span class="fn">max</span>())
+<span class="fn">print</span>(levels.<span class="fn">min</span>())</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="مرتفع" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="منخفض" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! هذه خارطة الطريق لكل مشاريعك." data-hint="ابدأ بالسؤال وانتهِ بالتوصية.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب مراحل دورة حياة مشروع البيانات. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) الاستكشاف (EDA)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="6" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">6) عرض النتائج والتوصيات</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">1) فهم المشكلة وتحديد السؤال</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">5) النمذجة</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">3) التنظيف والتجهيز</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="6">
+            <span class="order-num">6</span>
+            <span style="flex:1; white-space:pre;">2) جمع البيانات</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر: ما نوع هذا المتغير؟</div>
+    <p style="color:var(--text-light); font-size:0.95em;">اختر لكل عمود من جدول بيانات متجر نوعه الصحيح، ثم اضغط «افحص» لترى العمليات والرسوم المناسبة له.</p>
+    <div id="vtList"></div>
+    <div class="lab-row"><button class="btn btn-primary" onclick="vtCheck()"><i class="fas fa-search"></i> افحص</button></div>
+    <div class="lab-console" id="vtConsole" style="direction:rtl; text-align:right; font-family:Cairo, sans-serif;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> علم البيانات = برمجة + إحصاء + فهم المجال لتحويل البيانات إلى قرارات.</li>
+                <li><i class="fas fa-check"></i> الفرق بين محلل البيانات وعالم البيانات ومهندس البيانات ومهندس تعلم الآلة.</li>
+                <li><i class="fas fa-check"></i> مراحل دورة حياة مشروع البيانات الست، وأهمية التنظيف.</li>
+                <li><i class="fas fa-check"></i> تجهيز البيئة: venv، المكتبات، JupyterLab و Google Colab واختصاراتهما.</li>
+                <li><i class="fas fa-check"></i> أنواع المتغيرات (متصل، منفصل، اسمي، ترتيبي، زمني) و <code>pd.Categorical</code>.</li>
+                <li><i class="fas fa-check"></i> تنفيذ أول تحليل مصغر ينتهي بتوصية عملية.</li>
+                <li><i class="fas fa-check"></i> مصادر البيانات المفتوحة وأخلاقيات التعامل مع البيانات.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> ثبّت JupyterLab أو افتح حسابًا على Google Colab الآن.</li>
+                <li><i class="fas fa-lightbulb"></i> اختر مجموعة بيانات تهمك من Kaggle لتطبّق عليها كل درس.</li>
+                <li><i class="fas fa-lightbulb"></i> اكتب سؤالك بوضوح قبل أن تفتح البيانات.</li>
+                <li><i class="fas fa-lightbulb"></i> أنهِ كل تحليل بجملة توصية يفهمها غير المبرمج.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعمق في <strong>NumPy</strong>: الأبعاد، والبث (Broadcasting)، والأرقام العشوائية، والعمليات المصفوفية.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="../index.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>العودة إلى صفحة التخصص</span>
+        </a>
+        <a href="lesson2.html" class="nav-link next">
+            <span>الدرس التالي: NumPy بعمق</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · مدخل إلى علم البيانات
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '8%';
+            text.textContent = '8% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر أنواع المتغيرات ========== */
+    const VT = [
+        ['order_total', 'مجموع الفاتورة (ريال)', 'متصل', 'المتوسط والوسيط والانحراف — مدرج تكراري'],
+        ['items_count', 'عدد القطع في الطلب', 'منفصل', 'المتوسط والمنوال — أعمدة'],
+        ['payment', 'طريقة الدفع', 'اسمي', 'التكرار والنسب — أعمدة أو دائرة'],
+        ['satisfaction', 'الرضا: ضعيف/جيد/ممتاز', 'ترتيبي', 'الوسيط والتكرار — أعمدة مرتبة'],
+        ['order_date', 'تاريخ الطلب', 'زمني', 'التجميع حسب اليوم/الشهر — خط زمني'],
+        ['review_text', 'نص تعليق العميل', 'غير مهيكل', 'تحليل النصوص — سحابة كلمات'],
+    ];
+    const VT_TYPES = ['متصل', 'منفصل', 'اسمي', 'ترتيبي', 'زمني', 'غير مهيكل'];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('vtList').innerHTML = VT.map(([col, desc], i) => `
+            <div class="lab-row" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:9px; padding:8px 12px;">
+                <code>${col}</code><span style="flex:1; color:var(--text-light);">${desc}</span>
+                <select class="lab-select" id="vt${i}"><option value="">— اختر —</option>${VT_TYPES.map(t => `<option>${t}</option>`).join('')}</select>
+            </div>`).join('');
+    });
+
+    function vtCheck() {
+        let score = 0;
+        document.getElementById('vtConsole').innerHTML = VT.map(([col, , type, tip], i) => {
+            const ok = document.getElementById('vt' + i).value === type;
+            if (ok) score++;
+            return (ok ? '✅ ' : '<span class="err">❌ </span>') + `<code>${col}</code>: ${type} ← ${tip}`;
+        }).join('<br>') + `<br><br>🎯 النتيجة: ${score} من ${VT.length}`;
+    }
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

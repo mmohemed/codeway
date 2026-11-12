@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 4: تنظيف البيانات وتجهيزها | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص تحليل البيانات</a>
+        <span class="sep">/</span>
+        <span>تنظيف البيانات</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-broom"></i>
+            الدرس 4 · جودة البيانات
+        </div>
+        <h1 class="lesson-title">تنظيف البيانات وتجهيزها للتحليل والنمذجة</h1>
+        <p class="lesson-intro">
+            «القمامة الداخلة تُنتج قمامة خارجة» (Garbage In, Garbage Out). أي تحليل أو نموذج مبني على بيانات متسخة سيعطي نتائج مضللة. في هذا الدرس ستتعلم منهجية كاملة لـ <strong>القيم المفقودة</strong>، و<strong>القيم الشاذة</strong>، و<strong>تصحيح الأنواع</strong>، و<strong>التحقق من القواعد</strong>، ثم تجهيز البيانات لتعلم الآلة بـ <strong>الترميز والتطبيع</strong>.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 80 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 بيانات موثوقة وجاهزة للنمذجة</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 3</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#audit">1. تقرير الجودة</a>
+            <a href="#types">2. تصحيح الأنواع</a>
+            <a href="#missing">3. القيم المفقودة</a>
+            <a href="#outliers">4. القيم الشاذة</a>
+            <a href="#validate">5. التحقق من القواعد</a>
+            <a href="#encoding">6. ترميز الفئات</a>
+            <a href="#scaling">7. التطبيع والتقسيم</a>
+            <a href="#pipeline">8. دالة التنظيف</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="audit">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-stethoscope"></i>
+        الخطوة الأولى: تقرير جودة البيانات
+    </h2>
+        <p>
+            وصلك ملف موظفين من قسم الموارد البشرية. قبل أي تحليل، نفحصه بشكل منهجي. اكتب دالة «تقرير جودة» تستخدمها مع كل مجموعة بيانات:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>audit.py</span>
+    </div>
+<pre><span class="fn">print</span>(hr, <span class="str">"\n"</span>)
+
+<span class="kw">def</span> <span class="fn">quality_report</span>(df):
+    <span class="kw">return</span> pd.<span class="fn">DataFrame</span>({
+        <span class="str">"النوع"</span>: df.dtypes.<span class="fn">astype</span>(str),
+        <span class="str">"مفقود"</span>: df.<span class="fn">isna</span>().<span class="fn">sum</span>(),
+        <span class="str">"مفقود %"</span>: (df.<span class="fn">isna</span>().<span class="fn">mean</span>() * <span class="num">100</span>).<span class="fn">round</span>(<span class="num">1</span>),
+        <span class="str">"قيم فريدة"</span>: df.<span class="fn">nunique</span>(),
+        <span class="str">"مثال"</span>: df.iloc[<span class="num">0</span>],
+    })
+
+<span class="fn">print</span>(<span class="fn">quality_report</span>(hr))
+<span class="fn">print</span>(<span class="str">"\nصفوف مكررة بالكامل:"</span>, hr.<span class="fn">duplicated</span>().<span class="fn">sum</span>(), <span class="str">"| أرقام موظفين مكررة:"</span>, hr[<span class="str">"emp_id"</span>].<span class="fn">duplicated</span>().<span class="fn">sum</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   emp_id    name    dept  age    salary   join_date remote
+0     101   سارة    تقنية   29   15000.0  2020-03-15    نعم
+1     102     علي  مبيعات   35    9000.0  2018-07-01     لا
+2     103     منى   تقنية   41       NaN  2015-01-20    yes
+3     104    خالد  مبيعات  abc   11000.0  2019-11-05     No
+4     105     ريم   Sales   27    9500.0  2022-02-30    نعم
+5     106    يوسف   تقنية   33  250000.0  2021-06-10     لا
+6     107     هند     NaN   45   12000.0  2012-09-01     لا
+7     108     عمر   موارد   38       NaN  2017-04-12    نعم
+8     103     منى   تقنية   41       NaN  2015-01-20    yes
+9     109    لينا  مبيعات   -5   10500.0  2023-08-01     لا 
+
+             النوع  مفقود  مفقود %  قيم فريدة        مثال
+emp_id       int64      0      0.0          9         101
+name           str      0      0.0          9       سارة 
+dept           str      1     10.0          4       تقنية
+age            str      0      0.0          9          29
+salary     float64      3     30.0          7     15000.0
+join_date      str      0      0.0          9  2020-03-15
+remote         str      0      0.0          4         نعم
+
+صفوف مكررة بالكامل: 1 | أرقام موظفين مكررة: 1</pre>
+</div>
+        <div class="note-box">
+            <strong>🔍 المشاكل المكتشفة:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> <code>age</code> نصي وفيه <code>"abc"</code> و <code>"-5"</code>.</li>
+                <li><i class="fas fa-angle-left"></i> <code>salary</code> فيه قيم مفقودة وقيمة شاذة 250,000.</li>
+                <li><i class="fas fa-angle-left"></i> <code>dept</code> فيه <code>Sales</code> بالإنجليزية وقيمة مفقودة.</li>
+                <li><i class="fas fa-angle-left"></i> <code>join_date</code> فيه تاريخ مستحيل <code>2022-02-30</code>.</li>
+                <li><i class="fas fa-angle-left"></i> <code>remote</code> بقيم غير موحدة: نعم/yes/No/لا.</li>
+                <li><i class="fas fa-angle-left"></i> الموظفة 103 مكررة، و <code>" سارة "</code> بمسافات.</li>
+            </ul>
+        </div>
+</section>
+
+<section class="section-card" id="types">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-wrench"></i>
+        تصحيح الأنواع والقيم غير الصالحة
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>fix_types.py</span>
+    </div>
+<pre>df = hr.<span class="fn">drop_duplicates</span>().<span class="fn">copy</span>()                               <span class="cm"># 1) حذف المكرر</span>
+
+df[<span class="str">"name"</span>] = df[<span class="str">"name"</span>].str.<span class="fn">strip</span>()                            <span class="cm"># 2) تنظيف النصوص</span>
+df[<span class="str">"dept"</span>] = df[<span class="str">"dept"</span>].<span class="fn">replace</span>({<span class="str">"Sales"</span>: <span class="str">"مبيعات"</span>})
+
+df[<span class="str">"age"</span>] = pd.<span class="fn">to_numeric</span>(df[<span class="str">"age"</span>], errors=<span class="str">"coerce"</span>)          <span class="cm"># 3) "abc" ← NaN</span>
+df.loc[~df[<span class="str">"age"</span>].<span class="fn">between</span>(<span class="num">18</span>, <span class="num">70</span>), <span class="str">"age"</span>] = np.nan             <span class="cm"># 4) قاعدة عمل: العمر بين 18 و 70</span>
+
+df[<span class="str">"join_date"</span>] = pd.<span class="fn">to_datetime</span>(df[<span class="str">"join_date"</span>], errors=<span class="str">"coerce"</span>)   <span class="cm"># 5) التاريخ المستحيل ← NaT</span>
+
+df[<span class="str">"remote"</span>] = (df[<span class="str">"remote"</span>].str.<span class="fn">strip</span>().str.<span class="fn">lower</span>()          <span class="cm"># 6) توحيد القيم المنطقية</span>
+                .<span class="fn">map</span>({<span class="str">"نعم"</span>: <span class="kw">True</span>, <span class="str">"yes"</span>: <span class="kw">True</span>, <span class="str">"لا"</span>: <span class="kw">False</span>, <span class="str">"no"</span>: <span class="kw">False</span>}))
+
+<span class="fn">print</span>(df.dtypes, <span class="str">"\n"</span>)
+<span class="fn">print</span>(df[[<span class="str">"name"</span>, <span class="str">"dept"</span>, <span class="str">"age"</span>, <span class="str">"join_date"</span>, <span class="str">"remote"</span>]])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>emp_id                int64
+name                    str
+dept                    str
+age                 float64
+salary              float64
+join_date    datetime64[us]
+remote                 bool
+dtype: object 
+
+   name    dept   age  join_date  remote
+0  سارة   تقنية  29.0 2020-03-15    True
+1   علي  مبيعات  35.0 2018-07-01   False
+2   منى   تقنية  41.0 2015-01-20    True
+3  خالد  مبيعات   NaN 2019-11-05   False
+4   ريم  مبيعات  27.0        NaT    True
+5  يوسف   تقنية  33.0 2021-06-10   False
+6   هند     NaN  45.0 2012-09-01   False
+7   عمر   موارد  38.0 2017-04-12    True
+9  لينا  مبيعات   NaN 2023-08-01   False</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong><code>errors="coerce"</code></strong> هو صديقك في التنظيف: بدل أن يتوقف البرنامج عند قيمة لا يمكن تحويلها،
+                يجعلها مفقودة (<code>NaN</code> أو <code>NaT</code>)، ثم تتعامل معها لاحقًا مع باقي القيم المفقودة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="missing">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-question-circle"></i>
+        استراتيجيات القيم المفقودة
+    </h2>
+        <p>لا توجد طريقة واحدة صحيحة دائمًا. الاختيار يعتمد على <strong>سبب الفقدان</strong> و<strong>نسبته</strong> و<strong>استخدامك للبيانات</strong>:</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الاستراتيجية</th><th>متى تستخدمها؟</th><th>الخطر</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>حذف الصفوف <code>dropna()</code></td><td>نسبة الفقدان صغيرة جدًا وعشوائية</td><td>فقدان بيانات وتحيّز إن لم يكن الفقد عشوائيًا</td></tr>
+                    <tr><td>حذف العمود</td><td>العمود مفقود بنسبة كبيرة (مثلًا +60%) وغير مهم</td><td>فقدان معلومة</td></tr>
+                    <tr><td>قيمة ثابتة <code>fillna("غير معروف")</code></td><td>للفئات: المفقود نفسه معلومة</td><td>قليل</td></tr>
+                    <tr><td>المتوسط / الوسيط</td><td>أرقام بلا منطق خاص (الوسيط أفضل مع القيم الشاذة)</td><td>يقلل التباين</td></tr>
+                    <tr><td>حسب المجموعة <code>transform</code></td><td>القيمة تعتمد على فئة (راتب حسب القسم)</td><td>يحتاج مجموعات كافية</td></tr>
+                    <tr><td>الأمام/الخلف <code>ffill</code></td><td>السلاسل الزمنية (القراءة السابقة)</td><td>غير مناسب لغير الزمني</td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>fill_missing.py</span>
+    </div>
+<pre>df = hr.<span class="fn">drop_duplicates</span>().<span class="fn">copy</span>()
+df[<span class="str">"dept"</span>] = df[<span class="str">"dept"</span>].<span class="fn">replace</span>({<span class="str">"Sales"</span>: <span class="str">"مبيعات"</span>})
+
+df[<span class="str">"salary_missing"</span>] = df[<span class="str">"salary"</span>].<span class="fn">isna</span>()                     <span class="cm"># احتفظ بمعلومة «كان مفقودًا»</span>
+df[<span class="str">"dept"</span>] = df[<span class="str">"dept"</span>].<span class="fn">fillna</span>(<span class="str">"غير محدد"</span>)
+
+overall = df[<span class="str">"salary"</span>].<span class="fn">median</span>()
+by_dept = df.<span class="fn">groupby</span>(<span class="str">"dept"</span>)[<span class="str">"salary"</span>].<span class="fn">transform</span>(<span class="str">"median"</span>)
+df[<span class="str">"salary_filled"</span>] = df[<span class="str">"salary"</span>].<span class="fn">fillna</span>(by_dept).<span class="fn">fillna</span>(overall)
+
+<span class="fn">print</span>(df[[<span class="str">"name"</span>, <span class="str">"dept"</span>, <span class="str">"salary"</span>, <span class="str">"salary_filled"</span>, <span class="str">"salary_missing"</span>]])
+<span class="fn">print</span>(<span class="str">"\nالوسيط العام:"</span>, overall, <span class="str">"| المتوسط العام:"</span>, <span class="fn">round</span>(df[<span class="str">"salary"</span>].<span class="fn">mean</span>()))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>     name      dept    salary  salary_filled  salary_missing
+0   سارة      تقنية   15000.0        15000.0           False
+1     علي    مبيعات    9000.0         9000.0           False
+2     منى     تقنية       NaN       132500.0            True
+3    خالد    مبيعات   11000.0        11000.0           False
+4     ريم    مبيعات    9500.0         9500.0           False
+5    يوسف     تقنية  250000.0       250000.0           False
+6     هند  غير محدد   12000.0        12000.0           False
+7     عمر     موارد       NaN        11000.0            True
+9    لينا    مبيعات   10500.0        10500.0           False
+
+الوسيط العام: 11000.0 | المتوسط العام: 45286</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>لاحظ الفرق الكبير:</strong> المتوسط تأثر بالقيمة الشاذة 250,000 فأصبح مضللًا، بينما الوسيط ظل معبرًا.
+                لذلك نفضّل <strong>الوسيط</strong> عند التعويض في البيانات التي قد تحتوي قيمًا شاذة.
+            </div>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-bug"></i>
+            <div>
+                <strong>انظر إلى راتب «منى»: 132,500!</strong> قسم التقنية فيه راتبان فقط أحدهما الشاذ 250,000، فأصبح وسيط القسم نفسه مضللًا.
+                الدرس المهم: <strong>عالج القيم الشاذة قبل تعويض القيم المفقودة</strong>، وانتبه للمجموعات الصغيرة.
+                سنصلح هذا الترتيب في دالة التنظيف النهائية.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="outliers">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-exclamation-circle"></i>
+        اكتشاف القيم الشاذة ومعالجتها
+    </h2>
+        <p>
+            القيمة الشاذة (Outlier) قد تكون <strong>خطأ إدخال</strong> (راتب 250,000 بدل 25,000) أو <strong>حقيقة نادرة</strong>
+            (المدير التنفيذي). لا تحذفها قبل أن تفهم سببها! أشهر طريقتين للاكتشاف:
+        </p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-box"></i> طريقة IQR (المدى الربيعي)</h4>
+                <p><code>IQR = Q3 - Q1</code>، والشاذ ما كان خارج <code>[Q1 - 1.5×IQR ، Q3 + 1.5×IQR]</code>. لا تتأثر بالقيم الشاذة نفسها.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-wave-square"></i> طريقة Z-Score</h4>
+                <p>كم انحرافًا معياريًا تبعد القيمة عن المتوسط؟ عادة الشاذ |z| &gt; 3. مناسبة للتوزيعات القريبة من الطبيعي.</p>
+            </div>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>outliers.py</span>
+    </div>
+<pre>s = hr.<span class="fn">drop_duplicates</span>()[<span class="str">"salary"</span>].<span class="fn">dropna</span>()
+
+q1, q3 = s.<span class="fn">quantile</span>([<span class="num">0.25</span>, <span class="num">0.75</span>])
+iqr = q3 - q1
+low, high = q1 - <span class="num">1.5</span> * iqr, q3 + <span class="num">1.5</span> * iqr
+<span class="fn">print</span>(<span class="str">f"Q1={q1:.0f}  Q3={q3:.0f}  IQR={iqr:.0f}  الحدود=[{low:.0f}, {high:.0f}]"</span>)
+<span class="fn">print</span>(<span class="str">"قيم شاذة (IQR):"</span>, s[(s &lt; low) | (s &gt; high)].<span class="fn">tolist</span>())
+
+z = (s - s.<span class="fn">mean</span>()) / s.<span class="fn">std</span>()
+<span class="fn">print</span>(<span class="str">"Z-scores:"</span>, z.<span class="fn">round</span>(<span class="num">2</span>).<span class="fn">tolist</span>())
+
+capped = s.<span class="fn">clip</span>(lower=low, upper=high)             <span class="cm"># التقليم (Capping / Winsorizing)</span>
+<span class="fn">print</span>(<span class="str">"بعد التقليم:"</span>, capped.<span class="fn">tolist</span>())
+<span class="fn">print</span>(<span class="str">"المتوسط قبل/بعد:"</span>, <span class="fn">round</span>(s.<span class="fn">mean</span>()), <span class="str">"/"</span>, <span class="fn">round</span>(capped.<span class="fn">mean</span>()))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>Q1=10000  Q3=13500  IQR=3500  الحدود=[4750, 18750]
+قيم شاذة (IQR): [250000.0]
+Z-scores: [-0.34, -0.4, -0.38, -0.4, 2.27, -0.37, -0.39]
+بعد التقليم: [15000.0, 9000.0, 11000.0, 9500.0, 18750.0, 12000.0, 10500.0]
+المتوسط قبل/بعد: 45286 / 12250</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>لماذا لم تكتشف Z-Score القيمة الشاذة هنا (أقل من 3)؟</strong> لأن القيمة الشاذة نفسها ضخّمت الانحراف المعياري!
+                مع العينات الصغيرة، طريقة IQR أكثر موثوقية.
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>طريقة المعالجة</th><th>متى؟</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>التصحيح</td><td>إذا عرفت القيمة الصحيحة (خطأ إدخال واضح)</td></tr>
+                    <tr><td>الحذف</td><td>إذا تأكدت أنها خطأ ولا يمكن تصحيحها</td></tr>
+                    <tr><td>التقليم <code>clip</code></td><td>تريد الإبقاء على الصف مع تقليل تأثير القيمة</td></tr>
+                    <tr><td>التحويل اللوغاريتمي <code>np.log1p</code></td><td>البيانات منحرفة بطبيعتها (الدخل، الأسعار)</td></tr>
+                    <tr><td>الإبقاء</td><td>إذا كانت حقيقية ومهمة للتحليل</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="validate">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-check-double"></i>
+        التحقق من القواعد (Data Validation)
+    </h2>
+        <p>
+            بعد التنظيف، اكتب <strong>قواعد</strong> يجب أن تتحقق دائمًا. إذا وصلتك بيانات جديدة الشهر القادم، تكشف القواعد المشاكل فورًا:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>validation.py</span>
+    </div>
+<pre><span class="kw">def</span> <span class="fn">validate</span>(df):
+    rules = {
+        <span class="str">"أرقام الموظفين فريدة"</span>: df[<span class="str">"emp_id"</span>].is_unique,
+        <span class="str">"لا توجد أسماء فارغة"</span>: df[<span class="str">"name"</span>].str.<span class="fn">strip</span>().<span class="fn">ne</span>(<span class="str">""</span>).<span class="fn">all</span>(),
+        <span class="str">"الأعمار بين 18 و 70"</span>: df[<span class="str">"age"</span>].<span class="fn">dropna</span>().<span class="fn">between</span>(<span class="num">18</span>, <span class="num">70</span>).<span class="fn">all</span>(),
+        <span class="str">"الرواتب موجبة"</span>: (df[<span class="str">"salary"</span>].<span class="fn">dropna</span>() &gt; <span class="num">0</span>).<span class="fn">all</span>(),
+        <span class="str">"تاريخ التعيين ليس في المستقبل"</span>: (df[<span class="str">"join_date"</span>].<span class="fn">dropna</span>() &lt;= pd.Timestamp.<span class="fn">today</span>()).<span class="fn">all</span>(),
+        <span class="str">"الأقسام من القائمة المعتمدة"</span>: df[<span class="str">"dept"</span>].<span class="fn">dropna</span>().<span class="fn">isin</span>([<span class="str">"تقنية"</span>, <span class="str">"مبيعات"</span>, <span class="str">"موارد"</span>]).<span class="fn">all</span>(),
+    }
+    <span class="kw">for</span> rule, ok <span class="kw">in</span> rules.<span class="fn">items</span>():
+        <span class="fn">print</span>((<span class="str">"✅"</span> <span class="kw">if</span> ok <span class="kw">else</span> <span class="str">"❌"</span>), rule)
+    <span class="kw">return</span> <span class="fn">all</span>(rules.<span class="fn">values</span>())
+
+raw = hr.<span class="fn">assign</span>(age=pd.<span class="fn">to_numeric</span>(hr[<span class="str">"age"</span>], errors=<span class="str">"coerce"</span>),
+                join_date=pd.<span class="fn">to_datetime</span>(hr[<span class="str">"join_date"</span>], errors=<span class="str">"coerce"</span>))
+<span class="fn">print</span>(<span class="str">"البيانات الخام نجحت؟"</span>, <span class="fn">validate</span>(raw), <span class="str">"\n"</span>)
+
+clean = raw.<span class="fn">drop_duplicates</span>().<span class="fn">assign</span>(dept=<span class="kw">lambda</span> d: d[<span class="str">"dept"</span>].<span class="fn">replace</span>({<span class="str">"Sales"</span>: <span class="str">"مبيعات"</span>}))
+clean.loc[~clean[<span class="str">"age"</span>].<span class="fn">between</span>(<span class="num">18</span>, <span class="num">70</span>), <span class="str">"age"</span>] = np.nan
+<span class="fn">print</span>(<span class="str">"البيانات النظيفة نجحت؟"</span>, <span class="fn">validate</span>(clean))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>❌ أرقام الموظفين فريدة
+✅ لا توجد أسماء فارغة
+❌ الأعمار بين 18 و 70
+✅ الرواتب موجبة
+✅ تاريخ التعيين ليس في المستقبل
+❌ الأقسام من القائمة المعتمدة
+البيانات الخام نجحت؟ False 
+
+✅ أرقام الموظفين فريدة
+✅ لا توجد أسماء فارغة
+✅ الأعمار بين 18 و 70
+✅ الرواتب موجبة
+✅ تاريخ التعيين ليس في المستقبل
+✅ الأقسام من القائمة المعتمدة
+البيانات النظيفة نجحت؟ True</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>في المشاريع الكبيرة</strong> توجد مكتبات متخصصة لهذا الغرض مثل <code>pandera</code> و <code>Great Expectations</code>
+                تعرّف فيها «مخطط» البيانات وقواعدها بشكل احترافي.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="encoding">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-code"></i>
+        ترميز الفئات للنماذج
+    </h2>
+        <p>نماذج تعلم الآلة لا تفهم إلا الأرقام. لذلك نحوّل الأعمدة النصية بطريقتين رئيسيتين:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>encoding.py</span>
+    </div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.<span class="fn">DataFrame</span>({
+    <span class="str">"city"</span>: [<span class="str">"الرياض"</span>, <span class="str">"جدة"</span>, <span class="str">"الدمام"</span>, <span class="str">"جدة"</span>],
+    <span class="str">"size"</span>: [<span class="str">"صغير"</span>, <span class="str">"كبير"</span>, <span class="str">"متوسط"</span>, <span class="str">"صغير"</span>],
+})
+
+<span class="cm"># 1) Ordinal: للفئات التي لها ترتيب طبيعي</span>
+df[<span class="str">"size_code"</span>] = df[<span class="str">"size"</span>].<span class="fn">map</span>({<span class="str">"صغير"</span>: <span class="num">0</span>, <span class="str">"متوسط"</span>: <span class="num">1</span>, <span class="str">"كبير"</span>: <span class="num">2</span>})
+
+<span class="cm"># 2) One-Hot: للفئات بلا ترتيب — عمود لكل قيمة</span>
+encoded = pd.<span class="fn">get_dummies</span>(df, columns=[<span class="str">"city"</span>], prefix=<span class="str">"city"</span>, dtype=int)
+<span class="fn">print</span>(encoded)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>    size  size_code  city_الدمام  city_الرياض  city_جدة
+0   صغير          0            0            1         0
+1   كبير          2            0            0         1
+2  متوسط          1            1            0         0
+3   صغير          0            0            0         1</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>خطأ شائع:</strong> ترميز المدن بأرقام 0 و 1 و 2 يجعل النموذج يظن أن «الدمام (2) أكبر من الرياض (0)»!
+                الترميز الرقمي المتسلسل فقط للفئات المرتبة، أما الفئات الاسمية فترمّز بـ One-Hot.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="scaling">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-ruler"></i>
+        التطبيع والتقسيم لفئات
+    </h2>
+        <p>
+            العمر (20–60) والراتب (5,000–50,000) بمقاييس مختلفة جدًا، وكثير من النماذج تتأثر بذلك فتعطي الراتب وزنًا أكبر لأن أرقامه أكبر.
+            الحل: توحيد المقياس.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>scaling.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.<span class="fn">DataFrame</span>({<span class="str">"age"</span>: [<span class="num">22</span>, <span class="num">35</span>, <span class="num">47</span>, <span class="num">29</span>, <span class="num">60</span>], <span class="str">"salary"</span>: [<span class="num">6000</span>, <span class="num">12000</span>, <span class="num">30000</span>, <span class="num">9000</span>, <span class="num">45000</span>]})
+
+minmax = (df - df.<span class="fn">min</span>()) / (df.<span class="fn">max</span>() - df.<span class="fn">min</span>())             <span class="cm"># بين 0 و 1</span>
+standard = (df - df.<span class="fn">mean</span>()) / df.<span class="fn">std</span>(ddof=<span class="num">0</span>)                  <span class="cm"># متوسط 0 وانحراف 1</span>
+<span class="fn">print</span>(<span class="str">"Min-Max:\n"</span>, minmax.<span class="fn">round</span>(<span class="num">2</span>), <span class="str">"\n"</span>)
+<span class="fn">print</span>(<span class="str">"Standard:\n"</span>, standard.<span class="fn">round</span>(<span class="num">2</span>), <span class="str">"\n"</span>)
+
+df[<span class="str">"salary_log"</span>] = np.<span class="fn">log1p</span>(df[<span class="str">"salary"</span>]).<span class="fn">round</span>(<span class="num">2</span>)           <span class="cm"># تقليل الانحراف</span>
+df[<span class="str">"age_group"</span>] = pd.<span class="fn">cut</span>(df[<span class="str">"age"</span>], bins=[<span class="num">0</span>, <span class="num">30</span>, <span class="num">45</span>, <span class="num">100</span>], labels=[<span class="str">"شباب"</span>, <span class="str">"منتصف"</span>, <span class="str">"خبرة"</span>])
+df[<span class="str">"salary_band"</span>] = pd.<span class="fn">qcut</span>(df[<span class="str">"salary"</span>], q=<span class="num">3</span>, labels=[<span class="str">"منخفض"</span>, <span class="str">"متوسط"</span>, <span class="str">"مرتفع"</span>])
+<span class="fn">print</span>(df)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>Min-Max:
+     age  salary
+0  0.00    0.00
+1  0.34    0.15
+2  0.66    0.62
+3  0.18    0.08
+4  1.00    1.00 
+
+Standard:
+     age  salary
+0 -1.23   -0.97
+1 -0.27   -0.56
+2  0.62    0.65
+3 -0.71   -0.77
+4  1.59    1.65 
+
+   age  salary  salary_log age_group salary_band
+0   22    6000        8.70      شباب       منخفض
+1   35   12000        9.39     منتصف       متوسط
+2   47   30000       10.31      خبرة       مرتفع
+3   29    9000        9.11      شباب       منخفض
+4   60   45000       10.71      خبرة       مرتفع</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الأداة</th><th>الوظيفة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Min-Max Scaling</td><td>كل القيم بين 0 و 1 (تتأثر بالقيم الشاذة)</td></tr>
+                    <tr><td>Standardization (Z)</td><td>متوسط 0 وانحراف 1 (الأكثر استخدامًا)</td></tr>
+                    <tr><td><code>pd.cut</code></td><td>تقسيم لفئات بحدود تحددها أنت</td></tr>
+                    <tr><td><code>pd.qcut</code></td><td>تقسيم لفئات متساوية العدد (أرباع، أثلاث)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>ستتعلم في دروس تعلم الآلة</strong> أدوات scikit-learn الجاهزة لهذا (<code>StandardScaler</code>, <code>OneHotEncoder</code>)
+                وكيف تُطبق على بيانات التدريب فقط لتجنب «تسرّب البيانات».
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="pipeline">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-cogs"></i>
+        دالة تنظيف قابلة لإعادة الاستخدام
+    </h2>
+        <p>نجمع كل الخطوات في دالة واحدة موثقة تطبقها على أي ملف جديد بنفس الشكل:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>clean_pipeline.py</span>
+    </div>
+<pre>DEPT_MAP = {<span class="str">"Sales"</span>: <span class="str">"مبيعات"</span>}
+BOOL_MAP = {<span class="str">"نعم"</span>: <span class="kw">True</span>, <span class="str">"yes"</span>: <span class="kw">True</span>, <span class="str">"لا"</span>: <span class="kw">False</span>, <span class="str">"no"</span>: <span class="kw">False</span>}
+
+
+<span class="kw">def</span> <span class="fn">clean_hr</span>(raw: pd.DataFrame) -&gt; tuple[pd.DataFrame, dict]:
+    <span class="str">"""تنظيف بيانات الموظفين، وإرجاع الجدول النظيف وسجل بالتغييرات."""</span>
+    log = {<span class="str">"صفوف البداية"</span>: <span class="fn">len</span>(raw)}
+    df = raw.<span class="fn">drop_duplicates</span>(subset=<span class="str">"emp_id"</span>).<span class="fn">copy</span>()
+    log[<span class="str">"مكرر محذوف"</span>] = <span class="fn">len</span>(raw) - <span class="fn">len</span>(df)
+
+    df[<span class="str">"name"</span>] = df[<span class="str">"name"</span>].str.<span class="fn">strip</span>()
+    df[<span class="str">"dept"</span>] = df[<span class="str">"dept"</span>].<span class="fn">replace</span>(DEPT_MAP).<span class="fn">fillna</span>(<span class="str">"غير محدد"</span>)
+    df[<span class="str">"age"</span>] = pd.<span class="fn">to_numeric</span>(df[<span class="str">"age"</span>], errors=<span class="str">"coerce"</span>).<span class="fn">where</span>(<span class="kw">lambda</span> a: a.<span class="fn">between</span>(<span class="num">18</span>, <span class="num">70</span>))
+    df[<span class="str">"join_date"</span>] = pd.<span class="fn">to_datetime</span>(df[<span class="str">"join_date"</span>], errors=<span class="str">"coerce"</span>)
+    df[<span class="str">"remote"</span>] = df[<span class="str">"remote"</span>].str.<span class="fn">strip</span>().str.<span class="fn">lower</span>().<span class="fn">map</span>(BOOL_MAP)
+
+    q1, q3 = df[<span class="str">"salary"</span>].<span class="fn">quantile</span>([<span class="num">0.25</span>, <span class="num">0.75</span>])
+    cap = q3 + <span class="num">1.5</span> * (q3 - q1)
+    log[<span class="str">"رواتب مقلّمة"</span>] = <span class="fn">int</span>((df[<span class="str">"salary"</span>] &gt; cap).<span class="fn">sum</span>())
+    df[<span class="str">"salary"</span>] = df[<span class="str">"salary"</span>].<span class="fn">clip</span>(upper=cap)
+    df[<span class="str">"salary"</span>] = df[<span class="str">"salary"</span>].<span class="fn">fillna</span>(df.<span class="fn">groupby</span>(<span class="str">"dept"</span>)[<span class="str">"salary"</span>].<span class="fn">transform</span>(<span class="str">"median"</span>)).<span class="fn">fillna</span>(df[<span class="str">"salary"</span>].<span class="fn">median</span>())
+
+    df[<span class="str">"age"</span>] = df[<span class="str">"age"</span>].<span class="fn">fillna</span>(df[<span class="str">"age"</span>].<span class="fn">median</span>())
+    df[<span class="str">"years"</span>] = ((pd.<span class="fn">Timestamp</span>(<span class="str">"2025-01-01"</span>) - df[<span class="str">"join_date"</span>]).dt.days / <span class="num">365.25</span>).<span class="fn">round</span>(<span class="num">1</span>)
+    log[<span class="str">"صفوف النهاية"</span>] = <span class="fn">len</span>(df)
+    log[<span class="str">"مفقود متبقٍ"</span>] = df.<span class="fn">isna</span>().<span class="fn">sum</span>()[<span class="kw">lambda</span> s: s &gt; <span class="num">0</span>].<span class="fn">to_dict</span>()
+    <span class="kw">return</span> df, log
+
+
+clean, log = <span class="fn">clean_hr</span>(hr)
+<span class="fn">print</span>(clean[[<span class="str">"emp_id"</span>, <span class="str">"name"</span>, <span class="str">"dept"</span>, <span class="str">"age"</span>, <span class="str">"salary"</span>, <span class="str">"remote"</span>, <span class="str">"years"</span>]].<span class="fn">to_string</span>(index=<span class="kw">False</span>))
+<span class="fn">print</span>()
+<span class="kw">for</span> k, v <span class="kw">in</span> log.<span class="fn">items</span>():
+    <span class="fn">print</span>(<span class="str">f"- {k}: {v}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre> emp_id name     dept  age  salary  remote  years
+    101 سارة    تقنية 29.0 15000.0    True    4.8
+    102  علي   مبيعات 35.0  9000.0   False    6.5
+    103  منى    تقنية 41.0 16875.0    True    9.9
+    104 خالد   مبيعات 35.0 11000.0   False    5.2
+    105  ريم   مبيعات 27.0  9500.0    True    NaN
+    106 يوسف    تقنية 33.0 18750.0   False    3.6
+    107  هند غير محدد 45.0 12000.0   False   12.3
+    108  عمر    موارد 38.0 11000.0    True    7.7
+    109 لينا   مبيعات 35.0 10500.0   False    1.4
+
+- صفوف البداية: 10
+- مكرر محذوف: 1
+- رواتب مقلّمة: 1
+- صفوف النهاية: 9
+- مفقود متبقٍ: {'join_date': 1, 'years': 1}</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>سجل التغييرات (log)</strong> مهم جدًا: يوثّق ما فعلته بالبيانات لتذكره في تقريرك. ولاحظ أن التاريخ المستحيل
+                ما زال مفقودًا — بعض المشاكل لا تُحل برمجيًا، بل بالرجوع لمصدر البيانات.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! الوسيط لا يتأثر بالقيم الشاذة كما يتأثر المتوسط." data-hint="فكّر أي إحصاء يتأثر بقيمة واحدة ضخمة.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">التعويض</span>
+    </div>
+    <p class="exercise-question">عمود رواتب فيه قيم مفقودة وبعض القيم الشاذة الكبيرة جدًا. ما أفضل قيمة عامة للتعويض؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> المتوسط الحسابي</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> الوسيط</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> أكبر قيمة</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> صفر</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! منهجية التنظيف واضحة لديك." data-hint="الفئات الاسمية تُرمّز بـ One-Hot، والقيمة الشاذة قد تكون حقيقية.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>pd.to_numeric(s, errors="coerce")</code> يحوّل القيم غير الرقمية إلى NaN.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يجب حذف أي قيمة شاذة فورًا دون التحقق من سببها.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">ترميز المدن بـ 0 و 1 و 2 مناسب لأن المدن لها ترتيب طبيعي.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>pd.qcut</code> يقسم البيانات لفئات متساوية في عدد العناصر.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">طريقة IQR أكثر مقاومة لتأثير القيم الشاذة من Z-Score.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! IQR = 20، والحدود = 40 − 30 و 60 + 30." data-hint="الحد = Q1 − 1.5×IQR و Q3 + 1.5×IQR.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>احسب الحدود</h4>
+        <span class="exercise-tag">طريقة IQR</span>
+    </div>
+    <p class="exercise-question">لدينا Q1 = 40 و Q3 = 60. احسب IQR والحدين الأدنى والأعلى للقيم الطبيعية:</p>
+    <div class="code-fill">
+        <div class="line"><span class="cm">IQR =</span><input type="text" class="blank-input" data-answers="20" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">الحد الأدنى =</span><input type="text" class="blank-input" data-answers="10" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">الحد الأعلى =</span><input type="text" class="blank-input" data-answers="90" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذه خمس عمليات تستخدمها في كل مشروع تقريبًا." data-hint="حذف المكرر، التحويل القسري، تعويض الفئات، التقليم، ثم One-Hot.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">التنظيف</span>
+    </div>
+    <p class="exercise-question">أكمل كود التنظيف:</p>
+    <div class="code-fill">
+        <div class="line"><span>df = df.</span><input type="text" class="blank-input" data-answers="drop_duplicates" placeholder="..." style="min-width:240px;" autocomplete="off" spellcheck="false"><span>(subset=<span class="str">'id'</span>)</span></div>
+        <div class="line"><span>df[<span class="str">'age'</span>] = pd.<span class="fn">to_numeric</span>(df[<span class="str">'age'</span>], errors=</span><input type="text" class="blank-input" data-answers="&#x27;coerce&#x27;" placeholder="..." style="min-width:142px;" autocomplete="off" spellcheck="false"><span>)</span></div>
+        <div class="line"><span>df[<span class="str">'city'</span>] = df[<span class="str">'city'</span>].</span><input type="text" class="blank-input" data-answers="fillna" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'غير معروف'</span>)</span></div>
+        <div class="line"><span>df[<span class="str">'salary'</span>] = df[<span class="str">'salary'</span>].</span><input type="text" class="blank-input" data-answers="clip" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"><span>(upper=cap)</span></div>
+        <div class="line"><span>encoded = pd.</span><input type="text" class="blank-input" data-answers="get_dummies" placeholder="..." style="min-width:184px;" autocomplete="off" spellcheck="false"><span>(df, columns=[<span class="str">'city'</span>])</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! افحص ← نظّف ← صحّح ← عالج ← تحقق." data-hint="ابدأ دائمًا بالفحص وانتهِ بالتحقق.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب خطوات منهجية التنظيف. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) معالجة القيم الشاذة والمفقودة</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">1) تقرير جودة: الأنواع والمفقود والمكرر</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">5) التحقق من القواعد وتوثيق التغييرات</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">3) تصحيح الأنواع مع errors=&#x27;coerce&#x27;</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) حذف المكرر وتوحيد النصوص</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> كاشف القيم الشاذة</div>
+    <p style="color:var(--text-light); font-size:0.95em;">اكتب مجموعة أرقام مفصولة بفواصل (مثل أسعار أو رواتب)، وشاهد حساب IQR و Z-Score والقيم الشاذة خطوة بخطوة.</p>
+    <div class="lab-row">
+        <input type="text" class="lab-input" id="outVals" value="12, 15, 14, 10, 18, 16, 13, 95, 11, 17" style="flex:1; direction:ltr;">
+        <button class="btn btn-primary" onclick="runOutliers()"><i class="fas fa-search"></i> حلّل</button>
+    </div>
+    <div class="lab-console" id="outConsole"></div>
+    <div id="outDots" style="position:relative; height:46px; margin-top:12px; border-bottom:1px solid rgba(255,255,255,0.2);"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> تقرير جودة البيانات: الأنواع، والمفقود، والقيم الفريدة، والمكرر.</li>
+                <li><i class="fas fa-check"></i> تصحيح الأنواع بـ <code>errors="coerce"</code> وتطبيق قواعد العمل وتوحيد القيم.</li>
+                <li><i class="fas fa-check"></i> استراتيجيات القيم المفقودة: الحذف، الثابت، الوسيط، حسب المجموعة، ومؤشر الفقدان.</li>
+                <li><i class="fas fa-check"></i> اكتشاف القيم الشاذة بـ IQR و Z-Score ومعالجتها بالتقليم أو اللوغاريتم.</li>
+                <li><i class="fas fa-check"></i> التحقق من القواعد بعد التنظيف لحماية التحليلات المستقبلية.</li>
+                <li><i class="fas fa-check"></i> ترميز الفئات (Ordinal و One-Hot) وتوحيد المقاييس والتقسيم لفئات.</li>
+                <li><i class="fas fa-check"></i> بناء دالة تنظيف قابلة لإعادة الاستخدام مع سجل للتغييرات.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> لا تحذف شيئًا قبل أن تفهم سببه.</li>
+                <li><i class="fas fa-lightbulb"></i> وثّق كل قرار تنظيف، فهو جزء من نتائجك.</li>
+                <li><i class="fas fa-lightbulb"></i> فضّل الوسيط على المتوسط مع البيانات المالية.</li>
+                <li><i class="fas fa-lightbulb"></i> اجعل التنظيف دالة أو سكربت يُعاد تشغيله، لا خطوات يدوية.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستبدأ <strong>التصوير البياني بـ Matplotlib</strong> لتحويل الأرقام إلى رسوم واضحة تحكي قصة البيانات.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson3.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 3: Pandas المتقدم</span>
+        </a>
+        <a href="lesson5.html" class="nav-link next">
+            <span>الدرس التالي: التصوير البياني بـ Matplotlib</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · تنظيف البيانات
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '33%';
+            text.textContent = '33% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== كاشف القيم الشاذة ========== */
+    function quantile(sorted, q) {             // نفس طريقة pandas (linear)
+        const pos = (sorted.length - 1) * q, lo = Math.floor(pos), hi = Math.ceil(pos);
+        return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
+    }
+
+    function runOutliers() {
+        const vals = document.getElementById('outVals').value.split(',').map(s => parseFloat(s)).filter(v => !isNaN(v));
+        const out = document.getElementById('outConsole');
+        if (vals.length < 4) { out.innerHTML = '<span class="err">أدخل 4 أرقام على الأقل</span>'; return; }
+        const s = [...vals].sort((a, b) => a - b);
+        const q1 = quantile(s, 0.25), q3 = quantile(s, 0.75), iqr = q3 - q1;
+        const low = q1 - 1.5 * iqr, high = q3 + 1.5 * iqr;
+        const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+        const std = Math.sqrt(vals.reduce((a, v) => a + (v - mean) ** 2, 0) / (vals.length - 1));
+        const median = quantile(s, 0.5);
+        const iqrOut = vals.filter(v => v < low || v > high);
+        const zOut = vals.filter(v => Math.abs((v - mean) / std) > 3);
+        const r = v => Math.round(v * 100) / 100;
+        out.innerHTML = escapeHtml([
+            `n = ${vals.length} | المتوسط = ${r(mean)} | الوسيط = ${r(median)} | الانحراف = ${r(std)}`,
+            `Q1 = ${r(q1)} | Q3 = ${r(q3)} | IQR = ${r(iqr)}`,
+            `الحدود الطبيعية = [${r(low)} ، ${r(high)}]`,
+            `Z-scores: ${vals.map(v => r((v - mean) / std)).join(', ')}`,
+        ].join('\n')) + `\n<span class="${iqrOut.length ? 'err' : ''}">شاذ حسب IQR: ${iqrOut.length ? iqrOut.join(', ') : 'لا يوجد'}</span>` +
+            `\nشاذ حسب |Z| > 3: ${zOut.length ? zOut.join(', ') : 'لا يوجد'}`;
+        const min = Math.min(...vals, low), max = Math.max(...vals, high), span = (max - min) || 1;
+        const x = v => ((v - min) / span * 96 + 2).toFixed(2) + '%';
+        document.getElementById('outDots').innerHTML =
+            `<div style="position:absolute; left:${x(low)}; right:calc(100% - ${x(high)}); top:14px; height:18px; background:rgba(76,175,80,0.15); border:1px dashed rgba(76,175,80,0.5);"></div>` +
+            vals.map(v => `<div title="${v}" style="position:absolute; left:${x(v)}; top:17px; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:${v < low || v > high ? '#f44336' : 'var(--gold)'};"></div>`).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', runOutliers);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

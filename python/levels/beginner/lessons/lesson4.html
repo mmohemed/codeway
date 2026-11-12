@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 4: التعامل مع النصوص (Strings) | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --text: #fff;
+            --text-light: #dcdcdc;
+            --info: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 800;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .breadcrumb {
+            font-size: 0.82em;
+            color: #ccc;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+
+        .breadcrumb span { margin: 0 6px; color: #777; }
+
+        /* ===== الهيدر ===== */
+        .page-hero {
+            padding: 140px 30px 70px;
+            background: radial-gradient(circle at top, #1a1a1a 0%, #000 70%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .page-hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 16px;
+        }
+
+        .lesson-title {
+            font-size: 2.6em;
+            color: var(--gold);
+            margin-bottom: 14px;
+            text-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
+            line-height: 1.4;
+        }
+
+        .lesson-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            font-size: 0.85em;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lesson-meta-item i { color: var(--gold); }
+
+        /* ===== المحتوى (كامل العرض) ===== */
+        .content-wrapper {
+            width: 100%;
+            padding: 50px 40px 80px;
+            background: linear-gradient(180deg, #000 0%, #050505 100%);
+        }
+
+        .content-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .main-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 50px 55px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+        }
+
+        .main-card h2 {
+            font-size: 1.6em;
+            color: var(--gold);
+            margin: 40px 0 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+        }
+
+        .main-card h2:first-child { margin-top: 0; }
+
+        .main-card h2 i { font-size: 1.05rem; color: var(--gold-soft); }
+
+        .main-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 14px 0 18px;
+        }
+
+        .main-card ul.plain,
+        .main-card ol.plain {
+            padding-right: 24px;
+            margin: 14px 0;
+        }
+
+        .main-card ul.plain li,
+        .main-card ol.plain li {
+            margin-bottom: 10px;
+            color: var(--text-light);
+            font-size: 0.98em;
+        }
+
+        /* ===== صندوق مميز ===== */
+        .highlight-box {
+            margin: 25px 0;
+            background: #121212;
+            border-radius: 14px;
+            padding: 24px 28px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+        }
+
+        .highlight-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 14px;
+            font-size: 1.1em;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .highlight-box ul li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 9px 0;
+            color: var(--text-light);
+            font-size: 0.97em;
+        }
+
+        .highlight-box ul li i {
+            color: var(--gold);
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        /* ===== كتلة الكود ===== */
+        .code-block {
+            margin: 22px 0;
+            background: #050505;
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+        }
+
+        .code-label {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            font-size: 0.74em;
+            color: var(--gold-soft);
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        pre {
+            margin: 0;
+            padding-top: 26px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.95em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.75;
+        }
+
+        code.inline {
+            background: #1a1a1a;
+            color: var(--gold);
+            padding: 2px 9px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.9em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== ملاحظات ===== */
+        .note, .tip, .warning {
+            margin: 22px 0;
+            padding: 18px 22px;
+            border-radius: 12px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            line-height: 1.85;
+        }
+
+        .note {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+
+        .tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+
+        .warning {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+
+        .note i, .tip i, .warning i { font-size: 1.2em; margin-top: 5px; flex-shrink: 0; }
+        .note i { color: var(--info); }
+        .tip i { color: var(--success); }
+        .warning i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        table thead {
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        table th {
+            padding: 16px 18px;
+            color: var(--gold);
+            text-align: right;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        table td {
+            padding: 16px 18px;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table tr:last-child td { border-bottom: none; }
+        table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        /* ===== التمارين ===== */
+        .exercise-section {
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(15, 15, 15, 0.9));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+        }
+
+        .exercise-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+            color: #000;
+            font-weight: 800;
+            font-size: 1.05em;
+            flex-shrink: 0;
+        }
+
+        .exercise-title {
+            color: var(--gold);
+            font-size: 1.15em;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .exercise-question {
+            font-size: 1em;
+            color: var(--text-light);
+            margin-bottom: 18px;
+            line-height: 1.8;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option-item:hover {
+            border-color: rgba(255, 215, 0, 0.4);
+            background: #101010;
+            transform: translateX(-4px);
+        }
+
+        .option-item input[type="radio"],
+        .option-item input[type="checkbox"] {
+            accent-color: var(--gold);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .text-input-wrap {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .text-input {
+            flex: 1;
+            min-width: 220px;
+            padding: 13px 18px;
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .exercise-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 22px;
+            border-radius: 9px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 700;
+            font-size: 0.94em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .exercise-result {
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            display: none;
+            line-height: 1.8;
+        }
+
+        .exercise-result.success {
+            display: block;
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+
+        .exercise-result.partial {
+            display: block;
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+
+        .exercise-result.error {
+            display: block;
+            background: rgba(244, 67, 54, 0.15);
+            border-right: 4px solid var(--danger);
+            color: #ffcdd2;
+        }
+
+        /* ===== شريط التقدم ===== */
+        .progress-footer {
+            margin: 40px 0 0;
+            padding: 26px 28px;
+            background: #0a0a0a;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .progress-footer h3 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.85em;
+            color: #aaa;
+            text-align: center;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            margin-top: 45px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 260px;
+            font-size: 0.95em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.5);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        footer {
+            text-align: center;
+            padding: 28px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: #aaa;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 8px; padding: 10px 15px; }
+            .page-hero { padding: 160px 15px 50px; }
+            .lesson-title { font-size: 1.75em; }
+            .content-wrapper { padding: 30px 15px 50px; }
+            .main-card { padding: 26px 20px; }
+            .exercise-section { padding: 22px 18px; }
+            .lesson-meta { flex-direction: column; align-items: center; }
+            .nav-links { flex-direction: column; }
+            .nav-link { min-width: 100%; justify-content: center !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- شريط التنقل -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span>/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span>/</span>
+        <span>الدرس 4</span>
+    </div>
+</nav>
+
+<!-- الهيدر -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-font"></i>
+            الدرس 4 · النصوص (Strings)
+        </div>
+        <h1 class="lesson-title">التعامل مع النصوص (Strings) في بايثون</h1>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> المدة: 20 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> الهدف: فهم النصوص وطرق التعامل معها</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> المستوى: مبتدئ</div>
+            <div class="lesson-meta-item"><i class="fas fa-list-ol"></i> الدرس 4 من 15</div>
+        </div>
+    </div>
+</section>
+
+<!-- المحتوى -->
+<div class="content-wrapper">
+    <div class="content-inner">
+        <article class="main-card">
+
+            <!-- ===== ما هي النصوص ===== -->
+            <h2><i class="fas fa-question-circle"></i> ما هي النصوص (Strings)؟</h2>
+            <p>
+                النص (String) في بايثون هو أي مجموعة من الحروف أو الكلمات أو الجمل
+                نضعها بين علامتي اقتباس مفردة <code class="inline">' '</code> أو مزدوجة <code class="inline">" "</code>.
+            </p>
+            <p>أمثلة على النصوص:</p>
+            <ul class="plain">
+                <li><code class="inline">"Hello"</code> — كلمة إنجليزية.</li>
+                <li><code class="inline">'محمد'</code> — اسم بالعربية.</li>
+                <li><code class="inline">"مرحبًا بك في عالم بايثون"</code> — جملة كاملة.</li>
+                <li><code class="inline">"123"</code> — أرقام بين علامات الاقتباس تُعتبر نصًا وليست عددًا!</li>
+            </ul>
+
+            <p>
+                في الأمثلة سنكتب مثل <code class="inline">name = "Mohammed"</code>: هذا يعني أننا نحفظ النص باسم
+                <code class="inline">name</code> لنستخدمه لاحقًا، ويسمى ذلك <strong>متغيرًا</strong>. سنشرح المتغيرات بالتفصيل في الدرس 5.
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">أمثلة بسيطة على النصوص</div>
+<pre>
+name = "Mohammed"
+msg  = "مرحبًا بك في CodeWay"
+
+print(name)
+print(msg)
+</pre>
+            </div>
+
+            <div class="warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>مهم:</strong> علامات الاقتباس <strong>ليست جزءًا من النص</strong>، بل هي فقط
+                    طريقة لتوضيح أن ما بينها نص. الفرق بين <code class="inline">"123"</code> و <code class="inline">123</code> كبير
+                    — الأول نص، والثاني عدد صحيح.
+                </div>
+            </div>
+
+            <!-- ===== دمج النصوص ===== -->
+            <h2><i class="fas fa-plus"></i> دمج النصوص (Concatenation)</h2>
+            <p>
+                يمكننا دمج أكثر من نص باستخدام علامة <code class="inline">+</code> أو باستخدام الفواصل داخل
+                <code class="inline">print()</code>.
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">دمج نصوص</div>
+<pre>
+first_name = "Mohammed"
+last_name  = "Quraea"
+
+# دمج باستخدام +
+full_name = first_name + " " + last_name
+print(full_name)
+
+# دمج باستخدام الفواصل
+print("الاسم الكامل هو:", first_name, last_name)
+</pre>
+            </div>
+
+            <div class="note">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    عند استخدام الفواصل، تقوم <code class="inline">print</code> بإضافة مسافة تلقائيًا بين العناصر.
+                    أما عند استخدام <code class="inline">+</code> فيجب إضافة المسافة يدويًا.
+                </div>
+            </div>
+
+            <!-- ===== الدوال ===== -->
+            <h2><i class="fas fa-tools"></i> أهم دوال النصوص (String Methods)</h2>
+            <p>هناك دوال (Methods) كثيرة يمكن استخدامها مع النصوص. إليك أشهرها:</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الدالة</th>
+                            <th>الوظيفة</th>
+                            <th>مثال</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="inline">.upper()</code></td>
+                            <td>تحويل النص إلى حروف كبيرة</td>
+                            <td><code class="inline">"hello".upper()</code> → <code class="inline">"HELLO"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.lower()</code></td>
+                            <td>تحويل النص إلى حروف صغيرة</td>
+                            <td><code class="inline">"HELLO".lower()</code> → <code class="inline">"hello"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.capitalize()</code></td>
+                            <td>جعل أول حرف كبيرًا والباقي صغيرًا</td>
+                            <td><code class="inline">"hello world".capitalize()</code> → <code class="inline">"Hello world"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.title()</code></td>
+                            <td>جعل أول حرف من كل كلمة كبيرًا</td>
+                            <td><code class="inline">"hello world".title()</code> → <code class="inline">"Hello World"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.replace(old, new)</code></td>
+                            <td>استبدال نص بنص آخر</td>
+                            <td><code class="inline">"Hi Ali".replace("Ali", "Sara")</code> → <code class="inline">"Hi Sara"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.strip()</code></td>
+                            <td>حذف المسافات من البداية والنهاية</td>
+                            <td><code class="inline">"  hi  ".strip()</code> → <code class="inline">"hi"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">.split(sep)</code></td>
+                            <td>تقسيم النص إلى قائمة</td>
+                            <td><code class="inline">"a,b,c".split(",")</code> → <code class="inline">['a','b','c']</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">len(text)</code></td>
+                            <td>عدد أحرف النص بما فيها المسافات (دالة عامة في بايثون، وليست Method خاصة بالنصوص)</td>
+                            <td><code class="inline">len("Python")</code> → <code class="inline">6</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">تجربة بعض الدوال</div>
+<pre>
+text = "CodeWay منصة قوية"
+
+print(text.upper())      # تحويل إلى حروف كبيرة
+print(text.lower())      # تحويل إلى حروف صغيرة
+print(len(text))         # طول النص (عدد الأحرف مع المسافات)
+print(text.replace("قوية", "عالمية"))  # استبدال كلمة بأخرى
+</pre>
+            </div>
+
+            <!-- ===== Indexing ===== -->
+            <h2><i class="fas fa-hashtag"></i> الوصول إلى حروف معيّنة (Indexing)</h2>
+            <p>
+                يمكننا الوصول إلى حرف معيّن في النص باستخدام الفهرسة (Index)،
+                حيث <strong>يبدأ العد من 0</strong> وليس من 1:
+            </p>
+
+            <div class="table-wrap">
+                <table dir="ltr">
+                    <thead>
+                        <tr>
+                            <th>P</th>
+                            <th>y</th>
+                            <th>t</th>
+                            <th>h</th>
+                            <th>o</th>
+                            <th>n</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                            <td>5</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-label">الفهرسة في النصوص</div>
+<pre>
+word = "Python"
+
+print(word[0])   # الحرف الأول: P
+print(word[1])   # الحرف الثاني: y
+print(word[-1])  # آخر حرف: n
+print(word[-2])  # قبل الأخير: o
+</pre>
+            </div>
+
+            <div class="tip">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>فائدة:</strong> الفهرس السالب (مثل <code class="inline">-1</code>) يبدأ العد من نهاية النص.
+                    هذا مفيد جدًا لاستخراج آخر حرف دون معرفة طول النص.
+                </div>
+            </div>
+
+            <!-- ===== Slicing ===== -->
+            <h2><i class="fas fa-cut"></i> قص جزء من النص (Slicing)</h2>
+            <p>
+                يمكنك أخذ جزء من النص باستخدام الصيغة: <code class="inline">[start:end]</code>
+                — حيث <strong>start</strong> هو بداية المقطع، و<strong>end</strong> هو نهاية المقطع
+                (لا يُشمَل الحرف في موضع end).
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">Slicing</div>
+<pre>
+lang = "Programming"
+
+print(lang[0:4])   # Prog  (من 0 إلى 3)
+print(lang[4:])    # ramming (من 4 إلى النهاية)
+print(lang[:5])    # Progr (من البداية إلى 4)
+print(lang[-3:])   # ing   (آخر 3 حروف)
+</pre>
+            </div>
+
+            <div class="note">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    القاعدة الذهبية: <strong>start يُشمَل</strong> و <strong>end لا يُشمَل</strong>.
+                    مثال: <code class="inline">lang[0:4]</code> يعطي الحروف في المواضع 0, 1, 2, 3.
+                </div>
+            </div>
+
+            <!-- ===== f-strings ===== -->
+            <h2><i class="fas fa-magic"></i> استخدام f-strings لكتابة نصوص ديناميكية</h2>
+            <p>
+                <strong>f-strings</strong> هي طريقة حديثة ومريحة لدمج المتغيرات داخل النص.
+                نضع الحرف <code class="inline">f</code> قبل علامات الاقتباس، ثم نضع المتغيرات داخل <code class="inline">{ }</code>.
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">مثال f-string</div>
+<pre>
+name = "محمد"
+language = "Python"
+
+message = f"مرحبًا يا {name}، أنت تتعلم {language} الآن!"
+print(message)
+</pre>
+            </div>
+
+            <p>مزايا f-strings:</p>
+            <ul class="plain">
+                <li>✅ أوضح وأسهل قراءة من دمج النصوص بـ <code class="inline">+</code>.</li>
+                <li>✅ يمكنك وضع أي تعبير داخل <code class="inline">{ }</code> وليس فقط متغيرًا (مثل <code class="inline">{2+3}</code>).</li>
+                <li>✅ تدعم تنسيق الأرقام (مثل عدد الخانات العشرية).</li>
+            </ul>
+
+            <div class="code-block">
+                <div class="code-label">f-string مع تعبيرات</div>
+<pre>
+age = 20
+print(f"بعد 5 سنوات، سيكون عمرك {age + 5} سنة.")
+</pre>
+            </div>
+
+            <!-- ===== تمارين عملية ===== -->
+            <h2><i class="fas fa-laptop-code"></i> تمارين عملية للتطبيق</h2>
+            <p>أنشئ ملفًا جديدًا باسم <strong>strings_practice.py</strong> وجرّب ما يلي:</p>
+            <ol class="plain">
+                <li>أنشئ متغيرًا يحتوي على اسمك الكامل كنص.</li>
+                <li>اطبع الاسم بحروف كبيرة باستخدام <code class="inline">.upper()</code>.</li>
+                <li>اطبع عدد حروف اسمك باستخدام <code class="inline">len()</code>.</li>
+                <li>استخدم f-string لطباعة جملة مثل:
+                    <code class="inline">"اسمي (اسمك) وعدد حروفه هو (العدد)"</code>.
+                </li>
+            </ol>
+
+            <div class="highlight-box">
+                <strong><i class="fas fa-bullseye"></i> هدف التمرين العملي:</strong>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> تثبيت مفهوم النصوص في بايثون.</li>
+                    <li><i class="fas fa-check-circle"></i> التدرب على الدوال الأساسية مثل <code class="inline">upper</code> و <code class="inline">len</code>.</li>
+                    <li><i class="fas fa-check-circle"></i> الاعتياد على f-strings لكتابة نصوص احترافية.</li>
+                </ul>
+            </div>
+
+            <!-- ===== تمارين تفاعلية ===== -->
+            <h2><i class="fas fa-pencil-alt"></i> تمارين تفاعلية</h2>
+            <p>اختبر فهمك للنصوص من خلال التمارين التالية:</p>
+
+            <!-- تمرين 1 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">1</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — النص أم العدد</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> أي من التالي <strong>يُعتبر نصًا (String)</strong> في بايثون؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex1" value="a"> 123</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="b"> "123"</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="c"> 3.14</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="d"> True</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise1()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex1','result1')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result1"></div>
+            </div>
+
+            <!-- تمرين 2 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">2</div>
+                    <h3 class="exercise-title">تمرين إكمال الفراغ — طول النص</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ماذا ستكون نتيجة الكود التالي؟
+                    <br><code class="inline">print(len("CodeWay"))</code>
+                </p>
+                <div class="text-input-wrap">
+                    <input type="text" class="text-input" id="ex2-input" placeholder="اكتب الرقم الناتج..." autocomplete="off">
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise2()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex2','result2')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result2"></div>
+            </div>
+
+            <!-- تمرين 3 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">3</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — الفهرسة</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما هي نتيجة <code class="inline">"Python"[0]</code>؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex3" value="a"> P</label>
+                    <label class="option-item"><input type="radio" name="ex3" value="b"> y</label>
+                    <label class="option-item"><input type="radio" name="ex3" value="c"> n</label>
+                    <label class="option-item"><input type="radio" name="ex3" value="d"> خطأ</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise3()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex3','result3')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result3"></div>
+            </div>
+
+            <!-- تمرين 4 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">4</div>
+                    <h3 class="exercise-title">تمرين صح أو خطأ</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> في بايثون، يبدأ العد في الفهرسة (Indexing) من الرقم 1.
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex4" value="true"> ✔️ صح</label>
+                    <label class="option-item"><input type="radio" name="ex4" value="false"> ✖️ خطأ</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise4()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex4','result4')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result4"></div>
+            </div>
+
+            <!-- تمرين 5 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">5</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — f-string</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما الحرف الذي نضعه قبل علامات الاقتباس لاستخدام f-string؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex5" value="a"> s</label>
+                    <label class="option-item"><input type="radio" name="ex5" value="b"> f</label>
+                    <label class="option-item"><input type="radio" name="ex5" value="c"> t</label>
+                    <label class="option-item"><input type="radio" name="ex5" value="d"> لا نضع أي حرف</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise5()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex5','result5')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result5"></div>
+            </div>
+
+            <!-- تمرين 6 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">6</div>
+                    <h3 class="exercise-title">تمرين إكمال الفراغ — الدالة الصحيحة</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> اكتب اسم الدالة التي تُستخدم لتحويل النص إلى حروف كبيرة
+                    (اكتب الاسم فقط بدون أقواس أو نقطة):
+                </p>
+                <div class="text-input-wrap">
+                    <input type="text" class="text-input" id="ex6-input" placeholder="اكتب اسم الدالة..." autocomplete="off">
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise6()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex6','result6')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result6"></div>
+            </div>
+
+            <!-- ===== خلاصة ===== -->
+            <h2><i class="fas fa-tasks"></i> خلاصة الدرس</h2>
+            <ul class="plain">
+                <li>✔️ النص (String) هو أي تسلسل حروف بين علامات اقتباس مفردة أو مزدوجة.</li>
+                <li>✔️ يمكن دمج النصوص بـ <code class="inline">+</code> أو بالفواصل داخل <code class="inline">print()</code>.</li>
+                <li>✔️ هناك دوال مفيدة مثل <code class="inline">.upper()</code> و <code class="inline">.lower()</code> و <code class="inline">.replace()</code> و <code class="inline">len()</code>.</li>
+                <li>✔️ الفهرسة (Indexing) تبدأ من 0، والفهرس السالب يبدأ من النهاية.</li>
+                <li>✔️ Slicing يسمح بأخذ أجزاء من النص باستخدام <code class="inline">[start:end]</code>.</li>
+                <li>✔️ f-strings طريقة حديثة لدمج المتغيرات داخل النصوص.</li>
+            </ul>
+
+            <!-- ===== شريط التقدم ===== -->
+            <div class="progress-footer">
+                <h3><i class="fas fa-chart-line"></i> تقدمك في المسار</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0% مكتمل</div>
+            </div>
+
+            <!-- ===== التنقل ===== -->
+            <div class="nav-links">
+                <a href="lesson3.html" class="nav-link prev">
+                    <i class="fas fa-arrow-right"></i>
+                    الدرس السابق: أول برنامج و print()
+                </a>
+                <a href="lesson5.html" class="nav-link next">
+                    الدرس التالي: المتغيرات وأنواع البيانات
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+
+        </article>
+    </div>
+</div>
+
+<footer>
+    © 2025 CodeWay — مسار Python · الدرس 4 من مستوى المبتدئين.
+</footer>
+
+<script>
+    /* شريط التقدم */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '27%';
+            text.textContent = '27% مكتمل';
+        }, 400);
+    });
+
+    /* ===== تمرين 1 ===== */
+    function checkExercise1() {
+        const selected = document.querySelector('input[name="ex1"]:checked');
+        const result = document.getElementById('result1');
+        result.className = 'exercise-result';
+
+        if (!selected) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.';
+            return;
+        }
+
+        if (selected.value === 'b') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> <code class="inline">"123"</code> نص لأنه بين علامات اقتباس، بينما <code class="inline">123</code> عدد صحيح.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الإجابة الصحيحة هي <code class="inline">"123"</code> — الأرقام بين علامات الاقتباس تُعتبر نصًا.';
+        }
+    }
+
+    /* ===== تمرين 2 ===== */
+    function checkExercise2() {
+        const input = document.getElementById('ex2-input').value.trim();
+        const result = document.getElementById('result2');
+        result.className = 'exercise-result';
+
+        if (!input) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تكتب أي إجابة.';
+            return;
+        }
+
+        if (input === '7' || input === '٧') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> كلمة <code class="inline">CodeWay</code> تحتوي على 7 حروف: C-o-d-e-W-a-y.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة غير صحيحة.</strong> العدد الصحيح هو <strong>7</strong>.';
+        }
+    }
+
+    /* ===== تمرين 3 ===== */
+    function checkExercise3() {
+        const selected = document.querySelector('input[name="ex3"]:checked');
+        const result = document.getElementById('result3');
+        result.className = 'exercise-result';
+
+        if (!selected) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.';
+            return;
+        }
+
+        if (selected.value === 'a') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> الفهرسة تبدأ من 0، لذا <code class="inline">"Python"[0]</code> يعطي الحرف <strong>P</strong>.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الإجابة الصحيحة هي <strong>P</strong> — لأن الفهرسة تبدأ من 0.';
+        }
+    }
+
+    /* ===== تمرين 4 ===== */
+    function checkExercise4() {
+        const selected = document.querySelector('input[name="ex4"]:checked');
+        const result = document.getElementById('result4');
+        result.className = 'exercise-result';
+
+        if (!selected) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.';
+            return;
+        }
+
+        if (selected.value === 'false') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>صحيح تمامًا!</strong> الفهرسة في بايثون تبدأ من <strong>0</strong> وليس 1.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>للأسف خطأ.</strong> الفهرسة تبدأ من <strong>0</strong>، لذا <code class="inline">"Python"[0]</code> هو P.';
+        }
+    }
+
+    /* ===== تمرين 5 ===== */
+    function checkExercise5() {
+        const selected = document.querySelector('input[name="ex5"]:checked');
+        const result = document.getElementById('result5');
+        result.className = 'exercise-result';
+
+        if (!selected) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.';
+            return;
+        }
+
+        if (selected.value === 'b') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> نضع الحرف <code class="inline">f</code> قبل علامات الاقتباس: <code class="inline">f"..."</code>.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الحرف الصحيح هو <code class="inline">f</code>.';
+        }
+    }
+
+    /* ===== تمرين 6 ===== */
+    function checkExercise6() {
+        // بدون toLowerCase: UPPER بحروف كبيرة خطأ في بايثون
+        const input = document.getElementById('ex6-input').value.trim().replace(/[.()]/g, '');
+        const result = document.getElementById('result6');
+        result.className = 'exercise-result';
+
+        if (!input) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تكتب أي إجابة.';
+            return;
+        }
+
+        if (input === 'upper') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> الدالة هي <code class="inline">.upper()</code> وتحوّل النص إلى حروف كبيرة.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة غير صحيحة.</strong> الدالة الصحيحة هي <code class="inline">upper</code>.';
+        }
+    }
+
+    /* ===== إعادة تعيين ===== */
+    function resetExercise(name, resultId) {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(el => el.checked = false);
+        const input = document.getElementById(name + '-input');
+        if (input) input.value = '';
+        const result = document.getElementById(resultId);
+        if (result) {
+            result.className = 'exercise-result';
+            result.innerHTML = '';
+        }
+    }
+</script>
+
+</body>
+</html>

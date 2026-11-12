@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نماذج Flask-WTF | الدرس الرابع | CodeWay</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prism.js للتلوين -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-dark: #d4af37;
+            --primary-light: #ffed4a;
+            --dark: #0a0a0a;
+            --dark-light: #1a1a1a;
+            --dark-surface: #222;
+            --text: #ffffff;
+            --text-light: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --border-color: rgba(255, 215, 0, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #00c851;
+            --info: #00b4ff;
+            --warning: #ff8800;
+            --danger: #ff1744;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* شريط التقدم */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            z-index: 1001;
+            background: transparent;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.97);
+            backdrop-filter: blur(20px);
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .nav-links .back-home {
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary) !important;
+            border-radius: 50px;
+        }
+
+        .nav-links .back-home:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        /* زر العودة للأعلى */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+            z-index: 999;
+            border: none;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.6);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 20px 60px;
+            background: linear-gradient(135deg, var(--dark), var(--dark-light));
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05), transparent 70%);
+            border-radius: 50%;
+            animation: floatBubble 25s ease-in-out infinite;
+        }
+
+        @keyframes floatBubble {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-40px, 30px) scale(1.1); }
+        }
+
+        .hero-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .hero-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 i {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .hero-meta i {
+            color: var(--primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+        }
+
+        /* بطاقات المحتوى */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .content-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .content-card h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .content-card h2 i {
+            font-size: 1.5rem;
+        }
+
+        .content-card h3 {
+            color: var(--primary-light);
+            font-size: 1.3rem;
+            margin: 25px 0 15px;
+        }
+
+        .content-card h4 {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin: 20px 0 10px;
+        }
+
+        .content-card p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .content-card ul, .content-card ol {
+            color: var(--text-light);
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+
+        .content-card li {
+            margin-bottom: 8px;
+        }
+
+        .content-card li strong {
+            color: var(--primary);
+        }
+
+        /* كود */
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+        }
+
+        .code-block .code-label {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--primary);
+            color: #000;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* صندوق المعلومة */
+        .info-box {
+            background: rgba(0, 180, 255, 0.08);
+            border-right: 4px solid var(--info);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .info-box i {
+            color: var(--info);
+            margin-left: 10px;
+        }
+
+        .warning-box {
+            background: rgba(255, 136, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning-box i {
+            color: var(--warning);
+            margin-left: 10px;
+        }
+
+        .success-box {
+            background: rgba(0, 200, 81, 0.08);
+            border-right: 4px solid var(--success);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .success-box i {
+            color: var(--success);
+            margin-left: 10px;
+        }
+
+        .danger-box {
+            background: rgba(255, 23, 68, 0.08);
+            border-right: 4px solid var(--danger);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .danger-box i {
+            color: var(--danger);
+            margin-left: 10px;
+        }
+
+        /* المزايا */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: rgba(255, 215, 0, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .feature-item:hover {
+            background: rgba(255, 215, 0, 0.08);
+            transform: translateY(-5px);
+        }
+
+        .feature-item i {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .feature-item h4 {
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .feature-item p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* نموذج تفاعلي */
+        .interactive-form {
+            background: var(--dark-surface);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .interactive-form .form-group {
+            margin-bottom: 18px;
+        }
+
+        .interactive-form label {
+            display: block;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        .interactive-form label .required {
+            color: var(--danger);
+        }
+
+        .interactive-form input,
+        .interactive-form textarea,
+        .interactive-form select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--dark);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .interactive-form input:focus,
+        .interactive-form textarea:focus,
+        .interactive-form select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.08);
+        }
+
+        .interactive-form input.error,
+        .interactive-form textarea.error {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 4px rgba(255, 23, 68, 0.08);
+        }
+
+        .interactive-form .error-message {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .interactive-form .error-message.show {
+            display: block;
+        }
+
+        .interactive-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .interactive-form .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .interactive-form .btn-submit {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+            border: none;
+            padding: 12px 36px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .interactive-form .btn-submit:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .interactive-form .btn-reset-form {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .interactive-form .btn-reset-form:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .interactive-form .form-output {
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 10px;
+            background: var(--dark);
+            border: 1px solid var(--border-color);
+            min-height: 60px;
+            color: var(--text-light);
+            display: none;
+        }
+
+        .interactive-form .form-output.show {
+            display: block;
+        }
+
+        .interactive-form .form-output.success {
+            border-color: var(--success);
+            background: rgba(0, 200, 81, 0.05);
+        }
+
+        .interactive-form .form-output .output-item {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .interactive-form .form-output .output-item strong {
+            color: var(--primary);
+        }
+
+        /* تذييل */
+        .lesson-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .lesson-footer .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .lesson-footer .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .lesson-footer .btn-primary:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .lesson-footer .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .lesson-footer .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .btn-complete {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-complete:hover {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        .btn-complete.done {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        /* الفوتر */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--dark-light);
+            border-top: 2px solid var(--primary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* التجاوب */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 100px 15px 40px;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .hero-meta {
+                gap: 15px;
+            }
+            
+            .content-card {
+                padding: 20px;
+            }
+            
+            .content-card h2 {
+                font-size: 1.4rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .nav-links a {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+            
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .interactive-form .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-card {
+                padding: 15px;
+            }
+            
+            .lesson-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .lesson-footer .btn {
+                justify-content: center;
+            }
+        }
+
+        /* تأثير الظهور */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* التمرير السلس */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* أنماط Prism الإضافية */
+        .token.comment {
+            color: #6a9955;
+        }
+        .token.string {
+            color: #ce9178;
+        }
+        .token.keyword {
+            color: #569cd6;
+        }
+        .token.function {
+            color: #dcdcaa;
+        }
+        .token.class-name {
+            color: #4ec9b0;
+        }
+        .token.decorator {
+            color: #c586c0;
+        }
+
+        /* جدول الحقول */
+        .fields-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--dark);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .fields-table thead {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .fields-table th {
+            padding: 14px 18px;
+            text-align: right;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            font-weight: 700;
+        }
+
+        .fields-table td {
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+        }
+
+        .fields-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .fields-table .field-type {
+            color: var(--primary-light);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التقدم -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <a href="../index.html" class="logo">
+            <i class="fas fa-flask"></i>
+            <span>Flask</span>
+        </a>
+        <div class="nav-links">
+            <a href="#content">الدرس</a>
+            <a href="#interactive">تفاعل</a>
+            <a href="../flask.html" class="back-home">
+                <i class="fas fa-arrow-right"></i> العودة
+            </a>
+        </div>
+    </nav>
+
+    <!-- زر العودة للأعلى -->
+    <button class="back-to-top" id="backToTop" aria-label="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-breadcrumb">
+                <a href="../index.html">الرئيسية</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <a href="../flask.html">Flask</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <span style="color: var(--text);">الدرس الرابع</span>
+            </div>
+
+            <div class="hero-badge">
+                <i class="fas fa-graduation-cap"></i> الدرس 4 من 10
+            </div>
+
+            <h1><i class="fas fa-edit"></i> نماذج Flask-WTF</h1>
+            <p>تعلم كيفية إنشاء نماذج ويب تفاعلية باستخدام Flask-WTF، والتحقق من صحة البيانات، وحماية النماذج من الهجمات.</p>
+
+            <div class="hero-meta">
+                <span><i class="far fa-clock"></i> مدة القراءة: 14 دقيقة</span>
+                <span><i class="fas fa-signal"></i> مستوى: متوسط</span>
+                <span><i class="fas fa-shield-alt"></i> أمان متقدم</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="container" id="content">
+        <!-- الدرس -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-question-circle"></i> ما الذي سنتعلمه؟</h2>
+            <p>
+                في هذا الدرس، سنتعلم كيفية إنشاء نماذج ويب احترافية في Flask باستخدام مكتبة <strong>Flask-WTF</strong>.
+            </p>
+            <ul>
+                <li>✅ <strong>ما هو Flask-WTF</strong> – مقدمة عن المكتبة ومميزاتها.</li>
+                <li>✅ <strong>تثبيت Flask-WTF</strong> – إضافة المكتبة إلى المشروع.</li>
+                <li>✅ <strong>إنشاء نموذج</strong> – تعريف الحقول والتحقق من الصحة.</li>
+                <li>✅ <strong>عرض النموذج</strong> – استخدام النموذج في القوالب.</li>
+                <li>✅ <strong>معالجة البيانات</strong> – استقبال البيانات والتحقق منها.</li>
+                <li>✅ <strong>حماية CSRF</strong> – حماية النماذج من الهجمات.</li>
+                <li>✅ <strong>أنواع الحقول</strong> – استعراض جميع أنواع الحقول المتاحة.</li>
+            </ul>
+        </div>
+
+        <!-- ما هو Flask-WTF -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-info-circle"></i> ما هو Flask-WTF؟</h2>
+            <p>
+                <strong>Flask-WTF</strong> هو امتداد (Extension) لـ Flask يدمج مكتبة <strong>WTForms</strong> مع Flask.
+                يوفر طريقة سهلة لإنشاء نماذج ويب، والتحقق من صحة البيانات، وحماية النماذج من هجمات CSRF.
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>حماية CSRF</h4>
+                    <p>حماية مدمجة ضد هجمات التزوير عبر المواقع</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <h4>التحقق من الصحة</h4>
+                    <p>مدقق مدمج للتحقق من صحة البيانات المدخلة</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <h4>مرونة عالية</h4>
+                    <p>يدعم جميع أنواع الحقول والمدققات المخصصة</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-bolt"></i>
+                    <h4>سهل الاستخدام</h4>
+                    <p>بناء نماذج احترافية بأسطر قليلة من الكود</p>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>ملاحظة:</strong> Flask-WTF هي مكتبة رسمية موصى بها من قبل مجتمع Flask لبناء النماذج.
+            </div>
+        </div>
+
+        <!-- تثبيت Flask-WTF -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-download"></i> تثبيت Flask-WTF</h2>
+            <p>
+                لتثبيت Flask-WTF، استخدم الأمر التالي في محطة الأوامر:
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">تثبيت Flask-WTF</div>
+                <pre><code class="language-bash">
+# تثبيت Flask-WTF
+pip install flask-wtf
+
+# للتحقق من التثبيت
+pip show flask-wtf
+
+# إضافة إلى requirements.txt
+pip freeze > requirements.txt
+                </code></pre>
+            </div>
+
+            <div class="success-box">
+                <i class="fas fa-check-circle"></i>
+                <strong>تم التثبيت!</strong> الآن أصبحت جاهزاً لإنشاء النماذج.
+            </div>
+        </div>
+
+        <!-- إنشاء نموذج -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-plus-circle"></i> إنشاء نموذج</h2>
+            <p>
+                لإنشاء نموذج في Flask-WTF، نحدد كلاس يرث من <code>FlaskForm</code> ونعرف الحقول المطلوبة.
+            </p>
+
+            <h3>مثال: نموذج تسجيل دخول</h3>
+            <div class="code-block">
+                <div class="code-label">forms.py</div>
+                <pre><code class="language-python">
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, Length
+
+class LoginForm(FlaskForm):
+    # حقل البريد الإلكتروني
+    email = StringField('البريد الإلكتروني', 
+        validators=[DataRequired(), Email()])
+    
+    # حقل كلمة المرور
+    password = PasswordField('كلمة المرور', 
+        validators=[DataRequired(), Length(min=6)])
+    
+    # زر الإرسال
+    submit = SubmitField('تسجيل الدخول')
+                </code></pre>
+            </div>
+
+            <h3>مثال: نموذج تسجيل مستخدم</h3>
+            <div class="code-block">
+                <div class="code-label">forms.py - نموذج متقدم</div>
+                <pre><code class="language-python">
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, TextAreaField, SelectField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional
+
+class RegisterForm(FlaskForm):
+    username = StringField('اسم المستخدم', 
+        validators=[DataRequired(), Length(min=3, max=50)])
+    
+    email = StringField('البريد الإلكتروني', 
+        validators=[DataRequired(), Email()])
+    
+    password = PasswordField('كلمة المرور', 
+        validators=[DataRequired(), Length(min=6)])
+    
+    confirm_password = PasswordField('تأكيد كلمة المرور', 
+        validators=[DataRequired(), EqualTo('password')])
+    
+    bio = TextAreaField('السيرة الذاتية', 
+        validators=[Optional(), Length(max=500)])
+    
+    gender = SelectField('الجنس', 
+        choices=[('male', 'ذكر'), ('female', 'أنثى')])
+    
+    agree_terms = BooleanField('أوافق على الشروط', 
+        validators=[DataRequired()])
+    
+    submit = SubmitField('إنشاء حساب')
+                </code></pre>
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-lightbulb"></i>
+                <strong>المدققات الشائعة:</strong>
+                <ul style="margin-top: 8px;">
+                    <li><strong>DataRequired()</strong> – الحقل مطلوب</li>
+                    <li><strong>Email()</strong> – يجب أن يكون بريداً إلكترونياً صحيحاً</li>
+                    <li><strong>Length(min, max)</strong> – تحديد طول النص</li>
+                    <li><strong>EqualTo()</strong> – يساوي حقل آخر</li>
+                    <li><strong>Optional()</strong> – الحقل اختياري</li>
+                    <li><strong>NumberRange(min, max)</strong> – نطاق رقمي</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- أنواع الحقول -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-table"></i> أنواع الحقول في WTForms</h2>
+            <p>
+                توفر WTForms مجموعة واسعة من أنواع الحقول لتغطية جميع احتياجاتك:
+            </p>
+
+            <table class="fields-table">
+                <thead>
+                    <tr>
+                        <th>الحقل</th>
+                        <th>الوصف</th>
+                        <th>مثال</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="field-type">StringField</span></td>
+                        <td>نص قصير (سطر واحد)</td>
+                        <td><code>StringField('الاسم')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">TextAreaField</span></td>
+                        <td>نص طويل (متعدد الأسطر)</td>
+                        <td><code>TextAreaField('الوصف')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">PasswordField</span></td>
+                        <td>كلمة مرور (مخفية)</td>
+                        <td><code>PasswordField('كلمة المرور')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">EmailField</span></td>
+                        <td>بريد إلكتروني</td>
+                        <td><code>EmailField('البريد')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">IntegerField</span></td>
+                        <td>رقم صحيح</td>
+                        <td><code>IntegerField('العمر')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">FloatField</span></td>
+                        <td>رقم عشري</td>
+                        <td><code>FloatField('السعر')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">BooleanField</span></td>
+                        <td>خانة اختيار (Checkbox)</td>
+                        <td><code>BooleanField('موافق')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">SelectField</span></td>
+                        <td>قائمة منسدلة</td>
+                        <td><code>SelectField('الدولة', choices=[])</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">RadioField</span></td>
+                        <td>أزرار اختيار</td>
+                        <td><code>RadioField('الجنس', choices=[])</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">FileField</span></td>
+                        <td>رفع ملفات</td>
+                        <td><code>FileField('الصورة')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">DateField</span></td>
+                        <td>تاريخ</td>
+                        <td><code>DateField('تاريخ الميلاد')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">DateTimeField</span></td>
+                        <td>تاريخ ووقت</td>
+                        <td><code>DateTimeField('تاريخ النشر')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">HiddenField</span></td>
+                        <td>حقل مخفي</td>
+                        <td><code>HiddenField('id')</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-type">SubmitField</span></td>
+                        <td>زر الإرسال</td>
+                        <td><code>SubmitField('إرسال')</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- عرض النموذج -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-eye"></i> عرض النموذج في القالب</h2>
+            <p>
+                لاستخدام النموذج في القالب، نمرره إلى <code>render_template()</code> ونستخدمه في HTML.
+            </p>
+
+            <h3>كود التطبيق</h3>
+            <div class="code-block">
+                <div class="code-label">app.py</div>
+                <pre><code class="language-python">
+from flask import Flask, render_template, redirect, url_for, flash
+from forms import LoginForm
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your-secret-key-here'
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    
+    if form.validate_on_submit():
+        # معالجة البيانات
+        email = form.email.data
+        password = form.password.data
+        flash('تم تسجيل الدخول بنجاح!', 'success')
+        return redirect(url_for('home'))
+    
+    return render_template('login.html', form=form)
+                </code></pre>
+            </div>
+
+            <h3>قالب النموذج</h3>
+            <div class="code-block">
+                <div class="code-label">templates/login.html</div>
+                <pre><code class="language-html">
+{% extends "base.html" %}
+
+{% block content %}
+&lt;h1&gt;تسجيل الدخول&lt;/h1&gt;
+
+&lt;form method="POST" action=""&gt;
+    {{ form.hidden_tag() }}
+    
+    &lt;div class="form-group"&gt;
+        {{ form.email.label }}
+        {{ form.email(class="form-control") }}
+        {% for error in form.email.errors %}
+            &lt;span class="error"&gt;{{ error }}&lt;/span&gt;
+        {% endfor %}
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+        {{ form.password.label }}
+        {{ form.password(class="form-control") }}
+        {% for error in form.password.errors %}
+            &lt;span class="error"&gt;{{ error }}&lt;/span&gt;
+        {% endfor %}
+    &lt;/div&gt;
+    
+    {{ form.submit(class="btn btn-primary") }}
+&lt;/form&gt;
+{% endblock %}
+                </code></pre>
+            </div>
+
+            <div class="success-box">
+                <i class="fas fa-check-circle"></i>
+                <strong>ملاحظة:</strong> <code>form.hidden_tag()</code> يضيف تلقائياً حقل CSRF المخفي لحماية النموذج.
+            </div>
+        </div>
+
+        <!-- حماية CSRF -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-shield-alt"></i> حماية CSRF</h2>
+            <p>
+                <strong>CSRF</strong> (Cross-Site Request Forgery) هو هجوم يخدع المستخدم لإرسال طلب غير مقصود.
+                يوفر Flask-WTF حماية مدمجة ضد هذا الهجوم.
+            </p>
+
+            <h3>إعداد المفتاح السري</h3>
+            <div class="code-block">
+                <div class="code-label">إعداد SECRET_KEY</div>
+                <pre><code class="language-python">
+# في app.py
+app.config['SECRET_KEY'] = 'your-secret-key-here'
+
+# أفضل ممارسة: استخدم متغيرات البيئة
+import os
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'fallback-key'
+                </code></pre>
+            </div>
+
+            <h3>تفعيل الحماية</h3>
+            <div class="code-block">
+                <div class="code-label">تفعيل CSRF</div>
+                <pre><code class="language-python">
+from flask_wtf.csrf import CSRFProtect
+
+# تهيئة الحماية
+csrf = CSRFProtect(app)
+
+# أو باستخدام FlaskForm مباشرة
+# كل نموذج يرث من FlaskForm يحصل على حماية CSRF تلقائياً
+                </code></pre>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>تنبيه:</strong> تأكد من تعيين <code>SECRET_KEY</code> في التطبيق. بدونها، لن تعمل حماية CSRF.
+            </div>
+        </div>
+
+        <!-- معالجة البيانات -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-cogs"></i> معالجة البيانات والتحقق منها</h2>
+            <p>
+                بعد تقديم النموذج، يمكننا التحقق من صحة البيانات ومعالجتها:
+            </p>
+
+            <div class="code-block">
+                <div class="code-label">معالجة النموذج</div>
+                <pre><code class="language-python">
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    
+    if form.validate_on_submit():
+        # جميع البيانات صالحة
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        bio = form.bio.data
+        gender = form.gender.data
+        agree = form.agree_terms.data
+        
+        # هنا يمكن حفظ البيانات في قاعدة البيانات
+        # user = User(username=username, email=email, password=password)
+        # db.session.add(user)
+        # db.session.commit()
+        
+        flash('تم إنشاء الحساب بنجاح!', 'success')
+        return redirect(url_for('login'))
+    
+    # إذا كان هناك أخطاء، أعد عرض النموذج مع الأخطاء
+    return render_template('register.html', form=form)
+                </code></pre>
+            </div>
+
+            <h3>عرض أخطاء التحقق</h3>
+            <div class="code-block">
+                <div class="code-label">عرض الأخطاء في القالب</div>
+                <pre><code class="language-html">
+&lt;!-- عرض أخطاء التحقق --&gt;
+{% if form.errors %}
+    &lt;div class="alert alert-danger"&gt;
+        &lt;ul&gt;
+            {% for field, errors in form.errors.items() %}
+                {% for error in errors %}
+                    &lt;li&gt;{{ field }}: {{ error }}&lt;/li&gt;
+                {% endfor %}
+            {% endfor %}
+        &lt;/ul&gt;
+    &lt;/div&gt;
+{% endif %}
+                </code></pre>
+            </div>
+        </div>
+
+        <!-- مثال تفاعلي -->
+        <div class="content-card fade-in" id="interactive">
+            <h2><i class="fas fa-laptop-code"></i> نموذج تفاعلي: جرب بنفسك</h2>
+            <p>
+                املأ النموذج أدناه لتجربة كيفية عمل Flask-WTF بشكل تفاعلي:
+            </p>
+
+            <div class="interactive-form">
+                <form id="demoForm" onsubmit="handleFormSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="demoName">الاسم الكامل <span class="required">*</span></label>
+                            <input type="text" id="demoName" placeholder="أدخل اسمك الكامل" required>
+                            <div class="error-message" id="nameError">الرجاء إدخال اسمك الكامل</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="demoEmail">البريد الإلكتروني <span class="required">*</span></label>
+                            <input type="email" id="demoEmail" placeholder="example@email.com" required>
+                            <div class="error-message" id="emailError">الرجاء إدخال بريد إلكتروني صحيح</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="demoPassword">كلمة المرور <span class="required">*</span></label>
+                            <input type="password" id="demoPassword" placeholder="أدخل كلمة المرور" required minlength="6">
+                            <div class="error-message" id="passwordError">كلمة المرور يجب أن تكون 6 أحرف على الأقل</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="demoConfirm">تأكيد كلمة المرور <span class="required">*</span></label>
+                            <input type="password" id="demoConfirm" placeholder="أعد إدخال كلمة المرور" required>
+                            <div class="error-message" id="confirmError">كلمة المرور غير متطابقة</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="demoGender">الجنس</label>
+                        <select id="demoGender">
+                            <option value="">اختر...</option>
+                            <option value="male">ذكر</option>
+                            <option value="female">أنثى</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="demoBio">السيرة الذاتية</label>
+                        <textarea id="demoBio" rows="3" placeholder="أخبرنا عن نفسك..."></textarea>
+                    </div>
+
+                    <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="demoAgree" style="width:20px;height:20px;accent-color:var(--primary);">
+                        <label for="demoAgree" style="margin:0;font-weight:400;color:var(--text-secondary);">أوافق على الشروط والأحكام <span class="required">*</span></label>
+                    </div>
+                    <div class="error-message" id="agreeError" style="margin-top:-10px;">الرجاء الموافقة على الشروط</div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> إرسال النموذج</button>
+                        <button type="reset" class="btn-reset-form"><i class="fas fa-undo"></i> مسح الحقول</button>
+                    </div>
+                </form>
+
+                <div class="form-output" id="formOutput">
+                    <h4 style="color:var(--success);margin-bottom:10px;"><i class="fas fa-check-circle"></i> تم إرسال النموذج بنجاح!</h4>
+                    <div id="outputData"></div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>تنبيه:</strong> هذا النموذج تفاعلي فقط ويحاكي عمل Flask-WTF. لا يتم إرسال البيانات إلى خادم حقيقي.
+            </div>
+        </div>
+
+        <!-- نصائح -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-lightbulb"></i> نصائح للنماذج الاحترافية</h2>
+            <ul>
+                <li>
+                    <strong>استخدم مدققات مخصصة:</strong>
+                    يمكنك إنشاء دوال تحقق مخصصة لحالات خاصة.
+                </li>
+                <li>
+                    <strong>أضف تصميمات جذابة:</strong>
+                    استخدم CSS لإضافة أنماط جميلة للنماذج والحقول.
+                </li>
+                <li>
+                    <strong>استخدم رسائل خطأ واضحة:</strong>
+                    اشرح للمستخدم سبب رفض البيانات.
+                </li>
+                <li>
+                    <strong>حافظ على أمان البيانات:</strong>
+                    استخدم HTTPS في الإنتاج لحماية البيانات المرسلة.
+                </li>
+                <li>
+                    <strong>قم بتحسين تجربة المستخدم:</strong>
+                    أضف تحققاً فورياً (JavaScript) قبل إرسال النموذج.
+                </li>
+            </ul>
+
+            <div class="success-box">
+                <i class="fas fa-check-circle"></i>
+                <strong>نصيحة اليوم:</strong> "النماذج الجيدة هي واجهة التطبيق. اجعلها سهلة الاستخدام وجذابة للمستخدمين."
+            </div>
+        </div>
+
+        <!-- الخلاصة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-flag-checkered"></i> خلاصة الدرس</h2>
+            <ul>
+                <li>✅ تعرفنا على <strong>Flask-WTF</strong> ومميزاته في بناء النماذج.</li>
+                <li>✅ تعلمنا <strong>تثبيت</strong> Flask-WTF في المشروع.</li>
+                <li>✅ أنشأنا <strong>نماذج احترافية</strong> باستخدام WTForms.</li>
+                <li>✅ تعرفنا على <strong>جميع أنواع الحقول</strong> المتاحة.</li>
+                <li>✅ تعلمنا <strong>التحقق من صحة البيانات</strong> وعرض الأخطاء.</li>
+                <li>✅ فهمنا <strong>حماية CSRF</strong> وأهميتها.</li>
+                <li>✅ تعلمنا <strong>معالجة البيانات</strong> بعد تقديم النموذج.</li>
+            </ul>
+        </div>
+
+        <!-- أسئلة وتفاعل -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-question"></i> اختبر معلوماتك</h2>
+            <div id="quizSection">
+                <p><strong>ما هي الدالة المستخدمة في Flask-WTF لحماية النماذج من هجمات CSRF؟</strong></p>
+                <div style="display:flex;flex-direction:column;gap:10px;margin:15px 0;">
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="csrf">
+                        <input type="radio" name="quiz" value="csrf" style="accent-color:var(--primary);width:18px;height:18px;">
+                        form.csrf_token()
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="hidden">
+                        <input type="radio" name="quiz" value="hidden" style="accent-color:var(--primary);width:18px;height:18px;">
+                        form.hidden_tag()
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="protect">
+                        <input type="radio" name="quiz" value="protect" style="accent-color:var(--primary);width:18px;height:18px;">
+                        form.protect()
+                    </label>
+                </div>
+                <button id="checkQuizBtn" style="background:var(--primary);color:#000;border:none;padding:12px 30px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;transition:var(--transition);font-family:'Cairo',sans-serif;">
+                    <i class="fas fa-check"></i> تحقق الإجابة
+                </button>
+                <div id="quizResult" style="margin-top:15px;padding:15px;border-radius:10px;display:none;"></div>
+            </div>
+        </div>
+
+        <!-- تذييل الدرس -->
+        <div class="lesson-footer">
+            <div style="display:flex;gap:15px;flex-wrap:wrap;">
+                <button class="btn-complete" id="markCompleteBtn">
+                    <i class="fas fa-circle" id="completeIcon"></i>
+                    <span id="completeText">تحديد كمكتمل</span>
+                </button>
+                <a href="../flask.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i> العودة للدروس
+                </a>
+            </div>
+            <a href="lesson5.html" class="btn btn-primary">
+                الدرس التالي <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- فوتر -->
+    <footer>
+        <p>© 2026 <a href="../index.html">CodeWay</a> — تخصص Flask — الدرس الرابع: نماذج Flask-WTF</p>
+    </footer>
+
+    <!-- Prism.js للتلوين -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+
+    <script>
+        // =============================================
+        // شريط التقدم
+        // =============================================
+        function updateProgressBar() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // =============================================
+        // زر العودة للأعلى
+        // =============================================
+        function toggleBackToTop() {
+            const btn = document.getElementById('backToTop');
+            if (document.documentElement.scrollTop > 300 || document.body.scrollTop > 300) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // =============================================
+        // تأثير الظهور التدريجي
+        // =============================================
+        function checkFadeIn() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 80) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        // =============================================
+        // النموذج التفاعلي
+        // =============================================
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            // الحصول على القيم
+            const name = document.getElementById('demoName').value.trim();
+            const email = document.getElementById('demoEmail').value.trim();
+            const password = document.getElementById('demoPassword').value;
+            const confirm = document.getElementById('demoConfirm').value;
+            const gender = document.getElementById('demoGender').value;
+            const bio = document.getElementById('demoBio').value.trim();
+            const agree = document.getElementById('demoAgree').checked;
+            
+            let isValid = true;
+            
+            // التحقق من الاسم
+            const nameError = document.getElementById('nameError');
+            const nameInput = document.getElementById('demoName');
+            if (name.length < 3) {
+                nameInput.classList.add('error');
+                nameError.classList.add('show');
+                isValid = false;
+            } else {
+                nameInput.classList.remove('error');
+                nameError.classList.remove('show');
+            }
+            
+            // التحقق من البريد الإلكتروني
+            const emailError = document.getElementById('emailError');
+            const emailInput = document.getElementById('demoEmail');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                emailInput.classList.add('error');
+                emailError.classList.add('show');
+                isValid = false;
+            } else {
+                emailInput.classList.remove('error');
+                emailError.classList.remove('show');
+            }
+            
+            // التحقق من كلمة المرور
+            const passwordError = document.getElementById('passwordError');
+            const passwordInput = document.getElementById('demoPassword');
+            if (password.length < 6) {
+                passwordInput.classList.add('error');
+                passwordError.classList.add('show');
+                isValid = false;
+            } else {
+                passwordInput.classList.remove('error');
+                passwordError.classList.remove('show');
+            }
+            
+            // التحقق من تطابق كلمة المرور
+            const confirmError = document.getElementById('confirmError');
+            const confirmInput = document.getElementById('demoConfirm');
+            if (password !== confirm) {
+                confirmInput.classList.add('error');
+                confirmError.classList.add('show');
+                isValid = false;
+            } else {
+                confirmInput.classList.remove('error');
+                confirmError.classList.remove('show');
+            }
+            
+            // التحقق من الموافقة على الشروط
+            const agreeError = document.getElementById('agreeError');
+            if (!agree) {
+                agreeError.classList.add('show');
+                isValid = false;
+            } else {
+                agreeError.classList.remove('show');
+            }
+            
+            if (!isValid) {
+                return;
+            }
+            
+            // عرض البيانات المرسلة
+            const output = document.getElementById('formOutput');
+            const outputData = document.getElementById('outputData');
+            
+            outputData.innerHTML = `
+                <div class="output-item"><strong>الاسم:</strong> ${name}</div>
+                <div class="output-item"><strong>البريد الإلكتروني:</strong> ${email}</div>
+                <div class="output-item"><strong>كلمة المرور:</strong> ${'*'.repeat(password.length)}</div>
+                <div class="output-item"><strong>الجنس:</strong> ${gender === 'male' ? 'ذكر' : gender === 'female' ? 'أنثى' : 'غير محدد'}</div>
+                <div class="output-item"><strong>السيرة الذاتية:</strong> ${bio || 'غير مذكورة'}</div>
+                <div class="output-item"><strong>موافق على الشروط:</strong> ${agree ? '✅ نعم' : '❌ لا'}</div>
+            `;
+            
+            output.className = 'form-output show success';
+            
+            // تمرير إلى الأعلى لعرض النتيجة
+            output.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // إعادة تعيين النموذج
+        document.querySelector('.btn-reset-form').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('demoForm').reset();
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('input.error').forEach(el => el.classList.remove('error'));
+            document.getElementById('formOutput').className = 'form-output';
+        });
+
+        // =============================================
+        // اختبار المعرفة
+        // =============================================
+        document.getElementById('checkQuizBtn').addEventListener('click', function() {
+            const selected = document.querySelector('input[name="quiz"]:checked');
+            const resultDiv = document.getElementById('quizResult');
+            
+            if (!selected) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> الرجاء اختيار إجابة أولاً.';
+                return;
+            }
+
+            const answer = selected.value;
+            resultDiv.style.display = 'block';
+            
+            if (answer === 'hidden') {
+                resultDiv.className = 'success-box';
+                resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ إجابة صحيحة! <code>form.hidden_tag()</code> يضيف حقل CSRF المخفي تلقائياً.';
+            } else {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. الدالة الصحيحة هي <code>form.hidden_tag()</code>.`;
+            }
+        });
+
+        // =============================================
+        // إكمال الدرس - localStorage
+        // =============================================
+        const LESSON_ID = 4;
+        const STORAGE_KEY = 'flask_lessons_completed';
+
+        function isLessonCompleted() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return false;
+            const completed = JSON.parse(saved);
+            return completed.includes(LESSON_ID);
+        }
+
+        function toggleLessonComplete() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            let completed = saved ? JSON.parse(saved) : [];
+            const index = completed.indexOf(LESSON_ID);
+            
+            if (index > -1) {
+                completed.splice(index, 1);
+            } else {
+                completed.push(LESSON_ID);
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+            updateCompleteButton();
+        }
+
+        function updateCompleteButton() {
+            const btn = document.getElementById('markCompleteBtn');
+            const icon = document.getElementById('completeIcon');
+            const text = document.getElementById('completeText');
+            
+            if (isLessonCompleted()) {
+                btn.classList.add('done');
+                icon.className = 'fas fa-check-circle';
+                text.textContent = 'مكتمل ✓';
+            } else {
+                btn.classList.remove('done');
+                icon.className = 'fas fa-circle';
+                text.textContent = 'تحديد كمكتمل';
+            }
+        }
+
+        document.getElementById('markCompleteBtn').addEventListener('click', toggleLessonComplete);
+
+        // =============================================
+        // الأحداث العامة
+        // =============================================
+        window.addEventListener('scroll', function() {
+            updateProgressBar();
+            toggleBackToTop();
+            checkFadeIn();
+        });
+
+        window.addEventListener('load', function() {
+            checkFadeIn();
+            updateCompleteButton();
+        });
+
+        // اختيار خيار الاختبار بالنقر على البطاقة
+        document.querySelectorAll('.quiz-option').forEach(label => {
+            label.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+    </script>
+</body>
+</html>

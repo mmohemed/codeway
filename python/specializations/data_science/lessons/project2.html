@@ -1,0 +1,2205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مشروع 2: نموذج تنبؤ بأسعار المنازل | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص تحليل البيانات</a>
+        <span class="sep">/</span>
+        <span>مشروع أسعار المنازل</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-home"></i>
+            مشروع 2 · تعلم الآلة
+        </div>
+        <h1 class="lesson-title">مشروع 2: نموذج تنبؤ بأسعار المنازل من البداية حتى الإنتاج</h1>
+        <p class="lesson-intro">
+            المشروع الختامي للتخصص: شركة عقارية تريد <strong>تقدير أسعار المنازل تلقائيًا</strong> لموقعها. ستبني الحل كاملًا كما يحدث في الشركات: تحديد المشكلة ومقياس النجاح، وحماية بيانات الاختبار، وكشف <strong>فخ تسرّب البيانات</strong>، و<strong>هندسة الخصائص</strong>، ومقارنة النماذج وضبطها، و<strong>تحليل الأخطاء</strong> وتفسير النموذج، ثم <strong>تقديمه كـ API</strong> بـ FastAPI.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 4–5 ساعات</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 نموذج جاهز للإنتاج</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 مشروع تطبيقي</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدروس 8–10</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#framing">1. تحديد المشكلة</a>
+            <a href="#data">2. البيانات والتقسيم</a>
+            <a href="#eda">3. الاستكشاف</a>
+            <a href="#leakage">4. فخ التسرّب</a>
+            <a href="#features">5. هندسة الخصائص</a>
+            <a href="#compare">6. مقارنة النماذج</a>
+            <a href="#tuning">7. ضبط النموذج</a>
+            <a href="#final">8. التقييم النهائي</a>
+            <a href="#deploy">9. النشر كـ API</a>
+            <a href="#exercises">10. تمارين تفاعلية</a>
+            <a href="#summary">11. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="framing">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-bullseye"></i>
+        تحديد المشكلة ومقياس النجاح
+    </h2>
+        <div class="note-box">
+            <strong>📩 الطلب:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> «نريد خانة في موقعنا: يُدخل المالك مواصفات منزله فيحصل فورًا على سعر تقديري.</li>
+                <li><i class="fas fa-angle-left"></i> التقدير الحالي يدوي ويأخذ يومين، ونريد دقة لا تقل عن تقدير المثمّن المبتدئ (خطأ متوسط حوالي 10%).»</li>
+            </ul>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>القرار</th><th>اختيارنا</th><th>السبب</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>نوع المشكلة</td><td>انحدار</td><td>الناتج رقم (السعر)</td></tr>
+                    <tr><td>المقياس الرئيسي</td><td>MAE بالريال + MAPE</td><td>سهل الشرح: «نخطئ بمتوسط X ريال / Y%»</td></tr>
+                    <tr><td>معيار النجاح</td><td>MAPE &lt; 10% وتفوق واضح على خط الأساس</td><td>من متطلبات العمل</td></tr>
+                    <tr><td>الخصائص المسموحة</td><td>ما يعرفه المالك وقت الإدخال فقط</td><td>لا نستخدم معلومات غير متاحة عند التنبؤ</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>السطر الأخير في الجدول هو أهم سطر في المشروع.</strong> سترى بعد قليل كيف يُسقط عمود واحد مخالف له مشروعًا كاملًا.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="data">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-database"></i>
+        البيانات وتجنيب بيانات الاختبار
+    </h2>
+        <p>نستخدم بيانات المنازل من الدرس 8، مع إضافة واقعية: بعض القيم مفقودة، وعمود جديد <code>price_per_m2</code> وصل من نظام التقييم السابق:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>housing_project_data.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+rng = np.random.<span class="fn">default_rng</span>(<span class="num">2024</span>)
+n = <span class="num">600</span>
+district = rng.<span class="fn">choice</span>([<span class="str">"north"</span>, <span class="str">"center"</span>, <span class="str">"east"</span>, <span class="str">"south"</span>], n, p=[<span class="num">0.3</span>, <span class="num">0.25</span>, <span class="num">0.25</span>, <span class="num">0.2</span>])
+area = rng.<span class="fn">normal</span>(<span class="num">260</span>, <span class="num">70</span>, n).<span class="fn">clip</span>(<span class="num">90</span>, <span class="num">520</span>).<span class="fn">round</span>()
+rooms = np.<span class="fn">clip</span>((area / <span class="num">55</span> + rng.<span class="fn">normal</span>(<span class="num">0</span>, <span class="num">0.8</span>, n)).<span class="fn">round</span>(), <span class="num">2</span>, <span class="num">9</span>).<span class="fn">astype</span>(int)
+age = rng.<span class="fn">integers</span>(<span class="num">0</span>, <span class="num">35</span>, n)
+distance = (rng.<span class="fn">gamma</span>(<span class="num">2.5</span>, <span class="num">4</span>, n) + np.<span class="fn">where</span>(district == <span class="str">"center"</span>, -<span class="num">4</span>, <span class="num">0</span>)).<span class="fn">clip</span>(<span class="num">0.5</span>, <span class="num">40</span>).<span class="fn">round</span>(<span class="num">1</span>)
+garden = rng.<span class="fn">random</span>(n) &lt; <span class="num">0.35</span>
+base = {<span class="str">"north"</span>: <span class="num">4200</span>, <span class="str">"center"</span>: <span class="num">5200</span>, <span class="str">"east"</span>: <span class="num">3300</span>, <span class="str">"south"</span>: <span class="num">2900</span>}
+price = (area * np.<span class="fn">vectorize</span>(base.get)(district)
+         + rooms * <span class="num">25</span>_000
+         - age * <span class="num">6</span>_000
+         - distance * <span class="num">9</span>_000
+         + garden * <span class="num">60</span>_000
+         + rng.<span class="fn">normal</span>(<span class="num">0</span>, <span class="num">90</span>_000, n))
+houses = pd.<span class="fn">DataFrame</span>({
+    <span class="str">"area"</span>: area, <span class="str">"rooms"</span>: rooms, <span class="str">"age"</span>: age, <span class="str">"distance_km"</span>: distance,
+    <span class="str">"district"</span>: district, <span class="str">"garden"</span>: garden.<span class="fn">astype</span>(int),
+    <span class="str">"price"</span>: (price.<span class="fn">clip</span>(<span class="num">250</span>_000) / <span class="num">1000</span>).<span class="fn">round</span>() * <span class="num">1000</span>,
+})
+<span class="cm"># بيانات واقعية فيها نواقص، وعمود «خطير» سنكتشف أمره</span>
+rng2 = np.random.<span class="fn">default_rng</span>(<span class="num">7</span>)
+houses.loc[rng2.<span class="fn">choice</span>(<span class="fn">len</span>(houses), <span class="num">30</span>, replace=<span class="kw">False</span>), <span class="str">"age"</span>] = np.nan
+houses.loc[rng2.<span class="fn">choice</span>(<span class="fn">len</span>(houses), <span class="num">20</span>, replace=<span class="kw">False</span>), <span class="str">"distance_km"</span>] = np.nan
+houses[<span class="str">"price_per_m2"</span>] = (houses[<span class="str">"price"</span>] / houses[<span class="str">"area"</span>]).<span class="fn">round</span>()    <span class="cm"># يأتي من تقييم سابق للمنزل نفسه</span></pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>first_look.py</span>
+    </div>
+<pre><span class="fn">print</span>(houses.shape)
+<span class="fn">print</span>(houses.<span class="fn">head</span>())
+<span class="fn">print</span>(<span class="str">"\nمفقود:"</span>, houses.<span class="fn">isna</span>().<span class="fn">sum</span>()[<span class="kw">lambda</span> s: s &gt; <span class="num">0</span>].<span class="fn">to_dict</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>(600, 8)
+    area  rooms   age  distance_km district  garden      price  price_per_m2
+0  345.0      5  13.0         18.4     east       1   927000.0        2687.0
+1  234.0      5  15.0          1.5    north       0  1209000.0        5167.0
+2  303.0      6   7.0          NaN   center       1  1839000.0        6069.0
+3  296.0      5   NaN         20.1     east       1   892000.0        3014.0
+4  300.0      5   1.0         11.9    south       0   902000.0        3007.0
+
+مفقود: {'age': 30, 'distance_km': 20}</pre>
+</div>
+        <p><strong>قبل أي استكشاف</strong> نفصل بيانات الاختبار ونخفيها حتى النهاية، حتى لا تتأثر قراراتنا بها:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>split.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+train, test = <span class="fn">train_test_split</span>(houses, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>, stratify=houses[<span class="str">"district"</span>])
+<span class="fn">print</span>(<span class="str">"تدريب:"</span>, train.shape, <span class="str">"| اختبار:"</span>, test.shape)
+<span class="fn">print</span>(<span class="str">"نسب الأحياء متطابقة؟"</span>, (train[<span class="str">"district"</span>].<span class="fn">value_counts</span>(normalize=<span class="kw">True</span>).<span class="fn">round</span>(<span class="num">2</span>)
+                              == test[<span class="str">"district"</span>].<span class="fn">value_counts</span>(normalize=<span class="kw">True</span>).<span class="fn">round</span>(<span class="num">2</span>)).<span class="fn">all</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>تدريب: (480, 8) | اختبار: (120, 8)
+نسب الأحياء متطابقة؟ True</pre>
+</div>
+</section>
+
+<section class="section-card" id="eda">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-search"></i>
+        استكشاف سريع (على التدريب فقط)
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>eda.py</span>
+    </div>
+<pre><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> seaborn <span class="kw">as</span> sns
+sns.<span class="fn">set_theme</span>(style=<span class="str">"whitegrid"</span>)
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">3</span>, figsize=(<span class="num">16</span>, <span class="num">4</span>))
+sns.<span class="fn">histplot</span>(train[<span class="str">"price"</span>] / <span class="num">1</span>e6, bins=<span class="num">35</span>, ax=axes[<span class="num">0</span>], color=<span class="str">"#4C72B0"</span>)
+axes[<span class="num">0</span>].<span class="fn">set_title</span>(<span class="str">"Price (M SAR): right-skewed"</span>)
+sns.<span class="fn">scatterplot</span>(data=train, x=<span class="str">"area"</span>, y=train[<span class="str">"price"</span>] / <span class="num">1</span>e6, hue=<span class="str">"district"</span>, alpha=<span class="num">0.6</span>, s=<span class="num">25</span>, ax=axes[<span class="num">1</span>])
+axes[<span class="num">1</span>].<span class="fn">set_title</span>(<span class="str">"Price vs area by district"</span>)
+axes[<span class="num">1</span>].<span class="fn">set_ylabel</span>(<span class="str">"price (M)"</span>)
+sns.<span class="fn">boxplot</span>(data=train, x=<span class="str">"district"</span>, y=train[<span class="str">"price"</span>] / <span class="num">1</span>e6, color=<span class="str">"#d4a017"</span>, ax=axes[<span class="num">2</span>])
+axes[<span class="num">2</span>].<span class="fn">set_title</span>(<span class="str">"Price by district"</span>)
+axes[<span class="num">2</span>].<span class="fn">set_ylabel</span>(<span class="str">"price (M)"</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+<span class="fn">print</span>(train[[<span class="str">"area"</span>, <span class="str">"rooms"</span>, <span class="str">"age"</span>, <span class="str">"distance_km"</span>, <span class="str">"garden"</span>, <span class="str">"price"</span>]].<span class="fn">corr</span>()[<span class="str">"price"</span>].<span class="fn">drop</span>(<span class="str">"price"</span>).<span class="fn">round</span>(<span class="num">2</span>).<span class="fn">to_dict</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'area': 0.76, 'rooms': 0.64, 'age': -0.1, 'distance_km': -0.28, 'garden': -0.01}</pre>
+</div>
+<div class="figure-block">
+    <div class="output-header"><i class="fas fa-chart-bar"></i> الرسم الناتج</div>
+    <img src="data:image/webp;base64,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" alt="رسم بياني ناتج عن eda.py" loading="lazy">
+</div>
+        <p>
+            المساحة أقوى عامل، والحي يغير مستوى السعر كله (خطوط متوازية تقريبًا في الرسم الأوسط)، والسعر ملتوٍ قليلًا لليمين.
+        </p>
+</section>
+
+<section class="section-card" id="leakage">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-user-secret"></i>
+        فخ تسرّب البيانات: نموذج «مثالي» مزيف
+    </h2>
+        <p>لنجرّب نموذجًا سريعًا بكل الأعمدة الرقمية، بما فيها <code>price_per_m2</code>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>leakage.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_absolute_percentage_error, r2_score
+
+cols = [<span class="str">"area"</span>, <span class="str">"rooms"</span>, <span class="str">"price_per_m2"</span>]
+leaky = <span class="fn">LinearRegression</span>().<span class="fn">fit</span>(train[cols].<span class="fn">fillna</span>(<span class="num">0</span>), train[<span class="str">"price"</span>])
+pred = leaky.<span class="fn">predict</span>(test[cols].<span class="fn">fillna</span>(<span class="num">0</span>))
+<span class="fn">print</span>(<span class="str">f"R² = {r2_score(test['price'], pred):.3f} | MAPE = {mean_absolute_percentage_error(test['price'], pred):.1%}  🤩 ?!"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>R² = 0.965 | MAPE = 8.1%  🤩 ?!</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-user-secret"></i>
+            <div>
+                <strong>نتيجة أجمل من أن تكون حقيقية!</strong> العمود <code>price_per_m2</code> محسوب من <strong>السعر نفسه</strong>
+                (<code>price ÷ area</code>). عندما يُدخل مالك منزله في الموقع لن يكون هذا الرقم متاحًا أصلًا — هو بالضبط ما نحاول تقديره!
+                هذا هو <strong>تسرّب الهدف (Target Leakage)</strong>: النموذج «يغش» في التدريب ويفشل تمامًا في الواقع.
+            </div>
+        </div>
+        <div class="note-box">
+            <strong>🕵️ علامات التسرّب:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> دقة مذهلة بشكل مريب (R² قريب من 1) في مشكلة صعبة.</li>
+                <li><i class="fas fa-angle-left"></i> خاصية واحدة تسيطر على أهمية النموذج كله.</li>
+                <li><i class="fas fa-angle-left"></i> عمود يُحسب أو يُسجل <strong>بعد</strong> معرفة الهدف (تاريخ البيع، سعر المتر، حالة الإلغاء…).</li>
+                <li><i class="fas fa-angle-left"></i> <strong>القاعدة:</strong> لكل خاصية اسأل: «هل ستكون متاحة لحظة التنبؤ؟»</li>
+            </ul>
+        </div>
+        <p>لذلك نعتمد قائمة خصائص صريحة تحتوي فقط ما يعرفه المالك:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>features.py</span>
+    </div>
+<pre>FEATURES = [<span class="str">"area"</span>, <span class="str">"rooms"</span>, <span class="str">"age"</span>, <span class="str">"distance_km"</span>, <span class="str">"district"</span>, <span class="str">"garden"</span>]
+X_train, y_train = train[FEATURES], train[<span class="str">"price"</span>]
+X_test, y_test = test[FEATURES], test[<span class="str">"price"</span>]</pre>
+</div>
+</section>
+
+<section class="section-card" id="features">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-cogs"></i>
+        المعالجة وهندسة الخصائص
+    </h2>
+        <p>
+            نبني <strong>Pipeline</strong> كاملًا: إضافة خصائص جديدة، ثم تعويض النواقص بالوسيط، ثم التطبيع والترميز. كل ذلك يتعلم من التدريب فقط:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>pipeline.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.compose <span class="kw">import</span> ColumnTransformer
+<span class="kw">from</span> sklearn.impute <span class="kw">import</span> SimpleImputer
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline, make_pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> FunctionTransformer, OneHotEncoder, StandardScaler
+
+
+<span class="kw">def</span> <span class="fn">add_features</span>(X):
+    X = X.<span class="fn">copy</span>()
+    X[<span class="str">"area_per_room"</span>] = X[<span class="str">"area"</span>] / X[<span class="str">"rooms"</span>]
+    X[<span class="str">"is_new"</span>] = (X[<span class="str">"age"</span>] &lt;= <span class="num">5</span>).<span class="fn">astype</span>(float)
+    <span class="kw">return</span> X
+
+
+NUM = [<span class="str">"area"</span>, <span class="str">"rooms"</span>, <span class="str">"age"</span>, <span class="str">"distance_km"</span>, <span class="str">"garden"</span>, <span class="str">"area_per_room"</span>, <span class="str">"is_new"</span>]
+prep = <span class="fn">Pipeline</span>([
+    (<span class="str">"features"</span>, <span class="fn">FunctionTransformer</span>(add_features)),
+    (<span class="str">"columns"</span>, <span class="fn">ColumnTransformer</span>([
+        (<span class="str">"num"</span>, <span class="fn">make_pipeline</span>(<span class="fn">SimpleImputer</span>(strategy=<span class="str">"median"</span>), <span class="fn">StandardScaler</span>()), NUM),
+        (<span class="str">"cat"</span>, <span class="fn">OneHotEncoder</span>(handle_unknown=<span class="str">"ignore"</span>), [<span class="str">"district"</span>]),
+    ])),
+])</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>check_pipeline.py</span>
+    </div>
+<pre>Xt = prep.<span class="fn">fit_transform</span>(X_train)
+<span class="fn">print</span>(<span class="str">"الشكل بعد المعالجة:"</span>, Xt.shape)
+<span class="fn">print</span>(<span class="str">"الأعمدة:"</span>, <span class="fn">list</span>(prep.named_steps[<span class="str">"columns"</span>].<span class="fn">get_feature_names_out</span>()))
+<span class="fn">print</span>(<span class="str">"هل بقيت قيم مفقودة؟"</span>, <span class="fn">bool</span>(np.<span class="fn">isnan</span>(Xt).<span class="fn">any</span>()))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الشكل بعد المعالجة: (480, 11)
+الأعمدة: ['num__area', 'num__rooms', 'num__age', 'num__distance_km', 'num__garden', 'num__area_per_room', 'num__is_new', 'cat__district_center', 'cat__district_east', 'cat__district_north', 'cat__district_south']
+هل بقيت قيم مفقودة؟ False</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>خصائص جديدة من المعرفة بالمجال:</strong> <code>area_per_room</code> (رحابة الغرف) و <code>is_new</code> (منزل جديد عمره 5 سنوات أو أقل).
+                هندسة الخصائص الجيدة كثيرًا ما تحسن النموذج أكثر من تغيير الخوارزمية.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="compare">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-trophy"></i>
+        مقارنة النماذج بالتحقق المتقاطع
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>compare.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.compose <span class="kw">import</span> TransformedTargetRegressor
+<span class="kw">from</span> sklearn.dummy <span class="kw">import</span> DummyRegressor
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> GradientBoostingRegressor, RandomForestRegressor
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression, Ridge
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> KFold, cross_validate
+
+models = {
+    <span class="str">"Baseline (median)"</span>: <span class="fn">DummyRegressor</span>(strategy=<span class="str">"median"</span>),
+    <span class="str">"Linear Regression"</span>: <span class="fn">LinearRegression</span>(),
+    <span class="str">"Ridge + log(price)"</span>: <span class="fn">TransformedTargetRegressor</span>(<span class="fn">Ridge</span>(alpha=<span class="num">1</span>), func=np.log, inverse_func=np.exp),
+    <span class="str">"Random Forest"</span>: <span class="fn">RandomForestRegressor</span>(n_estimators=<span class="num">300</span>, min_samples_leaf=<span class="num">3</span>, random_state=<span class="num">0</span>, n_jobs=-<span class="num">1</span>),
+    <span class="str">"Gradient Boosting"</span>: <span class="fn">GradientBoostingRegressor</span>(random_state=<span class="num">0</span>),
+}
+cv = <span class="fn">KFold</span>(<span class="num">5</span>, shuffle=<span class="kw">True</span>, random_state=<span class="num">0</span>)
+<span class="fn">print</span>(<span class="str">f"{'النموذج':&lt;22}{'MAE':&gt;10}{'MAPE':&gt;8}{'R²':&gt;7}"</span>)
+<span class="kw">for</span> name, reg <span class="kw">in</span> models.<span class="fn">items</span>():
+    s = <span class="fn">cross_validate</span>(<span class="fn">Pipeline</span>([(<span class="str">"prep"</span>, prep), (<span class="str">"reg"</span>, reg)]), X_train, y_train, cv=cv,
+                       scoring=[<span class="str">"neg_mean_absolute_error"</span>, <span class="str">"neg_mean_absolute_percentage_error"</span>, <span class="str">"r2"</span>])
+    <span class="fn">print</span>(<span class="str">f"{name:&lt;22}{-s['test_neg_mean_absolute_error'].mean():&gt;10,.0f}"</span>
+          <span class="str">f"{-s['test_neg_mean_absolute_percentage_error'].mean():&gt;8.1%}{s['test_r2'].mean():&gt;7.3f}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>النموذج                      MAE    MAPE     R²
+Baseline (median)        330,258   43.1% -0.033
+Linear Regression         92,390   11.8%  0.918
+Ridge + log(price)        99,859   11.2%  0.869
+Random Forest             97,094   12.3%  0.909
+Gradient Boosting         89,457   11.1%  0.925</pre>
+</div>
+</section>
+
+<section class="section-card" id="tuning">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-sliders-h"></i>
+        ضبط النموذج المختار
+    </h2>
+        <p>نضبط Gradient Boosting بـ <code>RandomizedSearchCV</code> الذي يجرّب توافيق عشوائية بدل كل التوافيق:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>tuning.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> GradientBoostingRegressor
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> KFold, RandomizedSearchCV
+
+pipe = <span class="fn">Pipeline</span>([(<span class="str">"prep"</span>, prep), (<span class="str">"reg"</span>, <span class="fn">GradientBoostingRegressor</span>(random_state=<span class="num">0</span>))])
+space = {
+    <span class="str">"reg__n_estimators"</span>: [<span class="num">100</span>, <span class="num">200</span>, <span class="num">300</span>, <span class="num">500</span>],
+    <span class="str">"reg__learning_rate"</span>: [<span class="num">0.02</span>, <span class="num">0.05</span>, <span class="num">0.1</span>],
+    <span class="str">"reg__max_depth"</span>: [<span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>],
+    <span class="str">"reg__subsample"</span>: [<span class="num">0.8</span>, <span class="num">1.0</span>],
+}
+search = <span class="fn">RandomizedSearchCV</span>(pipe, space, n_iter=<span class="num">15</span>, cv=<span class="fn">KFold</span>(<span class="num">5</span>, shuffle=<span class="kw">True</span>, random_state=<span class="num">0</span>),
+                            scoring=<span class="str">"neg_mean_absolute_error"</span>, random_state=<span class="num">1</span>, n_jobs=-<span class="num">1</span>)
+search.<span class="fn">fit</span>(X_train, y_train)
+<span class="fn">print</span>(<span class="str">"أفضل معاملات:"</span>, {k.<span class="fn">replace</span>(<span class="str">"reg__"</span>, <span class="str">""</span>): v <span class="kw">for</span> k, v <span class="kw">in</span> search.best_params_.<span class="fn">items</span>()})
+<span class="fn">print</span>(<span class="str">f"MAE (تحقق متقاطع) = {-search.best_score_:,.0f}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>أفضل معاملات: {'subsample': 1.0, 'n_estimators': 200, 'max_depth': 3, 'learning_rate': 0.05}
+MAE (تحقق متقاطع) = 88,170</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>التحسن من الضبط متواضع</strong> مقارنة بالنقلة من خط الأساس إلى أي نموذج حقيقي. هذا طبيعي: البيانات الجيدة والخصائص الصحيحة
+                أهم من المعاملات. نعتمد المعاملات الأفضل في النموذج النهائي.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="final">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-flag-checkered"></i>
+        التقييم النهائي وتحليل الأخطاء
+    </h2>
+        <p>الآن فقط، ولمرة واحدة، نفتح بيانات الاختبار:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>final_model.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> GradientBoostingRegressor
+model = <span class="fn">Pipeline</span>([(<span class="str">"prep"</span>, prep), (<span class="str">"reg"</span>, <span class="fn">GradientBoostingRegressor</span>(
+    n_estimators=<span class="num">200</span>, learning_rate=<span class="num">0.05</span>, max_depth=<span class="num">3</span>, subsample=<span class="num">1.0</span>, random_state=<span class="num">0</span>))])
+model.<span class="fn">fit</span>(X_train, y_train)</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>final_eval.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_absolute_error, mean_absolute_percentage_error, r2_score
+
+pred = model.<span class="fn">predict</span>(X_test)
+mae = <span class="fn">mean_absolute_error</span>(y_test, pred)
+mape = <span class="fn">mean_absolute_percentage_error</span>(y_test, pred)
+<span class="fn">print</span>(<span class="str">f"MAE  = {mae:,.0f} ريال"</span>)
+<span class="fn">print</span>(<span class="str">f"MAPE = {mape:.1%}   ← معيار النجاح &lt; 10%: {'✅ تحقق' if mape &lt; 0.10 else '❌ لم يتحقق'}"</span>)
+<span class="fn">print</span>(<span class="str">f"R²   = {r2_score(y_test, pred):.3f}"</span>)
+
+errors = test.<span class="fn">assign</span>(pred=pred, abs_pct=np.<span class="fn">abs</span>(pred - y_test) / y_test * <span class="num">100</span>)
+<span class="fn">print</span>(<span class="str">"\nمتوسط الخطأ % حسب الحي:"</span>)
+<span class="fn">print</span>(errors.<span class="fn">groupby</span>(<span class="str">"district"</span>)[<span class="str">"abs_pct"</span>].<span class="fn">mean</span>().<span class="fn">round</span>(<span class="num">1</span>).<span class="fn">sort_values</span>().<span class="fn">to_string</span>())
+errors[<span class="str">"band"</span>] = pd.<span class="fn">qcut</span>(errors[<span class="str">"price"</span>], <span class="num">4</span>, labels=[<span class="str">"أرخص 25%"</span>, <span class="str">"Q2"</span>, <span class="str">"Q3"</span>, <span class="str">"أغلى 25%"</span>])
+<span class="fn">print</span>(<span class="str">"\nمتوسط الخطأ % حسب شريحة السعر:"</span>)
+<span class="fn">print</span>(errors.<span class="fn">groupby</span>(<span class="str">"band"</span>, observed=<span class="kw">True</span>)[<span class="str">"abs_pct"</span>].<span class="fn">mean</span>().<span class="fn">round</span>(<span class="num">1</span>).<span class="fn">to_string</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>MAE  = 90,143 ريال
+MAPE = 10.7%   ← معيار النجاح &lt; 10%: ❌ لم يتحقق
+R²   = 0.924
+
+متوسط الخطأ % حسب الحي:
+district
+center     8.7
+north      9.6
+south     10.6
+east      13.8
+
+متوسط الخطأ % حسب شريحة السعر:
+band
+أرخص 25%    17.3
+Q2          10.0
+Q3           9.7
+أغلى 25%     5.6</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>error_analysis.py</span>
+    </div>
+<pre><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> sklearn.inspection <span class="kw">import</span> permutation_importance
+
+pred = model.<span class="fn">predict</span>(X_test)
+fig, (ax1, ax2) = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">13</span>, <span class="num">4.5</span>))
+ax1.<span class="fn">scatter</span>(y_test / <span class="num">1</span>e6, pred / <span class="num">1</span>e6, alpha=<span class="num">0.6</span>, c=<span class="str">"#4C72B0"</span>)
+ax1.<span class="fn">plot</span>([<span class="num">0.2</span>, <span class="num">2.6</span>], [<span class="num">0.2</span>, <span class="num">2.6</span>], <span class="str">"--"</span>, color=<span class="str">"red"</span>)
+ax1.<span class="fn">fill_between</span>([<span class="num">0.2</span>, <span class="num">2.6</span>], [<span class="num">0.18</span>, <span class="num">2.34</span>], [<span class="num">0.22</span>, <span class="num">2.86</span>], color=<span class="str">"green"</span>, alpha=<span class="num">0.08</span>, label=<span class="str">"±10% zone"</span>)
+ax1.<span class="fn">set_xlabel</span>(<span class="str">"actual (M SAR)"</span>)
+ax1.<span class="fn">set_ylabel</span>(<span class="str">"predicted (M SAR)"</span>)
+ax1.<span class="fn">set_title</span>(<span class="str">"Test set: predicted vs actual"</span>)
+ax1.<span class="fn">legend</span>()
+
+imp = <span class="fn">permutation_importance</span>(model, X_test, y_test, n_repeats=<span class="num">10</span>, random_state=<span class="num">0</span>, scoring=<span class="str">"neg_mean_absolute_error"</span>)
+order = imp.importances_mean.<span class="fn">argsort</span>()
+ax2.<span class="fn">barh</span>(np.<span class="fn">array</span>(X_test.columns)[order], imp.importances_mean[order] / <span class="num">1000</span>, color=<span class="str">"#d4a017"</span>)
+ax2.<span class="fn">set_title</span>(<span class="str">"Permutation importance (MAE increase, K SAR)"</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+</div>
+<div class="figure-block">
+    <div class="output-header"><i class="fas fa-chart-bar"></i> الرسم الناتج</div>
+    <img src="data:image/webp;base64,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" alt="رسم بياني ناتج عن error_analysis.py" loading="lazy">
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>أهمية التبديل (Permutation Importance):</strong> نخلط قيم عمود واحد عشوائيًا ونقيس كم يسوء النموذج. كلما زاد الخطأ، كانت الخاصية أهم.
+                الطريقة تعمل مع أي نموذج، وهي أوضح طريقة لشرح «على ماذا يعتمد النموذج» للإدارة.
+            </div>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>تحليل الأخطاء يوجّه الخطوة القادمة:</strong> نسبة الخطأ أعلى في المنازل الأرخص (لأن الخطأ نفسه بالريال يمثل نسبة أكبر من سعر صغير).
+                هذا يستحق ذكره في واجهة الموقع: «التقدير أقل دقة لأرخص ربع المنازل (تحت 700 ألف تقريبًا)».
+            </div>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> لم نحقق معيار النجاح… ماذا نفعل؟</p>
+        <p>
+            MAPE على الاختبار أعلى قليلًا من 10%. هذا يحدث كثيرًا في المشاريع الحقيقية، والتصرف الاحترافي <strong>ليس</strong> أن نعيد التجربة
+            على بيانات الاختبار حتى تتحسن النتيجة (فهذا تسرّب من نوع آخر)، بل أن نفهم السبب ونعرض الخيارات بصدق:
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الملاحظة</th><th>المعنى</th><th>الخيار المقترح للإدارة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>كل النماذج متقاربة (MAPE 11–12% في التحقق المتقاطع)</td><td>الحد يأتي من البيانات لا من الخوارزمية: جزء من السعر لا تفسره الخصائص المتاحة</td><td>جمع خصائص جديدة (الطابق، التشطيب، الإطلالة، القرب من الخدمات)</td></tr>
+                    <tr><td>الخطأ 6–10% للمنازل فوق 700 ألف</td><td>المعيار متحقق لثلاثة أرباع المنازل</td><td>إطلاق الخدمة لهذه الشريحة أولًا</td></tr>
+                    <tr><td>الخطأ حوالي 17% لأرخص ربع</td><td>الخطأ بالريال ثابت تقريبًا فيبدو كبيرًا نسبيًا</td><td>عرض مدى أوسع لهذه الشريحة أو تحويلها لمثمّن</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>الصدق في عرض النتائج</strong> أهم مهارة لمحلل البيانات. نموذج أفضل من التقدير اليدوي بيومين، ومعروف الحدود بدقة،
+                أكثر فائدة من وعد بدقة غير حقيقية.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="deploy">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-rocket"></i>
+        النشر: تقديم النموذج كـ API
+    </h2>
+        <p>
+            ندرّب النموذج النهائي، ونحفظه بـ <code>joblib</code>، ثم نبني خدمة FastAPI (كما تعلمت في مشروع 2 بالمستوى المتقدم)
+            يستدعيها الموقع. نضع الدالة <code>add_features</code> في ملف <code>features.py</code> حتى يجدها <code>joblib</code> عند تحميل النموذج.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>serve_api.py</span>
+    </div>
+<pre><span class="kw">import</span> joblib
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> fastapi.testclient <span class="kw">import</span> TestClient
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> typing <span class="kw">import</span> Literal
+
+app = <span class="fn">FastAPI</span>(title=<span class="str">"House Price Estimator"</span>)
+model = joblib.<span class="fn">load</span>(<span class="str">"house_model.joblib"</span>)
+
+
+<span class="kw">class</span> <span class="fn">House</span>(BaseModel):
+    area: float = <span class="fn">Field</span>(gt=<span class="num">40</span>, lt=<span class="num">1500</span>, description=<span class="str">"المساحة بالمتر المربع"</span>)
+    rooms: int = <span class="fn">Field</span>(ge=<span class="num">1</span>, le=<span class="num">15</span>)
+    age: float | <span class="kw">None</span> = <span class="fn">Field</span>(default=<span class="kw">None</span>, ge=<span class="num">0</span>, le=<span class="num">100</span>)
+    distance_km: float | <span class="kw">None</span> = <span class="fn">Field</span>(default=<span class="kw">None</span>, ge=<span class="num">0</span>, le=<span class="num">80</span>)
+    district: Literal[<span class="str">"north"</span>, <span class="str">"center"</span>, <span class="str">"east"</span>, <span class="str">"south"</span>]
+    garden: bool = <span class="kw">False</span>
+
+
+@app.<span class="fn">post</span>(<span class="str">"/estimate"</span>)
+<span class="kw">def</span> <span class="fn">estimate</span>(house: House):
+    row = pd.<span class="fn">DataFrame</span>([house.<span class="fn">model_dump</span>()]).<span class="fn">assign</span>(garden=<span class="kw">lambda</span> d: d[<span class="str">"garden"</span>].<span class="fn">astype</span>(int))
+    price = <span class="fn">float</span>(model.<span class="fn">predict</span>(row)[<span class="num">0</span>])
+    <span class="kw">return</span> {<span class="str">"estimate"</span>: <span class="fn">round</span>(price, -<span class="num">3</span>), <span class="str">"range"</span>: [<span class="fn">round</span>(price * <span class="num">0.9</span>, -<span class="num">3</span>), <span class="fn">round</span>(price * <span class="num">1.1</span>, -<span class="num">3</span>)]}
+
+
+client = <span class="fn">TestClient</span>(app)
+r = client.<span class="fn">post</span>(<span class="str">"/estimate"</span>, json={<span class="str">"area"</span>: <span class="num">300</span>, <span class="str">"rooms"</span>: <span class="num">5</span>, <span class="str">"age"</span>: <span class="num">4</span>, <span class="str">"distance_km"</span>: <span class="num">6</span>,
+                                   <span class="str">"district"</span>: <span class="str">"center"</span>, <span class="str">"garden"</span>: <span class="kw">True</span>})
+<span class="fn">print</span>(r.status_code, r.<span class="fn">json</span>())
+r = client.<span class="fn">post</span>(<span class="str">"/estimate"</span>, json={<span class="str">"area"</span>: <span class="num">220</span>, <span class="str">"rooms"</span>: <span class="num">4</span>, <span class="str">"district"</span>: <span class="str">"south"</span>})   <span class="cm"># بدون العمر والمسافة</span>
+<span class="fn">print</span>(r.status_code, r.<span class="fn">json</span>())
+r = client.<span class="fn">post</span>(<span class="str">"/estimate"</span>, json={<span class="str">"area"</span>: <span class="num">20</span>, <span class="str">"rooms"</span>: <span class="num">4</span>, <span class="str">"district"</span>: <span class="str">"mars"</span>})
+<span class="fn">print</span>(r.status_code, [e[<span class="str">"loc"</span>][-<span class="num">1</span>] <span class="kw">for</span> e <span class="kw">in</span> r.<span class="fn">json</span>()[<span class="str">"detail"</span>]])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>200 {'estimate': 1686000.0, 'range': [1518000.0, 1855000.0]}
+200 {'estimate': 585000.0, 'range': [527000.0, 644000.0]}
+422 ['area', 'district']</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>لاحظ الطلب الثاني:</strong> المالك لم يُدخل العمر والمسافة، ومع ذلك عمل النموذج لأن <code>SimpleImputer</code> داخل الـ Pipeline
+                يعوّضها بالوسيط تلقائيًا. وأعطينا مدى ±10% بدل رقم واحد لأن أي تقدير فيه هامش خطأ.
+            </div>
+        </div>
+
+        <div class="note-box">
+            <strong>🔄 بعد النشر — عمل لا ينتهي:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> <strong>المراقبة:</strong> سجّل كل تقدير، وقارنه بسعر البيع الفعلي عندما يتوفر.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>انجراف البيانات:</strong> الأسعار تتغير مع السوق؛ أعد التدريب كل بضعة أشهر.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>الإصدارات:</strong> احفظ كل نموذج برقم إصدار مع بيانات تدريبه ومقاييسه.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>العدالة:</strong> تأكد أن الخطأ ليس أكبر بكثير لحي معين أو نوع منازل معين.</li>
+            </ul>
+        </div>
+        <div class="note-box">
+            <strong>🚀 تحديات لتطوير المشروع:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> أضف خصائص جديدة (الطابق، المسبح، القرب من المدارس) وقِس أثرها.</li>
+                <li><i class="fas fa-angle-left"></i> جرّب <code>HistGradientBoostingRegressor</code> ومكتبة XGBoost أو LightGBM.</li>
+                <li><i class="fas fa-angle-left"></i> اصنع واجهة بسيطة بـ Streamlit أو صفحة HTML تستدعي الـ API.</li>
+                <li><i class="fas fa-angle-left"></i> طبّق نفس الخطوات على بيانات عقارية حقيقية من Kaggle.</li>
+            </ul>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">10</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! استرداد المبلغ لا يحدث إلا بعد الإلغاء، فهو غير متاح لحظة التنبؤ." data-hint="اسأل عن كل خاصية: هل تكون معروفة قبل أن نعرف النتيجة؟">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">التسرّب</span>
+    </div>
+    <p class="exercise-question">تبني نموذجًا للتنبؤ بإلغاء حجوزات الفنادق. أي خاصية تسبب <strong>تسرّب الهدف</strong>؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> عدد أيام الحجز المسبق</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> تاريخ استرداد المبلغ للعميل</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> عدد النزلاء</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> نوع الغرفة</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تفكر كمهندس تعلم آلة." data-hint="الدقة المريبة علامة تسرّب، والبيانات تتغير بعد النشر.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">يجب فصل بيانات الاختبار قبل الاستكشاف وهندسة الخصائص.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">R² = 0.99 في مشكلة صعبة دليل مؤكد على نموذج ممتاز.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">وضع SimpleImputer داخل الـ Pipeline يسمح للنموذج بالتعامل مع مدخلات ناقصة وقت الاستخدام.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">Permutation Importance تعمل مع أي نوع نموذج.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">بعد نشر النموذج لا يحتاج أي متابعة أو إعادة تدريب.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! الأخطاء 50 و 80 و 0 (متوسط 43.3)، والنسب 10% و 10% و 0% (متوسط 6.7%)." data-hint="MAE = متوسط الأخطاء المطلقة، و MAPE = متوسط (الخطأ ÷ القيمة الحقيقية).">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>احسب</h4>
+        <span class="exercise-tag">مقاييس الخطأ</span>
+    </div>
+    <p class="exercise-question">ثلاثة منازل أسعارها الحقيقية 500 و 800 و 1000 ألف، والتقديرات 550 و 720 و 1000 ألف. احسب:</p>
+    <div class="code-fill">
+        <div class="line"><span class="cm">MAE (بالألف) =</span><input type="text" class="blank-input" data-answers="43.3||43.33||43" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">MAPE % =</span><input type="text" class="blank-input" data-answers="6.7||6.67||6.66||7" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذه الأسطر الأربعة هي الجسر بين النوتبوك والإنتاج." data-hint="الحفظ &lt;code&gt;dump&lt;/code&gt;، والتحميل &lt;code&gt;load&lt;/code&gt;، والتنبؤ &lt;code&gt;predict&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">حفظ النموذج وتحميله</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لحفظ النموذج ثم تحميله داخل الـ API والتنبؤ:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">import</span> </span><input type="text" class="blank-input" data-answers="joblib" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span>joblib.</span><input type="text" class="blank-input" data-answers="dump" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"><span>(model, <span class="str">'house_model.joblib'</span>)</span></div>
+        <div class="line"><span>model = joblib.</span><input type="text" class="blank-input" data-answers="load" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'house_model.joblib'</span>)</span></div>
+        <div class="line"><span>price = model.</span><input type="text" class="blank-input" data-answers="predict" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"><span>(new_house_df)[<span class="num">0</span>]</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! مبروك، أنهيت التخصص كاملًا 🎓" data-hint="بيانات الاختبار تُفصل مبكرًا جدًا ولا تُستخدم إلا في النهاية.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب مراحل مشروع تعلم الآلة من البداية إلى الإنتاج. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) Pipeline وهندسة الخصائص ومقارنة النماذج</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="6" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">6) الحفظ والنشر كـ API والمراقبة</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">1) تحديد المشكلة ومقياس النجاح والخصائص المسموحة</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">5) الضبط ثم التقييم النهائي مرة واحدة على الاختبار</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">3) الاستكشاف وكشف التسرّب على التدريب</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="6">
+            <span class="order-num">6</span>
+            <span style="flex:1; white-space:pre;">2) فصل بيانات الاختبار</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مقدّر أسعار المنازل التفاعلي</div>
+    <p style="color:var(--text-light); font-size:0.95em;">جرّب نموذجًا حقيقيًا: هذا المقدّر يستخدم معاملات <strong>نموذج الانحدار الخطي</strong> المدرّب على بيانات المشروع (نسخة مبسطة من النموذج النهائي، متوسط خطئه حوالي 90 ألف ريال). غيّر المواصفات وشاهد أثر كل خاصية على السعر.</p>
+    <div class="lab-row">
+        <label>المساحة م²:</label><input type="range" id="hArea" min="100" max="500" step="10" value="300" oninput="estimateHouse()" style="flex:1;"><code id="hAreaV" style="min-width:48px;"></code>
+    </div>
+    <div class="lab-row">
+        <label>الغرف:</label><input type="range" id="hRooms" min="2" max="9" step="1" value="5" oninput="estimateHouse()" style="flex:1;"><code id="hRoomsV" style="min-width:48px;"></code>
+        <label>العمر (سنة):</label><input type="range" id="hAge" min="0" max="34" step="1" value="5" oninput="estimateHouse()" style="flex:1;"><code id="hAgeV" style="min-width:48px;"></code>
+    </div>
+    <div class="lab-row">
+        <label>البعد عن المركز (كم):</label><input type="range" id="hDist" min="0.5" max="30" step="0.5" value="6" oninput="estimateHouse()" style="flex:1;"><code id="hDistV" style="min-width:48px;"></code>
+    </div>
+    <div class="lab-row">
+        <label>الحي:</label>
+        <select class="lab-select" id="hDistrict" onchange="estimateHouse()" style="direction:ltr;">
+            <option value="north">north</option><option value="center" selected>center</option><option value="east">east</option><option value="south">south</option>
+        </select>
+        <label><input type="checkbox" id="hGarden" onchange="estimateHouse()" checked> حديقة</label>
+    </div>
+    <div class="lab-console" id="hOut" style="direction:rtl; text-align:right; font-family:Cairo, sans-serif;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">11</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> تحويل طلب عمل إلى مشكلة تعلم آلة بمقياس ومعيار نجاح واضحين.</li>
+                <li><i class="fas fa-check"></i> فصل بيانات الاختبار مبكرًا والاستكشاف على التدريب فقط.</li>
+                <li><i class="fas fa-check"></i> اكتشاف تسرّب الهدف وقاعدة «هل الخاصية متاحة لحظة التنبؤ؟».</li>
+                <li><i class="fas fa-check"></i> Pipeline كامل بهندسة خصائص وتعويض نواقص وتطبيع وترميز.</li>
+                <li><i class="fas fa-check"></i> مقارنة النماذج بالتحقق المتقاطع وضبطها بـ RandomizedSearchCV.</li>
+                <li><i class="fas fa-check"></i> التقييم النهائي وتحليل الأخطاء حسب الشرائح و Permutation Importance.</li>
+                <li><i class="fas fa-check"></i> حفظ النموذج ونشره كـ API بـ FastAPI مع تحقق المدخلات.</li>
+                <li><i class="fas fa-check"></i> متطلبات ما بعد النشر: المراقبة وإعادة التدريب والعدالة.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> اكتب قائمة الخصائص المسموحة صراحة في بداية كل مشروع.</li>
+                <li><i class="fas fa-lightbulb"></i> شك في أي نتيجة مذهلة قبل أن تحتفل بها.</li>
+                <li><i class="fas fa-lightbulb"></i> اعرض التقدير كمدى لا كرقم واحد.</li>
+                <li><i class="fas fa-lightbulb"></i> انشر المشروعين على GitHub مع README ورسوم — إنهما أقوى ما في ملف أعمالك.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> 🎓 <strong>مبروك! أنهيت تخصص تحليل البيانات و AI.</strong> الخطوة التالية: التعلم العميق (PyTorch)، أو مسابقات Kaggle، أو مشروع حقيقي ببيانات من عملك.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="project1.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى: مشروع 1 — التحليل الاستكشافي</span>
+        </a>
+        <a href="../index.html" class="nav-link next">
+            <span>العودة إلى صفحة تخصص تحليل البيانات</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · مشروع أسعار المنازل
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '100%';
+            text.textContent = '100% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مقدّر الأسعار ========== */
+    const HM = {"cols": ["area", "rooms", "age", "distance_km", "garden", "district_center", "district_east", "district_north", "district_south"], "coef": [3960.02, 23054.51, -5566.5, -9361.76, 63032.85, 332301.97, -155252.36, 78486.54, -255536.15], "b": -4313.5};
+
+    function estimateHouse() {
+        const v = {
+            area: +document.getElementById('hArea').value, rooms: +document.getElementById('hRooms').value,
+            age: +document.getElementById('hAge').value, distance_km: +document.getElementById('hDist').value,
+            garden: document.getElementById('hGarden').checked ? 1 : 0,
+        };
+        const district = document.getElementById('hDistrict').value;
+        ['Area', 'Rooms', 'Age', 'Dist'].forEach((k, i) => {
+            document.getElementById('h' + k + 'V').textContent = [v.area, v.rooms, v.age, v.distance_km][i];
+        });
+        let price = HM.b;
+        const parts = [];
+        HM.cols.forEach((c, i) => {
+            const x = c.startsWith('district_') ? (c === 'district_' + district ? 1 : 0) : v[c];
+            const contrib = HM.coef[i] * x;
+            price += contrib;
+            if (x) parts.push([c, contrib]);
+        });
+        const fmt = n => Math.round(n).toLocaleString('en-US');
+        const labels = { area: 'المساحة', rooms: 'الغرف', age: 'العمر', distance_km: 'البعد عن المركز', garden: 'الحديقة' };
+        document.getElementById('hOut').innerHTML =
+            `💰 السعر التقديري: <strong style="color:var(--gold); font-size:1.2em;">${fmt(Math.max(price, 250000))} ريال</strong>` +
+            `<br>المدى المتوقع (±10%): ${fmt(price * 0.9)} – ${fmt(price * 1.1)} ريال<br><br>` +
+            `<span style="color:#aaa">كيف تكوّن السعر (معاملات النموذج الخطي):</span><br>` +
+            `الأساس: ${fmt(HM.b)}<br>` +
+            parts.map(([c, x]) => `${c.startsWith('district_') ? 'الحي ' + c.slice(9) : labels[c]}: ${x >= 0 ? '+' : ''}${fmt(x)}`).join('<br>');
+    }
+
+    document.addEventListener('DOMContentLoaded', estimateHouse);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2503 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مشروع 2: مراقب الأسعار والتنبيهات | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص الأتمتة</a>
+        <span class="sep">/</span>
+        <span>مراقب الأسعار</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-tags"></i>
+            مشروع 2 · المشروع الختامي
+        </div>
+        <h1 class="lesson-title">مشروع 2: مراقب الأسعار والتنبيهات</h1>
+        <p class="lesson-intro">
+            تريد شراء لابتوب وسماعة وشاشة، لكن بالسعر المناسب. بدل فتح المتجر كل يوم، ستبني <strong>مراقبًا ذكيًا</strong> يزور صفحات المنتجات يوميًا، ويستخرج السعر وحالة التوفر، ويحفظ <strong>تاريخ الأسعار في قاعدة SQLite</strong>، ويرسل لك تنبيهًا فقط عندما يستحق الأمر: الوصول للسعر المستهدف، أو انخفاض كبير، أو أقل سعر، أو عودة المنتج للتوفر — دون تكرار، ودون أن يتوقف إذا غيّر الموقع تصميمه. ثم ترسم تاريخ الأسعار وتجدول المراقب.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 3–4 ساعات</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 لا تفوّت أي تخفيض</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 مشروع ختامي</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد المشروع 1</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#brief">1. موجز المشروع</a>
+            <a href="#setup">2. المتجر والقائمة</a>
+            <a href="#fetcher">3. الجلب والتحليل</a>
+            <a href="#storage">4. قاعدة البيانات</a>
+            <a href="#rules">5. قواعد التنبيه</a>
+            <a href="#run">6. المحاكاة</a>
+            <a href="#chart">7. الرسم البياني</a>
+            <a href="#notify">8. التنبيهات الحقيقية</a>
+            <a href="#tests">9. الاختبارات</a>
+            <a href="#deploy">10. الجدولة والتطوير</a>
+            <a href="#exercises">11. تمارين تفاعلية</a>
+            <a href="#summary">12. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="brief">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-clipboard-list"></i>
+        موجز المشروع والمتطلبات
+    </h2>
+        <p>
+            المراقب يعمل مرة يوميًا (بالجدولة)، ويمر على «قائمة المراقبة» ويفعل لكل منتج: <strong>جلب ← تحليل ← حفظ ← تقييم ← تنبيه</strong>.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الملف</th><th>المسؤولية</th><th>من الدرس</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>watchlist.json</code></td><td>المنتجات، والسعر المستهدف، ونسبة الانخفاض المهمة، ورابط التنبيهات</td><td>1</td></tr>
+                    <tr><td><code>fetcher.py</code></td><td>طلب الصفحة واستخراج السعر والتوفر، وإعادة المحاولة</td><td>4، 6</td></tr>
+                    <tr><td><code>storage.py</code></td><td>تاريخ الأسعار والتنبيهات المرسلة في SQLite</td><td>جديد</td></tr>
+                    <tr><td><code>rules.py</code></td><td>متى يستحق التغيير تنبيهًا (دالة نقية بلا شبكة ولا ملفات)</td><td>5</td></tr>
+                    <tr><td><code>notifier.py</code></td><td>صياغة الرسالة وإرسالها لـ Slack/Discord أو طباعتها</td><td>5</td></tr>
+                    <tr><td><code>monitor.py</code></td><td>المنسّق وواجهة الأوامر</td><td>7، 8</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p><strong>معايير القبول:</strong></p>
+        <ul>
+            <li>تنبيه الهدف يُرسل <strong>عند عبور</strong> السعر المستهدف، لا كل يوم يبقى فيه تحته.</li>
+            <li>المنتج غير المتوفر لا يولّد تنبيهات أسعار (لا تستطيع الشراء به)، وعودته للتوفر تستحق تنبيهًا.</li>
+            <li>إذا غيّر الموقع تصميم صفحة منتج، يُسجَّل الخطأ ويكمل المراقب بقية المنتجات.</li>
+            <li>تشغيل المراقب مرتين في اليوم نفسه لا يكرر أي تنبيه، والتنبيه الذي فشل إرساله يُعاد غدًا.</li>
+            <li>تنبيه واحد يجمع كل الأسباب لكل منتج، لا رسالة لكل سبب.</li>
+        </ul>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>قبل مراقبة متجر حقيقي:</strong> راجع شروطه و robots.txt (الدرس 6)، وابحث عن API رسمية أو خدمة تنبيهات أسعار يوفرها المتجر نفسه.
+                المراقب يطلب صفحة واحدة لكل منتج <strong>مرة يوميًا</strong> — هذا حمل لا يُذكر، أما مئات الطلبات في الدقيقة فليست مقبولة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="setup">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-store"></i>
+        المتجر التجريبي وقائمة المراقبة
+    </h2>
+        <p>
+            متجر Flask تجريبي <strong>تتغير أسعاره كل يوم</strong> على مدى عشرة أيام، ليختبر المراقب في كل الحالات: انخفاضات صغيرة وكبيرة، ونفاد المخزون،
+            ويوم واحد <strong>يغيّر فيه الموقع تصميم صفحة الشاشة</strong> (يصبح الصنف <code>amount</code> بدل <code>price</code>). شغّله بـ <code>python price_site.py</code>:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>price_site.py</span>
+    </div>
+<pre><span class="str">"""متجر تجريبي تتغير أسعاره يوميًا — شغّله بـ: python price_site.py"""</span>
+<span class="kw">from</span> flask <span class="kw">import</span> Flask, abort
+
+app = <span class="fn">Flask</span>(__name__)
+state = {<span class="str">"day"</span>: <span class="num">0</span>}          <span class="cm"># اليوم الحالي في المحاكاة (0 إلى 9)</span>
+
+<span class="cm"># (السعر، متوفر؟) لكل يوم من الأيام العشرة</span>
+TIMELINE = {
+    <span class="num">1</span>: (<span class="str">"لابتوب نور 14"</span>, [(<span class="num">3299</span>, <span class="num">1</span>), (<span class="num">3299</span>, <span class="num">1</span>), (<span class="num">3249</span>, <span class="num">1</span>), (<span class="num">3249</span>, <span class="num">1</span>), (<span class="num">3199</span>, <span class="num">1</span>),
+                          (<span class="num">2999</span>, <span class="num">1</span>), (<span class="num">2999</span>, <span class="num">1</span>), (<span class="num">3099</span>, <span class="num">1</span>), (<span class="num">2949</span>, <span class="num">1</span>), (<span class="num">2949</span>, <span class="num">1</span>)]),
+    <span class="num">2</span>: (<span class="str">"سماعة هدى اللاسلكية"</span>, [(<span class="num">249.5</span>, <span class="num">1</span>), (<span class="num">249.5</span>, <span class="num">1</span>), (<span class="num">224</span>, <span class="num">1</span>), (<span class="num">224</span>, <span class="num">1</span>), (<span class="num">224</span>, <span class="num">0</span>),
+                                (<span class="num">224</span>, <span class="num">0</span>), (<span class="num">199</span>, <span class="num">1</span>), (<span class="num">199</span>, <span class="num">1</span>), (<span class="num">209</span>, <span class="num">1</span>), (<span class="num">209</span>, <span class="num">1</span>)]),
+    <span class="num">3</span>: (<span class="str">"شاشة أفق 27 بوصة"</span>, [(<span class="num">1150</span>, <span class="num">1</span>), (<span class="num">1150</span>, <span class="num">1</span>), (<span class="num">1150</span>, <span class="num">1</span>), (<span class="num">1099</span>, <span class="num">1</span>), (<span class="num">1099</span>, <span class="num">1</span>),
+                             (<span class="num">1099</span>, <span class="num">1</span>), (<span class="num">1049</span>, <span class="num">1</span>), (<span class="num">1049</span>, <span class="num">1</span>), (<span class="num">1049</span>, <span class="num">1</span>), (<span class="num">989</span>, <span class="num">1</span>)]),
+}
+
+
+@app.<span class="fn">get</span>(<span class="str">"/item/&lt;int:item_id&gt;"</span>)
+<span class="kw">def</span> <span class="fn">item</span>(item_id):
+    <span class="kw">if</span> item_id <span class="kw">not</span> <span class="kw">in</span> TIMELINE:
+        <span class="fn">abort</span>(<span class="num">404</span>)
+    name, prices = TIMELINE[item_id]
+    price, in_stock = prices[state[<span class="str">"day"</span>]]
+    price_class = <span class="str">"amount"</span> <span class="kw">if</span> (item_id == <span class="num">3</span> <span class="kw">and</span> state[<span class="str">"day"</span>] == <span class="num">3</span>) <span class="kw">else</span> <span class="str">"price"</span>   <span class="cm"># يوم غيّر فيه الموقع تصميمه!</span>
+    stock = <span class="str">'&lt;span class="stock in"&gt;متوفر&lt;/span&gt;'</span> <span class="kw">if</span> in_stock <span class="kw">else</span> <span class="str">'&lt;span class="stock out"&gt;نفد المخزون&lt;/span&gt;'</span>
+    <span class="kw">return</span> (<span class="str">f'&lt;!doctype html&gt;&lt;html lang="ar" dir="rtl"&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;title&gt;{name}&lt;/title&gt;&lt;/head&gt;&lt;body&gt;'</span>
+            <span class="str">f'&lt;h1 class="title"&gt;{name}&lt;/h1&gt;&lt;span class="{price_class}"&gt;{price:,.2f} ر.س&lt;/span&gt;{stock}&lt;/body&gt;&lt;/html&gt;'</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    app.<span class="fn">run</span>(port=<span class="num">5006</span>)</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>make_watchlist.py</span>
+    </div>
+<pre><span class="kw">import</span> json
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+BASE = <span class="str">"http://127.0.0.1:5006"</span>
+<span class="fn">Path</span>(<span class="str">"watchlist.json"</span>).<span class="fn">write_text</span>(json.<span class="fn">dumps</span>({
+    <span class="str">"webhook"</span>: <span class="kw">None</span>,                        <span class="cm"># ضع رابط Slack أو Discord هنا، أو null للطباعة</span>
+    <span class="str">"items"</span>: [
+        {<span class="str">"id"</span>: <span class="str">"laptop"</span>, <span class="str">"name"</span>: <span class="str">"لابتوب نور 14"</span>, <span class="str">"url"</span>: <span class="str">f"{BASE}/item/1"</span>, <span class="str">"target"</span>: <span class="num">2999</span>, <span class="str">"drop_pct"</span>: <span class="num">5</span>},
+        {<span class="str">"id"</span>: <span class="str">"headset"</span>, <span class="str">"name"</span>: <span class="str">"سماعة هدى اللاسلكية"</span>, <span class="str">"url"</span>: <span class="str">f"{BASE}/item/2"</span>, <span class="str">"target"</span>: <span class="num">199</span>, <span class="str">"drop_pct"</span>: <span class="num">8</span>},
+        {<span class="str">"id"</span>: <span class="str">"monitor"</span>, <span class="str">"name"</span>: <span class="str">"شاشة أفق 27 بوصة"</span>, <span class="str">"url"</span>: <span class="str">f"{BASE}/item/3"</span>, <span class="str">"target"</span>: <span class="num">999</span>, <span class="str">"drop_pct"</span>: <span class="num">10</span>},
+    ],
+}, ensure_ascii=<span class="kw">False</span>, indent=<span class="num">2</span>), encoding=<span class="str">"utf-8"</span>)</pre>
+</div>
+        <p>
+            لاحظ أن لكل منتج نسبة انخفاض مختلفة: 5% من سعر لابتوب (≈ 165 ريالًا) تستحق الانتباه، بينما 5% من سعر سماعة (12 ريالًا) لا تستحق إزعاجك.
+        </p>
+</section>
+
+<section class="section-card" id="fetcher">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-download"></i>
+        الوحدة 1: الجلب والتحليل
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>fetcher.py</span>
+    </div>
+<pre><span class="str">"""جلب السعر وحالة التوفر من صفحة منتج."""</span>
+<span class="kw">import</span> re
+<span class="kw">import</span> time
+
+<span class="kw">import</span> requests
+<span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+
+<span class="kw">class</span> <span class="fn">FetchError</span>(Exception):
+    <span class="str">"""فشل قراءة السعر من الصفحة (شبكة، أو تغيّر تصميم الصفحة)."""</span>
+
+
+<span class="kw">def</span> <span class="fn">parse_price</span>(text):
+    <span class="kw">match</span> = re.<span class="fn">search</span>(<span class="str">r"\d[\d,]*(?:\.\d+)?"</span>, text)
+    <span class="kw">if</span> <span class="kw">not</span> <span class="kw">match</span>:
+        <span class="kw">raise</span> <span class="fn">FetchError</span>(<span class="str">f"لا يوجد رقم في {text!r}"</span>)
+    <span class="kw">return</span> <span class="fn">float</span>(<span class="kw">match</span>.<span class="fn">group</span>().<span class="fn">replace</span>(<span class="str">","</span>, <span class="str">""</span>))
+
+
+<span class="kw">def</span> <span class="fn">parse_page</span>(html, price_selector, stock_selector):
+    soup = <span class="fn">BeautifulSoup</span>(html, <span class="str">"html.parser"</span>)
+    price_el = soup.<span class="fn">select_one</span>(price_selector)
+    <span class="kw">if</span> price_el <span class="kw">is</span> <span class="kw">None</span>:
+        <span class="kw">raise</span> <span class="fn">FetchError</span>(<span class="str">f"العنصر {price_selector!r} غير موجود — هل تغيّر تصميم الصفحة؟"</span>)
+    stock_el = soup.<span class="fn">select_one</span>(stock_selector)
+    in_stock = stock_el <span class="kw">is</span> <span class="kw">None</span> <span class="kw">or</span> <span class="str">"out"</span> <span class="kw">not</span> <span class="kw">in</span> stock_el.<span class="fn">get</span>(<span class="str">"class"</span>, [])
+    <span class="kw">return</span> <span class="fn">parse_price</span>(price_el.<span class="fn">get_text</span>()), in_stock
+
+
+<span class="kw">def</span> <span class="fn">fetch</span>(session, item, retries=<span class="num">3</span>, wait=<span class="num">0.2</span>):
+    <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, retries + <span class="num">1</span>):
+        <span class="kw">try</span>:
+            r = session.<span class="fn">get</span>(item[<span class="str">"url"</span>], timeout=<span class="num">10</span>)
+            r.<span class="fn">raise_for_status</span>()
+            <span class="kw">return</span> <span class="fn">parse_page</span>(r.text, item.<span class="fn">get</span>(<span class="str">"price_selector"</span>, <span class="str">".price"</span>), item.<span class="fn">get</span>(<span class="str">"stock_selector"</span>, <span class="str">".stock"</span>))
+        <span class="kw">except</span> (requests.ConnectionError, requests.Timeout) <span class="kw">as</span> e:
+            <span class="kw">if</span> attempt == retries:
+                <span class="kw">raise</span> <span class="fn">FetchError</span>(<span class="str">f"الشبكة: {type(e).__name__}"</span>) <span class="kw">from</span> e
+            time.<span class="fn">sleep</span>(wait * attempt)
+        <span class="kw">except</span> requests.HTTPError <span class="kw">as</span> e:
+            <span class="kw">raise</span> <span class="fn">FetchError</span>(<span class="str">f"HTTP {e.response.status_code}"</span>) <span class="kw">from</span> e</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>try_fetcher.py</span>
+    </div>
+<pre><span class="kw">import</span> json
+
+<span class="kw">import</span> requests
+
+<span class="kw">import</span> fetcher
+<span class="kw">import</span> price_site
+
+watchlist = json.<span class="fn">loads</span>(<span class="fn">open</span>(<span class="str">"watchlist.json"</span>, encoding=<span class="str">"utf-8"</span>).<span class="fn">read</span>())
+session = requests.<span class="fn">Session</span>()
+
+<span class="kw">for</span> day <span class="kw">in</span> [<span class="num">0</span>, <span class="num">3</span>]:
+    price_site.state[<span class="str">"day"</span>] = day
+    <span class="fn">print</span>(<span class="str">f"── اليوم {day + 1} ──"</span>)
+    <span class="kw">for</span> item <span class="kw">in</span> watchlist[<span class="str">"items"</span>]:
+        <span class="kw">try</span>:
+            price, in_stock = fetcher.<span class="fn">fetch</span>(session, item)
+            <span class="fn">print</span>(<span class="str">f"   ✅ {item['name']:&lt;20} {price:&gt;9,.2f}  {'متوفر' if in_stock else 'نفد'}"</span>)
+        <span class="kw">except</span> fetcher.FetchError <span class="kw">as</span> e:
+            <span class="fn">print</span>(<span class="str">f"   ❌ {item['name']:&lt;20} {e}"</span>)
+
+<span class="fn">print</span>(<span class="str">"\nparse_price:"</span>, fetcher.<span class="fn">parse_price</span>(<span class="str">"3,299.00 ر.س"</span>), fetcher.<span class="fn">parse_price</span>(<span class="str">"السعر الآن 89.5"</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>── اليوم 1 ──
+   ✅ لابتوب نور 14         3,299.00  متوفر
+   ✅ سماعة هدى اللاسلكية     249.50  متوفر
+   ✅ شاشة أفق 27 بوصة      1,150.00  متوفر
+── اليوم 4 ──
+   ✅ لابتوب نور 14         3,249.00  متوفر
+   ✅ سماعة هدى اللاسلكية     224.00  متوفر
+   ❌ شاشة أفق 27 بوصة     العنصر '.price' غير موجود — هل تغيّر تصميم الصفحة؟
+
+parse_price: 3299.0 89.5</pre>
+</div>
+        <ul>
+            <li><code>FetchError</code> استثناء خاص بالمشروع يجمع كل أسباب الفشل (شبكة، HTTP، تصميم تغيّر)، فيلتقطه المنسّق في سطر واحد.</li>
+            <li><code>raise ... from e</code> يحفظ الخطأ الأصلي داخل الجديد، فيظهر كاملًا في السجل عند التشخيص.</li>
+            <li>إعادة المحاولة لأخطاء الشبكة فقط؛ صفحة 404 أو تصميم تغيّر لن يصلحهما التكرار.</li>
+            <li>النمط <code>\d[\d,]*(?:\.\d+)?</code> يبدأ برقم، فلا تخدعه نقطة «ر.س» (فخ الدرس 6).</li>
+        </ul>
+</section>
+
+<section class="section-card" id="storage">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-database"></i>
+        الوحدة 2: تاريخ الأسعار في SQLite
+    </h2>
+        <p>
+            نحتاج تاريخًا لكل منتج لنعرف «سعر الأمس» و«أقل سعر». ملف JSON يصلح لقائمة صغيرة، لكن <strong>SQLite</strong> — قاعدة بيانات كاملة
+            في ملف واحد، مدمجة في بايثون بلا تثبيت — تمنحنا الاستعلامات، والمفاتيح التي تمنع التكرار، والمعاملات التي لا تترك بيانات نصف محفوظة.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>storage.py</span>
+    </div>
+<pre><span class="str">"""تخزين تاريخ الأسعار والتنبيهات المرسلة في قاعدة SQLite."""</span>
+<span class="kw">import</span> sqlite3
+
+SCHEMA = <span class="str">"""
+CREATE TABLE IF NOT EXISTS prices (
+    product  TEXT    NOT NULL,
+    day      TEXT    NOT NULL,          -- YYYY-MM-DD
+    price    REAL    NOT NULL,
+    in_stock INTEGER NOT NULL,
+    PRIMARY KEY (product, day)          -- قراءة واحدة لكل منتج في اليوم
+);
+CREATE TABLE IF NOT EXISTS alerts (
+    product TEXT NOT NULL,
+    day     TEXT NOT NULL,
+    kind    TEXT NOT NULL,
+    PRIMARY KEY (product, day, kind)    -- يمنع إرسال التنبيه نفسه مرتين
+);
+"""</span>
+
+
+<span class="kw">def</span> <span class="fn">connect</span>(path=<span class="str">"prices.db"</span>):
+    con = sqlite3.<span class="fn">connect</span>(path)
+    con.<span class="fn">executescript</span>(SCHEMA)
+    <span class="kw">return</span> con
+
+
+<span class="kw">def</span> <span class="fn">save_price</span>(con, product, day, price, in_stock):
+    <span class="kw">with</span> con:                                       <span class="cm"># معاملة: تُحفظ كاملة أو لا تُحفظ</span>
+        con.<span class="fn">execute</span>(<span class="str">"INSERT OR REPLACE INTO prices VALUES (?, ?, ?, ?)"</span>, (product, day, price, <span class="fn">int</span>(in_stock)))
+
+
+<span class="kw">def</span> <span class="fn">history</span>(con, product, before_day):
+    rows = con.<span class="fn">execute</span>(<span class="str">"SELECT price, in_stock FROM prices WHERE product = ? AND day &lt; ? ORDER BY day"</span>,
+                       (product, before_day))
+    <span class="kw">return</span> [(price, <span class="fn">bool</span>(stock)) <span class="kw">for</span> price, stock <span class="kw">in</span> rows]
+
+
+<span class="kw">def</span> <span class="fn">unsent</span>(con, product, day, alerts):
+    <span class="str">"""التنبيهات التي لم تُرسل من قبل لهذا المنتج في هذا اليوم."""</span>
+    sent = {k <span class="kw">for</span> (k,) <span class="kw">in</span> con.<span class="fn">execute</span>(<span class="str">"SELECT kind FROM alerts WHERE product = ? AND day = ?"</span>, (product, day))}
+    <span class="kw">return</span> [(kind, text) <span class="kw">for</span> kind, text <span class="kw">in</span> alerts <span class="kw">if</span> kind <span class="kw">not</span> <span class="kw">in</span> sent]
+
+
+<span class="kw">def</span> <span class="fn">mark_sent</span>(con, product, day, alerts):
+    <span class="kw">with</span> con:
+        con.<span class="fn">executemany</span>(<span class="str">"INSERT OR IGNORE INTO alerts VALUES (?, ?, ?)"</span>, [(product, day, k) <span class="kw">for</span> k, _ <span class="kw">in</span> alerts])
+
+
+<span class="kw">def</span> <span class="fn">series</span>(con, product):
+    <span class="kw">return</span> con.<span class="fn">execute</span>(<span class="str">"SELECT day, price, in_stock FROM prices WHERE product = ? ORDER BY day"</span>, (product,)).<span class="fn">fetchall</span>()</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>try_storage.py</span>
+    </div>
+<pre><span class="kw">import</span> storage
+
+con = storage.<span class="fn">connect</span>(<span class="str">":memory:"</span>)                     <span class="cm"># قاعدة مؤقتة في الذاكرة للتجربة</span>
+<span class="kw">for</span> day, price <span class="kw">in</span> [(<span class="str">"2025-03-10"</span>, <span class="num">249.5</span>), (<span class="str">"2025-03-11"</span>, <span class="num">249.5</span>), (<span class="str">"2025-03-12"</span>, <span class="num">224</span>)]:
+    storage.<span class="fn">save_price</span>(con, <span class="str">"headset"</span>, day, price, <span class="kw">True</span>)
+storage.<span class="fn">save_price</span>(con, <span class="str">"headset"</span>, <span class="str">"2025-03-12"</span>, <span class="num">219</span>, <span class="kw">True</span>)   <span class="cm"># قراءة ثانية لليوم نفسه تستبدل الأولى</span>
+
+<span class="fn">print</span>(<span class="str">"التاريخ قبل 12 مارس:"</span>, storage.<span class="fn">history</span>(con, <span class="str">"headset"</span>, <span class="str">"2025-03-12"</span>))
+<span class="fn">print</span>(<span class="str">"كل السلسلة:"</span>, storage.<span class="fn">series</span>(con, <span class="str">"headset"</span>))
+
+row = con.<span class="fn">execute</span>(<span class="str">"SELECT MIN(price), MAX(price), COUNT(*) FROM prices WHERE product = ?"</span>, (<span class="str">"headset"</span>,)).<span class="fn">fetchone</span>()
+<span class="fn">print</span>(<span class="str">"الأدنى / الأعلى / عدد الأيام:"</span>, row)
+
+alerts = [(<span class="str">"drop"</span>, <span class="str">"انخفض 12%"</span>)]
+<span class="fn">print</span>(<span class="str">"لم يُرسل بعد:"</span>, storage.<span class="fn">unsent</span>(con, <span class="str">"headset"</span>, <span class="str">"2025-03-12"</span>, alerts))
+storage.<span class="fn">mark_sent</span>(con, <span class="str">"headset"</span>, <span class="str">"2025-03-12"</span>, alerts)
+<span class="fn">print</span>(<span class="str">"بعد الإرسال:"</span>, storage.<span class="fn">unsent</span>(con, <span class="str">"headset"</span>, <span class="str">"2025-03-12"</span>, alerts))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>التاريخ قبل 12 مارس: [(249.5, True), (249.5, True)]
+كل السلسلة: [('2025-03-10', 249.5, 1), ('2025-03-11', 249.5, 1), ('2025-03-12', 219.0, 1)]
+الأدنى / الأعلى / عدد الأيام: (219.0, 249.5, 3)
+لم يُرسل بعد: [('drop', 'انخفض 12%')]
+بعد الإرسال: []</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>حقن SQL:</strong> لاحظ علامات <code>?</code> في كل استعلام. لا تبنِ الاستعلام بـ f-string مثل
+                <code>f"... WHERE product = '{name}'"</code> أبدًا: اسم مثل <code>x' OR '1'='1</code> سيغيّر معنى الاستعلام — تمامًا كحقن الأوامر في الدرس 8.
+                مع <code>?</code> تمرر المكتبة القيمة كبيانات لا كجزء من الأمر.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="rules">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-balance-scale"></i>
+        الوحدة 3: قواعد التنبيه
+    </h2>
+        <p>
+            قلب المشروع دالة <strong>نقية</strong>: تأخذ التاريخ والقراءة الجديدة وتعيد قائمة الأسباب، بلا شبكة ولا قاعدة بيانات. لذلك نختبرها بأي سيناريو نتخيله في أجزاء من الثانية:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>rules.py</span>
+    </div>
+<pre><span class="str">"""قواعد التنبيه: متى يستحق تغيّر السعر إشعارًا؟"""</span>
+
+
+<span class="kw">def</span> <span class="fn">evaluate</span>(item, past, price, in_stock):
+    <span class="str">"""past: قائمة (السعر، متوفر) للأيام السابقة من الأقدم للأحدث."""</span>
+    alerts = []
+    target, drop_pct = item[<span class="str">"target"</span>], item.<span class="fn">get</span>(<span class="str">"drop_pct"</span>, <span class="num">10</span>)
+    prev = past[-<span class="num">1</span>] <span class="kw">if</span> past <span class="kw">else</span> <span class="kw">None</span>
+    <span class="kw">if</span> <span class="kw">not</span> in_stock:                                    <span class="cm"># سعر لا تستطيع الشراء به لا يهمك</span>
+        <span class="kw">return</span> alerts
+
+    <span class="kw">if</span> prev <span class="kw">and</span> <span class="kw">not</span> prev[<span class="num">1</span>]:
+        alerts.<span class="fn">append</span>((<span class="str">"back_in_stock"</span>, <span class="str">"عاد متوفرًا"</span>))
+
+    reached = price &lt;= target
+    was_reached = prev <span class="kw">is</span> <span class="kw">not</span> <span class="kw">None</span> <span class="kw">and</span> prev[<span class="num">1</span>] <span class="kw">and</span> prev[<span class="num">0</span>] &lt;= target
+    <span class="kw">if</span> reached <span class="kw">and</span> <span class="kw">not</span> was_reached:                     <span class="cm"># عند عبور الهدف فقط، لا كل يوم تحته</span>
+        alerts.<span class="fn">append</span>((<span class="str">"target"</span>, <span class="str">f"وصل للسعر المستهدف ({target:,.0f})"</span>))
+
+    <span class="kw">if</span> prev <span class="kw">and</span> price &lt;= prev[<span class="num">0</span>] * (<span class="num">1</span> - drop_pct / <span class="num">100</span>):
+        alerts.<span class="fn">append</span>((<span class="str">"drop"</span>, <span class="str">f"انخفض {(1 - price / prev[0]):.0%} عن الأمس"</span>))
+
+    <span class="kw">if</span> <span class="fn">len</span>(past) &gt;= <span class="num">3</span> <span class="kw">and</span> price &lt; <span class="fn">min</span>(p <span class="kw">for</span> p, _ <span class="kw">in</span> past):
+        alerts.<span class="fn">append</span>((<span class="str">"lowest"</span>, <span class="str">"أقل سعر منذ بدأنا المراقبة"</span>))
+    <span class="kw">return</span> alerts</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>try_rules.py</span>
+    </div>
+<pre><span class="kw">import</span> rules
+
+item = {<span class="str">"name"</span>: <span class="str">"سماعة"</span>, <span class="str">"target"</span>: <span class="num">199</span>, <span class="str">"drop_pct"</span>: <span class="num">8</span>}
+scenarios = [
+    (<span class="str">"انخفاض 10%"</span>,               [(<span class="num">249.5</span>, <span class="kw">True</span>)],                            <span class="num">224</span>, <span class="kw">True</span>),
+    (<span class="str">"انخفاض 4% فقط"</span>,            [(<span class="num">224</span>, <span class="kw">True</span>)],                              <span class="num">215</span>, <span class="kw">True</span>),
+    (<span class="str">"نفد ثم عاد بسعر الهدف"</span>,     [(<span class="num">224</span>, <span class="kw">True</span>), (<span class="num">224</span>, <span class="kw">False</span>)],                <span class="num">199</span>, <span class="kw">True</span>),
+    (<span class="str">"ما زال تحت الهدف"</span>,          [(<span class="num">224</span>, <span class="kw">True</span>), (<span class="num">199</span>, <span class="kw">True</span>)],                 <span class="num">195</span>, <span class="kw">True</span>),
+    (<span class="str">"سعر الهدف لكنه غير متوفر"</span>,  [(<span class="num">224</span>, <span class="kw">True</span>)],                              <span class="num">190</span>, <span class="kw">False</span>),
+    (<span class="str">"أقل سعر بعد 3 أيام"</span>,        [(<span class="num">249.5</span>, <span class="kw">True</span>), (<span class="num">249.5</span>, <span class="kw">True</span>), (<span class="num">224</span>, <span class="kw">True</span>)], <span class="num">219</span>, <span class="kw">True</span>),
+]
+<span class="kw">for</span> title, past, price, in_stock <span class="kw">in</span> scenarios:
+    found = [text <span class="kw">for</span> _, text <span class="kw">in</span> rules.<span class="fn">evaluate</span>(item, past, price, in_stock)]
+    <span class="fn">print</span>(<span class="str">f"{title:&lt;26} → {' • '.join(found) or '—'}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>انخفاض 10%                 → انخفض 10% عن الأمس
+انخفاض 4% فقط              → —
+نفد ثم عاد بسعر الهدف      → عاد متوفرًا • وصل للسعر المستهدف (199) • انخفض 11% عن الأمس
+ما زال تحت الهدف           → —
+سعر الهدف لكنه غير متوفر   → —
+أقل سعر بعد 3 أيام         → أقل سعر منذ بدأنا المراقبة</pre>
+</div>
+</section>
+
+<section class="section-card" id="run">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-play-circle"></i>
+        المنسّق ومحاكاة عشرة أيام
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>notifier.py</span>
+    </div>
+<pre><span class="str">"""إرسال التنبيهات إلى Webhook (Slack/Discord) أو طباعتها."""</span>
+<span class="kw">import</span> logging
+
+<span class="kw">import</span> requests
+
+log = logging.<span class="fn">getLogger</span>(<span class="str">"monitor.notifier"</span>)
+
+
+<span class="kw">def</span> <span class="fn">format_message</span>(item, price, prev_price, alerts, day):
+    change = <span class="str">f" (كان {prev_price:,.2f})"</span> <span class="kw">if</span> prev_price <span class="kw">and</span> prev_price != price <span class="kw">else</span> <span class="str">""</span>
+    reasons = <span class="str">" • "</span>.<span class="fn">join</span>(text <span class="kw">for</span> _, text <span class="kw">in</span> alerts)
+    <span class="kw">return</span> <span class="str">f"🔔 {item['name']}: {price:,.2f} ر.س{change}\n   {reasons}\n   {item['url']}  [{day}]"</span>
+
+
+<span class="kw">def</span> <span class="fn">send</span>(text, webhook_url=<span class="kw">None</span>):
+    <span class="kw">if</span> <span class="kw">not</span> webhook_url:
+        <span class="fn">print</span>(text)
+        <span class="kw">return</span> <span class="kw">True</span>
+    <span class="kw">try</span>:
+        requests.<span class="fn">post</span>(webhook_url, json={<span class="str">"text"</span>: text}, timeout=<span class="num">10</span>).<span class="fn">raise_for_status</span>()
+        <span class="kw">return</span> <span class="kw">True</span>
+    <span class="kw">except</span> requests.RequestException <span class="kw">as</span> e:
+        log.<span class="fn">error</span>(<span class="str">"فشل إرسال التنبيه (%s) — سيُعاد في التشغيل التالي"</span>, <span class="fn">type</span>(e).__name__)
+        <span class="kw">return</span> <span class="kw">False</span></pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>monitor.py</span>
+    </div>
+<pre><span class="str">"""مراقب الأسعار.
+
+    python monitor.py check   [--day 2025-03-14]
+    python monitor.py history laptop
+"""</span>
+<span class="kw">import</span> argparse
+<span class="kw">import</span> json
+<span class="kw">import</span> logging
+<span class="kw">import</span> sys
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">import</span> requests
+
+<span class="kw">import</span> fetcher
+<span class="kw">import</span> notifier
+<span class="kw">import</span> rules
+<span class="kw">import</span> storage
+
+log = logging.<span class="fn">getLogger</span>(<span class="str">"monitor"</span>)
+BASE = <span class="fn">Path</span>(__file__).<span class="fn">resolve</span>().parent
+
+
+<span class="kw">def</span> <span class="fn">check</span>(watchlist, con, day, webhook=<span class="kw">None</span>):
+    session = requests.<span class="fn">Session</span>()
+    session.headers[<span class="str">"User-Agent"</span>] = <span class="str">"PriceWatcher/1.0 (me@example.com)"</span>
+    stats = {<span class="str">"ok"</span>: <span class="num">0</span>, <span class="str">"failed"</span>: <span class="num">0</span>, <span class="str">"alerts"</span>: <span class="num">0</span>}
+    <span class="kw">for</span> item <span class="kw">in</span> watchlist[<span class="str">"items"</span>]:
+        <span class="kw">try</span>:
+            price, in_stock = fetcher.<span class="fn">fetch</span>(session, item)
+        <span class="kw">except</span> fetcher.FetchError <span class="kw">as</span> e:
+            stats[<span class="str">"failed"</span>] += <span class="num">1</span>
+            log.<span class="fn">error</span>(<span class="str">"%s: %s"</span>, item[<span class="str">"id"</span>], e)
+            <span class="kw">continue</span>
+        past = storage.<span class="fn">history</span>(con, item[<span class="str">"id"</span>], day)
+        storage.<span class="fn">save_price</span>(con, item[<span class="str">"id"</span>], day, price, in_stock)
+        stats[<span class="str">"ok"</span>] += <span class="num">1</span>
+        alerts = storage.<span class="fn">unsent</span>(con, item[<span class="str">"id"</span>], day, rules.<span class="fn">evaluate</span>(item, past, price, in_stock))
+        <span class="kw">if</span> alerts:
+            prev_price = past[-<span class="num">1</span>][<span class="num">0</span>] <span class="kw">if</span> past <span class="kw">else</span> <span class="kw">None</span>
+            <span class="kw">if</span> notifier.<span class="fn">send</span>(notifier.<span class="fn">format_message</span>(item, price, prev_price, alerts, day), webhook):
+                storage.<span class="fn">mark_sent</span>(con, item[<span class="str">"id"</span>], day, alerts)     <span class="cm"># بعد نجاح الإرسال فقط</span>
+                stats[<span class="str">"alerts"</span>] += <span class="fn">len</span>(alerts)
+    log.<span class="fn">info</span>(<span class="str">"%s: نجح %d | فشل %d | تنبيهات %d"</span>, day, stats[<span class="str">"ok"</span>], stats[<span class="str">"failed"</span>], stats[<span class="str">"alerts"</span>])
+    <span class="kw">return</span> stats
+
+
+<span class="kw">def</span> <span class="fn">main</span>(argv=<span class="kw">None</span>):
+    p = argparse.<span class="fn">ArgumentParser</span>(prog=<span class="str">"monitor"</span>)
+    p.<span class="fn">add_argument</span>(<span class="str">"command"</span>, choices=[<span class="str">"check"</span>, <span class="str">"history"</span>])
+    p.<span class="fn">add_argument</span>(<span class="str">"product"</span>, nargs=<span class="str">"?"</span>)
+    p.<span class="fn">add_argument</span>(<span class="str">"--day"</span>, default=date.<span class="fn">today</span>().<span class="fn">isoformat</span>())
+    p.<span class="fn">add_argument</span>(<span class="str">"--watchlist"</span>, type=Path, default=BASE / <span class="str">"watchlist.json"</span>)
+    args = p.<span class="fn">parse_args</span>(argv)
+
+    watchlist = json.<span class="fn">loads</span>(args.watchlist.<span class="fn">read_text</span>(encoding=<span class="str">"utf-8"</span>))
+    con = storage.<span class="fn">connect</span>(args.watchlist.<span class="fn">resolve</span>().parent / <span class="str">"prices.db"</span>)
+    <span class="kw">try</span>:
+        <span class="kw">if</span> args.command == <span class="str">"check"</span>:
+            stats = <span class="fn">check</span>(watchlist, con, args.day, watchlist.<span class="fn">get</span>(<span class="str">"webhook"</span>))
+            <span class="kw">return</span> <span class="num">1</span> <span class="kw">if</span> stats[<span class="str">"ok"</span>] == <span class="num">0</span> <span class="kw">else</span> <span class="num">0</span>           <span class="cm"># فشل كل شيء = مشكلة حقيقية</span>
+        <span class="kw">for</span> day, price, in_stock <span class="kw">in</span> storage.<span class="fn">series</span>(con, args.product):
+            <span class="fn">print</span>(<span class="str">f"{day}  {price:&gt;9,.2f}  {'✅' if in_stock else '⛔'}"</span>)
+        <span class="kw">return</span> <span class="num">0</span>
+    <span class="kw">finally</span>:
+        con.<span class="fn">close</span>()
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    logging.<span class="fn">basicConfig</span>(level=logging.INFO, format=<span class="str">"%(levelname)-7s %(message)s"</span>)
+    sys.<span class="fn">exit</span>(<span class="fn">main</span>())</pre>
+</div>
+        <p>
+            لنشغّل المراقب عشرة أيام متتالية (نغيّر «يوم» المتجر قبل كل تشغيل)، ثم نشغّله مرة إضافية في اليوم الأخير لنتأكد أنه لا يكرر التنبيهات:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>ten_days.py</span>
+    </div>
+<pre><span class="kw">import</span> json
+<span class="kw">import</span> logging
+<span class="kw">import</span> sys
+<span class="kw">from</span> datetime <span class="kw">import</span> date, timedelta
+
+<span class="kw">import</span> price_site
+<span class="kw">import</span> storage
+<span class="kw">from</span> monitor <span class="kw">import</span> check
+
+handler = logging.<span class="fn">StreamHandler</span>(sys.stdout)
+handler.<span class="fn">setFormatter</span>(logging.<span class="fn">Formatter</span>(<span class="str">"%(levelname)-7s %(message)s"</span>))
+logging.<span class="fn">getLogger</span>(<span class="str">"monitor"</span>).<span class="fn">addHandler</span>(handler)
+logging.<span class="fn">getLogger</span>(<span class="str">"monitor"</span>).<span class="fn">setLevel</span>(logging.INFO)
+
+watchlist = json.<span class="fn">loads</span>(<span class="fn">open</span>(<span class="str">"watchlist.json"</span>, encoding=<span class="str">"utf-8"</span>).<span class="fn">read</span>())
+con = storage.<span class="fn">connect</span>(<span class="str">"prices.db"</span>)
+<span class="kw">for</span> d <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>):
+    price_site.state[<span class="str">"day"</span>] = d
+    day = (<span class="fn">date</span>(<span class="num">2025</span>, <span class="num">3</span>, <span class="num">10</span>) + <span class="fn">timedelta</span>(days=d)).<span class="fn">isoformat</span>()
+    <span class="fn">check</span>(watchlist, con, day)
+
+<span class="fn">print</span>(<span class="str">"\n── تشغيل ثانٍ في اليوم الأخير ──"</span>)
+<span class="fn">check</span>(watchlist, con, day)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>INFO    2025-03-10: نجح 3 | فشل 0 | تنبيهات 0
+INFO    2025-03-11: نجح 3 | فشل 0 | تنبيهات 0
+🔔 سماعة هدى اللاسلكية: 224.00 ر.س (كان 249.50)
+   انخفض 10% عن الأمس
+   http://127.0.0.1:5006/item/2  [2025-03-12]
+INFO    2025-03-12: نجح 3 | فشل 0 | تنبيهات 1
+ERROR   monitor: العنصر '.price' غير موجود — هل تغيّر تصميم الصفحة؟
+INFO    2025-03-13: نجح 2 | فشل 1 | تنبيهات 0
+🔔 لابتوب نور 14: 3,199.00 ر.س (كان 3,249.00)
+   أقل سعر منذ بدأنا المراقبة
+   http://127.0.0.1:5006/item/1  [2025-03-14]
+🔔 شاشة أفق 27 بوصة: 1,099.00 ر.س (كان 1,150.00)
+   أقل سعر منذ بدأنا المراقبة
+   http://127.0.0.1:5006/item/3  [2025-03-14]
+INFO    2025-03-14: نجح 3 | فشل 0 | تنبيهات 2
+🔔 لابتوب نور 14: 2,999.00 ر.س (كان 3,199.00)
+   وصل للسعر المستهدف (2,999) • انخفض 6% عن الأمس • أقل سعر منذ بدأنا المراقبة
+   http://127.0.0.1:5006/item/1  [2025-03-15]
+INFO    2025-03-15: نجح 3 | فشل 0 | تنبيهات 3
+🔔 سماعة هدى اللاسلكية: 199.00 ر.س (كان 224.00)
+   عاد متوفرًا • وصل للسعر المستهدف (199) • انخفض 11% عن الأمس • أقل سعر منذ بدأنا المراقبة
+   http://127.0.0.1:5006/item/2  [2025-03-16]
+🔔 شاشة أفق 27 بوصة: 1,049.00 ر.س (كان 1,099.00)
+   أقل سعر منذ بدأنا المراقبة
+   http://127.0.0.1:5006/item/3  [2025-03-16]
+INFO    2025-03-16: نجح 3 | فشل 0 | تنبيهات 5
+INFO    2025-03-17: نجح 3 | فشل 0 | تنبيهات 0
+🔔 لابتوب نور 14: 2,949.00 ر.س (كان 3,099.00)
+   وصل للسعر المستهدف (2,999) • أقل سعر منذ بدأنا المراقبة
+   http://127.0.0.1:5006/item/1  [2025-03-18]
+INFO    2025-03-18: نجح 3 | فشل 0 | تنبيهات 2
+🔔 شاشة أفق 27 بوصة: 989.00 ر.س (كان 1,049.00)
+   وصل للسعر المستهدف (999) • أقل سعر منذ بدأنا المراقبة
+   http://127.0.0.1:5006/item/3  [2025-03-19]
+INFO    2025-03-19: نجح 3 | فشل 0 | تنبيهات 2
+
+── تشغيل ثانٍ في اليوم الأخير ──
+INFO    2025-03-19: نجح 3 | فشل 0 | تنبيهات 0</pre>
+</div>
+        <ul>
+            <li><strong>12 مارس:</strong> انخفضت السماعة 10% (حدها 8%) فوصل تنبيه، بينما انخفاض اللابتوب 1.5% في اليوم نفسه مرّ بصمت.</li>
+            <li><strong>13 مارس:</strong> تغيّر تصميم صفحة الشاشة، فسُجّل الخطأ وأكمل المراقب المنتجين الآخرين.</li>
+            <li><strong>16 مارس:</strong> رسالة واحدة للسماعة تجمع أربعة أسباب: عادت متوفرة، ووصلت للهدف، وانخفضت 11%، وأقل سعر.</li>
+            <li><strong>17 مارس:</strong> لا تنبيهات — السماعة بقيت على سعر الهدف (لا داعي لإزعاجك مجددًا)، واللابتوب ارتفع، والارتفاع لا يستحق تنبيهًا.</li>
+            <li><strong>18 مارس:</strong> عاد اللابتوب فوق الهدف (3,099) ثم نزل تحته (2,949)، فهذا «عبور» جديد يستحق تنبيهًا.</li>
+            <li><strong>التشغيل الثاني:</strong> صفر تنبيهات، بفضل جدول <code>alerts</code>.</li>
+        </ul>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                تنبيه «أقل سعر» ظهر كثيرًا هنا لأن الأسعار في هبوط مستمر. في الواقع قد تجعله يتطلب 14 يومًا من التاريخ بدل 3، أو تلغيه لبعض المنتجات —
+                ضبط القواعد بحيث تصلك الرسائل المهمة فقط هو أهم ما يجعل الناس يستمرون باستخدام المراقب.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="chart">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-chart-line"></i>
+        تاريخ الأسعار مرسومًا
+    </h2>
+        <p>
+            بعد أيام من المراقبة لديك بيانات حقيقية. هذا الرسم يقرأها من قاعدة البيانات مباشرة: السعر كدرجات، والخط المتقطع للسعر المستهدف،
+            والنقاط الحمراء لأيام نفاد المخزون. ولاحظ أن الشاشة بلا نقطة في 13/03 — يوم تغيّر التصميم ولم تُحفظ قراءة:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>price_chart.py</span>
+    </div>
+<pre><span class="kw">import</span> json
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+
+<span class="kw">import</span> matplotlib.dates <span class="kw">as</span> mdates
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="kw">import</span> storage
+
+con = storage.<span class="fn">connect</span>(<span class="str">"prices.db"</span>)
+items = json.<span class="fn">loads</span>(<span class="fn">open</span>(<span class="str">"watchlist.json"</span>, encoding=<span class="str">"utf-8"</span>).<span class="fn">read</span>())[<span class="str">"items"</span>]
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">3</span>, figsize=(<span class="num">13</span>, <span class="num">3.8</span>))
+<span class="kw">for</span> ax, item <span class="kw">in</span> <span class="fn">zip</span>(axes, items):
+    rows = storage.<span class="fn">series</span>(con, item[<span class="str">"id"</span>])
+    days = [date.<span class="fn">fromisoformat</span>(d) <span class="kw">for</span> d, _, _ <span class="kw">in</span> rows]
+    prices = [p <span class="kw">for</span> _, p, _ <span class="kw">in</span> rows]
+    ax.<span class="fn">step</span>(days, prices, where=<span class="str">"post"</span>, color=<span class="str">"#d4a017"</span>, lw=<span class="num">2.2</span>, marker=<span class="str">"o"</span>, ms=<span class="num">4</span>)
+    out = [(d, p) <span class="kw">for</span> d, (_, p, s) <span class="kw">in</span> <span class="fn">zip</span>(days, rows) <span class="kw">if</span> <span class="kw">not</span> s]
+    <span class="kw">if</span> out:
+        ax.<span class="fn">scatter</span>(*<span class="fn">zip</span>(*out), color=<span class="str">"#c0392b"</span>, s=<span class="num">60</span>, zorder=<span class="num">3</span>, label=<span class="str">"نفد المخزون"</span>)
+    ax.<span class="fn">axhline</span>(item[<span class="str">"target"</span>], ls=<span class="str">"--"</span>, color=<span class="str">"#2e8b57"</span>, label=<span class="str">f"الهدف {item['target']:,}"</span>)
+    ax.<span class="fn">set_title</span>(item[<span class="str">"name"</span>], fontsize=<span class="num">11</span>)
+    ax.xaxis.<span class="fn">set_major_formatter</span>(mdates.<span class="fn">DateFormatter</span>(<span class="str">"%d/%m"</span>))
+    ax.<span class="fn">tick_params</span>(axis=<span class="str">"x"</span>, labelsize=<span class="num">8</span>, rotation=<span class="num">45</span>)
+    ax.<span class="fn">grid</span>(alpha=<span class="num">0.3</span>)
+    ax.<span class="fn">legend</span>(fontsize=<span class="num">8</span>)
+fig.<span class="fn">suptitle</span>(<span class="str">"تاريخ الأسعار — 10 أيام من المراقبة"</span>, fontsize=<span class="num">13</span>)
+fig.<span class="fn">tight_layout</span>()</pre>
+</div>
+<div class="figure-block">
+    <div class="output-header"><i class="fas fa-chart-bar"></i> الرسم الناتج</div>
+    <img src="data:image/webp;base64,UklGRsRbAABXRUJQVlA4ILhbAACwhAGdASqHBFMBPm0ylkikIqIiI3G66IANiWdu3LS5EDshup2U1/KP1Pf1PygesDguaHPVPZk1p0ZvWkAzNEqp/pu7Nm30v/O/wn4m+ZDpfNN1kRIO3/+j/ffy0+ev+O9R/9b/wHsAf2H+menb/d+qD+j/7X1FfxH+3ft17v3+u/6/+Q9zn9w9QD+1f6HrFv3O9gj+Yf4z02v3C+Ev+zf9T90fa7//+tH+NP6Z/Uv65/X/fV3r/Y/8J+zP9g9XfxP5R+p/kP/cP28+Pf9p8cnXfmZ/Hfqz91/tf+S/5H9l/d37uftn97/wf7Yf070l+QX8v+XfwC/i38Z/s/9e/wf/a/uHqy/2XbzaR/sf97/gvYI9Yvmn+L/tP+Q/7n+F+HD4n/Ofk5+//yJ+kf2T/A/3j9uf7x///wA/jP8s/0n9m/d//J///6X/zX/B/qflM/VP9n+3/wA/yX+lf6b/Ff5n/0f4v///a3/D/7r+//5z/4f4j//+9z80/wf+7/xP+o/+v+V//////Qb+S/z7/Vf2z/K//D/K////+/d/7AP25/9XuUfrT/6Pz/J8SEvkJfIS+Ql8hL5CXyDxnId/Q+YyswB8fYRM4ab0RfiOIWZyLr/QxYnXyXSBdemQTseHbrIBrnNvObec285t5zbzm3nNvObec285t5zbzmHhJAG5Yca+6FF4rBnBgNMAmBQCK5kXACWpce+9/kMh/ZqD+g2vt2FK58DU7lqLtmdhKEkitdXdkKXkUM9YcZv60hQnz75NVDfQXc3gTtNJaIEYxrHr5LPABYi/RHh26yAa5zbzm3nNvObec285t5zbzm3nNvObec285wftI8vkJfIS+Ql8hL5CXyEvkJfIS+Ql8hL5CXp2FbCbM+2gmA8wj3ykexyX5uSEUEMqPDt1kA1zm3eRcSsayY+GwhldK8tplYdbpkkFw5c6uwFWboHDAOANif0NbR9Ry+Ql8hL5CXp+wAZdZk1G7uyHyuNCHgF4qJRgTsFCTGFBS1ifgMuMzLB37KEeninmZz9Edl2kptR/+Ge0ZquSUPuK3T9Wn+J1nq9hNc9si3n8uAaqqlhO39rZlVRwEKc7TBsJIXyKkv1CaaN5C7rwqBPnobPZfpv2DjpNpfzr8eLYADAzL1jXJaELYu9Litd1tJvdEuKoFsA5T7F9jz/7nUerPCw/eL/jZAfD/7+WWr8OaIAtJeUmX+zrjWetcwrUcLETSgFAbac4raEHbmwi7KdTnPy4aT3zbNANgJMf+8W0wTuYqB99gapoFcn6hG9OVrpx+2+EhC0FaqQ5A5CcUURnD0W7AN/ZnEKx4WfphkX934CGJ8fG2aIpxbr+Gh8tPk9lsSySZ3vKwr8A9HkZjKx83lxS+EHZwSEvP3Nb2J4uYbjk3IkRklZG0d2aO/avJBHx2Z3UQPSqT4JhWJ5S5X7qcB1KEW9U1H2d7lUnTWPdr7bw7bSJSG7TmmQPRqE5v5JFBNxLUq9b5vmS3jclGbc12qDEYyU61tCTnRUHbPgyZWhb5Z42kZc5i7KifeW1WpEKmsc9TFtdaYk/ubuQilnoJU9wRoO8Ri5RDFlWwwjddO/N8uMogYH+Fb7ADqZdpcDF4PEw02gosMAWYCE91/99j9cxgf4a4VH2HK7kUepBtcDaiA5OCU3YP9dIz1IHjSv67EZzF0EvwN6idwQ19r3eFFBO+QEvsGKgEvJ6Qot8CESmqgHHhHa2hi1ViCl4zxcrabgUE89G0CkDWCcYEB6AOLJK1jYrauS+Q64qpQME2GnGyiwFAZ0lBsosBQTmEYVXoBSda6l2aBzBukz3u2MoJ+w/iGCOa6HRl8np1JZnvvbTcCgCmBzUvHQZyY+WUVcskFlFVmEIRCYfoFl9zwon7K2mmQa8N6Y9ssPYCgn7IrkgIGV5BQ4HJLuPVPI4D+DQ4LnX3PCV3SHEzb8X7KzBGyiwFBP2VtNvlNsAvw8Ap/6sR1PiPFqW/srabeX70ycr6i8blO7p6Db23g1apqCfl55K9RkliEvVlyaTtWSdQ+YRSkLCZIPxY747KLAUE/ZF6nqwFBPz12Sxv2hZAvwHggPZtGXjCqf/HV4CsWXjvsyHrn42gE2wUkSonwauvx316wnQgeh+O+k70xcry8qVZDcD9kVzRmU1p3ziLeF8yQYH+XjCADR7bg/Euaw9LKvI6mHZ+Gjpa8mI0tJQvrMcM4/Iem87f0qRezqqpVsVmI39Dm9xwlS7JxZEmVfKY2UkJj+AnwkxWtUXqA377wnWwnQgdiydEH83/8m377wnWwnQgeeZfCm4gpLFOlhbxQB7G9uUehmqRSUeXjvsyNd2Qd5nzFeNeMBQFrfesdPUWsnRCTUwliG8EyEo/m64SvMwLvfcM6vNihSnQvFX9CsWXQIwHYlzfC/0XhhV8d7K2m4EtMDubH90PascI8YZYkWriM0BfS1TUyoAoN8r5jxGylnzv4zxtyBJymI2JLKXNP9osUjQAYH+LJBQ30CRH9+ToGcbP/GqkoAcpA6+EkysBQT9lbJbVblwqs6gg6/bjC4MCgI/yQkfq+6d3bYFXKeLiFpBNVAzdFNbMTbNY79lbTcCf/i2jW/2vgZ/7X8ssmnztrMk/nTxqsswnlWIxwzq8BWLLoYXWzI12fiC5sU9nJ3D3WjkZaxZBv33hPqNlFgJ8/crL72UrwExvUMzQCVk2V6PK0WoIGCN8oTvgJrAQfIksHxKXINhf4IwM6uMRl/BEsGDsD86ywBmD2UZLf1rGs0FPEXsmApAcdfUcZEmQmFZ1caLHSVFE/t1XC6aHAHduxLG5XOVXrHbsSxuVzlV4eYIR4aZcqLJR8X3Qp38UaIthcpfHGI3iqVmHbLb+x1RvGOFvD+i2pl8VYpMuXbkiTbXWE8gjLLpQCH4nkuZwFIX/gW94+8bFwcDPGjPtl0fqyeA1rq9brg9s7GvhXVeXr5pT2LFU3f00oIiZTNa28P4M74siTe/WmT0TrlfIqYn/U15XIoPxJ5WCvkT3UJrE2H3ZO+2hyUpsFFiQKec/TGTynm526dw9L+hNtZZt0HuEyGGARDF8wDI6OV/meaLv4dYSkiTuaZ8Iu5WQHA3wIXVDsbq+IDXAvXcVtNwKCWUrZLcn/LNvP88fnc/rpk5SwswB1BuH10FiUW44P081ITcwOD46auwzsJTM8DJK3IybBQL6ZoR7oJEnyTRSxHLI1ccX7aFK3WGD3+PuwlLuuVFVRb4DRDQsZkzRtVJNQBg4fqWmd+/7JjpI3tcHX9uaMK5C7GOR8fQDCBfpn087oVR91rjAIQIwAbU0fbGH3w4/IV5m+loJZH+us1NMlYpkQ8jP7L9V4fQI7PnK38ohnHZDyJoriE82hWgIVzACrzBuhDkYYE/5LcH33+tkgHxwM//4d3EAz1Yh9R8SPk302B9nbB6VGGZOjB97cZRlcJctFQ7Wd/7wPtG3NGpgmJDN/q1UvDROwutr1sWeSrdzJLH4YZqveW+GCUbiVvsBVm3zaNrkyBd81Zd9keRygI2sbbNc8OlCn5TYHQFGniVyzce5SL9XlRu99COZyxwTW1f3K+UzzxU1lbrMHZ4O9IJLIAwvR5HLkgyADRBHRbfDZ0gtFuFzCPkcgEo03bd3hQnrhsE8xftU5WHvgLBICnSZfwSIXmauYeT1Dsw/rvU/tLrtEhcmAN0D57nvpe8QBRtz9+xqZY0ACakwij1QEkhPxdtYGnqa1QvwD7woZ+GPzLPyJ3aA0icLmzqvkVyfrewjEUXW472KJmqrsulhxLOk8ct9M7dqsvGfE2E1VENC1NkBvuPt/RmgYCdm6PhRlMG3A3epo9u+hP1jAYTK1CpeoET0VgE3urJR7yumGihQpH3+TGSPp3zePHXYhQ8WvQdYiKQCB6DyvZN5M27UGgfnvFa7ZUuQO5+Rx2+3OVuK9syO2lf/cAp76XVUhHjOTMdaQGqsAgEfzwphvXM7HFw/kNFa6axxCYHkI0C/tI5Zb8jhs3vTkHF8HHYlqxAWXnuK1m7THNL7aQmXTuFPJ3bh4FdNlGQNYS2q0ghdN2l/Fq0MYvaB8D/Z+smSb+ROIUAbL6M7qWLlWUVX9933oq8A/vUuAewDSEvkJfQDZRX/gv0xDJ+iPDt1kpHpnVn+iPDt1kCarYAAP74lAAB08qMxtdGfnXmX9OnRrVq1r19xJmK8GZ5b6w8YUfW1s2bpyDuPsHs6jFeXd4dm4pt3POi8vC8AJ9cNBIg5uSo3iuk8RB+8fuU4ijfmUArF9Yzu0phJQIvKVWrWQL4RooOmxGpVytaKoLoEVluwFj2o0/oU6Xg0tCPX+rxiWsi3eBxuf7QHi1OEYrOEF7IhtHbSBXQrs9N2IZyTYvtzp44SBKE+IHK6sFlGMAcMy6BIclvff+b1eCCdYi4Yiy9MixAAAAASGDY0h5EvrXH8nimRhbKNrjI+BJtGMwPOf2aMMagrHEzocS1Syf84mQy+NWCmld4543y3nOlKSsZk17xFIjxlifCL2Tus3yEtUx8fgIopo8mHLSeyWygD017yeoUKVnYj8w5dlXS8rg9LO0HO7H67lIoTFePnDX/XrM3XHXewWAoVKz/GdFiOFnnKUgPSyEjOOOHkA79vHqpfV0PuFEe54CJH6dDk1J5uLz34WrqsKB8ezB6BdGRB12hHG05qKx14OCZ9e27AhaSq9VSgVOwuOvGSRcFn2R9tsCwkhze6Um39IS4XpKtFI+1YNYKAYC/fAQfuSYCaPY6ZYei5rqKc0fNJSkEh/q8rK7o9haPYa0B3iNNLJbqGvxUWqr7soeKoFF2U63m5ZnqUn615MKo2iQo/InBjyZeGu53m50HC3k3hn1Z7u/MO4diMX7PulFfTxL2u1HheE8Bh2dcBpjagaACHMP8n5qzIUUzusIWeKAp9s16T9BhRiPyhEeA9pPIPQ9q2KC9QZt77pGr8sB+RVuxBCMhyxf4/okkC/8JmRImfeCBRieDL0NV76c6TFx6Xz8SZ6jG0wblXpFtOVYmEbDObgQCQEy8bOGzTPmIJCIwCielTBE04yNN6fl9lcautwTuZoNZG1AcuQj3DJ+1/NeedoVbMWnpC/Kqnwtu7RwayPozUthoG+PBwysX2ZUeg/vR7FYJWa1FGQg6EKhDqK+ZmMT1IT+PpkayF4dbJQnr9qK9+PbmmKWkQusaCZEM/iqKLzxbCDYhaIvDbitN99JjqaLLI78lfSaAbtDin2BzEvM2gExvmmxNyUdJrhCWcTYTDaPTgVKMjEXkEvTcBFg8/AjYEMFS9S9TgpedCdLnkjLWVrtgngkEA5psPiP/CXAYNjTcRcpGWZH9Inxbrwoyys7dvjOuKI/YcpWjQRyY8INqt76/Wy9X+c0LhfU9+0tEw8r+/oyBLHVPkIYy0btwkYU/clqFlzWL/HviljyGOhs7rtOodlyK4FQ+5wTwX1R9YxdiEz8yMzRDAjucN0IHw+M8AFtcH92ygNnk2ZxKfvBuXmW1i1YWrAP6bGASVhwuElJR4ptQxLh+LUaH2LacoCBDvkdGoCxrg2yeItXzmciNL+Lb9RELemTNmZxpkBCvf+c2rybCc8TNksP9XeW58AmBfHnvXfWKP/3ros2MS6ztSUdwrkO1b9GlKJo12VV26zaVd4kdq7t3Non2I5OZ6Zr1YscvRhaZeXAZOzl3s5R5/O7XRebq2vRkyOeywZffc0u1Vu2EUrEn8Y4XO61oEIcKOuTEWnYtQcLzH7eLAAAAAAAAAAAAFoi+3x8KSlP3qptVoYdy13QzWD3QyfjrDARZUaJEjCG/lphqM5vWHEmd4PmAWUL0tE86RWSjoDz5ZWxdXuQeSTTSJjVd25EotJ54SL25AZ82EJuPhK7Q8n53iO2h/X/IIyY64ox+Qci/PJuUN1p99JetmHrI45OFJ9LN4Cvr7KVJolyJoRevzhdDXGphs8JZSSb1rSWBcE5M3njSO1uWLssk78c4z+rWYH/lw8FIxL+HnqeOLjBx9r4gyncSNZxY42POfSBqsSr08SVlgHZwSGaLLfjiEBxnElQKoPWrIIy0DrK4XlnQfbFc7hSVZygrpRWJoenTfqtX7riEJcJxQZQ64U5+k6OpTZasKqC3xD/QGGaUtk2hVPuL2cDvK6AoPPbedxTltihHumw2g/jHJ7FI8IWRQvw7nMDIjCvPlh4iDQBHeK8j9auSEF278PgPwpaeZiwD+QTzZnVZtytTDfY+9aUCZLSOb1krxeh5gryLTs3UWvGhvS80KD2dyiU9insuT8UGC1+/XAIwGpjyaUwVg9+hycG8RixUdi/daeE8ItW1XZA4NZQdbk3wfT3sfSyQ+GSi1Aq2caZFQ6Ti9P8gyTOQAJ9VtVzJJ8g2E6wuCV/ucbNgZsDKgTRrc1gW7SHEKUCxRamwZYVk6huwJ/9SgvcWOiH9HwtNU37jp+4qIaVyMnFJbVMyQzOeZp3oe8Z5WwEk69B2uWNQ9/HgEoU7d1NIlZsIa7X9YTwJ+EP+4TLlcLOo416ADVPqgF/ER5af5XG98nYD5MJ1ktz3jwiRhPjuXWPH/yh65o0kn+1eOOp0V3E9Rs5LZ5pW+gESnCciiBQxyhrky+V9yKYaKVzXeL1KgrilYsV1PxqF6UcFIomm1vBlf0hO3wuucVz+UbzVSDd4jp9qjBygsqbT+vFX3gDHJEwEXcNFHEo2MpP6DSZxcDk1bBwSTyEIDG0M7T7h1wmqfLs8vHA6Ez0upENAo69qEj4Lzm3GRE8LNaYvUHkze0EhZQixyRycfmnWcSqHW7WZ0YmCQXqitEUpNJo9NjCg5M9i8Ng3807XabgSpFoM6P27qTGWCQMgJ/OVZ2yjlzry1dOqC1l9ISlFtgRV0Hf+A1iS5WTTGRESdg6tn6dv55BrzhDRh2F3wjnAr0jg8G1cxhq+j/5t+vGqPcS48nH/eEzow28EohuO2b2Cl2QeWYQ7QcYNzYrpV8HyctJszt/h7M6DViE5RTcJR51/GGr6Iq4fNCN3W1x4TLtOyoXyBDRFi4sHC64dRtDU4Lf7hCu/6Du+vVpLJQlnCyNlBMKRiasETjvUmJ11TMpxQnmwD3g9rnj3z/2zZ3b53xpm9NVKFw9/EIjTCQjRpOdiIeUIaeoegXnkYgQBuRcu6xGHFnLDv3YZW29d3O9UzfNE1LiUND5+xrLEl2vy8jAnV6dIFbkpXMwLBlg+uFjOTjDyz/I1F9v53DmjYUT7Uquv+lnpNATFTu5xmWoAl0BZE8Awapj6WbTy/LFAnzJWUQCxBj01eJHJnkcoLJ3mg23usLiz3uLt+K1eFDgHrXcbEBi+Zt2FvbLPKIlPB9RqT7asPCeIepFxSe5u9hyixJotvtuMN+5z6T7sqYMIHX9sURpqa3EVFmd6CrDhZnCC/9NTJusgPlNwucHcx+F3Axvbpe8JszsFjP0G14z81lYf00JxMuDaM13iwphVjsJ+UpglYeHCP6jtUpKd/F4olG6HNTPEJSGAomT2F1lyy68Gr+FL3TbedkHpXzyXJy4wuLxvku9gvM1Gl9ikXBiaHaaAux0wDaOzVVi53M0X9GTobZneOJXcgeKsAfesVXpM5Dl/zNA0l9ixYmVGRwQh+VSW5X/dEBZPayytrlMW3P4C60zCEGhN8rm+7xdGSsH6d9XfLpydqKvn7bZJFb/svLrCl7LJHh+FcZs0mlTh188YDzbghN6L15jjZxDP+iLNBNbMNGJf8YKExjber59xMGA0FPaA7E/BeYKtTawU52jTBIZnbfglgyPds/5+PMA+GsFPLIf7PwpN7IjDU0fk+5x6iDMVTxYDXAc8k5LRw4G4sQe+MSKo8CApodSHKfWRwQ91gldpSBxO4e34PELB7IXPhtrIxy/zwjh+JGtWrTGhe/FdRnDIpiB3AGuEFnLg/Dl+jNhkNT6gRgjWYn0mA0Qd2nPoTONO2g4m83FMceMN5DZbjNPNRUcVn1MStYHnUalP9JF8gZc6hSt6xBKQv41c2k1CQIt2eUDQm30CXWT6VCKeRNfdE71omYPB8aIvbWAeUDE78lHWR4hEAJc5bUW5TRPYti3XrpR4Jwfwm+BdO3CBUtw0ftMupkigAiaNuoe05SVxUElJnpwUFQ/ETCQxGnSqyyFiJ/PwvT23QCuwNpCwB/P+rg16vDEHyNEKklaCFf20mTQnkwH2jcUmZO6Hg9yPtE8w/DVHQahZGGRlWFBT0c69GZDRyRTh0GPYef4wiufhQ/5aTiEPGaY9Bas8QPt2Jw17oUtQ/QGAHZcxYjksXH1NB8PYxh8ck2Jnx35gV49kIOYM7UFoORKT9EnF5wXn2sJZH+p/pkJiEptws7EBeeWmZMavm1Tp+fzn1iMQXpHBZ8RY9opxz40nb+wUxr1Hg/EiAZLQ1/CbyOElIT3rx0uARiYAAMP0IzQKCC3CI+pnyy8ixAmC8EdHqSQ5uTewAABfhbt1SV2qzkVCTnsR62667Oq7WLGQv5okXTsrcJWQ3WlRqZxqI5xoYiV872F0mCjf7yayNHOd21iWq9Dl09DJKHNVVQJA56jEhvlOCRtSCL4zi+HLqupdWuxLrp1yj3pjp5zyLBRj84PDMSPPpEiCNJ6mYRYziK83P/l7e+MQuFBsjMBSVDybBqfFI4s1SaCjH62Vq3R9oiyWRKGaxxxKaSEbe4NzOwtHQyzh5g0n/W8dBU8KuIVC34RSAhBTK4w7Iw0kXJnhbUziBkSE1JR08p431orRRRiF4LLGshZWcts2Bx/uIq1VShIiCodBxf89ihjWUJBN+UZsLOcIwjO1rfWckdTydGq1qZTjcNECLgDR0iNv/gKEF2B+6YqmZisJ1mLwxcXKcIF0XvX5nVobNHk+HMouV2iRugJC7qxBBMzelk/MKvmhlSQAAF5jTvwJgDB6uF9f7Cg1liTWtsQK4VuSSCQMH8ONkZlF4JA6C9P4bEMLedQ5GHKOmGIcK6wTiUddepUgGgI0nqoNf1IFw4bo1DmB2KY1T6WlhoAy/fiE1s2NHJpeYRTznBaJA7SKks0FgDPuNUso//ue7D6fhVgkmziMYkKI9wZs0hEiosD6BN0zIJDpJCiuJsAbiR6gKUMHV3zMHb3MohC3uHjkKs1QOFRq76LOJdhBO+l5ZkyH9OgdDlHa3QACYiBwp3avbmobNvpguxVaqTZUWP9617A/zyqQ9uN3Ij9tb4lkHqLla1RPtDp3oQ/kezvOrZO1jjK7erDSlYx6fgEwv1y7Ea5aP64yqInzLid109S0aJCzsxQuqr6EECfJdPTE0+0kYebkRyw3Mk44aPvM6Dfzxs/Hy5Nu/2J8Ef9zQW06dEHYEqOdc3ldHlIWtSjy/IXQTleOA934WZUOr5s8Wkjb/yjDZP6GpVIR6XCBy9Gn5Cl4RalFJPMLa2LFsA8frLLJxd4ZOY8KEClkz6SPqjVxjRpOy25D5BwEQrd87X+mVrBgqRnl+vE+U5E1JP+nfhHvI0mppwNI7hw58t3ieMKHGuWgZIeWR7W46kPqyiIscoZv1mkuCo8e/lPB3Maw1aTbYUPPr4k5ogZ79vFaHBpF7ZErMNv2PthvzxR1LT8estvVtfFZDBZIz4jl0D7EQl5G/pbhujbEtJa1zMMNCPvxF3wYATF4pQJzZfn+CvOmP0OkowNC0ZZG8945UULpUyR8Ocf1V+ncMWSAD6OKBJd/xhqobCbqmviTLX3do88M2zsmv8zDwq4AwSBDBo0xD29S4o6UfDfvXOAVDNJ1W4YGYNu8GYBecYBK+c85Z/m6QCIb+7tkV0lFHEeUpl27cFLm/+mSfQlT690AJOVlkNOgzUptuLsDLJF9E4xtlU9zz5y47VaMKAopUwMpCGJjnWCKKaQRM8YCLtyI0pjE72FhavjZwAlQvG5/orXDag3lpMUgMAyJGjvCJuBCH2KfqItCmiTWwK/Q5r4L6RZG7JO3BNS474q9wvZdkCcCfRNEzwMCIlCYrE0y6WcKH7L0jBda2gmq/QXG8DYebcJkld5AAXezFg0fATNh8x6BAMQe5vBZC/2E1vyu2XS3PKUpkLUZNHsYRG42pfCltgLdjrHAjDrMfQHuwdLLeZYG7yvuiPH7m/ZvWqShRstyUvfUyDKqZ3otHWks5x9/dryKdZojpMPSBy1dc0+Q0vSN6oEV/NqR4pv8NmwDAQSAdE+nEB+PFWpYWwO7qTHApt8leY2zKYlNIxzqhVnAMIPmH4wii33b4tM0H3DrBJ6b0FCowpYDEErUg9b8IBH8r2kkrP7h71f1l75GXrErDpdeCdh+yDgQuEyzyHF2Bbth4KUgScmp/r3xjSA3ygW8TeYxZT3weXjPcxZnOfigiEcqsdBlh8BYVtVsgZJ6Xo0u8Bgj+u8yPVpWr/VvHXRn5tpfZiwvBe5LOkVWdMf24fy+ZgTPcfOiQCf8TBJvVmylSQSvhlxQfpdaaIwufrcDs/uJHLfZg2dnvhKp9vuMGgI7OFAniILXZU3eC9UnEcDefjCved5YQzzzGdr6fIXGkae/x4mQAmLED1MBHq+Kwi5H0L+GwIVsHfpUTAi//TYIhVtTiiqEwe9fCTVFbtm4HibCdXWofli4LUf0YceGjxd0MsLhJPgXdv43FiY+SmcnR+mNYFI2yGuB+c43jkmCwzFL3a9xidJv/XX5VcnAuq3A8PC+9f8r2NTW7hOnMzKvZdQ14Vk+mgREThheNmWojCrd6471Y4+LkPAfvOzx/At9mvBkiyl6oHWZu4vX+KOg0m/uC4TXv7xS94Zs/ZH/EwhFeDrtCLxd/8AsBGwQo1LnX/hB4yyP+4Ku9eIl5gkTwIhrFEphwMJRL/Wst1X5H9As5mHdD2/spTkmubjEPRUoUgiPAzwUEY7QCYd1hNu4hSGWxHDUYJ6h5afVxIcknT/7VAH4JXj6oJ8+IaT76K/VCSnE+e2rfCA3IluXVVCCronSvMyyQjLxgan1GDT101fIo5Zhc57lWmqMNefy8xCBMkUHS/PDra5Mhj0i+HBO18b6so683cyzfcYqb1iFqmk3rNRtSLx7e7uVCHRDdjSQf+veZP1NoXAbx87sURbFujRcEiFcicgOO5Ss1kMGZWRfjRBECJldL2SwDqbA9ooifKxxD8xiqVBfo0lav91zENyuwHa4Njn6DJ7gFb9AG+xO2hlw1doE+CDvlS8AXpvNT+QCfzEyi6WXB/lME3aLLRZaLLNeeyqh8TKkHCCiFr75wAcVCLWXVj3RbyIzyKuZhB9QCSU3HS5oAIO+lKXxBU2vishpkHAmgG+taPM87RXNwUxT+Ts+4DJqQuE3iMimwqTzl5QfOIhBGvwR4gMxoNtbimGvldCyYYDkgXuf33rZfaDM0vH4UrtEh95BxfO44KipaKGt0Jn37CqiPcuxb/OdNPtfgIEPxndhABB2bHmzaO6kTh+qVfUlcXlXk3dcuWbdTGVwltUTRMSzTs6kjh6TOAdMJKj4zsqTfLZPG4vAlxHXE505GbQYk/uugjEbimtO6UU23n4kcS5E4fK3Hq+cX/QmxxHArQZcnqPTvkIhsIZ7Xz2ErwbpLY+CJXMeTtGfJc4Wep9HR/iPpvFzjRcyc7Uv1gEWhYngy7VEilu842rFIBH7Qt83ruNKvUqIyoPqP1pLpIMvgmea1N07wkQ340NsYQqsSHH3hBMEOjh0G4Y+mQUxdfu8Zqa52MWk6xbX2umlT2XgdDdELySeY6OmJYPmxMne/Gzv51ewz7QrDVuaUScifCfIaTT6vE1otSWZ2drXtmUOaivYcv2HBN52X+IXBqip28WX2yChY8TYFXaFC7+VzgapKLnFYI/UZkMqJOQ7ncSrjKbp+Lxv91isX/6h89lIpy5Ztc4GzUWpRVdd3Pe7VZNR4faVL0hgENVjlA+UyBbXtmLSINAH1NwZ4NoxnjUMtVkY1NHtJMXaguNCMs1lJmuNOWXW8W4iLqAfBszrpX8WLoC/abhMU5zzEAC1RDxAtFlqXM68ZJe3Ee7PxZMiUFLhtfDohNbj+m9GM6KIniNJQ9DFzECNQ/naG8gkNiryt/m3rMS75IDOaUz98jx6pww/Ie6Tvxro5M62gORGFwpR56xP4MO6OBajRfQNtiZ6Sgcp46tGzsQuLmrAdBoQQTvNyVmNZ56UWDWCgo3z8f8jawGNgs/3gn84GhyNfO8S3kajQyFggePrx2oCXpo242jXOlKtJqz3dEYqNSIxZDRQhNcadVSZdNHo3SoZt4klYZ+PI3UO0mPIr27INIdJw5WUIoLzViBmj5ryTdaOk74edsoCaIAan8MdfPa4pc9j7SGZ0QdXoZvilRWkKVYFfv75V9VtxsIPTvvA34zQlwsXhSVsqbLo1P6d5xWA/sKa6aDkonWm5Y7u7Xbk0H07df5EgSenQl5yup0gt+vgGqzKe/uundbpbGGkmOprPK3LubCJW2zxqQftrmIThieAohBdAF86P8PLGUjQE3J7gPMGK59qaeTmV+jHKlL86czWJ/wx/s+KGXQJKssufGk79NNdIqzjigDvirJ16WZrWmmy75tpMd4nOhIMqSKFTKSZlsRlWb2MAiJDtr3WjSPwj1qtalRibtovXxamDBSZ7AIJtYax8XyJTKBArnwqDF8p2wcUqu9PehQ/AsIXiDZkLOLy+0Eoo/BQkZyabIUfZS/Sf4wxPQbXSuKzy10jvHlU3nsJ9Iui40IBs/4X7QnFzM78buDEdW3Me67LXWR6zc/mqVOFLwwhLfjYGJiqNhrxtA5cqwWOhsFOK+tJo/3B8yRSftLaY7fmiTHZm6GgS80HxtSrjTvEp9R9Md4tbgE3QpdTlm3/vwfAPj9ZOvfPFzW3SOVGBm/E7ZbyZ/y2dT++Z4xvcAA4mYBvhI+mY+bIyGAkDAlX4EK1iMG5JGrdIl3TIID2soKLCbIwjwXzg/cvtR1M07KHR6PMiX64bhEXLf+XRCWM41VFQi9w4s0EpolRMTF9e0zamOldJE9OCZyUAJuxPb5TY9EJtGdNavrIEA3vZE6OROIvOxpY4TESG76cuq8k+059dttcD79J6Kc8ZHUUQjsGSX5r4aW3i1JtTsbrREsvmaMz89936S5bXIyYvb+VEWirHfeGy1yyaJrkOZhUJS4hWevNkdpogjgnSwjzoXfUtj1mVpYs5j4UIvyoPVXZz9JBY+fjuEHB4SVUBBAwn/rDyAxjQoFaT6QEg3zGch26yD7KqpdIgHfUSikBpHQJMHf0KxOXBypHQqfKfK/D1e+ewC8oloWe+f2Zt0kQl1WyCsUFZaFldz8uZ4mZC5ZwrhuXbK7qapHGpq9OeGpISst+xN0oMxBIwMh5N1aYPy/FKRIchPE4xzwMrN5tomo4ECgCM+AKfqLjBU0l2WyZgteM0bqZgteM0gocyWNuWm2pksbctHaFL0RYgqCY/pKZhNFDZBktnZArpcPdLXxFyks9x29Tc/vKF8vWwZUxrg37/uvBzm7yP7lufhSMLv+J3TRfmGOy8Bap+238MLcyU8ptzbJfO2Np8xuKJmybmygtZguavUgu6wtTZ2Jc0YzKJhvtv2PLA56s4V/L7PF3bLdTH3ziu1t+myUZZns1bEL4e7wCUv9XeV1znkCSbJZkHY3nowpR9ySDohGuJau5ayQNBeZasUn4VEd/1uswlBU8vd2n/5ilZ2t3CUmHHiqg08DW4cePDNeYwv6NZOGY/kxET520c4XrULVDoZTIKYhDQv3/HCIWx/sIhHRshdmQpfapco0OiKUYaBYpNSq9ARm15HzHryQVllVhS0QndneoMRuR2LzqxB/TlxWlODYl8tnF3XOxGcOCB5IBZEJcRHERMK1fhan1itZ4JF79vQ/IBX8mcPSSY1DogasoioiXFXj1MDzTD5pj63pdpBqvydXyAJfLc3jagjcWnZDYHLKZ8hNghQTlN1riWawijAnOKKi6OGCJi2cXRW11fZDObyt874pWrj/De/RSRMTPqCgbOiby1PvzcWx1QRDjpOhVJFfZBoVJbuTpC2Bc9avP2QAThwZkAAbLHXCvCEI5QIYVpvQtN8KScQKN6VY4wY4DmJ5yAstpCPjmr6i36akWM0Uv6Bl9KwAAAK9jKhB72YPogxTPYMD2vHyeAJQWw6hQMjD5s0n7PLfGOfKQRMWtYacGj4h6T7hAEI5azuGyLpiyAwLMlvKU/ilGQdLkVl4JSSlKjtjn/9kOOqVmax01syEe5QYOifU9RYmlHE7oi1xPx4xIrww5l2hZmrmJJh1i4GSsPkDBIlM7HSps1/yAWlyOW/G0Ab0kyHquz5jDo66jzyFDj0c57bFDfhqtcXLjyDtsk+4xQhhbw5004OTa7ha5M/7ZAmvAgDeqr5BJGnOZp66iHr5a+wua69Rx5VIzY/FeMnIZHgFO5RkzdotVyjgVTfioSiIeSVV5/p5SId6tDulJxNUZ3GbXdOLR3+nPdqEYJSzEowq507dgG3ocBIO0SoHcmBknc2bP3GgDamfAPjssRyud/1R5oFY1NUmnCDGIjFXRvcjim3rOZrfovCjIdaTfZfw74iBXeQP9PTTaBzOceppAjvywHzh8nY92zqArOeI1n9JJLKzGd4RHuhfShdif8ho419WQB+OLczWza0EdKgD5+o+2YK/P+/B7Bc/bBItfUyeBEaGpaEXYTUyrW53EZDsaHJfJpMrtycpC3p8sWa0ucDDqLJfq/2HG5gKkOJjo3xcolnLqxBbQ9NfWBNccFb2QDxJG6gbTuH64w/wrhIHxnCj6tqFcxXDBkMTSTD+0mwFTv4AYJ/4qLrA4ZlVr7eeODeLUMef9hAJteWHHPJqk6PQxS8klIwW5BYwjqeRF/laBoTk0hIrlqWhms5f7RxJ5KbVapjLhDV4Vo4PWLiakvX6LmgiGtaLy6nkz5ACbTBm/Ml0AF5QsV9PPn19yP3ci5nO1DSl4e5JaeNjVLFZX0tz5oIt59ePJaDK7RbABxjV2ZNf7fgM1Veg4G/HbtpS2s1RTJOmXi/g3JjRc5QiiH5QaJUSDSu4z5EdaXhlyU30ITy4zFIMJ0mhZqw/gF47tqb2RB/dw7C1zBjd8KsZCLy6XHBJNhmfYvU+qmpimE4x9RzBu65sotp96AlmONwwxNu65WqwgWJ6xaXe1pyVp4yvsiWjqC+iQVrQr+V4t3+dp+xagQv01GxVc7wx05owsKgWwanzC4zr833sqN9d4zyEi5XZKp6FYgEuLcmkUBtziR7IHYwAAAFsylrOLDjTS0Y6W1QgCZpGw6wajVenISx8Q3VUP9sH+6yev6NcdyIqnSMYqReA8l1occpGcnrn/RGf8QeBt4kFVGtUmSRhIrj1FbH4hsjZMnEy0QpJp0gmk9O3n7ePgFuRkMI7PWJ8vvo6Avp0q6gDdDZrpVytp16QOBu5Osa4gN48tx9eFkfJxSsWGxoAPMhSG5GWYFADB5NmUflAFYgJQKsrRyWS/K0nczEWOAQ/yfcJ4rEEfFwc1E3kcqZyImHDi3eRb7WKMoQp7RgabwopANOXdtg6Elf04bLkT1+x8aJG5Eh5xifNS+AioQ8u/X7BPwbNiSaBU7411i9kfaeLd5YzsiaX4Pgf9MFBTog6hLsk2Jqd6aucr1jd7tNKHZuAHVt3QbgvN0ln/59IqRFISTlLhz2/rP4kIf1oObwo1AMtFa7uBs49nWPX1CNx+YcWizCwX2CDFYhaYoYms49JElngOMbjQI241VAblu4Txjq9UyMjyW/d3twrxscXHv6JU+0bM/Dq5y8LLsigEtao4bC7JdWzABcFjgtSCnptgwkh7WsR1+G8VJdAsUXAaqTAcdAPfNt6cU31vvSpMcUP3RCaMjCpAJWfgSdLnhlLDYrAnjQ63mmF1Vr9MNkCqXZV1R4tlQNlHNAzO6CpVbA8oAJ4Xi5qB5HknSAgxxmSFRCwEAc6MgLOg4A4Q8HOwIU8Uo1mehqax46m65olBr8gCrsYHTnAsRsHwewbUCjf4uBOJDzUS5LvrZwsZfZ+p+G8cVCH5Br/P8QfEjUa4UqQlXIVNsWGm+wVQ/++1RB9QS0DTIKcr2UPsQX/w/QBOdcO/1zojHOSg5uELgpLPwFqFfSHayp1qJoTMLQrQF+vdCUQImjHDFVE/NtS0YE68Y0cruEfS1VO9gkL7lbJQyK2C1+YhJTRG/IG2HVaJPXrVWH/s9asuLU9KzgVIOPf2QHLHD4O62yh/S4KKEMry59AgwXMsoYsJ1zo9oQ8uK5j9xBZ0ufzP2d/5TJ9lrlakxy8APw2HuXKqpCk7GChHscT8Nvr/clhwwKlqEUw9wqht3Ijisiw0R/pPD/9Xa89JjvplCXRBk2D/Bv7xXPBoSNUzCaUvT+NaZ/wsCzeooCONR+DK+dTq73YfAWUGBl87hQlwXjPTA/irTZrS8/adBoync552JbqStUURQXIo+33hyWzvx4eGMI8D24HbHZddeKRG+fccLyuzwCr4PjcsvcwITnGdpzyCF3VnLjFKjOeL1t9b0NTFXJ4qElwErTql8VBlabfqHYOgtPF8oqMnkl5nPRodf2bareQkuy5CdmMI51ROUrkobfvXnsCnXGfr5iAQ3j39jtKf63pzznMc71ZOElM2R+9SD9XyeXdI9nthOOg5USKousKeHERU32UflkgjnGmY3XzVfG/v72Eceri2iEM07tEIZp3Q2Qh9dPxB12hH+B9hCF0QwiKyKxtIl5xCtWvxMWHoUj1fwSTxKufNStkSQD9ojUqM1W2wfmUp6MXbhXkUTglprXrfXqjeya/2SMTt5G1s7NW+kB7I68EeIH/rAe0g33KunSHecnbri3dWt1nuHGo4IiR1wwcb6niao23YV357ATsF0Td6BR03dqqAogBIKCU0JtnFtqwjlV2OBMb5KHAV3kHmRdZm15YzSlTi3f6tKFQHooPk4NhhTBqRkBuB/+Xmmi/Qd1v9xk28HIFm/rJ9KxhIwYA0sh1yE8+Do1pwez9nZDKXe4/CPZDwBC4wEnIt3c3S18v9MVRc6rkFlLsf2VENF7+55mhfof3IYWPNLST+DkUmiEkRQb0HlYQIeq7mz29/Cy3q2CJOHztj/VwCE8E1kWzdp1UyXV1ziUjqsjW596GAf8d2iYPhwtwBQVhK8xvofZt3XHLazvT1EdNpF5IONQbr0l3Ns0tBwnSc7Uw6DwmMk5Gkv2gw2hZhcc8ymslAUyFp4NrREP3GdeO7VNna7dGhQZGBFDeDIv5OO9bIWMpeRtFZLvFjygaiW4wfwDKHvh8+rQLbVmwoDpbvRzZTCkfbnoiyB8NPqF67DmJ8e14sn5iS8GhEsWh+1pvJzVL9pRkMg4qbG5Ha8R4uBIH5kPnQdTI2d5U66cLfITmt73+JzPfksqQTCQSwAARhm+5iRRH1M3oOINiunfhG0OsJan0kB+fAa6iLug+ANX8u1Lu1gYKN2GkKgtFJNlnYZmvwLrd2czw+hIY7aMSUdXhOCPJVZEy9/AKPlrT4mB35KSeLIqPVHM+wnK2kiAMcM+jvPANeFADyel82o+lvtpFXyUu7+3V+UNdBq8u+S/Q1bH9SFjf5qpofO+sQ5KoJ+lUgBo9osTXh28vyhRdhbuKNrhkjdPe/iAIuehqi9YuSSR5YVQvy0XyfO/IhJdcPr6xk5VLNCoEXsEWC1xber9uUTxhPYUP6dn9MUrgN4dMD6LPeVJncXkO6bKTEIb6994G4JDs8MyiTEcb0o1zrcmq4gC2MwmpXErP9JigjRnPzc0CUPLNxEAk1BC3v3S3hpnWm+Dsg0bemFf2+iNyDNiP3U4ZrBDiU/7g3tt6atVtGYj4IBSZZk9iWztSrYFUADKTD3dRvagGaYJSizEil3tzXfH5f5DM71BWrH3UDumdnqS/UkxVMJf8gt94tyEPc5GtgfNLUNPilHlpibkFm+Jo+LiHJeC71+d7FShZUjcAlWo9Dk5FD9QnlbV7TbhHG5/f+/MIIq0eyhn4yTd2H/WBY46JrjWGkgL1VWxTrQ84tWWqQSzFX0QTUQsGIXycDR5DFk4VAOXiHgLfdMFpNL/NMmJCwI2wOE89DIGGl3Qefu67YmmqV5xJDVbeGjsCfHaJM5aRjEzxy1f4LVGGMWYJcExAC29vNS/DaUWPdaAsdZfnKoFSzdPlAFFxbJdyZv6gfNdj25yof0/R6do4eXTrQFaDLNg3pcyKtMqJELhgOfReQ5LkRb6ey7tWEinHY9g53gzps3ml1jFYymXIqXPDWo5KQk4lbTAdNxKabvH7WMQbSkOXP+kWWeIbUzs2pzGFazae6mdy+4RN+yvPfwQ3jIoBuWGRkzCg3bfzaPP6xEjIqfVtjpevgI2peZSPu01W4UGvmOf6SDpjrZi5RN31WAm0h9sbZpdR8GmB6tFV0zLZeltHsgqEaLizHLItHA3EdIDz7h+h0EBxcNl95C0yXfdK9hRfLWBCON6AYHy5L77I3yIDVB+H0DQE0MPAM49EJO4KlUxP1rvWlgU1mQBtC8ByrpCBYAju5c+wWB+te89KljixZUVN5SuGK8BwW8oG9DbfMGTWdEVib8Bpp0guOE+zAMNTK7fmeaznuXrSIkCIYzE4Nca5s3bzl+RjK+N8PGfdwXOozRWYJuB5RcgE2LK5aGXkeN335NTqrpVPCtoGxYs2BepQIakCSyb8lHsFUuyVwRFh3DjDt69UicQviB0ezPuTXZDs3LUWE/42uyrFyNX2fAfaH2yPYIqck0gXA0JY/fV9YQOvzog+OMYe0J8qa4KMysHR1lkLMOUeJRwk3ABjFqHlrR0lQIgzBoMbXvE6csNtESBD+OZSQy6YRTSHKwKqGjLP0+L+W3Xox+xpDie/aSfRQotxTnMTWqdZACppPUEKffHzEbugDiVFTscyKd2qj1auvIph/ethorIHcNzOJK3boNbrqGkMl65RHf0xtU82MdY5usrx5nu9qCZnwz1pGpZyTFnNuEOhsOLLmFaolRU6W4Wn3Fxu2akgcDpBEBpGtVpdgKY4AxEunK5u+rW/i+nHtImI/UOZceRNFRFldS2U1VbmLOROFkpwK1E9J7nLxVW7TzEOEq/sckw31PFoGAkFiaApuRh10kgcMHwV/hFuYnd4gIrlvemHoWC9Yd8oALZBG7ZZABzpsSUtyoG6FkABHeeyrc3nrUZMDF6h1Dso7+p89SV3OV/19W/e1yxCLPKtt6IqaUAmfj8mCdyc42QfAcZ5XKJC4TvQRbk8mHwHyv0qpPY6W4PO3Ywwvswjao+0qUEj3CMB2SLjB9BtoXoJ0XKfzvJ3uw9BvDhU8EWdkkc7uTV55RtrICgkRKjmrBT1IB8oyaY40Tgp2m+bKJzIJNtat+o7NAcvZWCWEvpFxKqQs6RoU7q0TaER37eiGJEEKzz/tPO6kPnepDVNHoLlYaKMKhSiG7Sl/XOKTvUCn2OaHdCAqI//skjhBDMfGk/yVkKuk4G3l0Yqtl6GzRlkKeM8FqQhcrI/Boim2J/yKpp4e0iYNF/MOkvGk04FnCxBBpFfRpv1abA1y3xLo0N+x30LiT9xn6FxHeRR70BoZRv5GFjrFL6wSCUi5OKWCQVasUEvy0NKOAeFpPDuDLcsQmaOMBU/GAHXqXKPkUG1x6FQ8ONjgikMYNAu/Vf+Icqr/xIR8Fvo2eY74UsQ50Cwol91RcUvY9KRhHVtZUFZHDBGid3uiqL0HvXfFDm6AtLh32avsbm3Qm18rQbQjQ+tP6aHAqQYJgKd1rFRYI8wdqPA7RMHQM/kbW5kc77/RLGiDmqLrHRU5GsHyraObJTwy7yCMfBaFZrQd1aV0jEPmruE6+0RZuxxWp+XzB9HDRGbh/VrLQGF1U9UiI5DtpEyaFt8IQmr0DFZGhqzB3q7KvNUe+AieDH9F958KxNzWUaAeswAOWSeTZF1Xl/roAQB22fFBgAG36twAmRTcYMr1dLAAerQkw6wakJR9cWZ3ehC1TwqDRHeDJZ64xb0P8mAlKprNWs8wmqBbZb2qM05oXy8L6Uid11E3aivbFWZuVHhCVSIdEd37JKNAnml6pd12XA8pnpIVV0Gd2KAhl+yGWcvh+NcFBaBfvP2o6/oRgzx88j9WEAH9j0FY375NTkcKogMgjTRc/sFPT09OKn8UTAMAfz3Lwy0QBYRDmXrtRa+ny+EHqOat+UUISOatXcHdq1980t97domN4/6f7z9q/LRY9UgBO4Xt6QTpJi7LNxZZhqcho4/5hi4cPnNLZxIs87zn3OsZd310fe8LfvayKgtU+d9vuMr+ohGLQmK1g67t8OvJ3Aswm7LAUpRn4RS02OzbvtTCNyjdYWWGmx0rfE9cIczpIgSqtZrDAz4R2i9glVkrG59cj69pyqx0KVv1HGycp/O8m8gluWRit/SGUHyKYJZhZCt8cy2wbNK+Q43WbzPcMDROwr89iKEnuM0EKhq9uJUhVp71FJwhVMHvZQO8W1sAH1F99XOzaveXGAOXhKf9kMvhZM3CrXndKxJpUdysaSUq1vDbBZPdQ1kvKBXArQqU30y41WksmmHOoKQXCCa3PJrqyIy+CEp4JU+BCON6APNAWDx+zG6cfYNQrizjuTRrUme46SSnacVwF8YShv3wN8vCwqNc1RRBkTIhT6Z8tibr7fXKSgyr+S8FlCTDNgI+hs/oNGTSRisAN6CDaUa4lkM+ZhiDuDH+sEQgYxxfghZ/KJ8JgSskuDaOMBNytkGD7PGZgjTKUPJXQfaikaW7kvucCh9t7SKQvhBdeQhAspEIhk/WxdxDD4SvOCQdHWWQsw5R4wIaqSyVY69scRCZFa3vzyG0V9Vzt9WrlX1HlxiXpA5aRGYXqZsxRUmQ6lvEiuqFQCAshg/htd0+0heqrp59THhWGH9TaD0u0rIIkt2MuyyVttWuaLVg/dgQknGth3dq30y8tn26GDc34nahqZX+ycHjabssMmJqSF/AqJOsRxWKF2hRAx/kXL/jFSlT7AqIdL4J8B5tHcRm49LlC2YllD0IhO5AhXLnabMNEeH5J4e+bc+ip3q6qJAcD+VGJQjAUJbGGm6+jCOrDf77vrqz3QZ3FalNa3AYePoDgbtgw9qBIFgCzWJYYu4w+OJNaCyGoSgq7vnHUftJZChnd6qXbyCcsfcm3wJYEMy8KLAIgjpkJeGyvkrRnRHjHMsUKFiBNIufaKQigpd/sPAgmprIAJ6Dfpzr/67NGuSlE1+SasSNaIjRp2JvgcvnlFxQAAcZKxp/5wHnwEe3A81sq0cgytjWWd7VYi341a6IznlhSxGHZcsVrbfJJZeQjZ9l4qiBdHRPQv62q+syU10MtwQMoNfRZY3mwYxuZiO2yJkilPu7qo4Havq54XzzJIvTFnw5+L3vfHrlpyLJ23oZmlKO4jBI3NkT3cIXr2oaxWU2Tp1Ag6fcNLewhySWBAfYKg/sWW7+82rrYKXflzVg1GyRi6L47WnqLK4iRMBS9/KY3TCUED5wxTF9zuqeY6VuU3HAYBY4bB6SwsqkW4JYrwy0RE/Xa8TMgm4q8MVErVaiN6eyyvMTycHEF/zZu6+XtL2A4QfboTH2PETPDuLvT6oyX1x9Wi1j4W/s5n1dze51riHecyrD5wNR9QV4Kb3oCi7MaQbovxMHRZMq0at74vRvzUZ7jI1O7DijbpWXwjBTmecIVjxgpQtBhlWIq9v5JrNzXstWGwmPH3MoxbGD4qfUZx0s3ru4hbN27XEl15tJhK58Qbn7gYZiMRpG+yRAMzo6IocnQuphObdG9Ungav4OLJXRJNs6nZv2+rfIqdpEK/K3CwvtWCtzCFpql9SKnSqTcdHmEsmKfejq3XpGzvQS186IzW4milGw/lE8KRUoFC5IiaMUhGSUfPJP6dp1SEYitBMHbncONL5AjOstzbLKT69mkWldU7rUXtScvt1tB9Yh9qq5KeVVB3m7iR3FTXK4b/uZUnsQIpWKJPUJHYAYAgiwIXgoTm+NO7nA8LtrCeEnPMKZSXX+uZCsPUQkBvymPmXUVpaFjXcqbYkHrHdyBsYsB6HVh+BS166kuVgE5sqxUNfxpxrwet7yJAI3mOy1AuP4jsjPEQZQAYzXWUFx58L7Zil7emV8CMEVOiOB6dSpDxs3n6r5/LZ2YV+KTr9gYAfogBIf1/S2WnwrvtFBiZCFTAkA/U9iZb0TZ09ivogr77P22G3vhA0AgCbY1gzLdlyMyqygp2RayORbkRIFHO+oJnJPiK5hXm+rLZQ/5rfFtuDL0YLbKlqsRKRD02lRuozC35aws1n2g2OnBy57i7Fo2pX9ggW0SY2CJxGcid1tGj0wFY3Ll1sju3qVqdFaeyZe4jvo/7NBM4I03bfpLviDmdiUuso4LI3KOuZinS69jUbf6D2qlJt2kfqlT9ZyNTfu42UOitKBz6P/NFSqguPjqO7f2ijpjD9uyB1Hw8xtHJHLk+d76RKkd5oRfYoq5URNS9xYYLyywTciIWFe7gn04BLZZEBYEwTXRQ0GwZhFLHi+hPNWiDYvUNkYAqCjgQB6PMUpSEqnyLciIXVyM1JB2KtFwcvB3JqFFXUs9AR07jOWq+TmgH/B/ckzpLu+SBBXQCrWAZ00qJCtmVxhEyMMTaGHa6Vcv/X8XCuSNaEkQ8/wOLreZ6DKV7ZRdRFabdgaHMSG19dzOuhp9FkXFQMyHM1Qga6Vr6LN8LZ7WjKdRGTywcgGGcAmC9MQZuD+ZvCUSHBg4qsgxSOhyov8F50bp0mawe8uoI7TGH5nxXrPW38INiGL1ImQpKyp6LW8URdRbONgxSQYbRJkwNffbnV+h8k1UIQn3h+QCzo8hz34CGrYr+W5uHhW3YROG6LHV6euyNd1nTNUubc/lfqNgGnbKUS/G/LSXK7JG7MFcm7HIc8G3xVlOGjn2xBnzXfS37medxDFEz63PNFzIc4bGLPOTw2QHCDSuE7PU/sgUe/I6wZVGMAm0lhzSPfsQ5rHxEk5cenQGvZfNhfdxCZdxTMrn66slfRnzpHCmtpCgI6MX82IIU3rgQd4mpFP4eeIADc0r9+0MTvWVTdpn7D2x+oAZQ47JAoSwlorFFikRBrP8+6dLO6ET0kUMG/KzAAyMJMJ97QWYl0kp8LIWLDdNUCAo4Fmp34iOUgm8feqLHgxRbHuBBF4zMswpRl+EiyRZVotqmlJ7SN5xZM3MnRfYBhy274jViCaOKTfeTJi0gvIubObX9X9gOQZ+9jyLFagjBQWbZsoqvY7lxU1yrDxNto55dHSA5cYRfi3PmnYK4MWHb1+ULg3KONuQqb1PpaRfLYkMFSTFF3czjlGCWjLtP2pQj2wEd7D3lFv5lNAr3VGj+DnUiaGm9VHGCbPYqJyX1rsHLGJogF9DoEGEh2In4jYSNucDTrptK/rcynjLAWi161OLrGfLTyzMBdMOb88IAWOnDBSOVV8Lb2hcVV2gAQABJ4fegqvRvOGbMwgIjIonOAArx1X8Qd4TbDz5x5hEo+qhIXSYMAAD/bGmhumnykgGWOUDhUhTP1YE+ZA7MJMAUCxpr8bmDdFpxzpqxOPRz/88rLzK1AFkLIWOmqoggSNzdE4oUdFFXlQZAfcthZ/aiue1pCbW9IQHzDTMTMNwXXb/sKjRAxlazA2Z+QtjZprbWYjLaRH/tR2IdgViJwfC1uWK/nNS11v1BFiSvb2+nfRa0N1cOVRNmdCEmDhwsKLfSVAyPJiyRThwm/46yq+yDrUCRpW//R65myh4zGeGVuImjetuyvrArZ3Knh9toS0FvDCItfSTVjyHcwLN0ppNbSZi6C4WXA4bXTTpE4wgTcB/vzMUyg+0EuisWrLwtjyjI8JYFdDl7lUgkKtFpxwUZEc3Uji7P0ABue9+HXNacmpW+Y85E33EV5/MyCZyvU/xzxNTqSf5pWlXYJvz9aZaRCyUdOyVoT/kOGi2nM6Lw3WrmYj+V9okk/zNB8beI9UBbNeOqQo085vunecQQO/duPgw2z28I1p6UpklyJJhUGFJ3qZ+IWDU7vOhFv9O+u47gZhpOIONGRoAzO/G3pIV1zyZvjSKJnOBMRIGzXAh/Y1xthWCN0UQ3RkhsZ0VHJbaGMB6GCEUaJkVEdSJld93zJoKX6d7vVbVJbfrxwAhABiIkeYnN2M8ib8W2i+MWnhMfbRSAl1Rz9psWAQ5NaFf2feaeBAhM5mpzrWfWV8m0eUJZ3m9wqVV1pgoxfHqncDyDld1QVLSSD0eg18H3Y/CMeR0XDWouiU4jvswTHieiMKuqSkNDYwRpgKiFDHqYLeGEbeRBxQKZKm6a7TTZoQU46sd2AzyqcpXrCRM5Ii2O5a2FAD5FEwAUISp9xMn9jXEOPn7WPX+6fR6Iwq6oBlxnYAfRpioU5eMLorUicXqirZ1seRi8QzNYBZnI3su63mKmdz6nEJzfKAjrQUZzwQ2BGMezgyfnqncDyDB6aP3Mrvu+ZNBT7HexDXE0sxZH0bWwi4TZzR1N/nRC1SumnSJ/AYmQoausCNIImqlfyrJqugxuEpzlNzQhAlbMk9TeHMHYckdzz4AVuf30IItNteXVfhehI7Gzyzcj1nBxXPkO3Sd0OdT/nryotyFBoJjMHZMuAo5kvjaE713KpBIVnkYX42c0dTf6wX2nwZW2iRd0W/wFbo4/goL8FxasfgGl4L2ucL8X6wK2w+GaTFTiAbEH4QOdF5yWghww/8IVwegCYRxT6ud7HiYCJDui3+ArdHH8ZQsCuZr9tx2MwvGEUu4fkjBTZfbRY2t27xV4uKg20wS4lq7hZIhxdm43YkfiE2yOZBzUV72MYgU/TK0JiL9iOaw5HmXB7Ozi3h5moaXhbY5QyHTXFcueo8T2cY6RcZqimIl2PwbX2Bprtiyg9+SLy/T57Cxr4bnyClq1aBZr5OJ0jLmeYg5hHVS29o/+tXbiHPEVxZnUC80iUYIHwJ2pYvYHaN63//zglnGrLipfYtjQaRvuqtWlgsLXb7jWrIMyy55esHW1iq8pNnRSPxdToFi3dhR1gf/qkalqE83U0j/gktT9qkL5wZH8Gsb/tJ8LE27rPczNJLqIDsfIy8r33Q0h2bfwaD8WbEw6WQf5ofSi+OObEi1Ug/0GM1fahUFO+nuGONMBB8MfCjdLKUxQWf5E2hkJ/1OyoJnjjskL85OaCxkG715kK7yNL2PUvq3k1Oj2Qy6XoDTYx+EmNBnyTgKeMyA5mdwMw0A1C4yXVAELFb7aC39FHYTtmW/Zr0EDskQwIydDIJuLJ5Q7ZznxdurHyLx87mmTEGqeJDOe8guQ5GL4wO+bu2j6pmdPspwrIOkmGwY1MphapkLqp0iuTNxC+xq9CVcS2AWRgvk6RC3prEjdrBDyRD2zJ7YB0xP1JVGTLYw43g2/LJBxyHazG7pE3McrI+hnECQQOFktOX/DU0yAUlzIE1t01edxI/LPicwydy8Veb33w/soA4Bfzogi3NRDF9RGzwdqK5MYFIkWqY+mH2OH2dRv1WpqA11eMeDt/POlIwxzFqqjZLjjJTpLPQUxwJrxHRfJfA6PlmnDz+zVyIqxZvVbJ0leFOOJT5bhkNG5eN/ryBeYoAVrmq9H/buhVH2nKnQCzOmPnAlW2ABYhTJ/MzAe7m6bPmstGzEMXvN6jy+7fYkt3TnyK/wVa4IUup5fVxS5yRwU21Q/U8uZPzqIEuQ8BRqJJxsDnphuR0DQxn68Cr14yKoS3PUZIeT48WwVWE0//BXVAcXJiA6QuOWbq9FU+p4gY5wFA1/DFum6E0UIsxtbZDLTMYg5geuHBB+SsaHaUyO3xySLyhs62AuAg5Mkp983UzwwInjqtMYP80C4Mp+b3iDReV5bO/GIK6lUTjPw34iLW+7hl/kNFZTho7QGRsTtpBr+oMjwpZY5bE/fggk79vW2KfrUm1olFHhvcSQXQ/YUouUzkEG+h36eqfxcHOD0zUBOBsYSA/JDAVchF+hGtGacO02TksoFbSDv39s4XbkpSoswGAfIXOQabMCzVq00gfZjqusK3plXm/YFQj8ogGF4DVUIsweChtLlJLZhEd+hpxS47c6xe5+2WSK2b1chtfEmvvwFVQsIzmvPL/c2p9NSN4ao0njNY741OzvIsPAmzqFTlj3aT3c9vMnpf5lWGLwI2BwTaapWaFRw2Jc1TuLnvWLm/DLSqj5k/7u/e35o7S4fM2pRlVmnoMlLAI5CZnvUKs+PwPP/zR/SQny4+eE7PS6LbSJxzoMRkffaqnbmwO+RO6YPphoN826DNeVUjmay1E9zcZVFUuaHcNJg3G3oujFVIXmOi49M7GFnHEm5t2lxglOG2Ifob5VVc1IldnVA/UghN+UR+rGIUguJ2Ce7+veIVr/LLhqKJ4uLCrsyXxUaad+wXfLcqgovWJ4eorkBqYWuaXIVywQn2a/m6vhaGdPj21pO56ajEkODbdGVoBOUonfm5Gvalt3LM/13e00cTBUbqTm2JTHeShajLt3vJjCjo1lrzWSs99KOwaUfO/qsxTyHs/G1FxLUOYjLnaooFfDLPJLcuvFLU1+GcO/HeZ53DLZWnYohcSR4hROmtCVOL9zoDaPTCzXhjaaiLNnuk7yI8ZYFBT0dC64Ln1+aRtQxefYtwRbHAL34xl3UeuwQg3lCQon2p6R4xaBCP6586UZ45lGxk5obpUcleixqeT2GJR5/DLRAKU4vF78FQIfW78AkZJVzO3xqdwwAsA9jul9lYByJWRj8Iy+WgTtAmUyJJJrmaCNgw32yGT9ReCakRqSmBHWY30u3AtSCown3Hi5NOBknazuR1+vEeWI9dMby6czangJsDiWV6ifyBsTJovEzMmdoJihZh3hFWerRO+F2bf0w/HOq6ZCgoxCLWwmXYpibNQMF57VnvUUIiA8t+s6Jzyft0pzFpxHoGpozP7pHOpPCoUG34wgdELmUbwLJA2xt6TwVZAxgAFRG5KfT/Gwg7pu/u5J/sVvGh6ruYvkNseBYFXGCQkoMRWed8iejZKKa54IpRR3BqQLT2NpbshSKchXw5w4zXe7hV+Y0b58rKxpi4EuCdE8CrX9nujBUR1ac/U6exfTLougabRQhMD960RnnU/Z3kEPOCIxTktRJcctmtsN6aYZ+ziQ2CJnEtDkHPZJKavl/FxnbztEu4XF/cbqXRi0ZT0nQuHiAV1Gds1N7uk15KRkwVzSuD8c5mYI6JAze1MLxJj8FxgA2PZEs3rDrXF+qHqgT4SxxCsrBHxpOJK0h4QBvLZ3I1hK4TxyaClBV9l7fMmbZoz4hIvikeQfH75UbllTwX8A6ws3Wsobm4JZBG7XjiigJ4zJVtm+jvHQJTDd1AlsJLUapRZkW92R1pmhL/hyibxyM+fFReHibZFRn7VS4AbEneH/wpBCltCpuDxTlzOkbZpuo0FkfkpBs4GHmoetY9/NtsG/Nr0FtZ6NuNn7MbVXGNfnORztdFvk2jd1b/E3XUlQH3hQQky7cRp2CQGpFGFFwPWcQCCllxvjCotY9WQDtMBkuLQf/Cims7hTfzs7DeObtRDwwacLM/x+9uvW3LCSVCNNDNIaYpDTsCSVnWUs30qP43HBPlvwGQ42KveKJzdAGZ3OUPpNVIqyZ9qzfhiJIOM7p692+QNAnTZdch1MrpQy0cfHKc6k2wvs8gfRrqxg+J2uBDqFzIM4Q3qq9KayCyyyMqhvrcj/hnuoN5rJ6e7Xet/9tITqOF2twyecZQ3O9pnSOXC9e5QcdX65BZB5ZZ5lVDoRJEYjAWhUPZCNod80IfisT44/uMwwQ4WcIZaR1juNAPJIjEj/AmmYJAZZFYSQXzi554TpM+900X2eIlZijKodacPDoEma86/PuA6sEw26xujP3vjOjWXXOautZlgFT19oo06NxuI711hK/V+j/Y+5YOqKBXwy0GzSgucnajH511jyHFn6zVVtqJ8sFd+q9KCSkVw57aLQB7nP7QETuhVhZWQ3gbvF+gyVTPOokXRpZKQSRF1r0n/K7fdb6mcX7OMAnRTIreJtzeRo87pBlXrCTclHKKpmKFU1Rc5yTDPhX0eDrWVw2rx9BL7lIf5jX8WlPSezR2R8Yj2Rj8/Z2+GYiZSMEoUTbljZeG8ridD9DEINR2pRtNw3jyvZ493URpBosP2hN8vqrvsVOopMDxixxXXCDbdQyJJuBlymk94UHDkNn5AxZbu3B1ZvdS8WXtdX5SIM/tmiHNm4pQJtvEaG4uU7ZMKIRqpkMeQGadvmFc3BR1dHsWswNUsYkT0xCPDvdpFP86yiOKzbL3Gnl+MHU60bgHKQarPuc62xgsDPwW7RJjMEQTwrOB0TP1+m5FQ2001yI8ad0Q2BBz1pxTKeFA+aj7Pap6GymrLowwNoMFp1YCp2bBBLvkEX4o28wgFEFy/wiu9xXj5oIRnbq6LqBCcoxGS7sht45VR/Vx02JOwuEoUDy0DyfF0eCgzCLXkFRG+1flTqePbYwAkRaWjMlUPJ8pxkBQ9WWRl9fp80xPqflL00EPhOTHTApGdXQdgKbfvHr8WJAJGnZXnOlVT6fffkNZaNmGxy0WpRuKziSz3PHCFe1QzrUbVu5qUR1hPWBUTm8vlynf69dxarM7pkfzuHN6lNkMDZ8ZasB66BioE3y+ro5N3a2aef88k5Oi87ByMJzTGHfuYJGNW6+0Jc3C6AUbZOB2PgAwM1HrUSAohAPKHRhBJkruQFmiNHbcFxrqDhIx/BPmbRzl1TNcm4JVJRLO9A4fJP9/d6sl7/1AUUKIXrWzAHjHLUA3W0QTNrkQp+GBTrl1zon4bBKKQ7WICUOoAp4Aee7LQgThEoDKooyKDpqLgG6hVuNXfs2d9r1eaKEANCfzTYVqFQ+8qTI4SPUr+7Pn6Vvxz8eU+2BFliErn9JuFVAqb4vLYveFu5JlisraqYCAvoNbJEpIRdd53gzfuFbGQVRbGU1lzu+OnzIZGOzwh53oEk2y3Q2oGX7pXEmuH+vrt3J0D9J/7tkyBEISHbutGS2Z25xnXgP9g/Fh9KTwRgWpLyP2AiQe+HjfMBWvI0y8yptCV5dmEqi7CdzVsG/Nvx/pu23prGVm2PgFw8UMXzFP8MYAyLO0gb3yyCckzANkJ2Ed/EXjbAnIuJimYbTnjSv9sdZjlb7ljuqxutzpE2PNzOsfc05C1ZKlHnn+OdrsjHGNVTKP228z7Ld3ZU4Mg/RLr2zIlBpISHMzYwLHm6tT7ezlVz62r4LAUdpxkxFm+TChcUTtIVmuKzbmjvxp3v3BuQ2Gxwb+rZMX6Yr6U3srgKNH8UIw0NnRGgq1q2DqdgUByd3k29gqRn2yuamTmpXZlcUONVk02dUUFh2jNMSYWJFc1fKorR//pD+JR11SDmzmmynXEWWtLvOigzhrXu2r5jXkosMxzIEcnheq2aqdwnlGOdJk+0GAUZ2bjcnHOBjl9oTTO19NikPPa0GNtlwOHhfTRMtUeUCn6GXqjvX7Vo8uOkJd4wDBVRd15+mEXFBy067eegV2nUrOUcGqhbVHvYmskkN80cgGJ7iySBrHbsH5LQRayC0VSbDUGY4YjYz4fPKu9x49zqbLpjE1cNUqM77U9g9M5C8nyOaoWmreYW1NtcOtYW6AqfGBNFgBTD4esTeqSracH2rWntggOOPPPp/6o3CrXzeYWi61MkCRhbt5WnUjUtwYCCAiF80vvZE2nTFOHyn2zci9GttH38egUXj+EjHnfFomQghCtVNFpInTfsvk2A/7YNkX3ksCDy8GPsOxwo/JL8gd16/ycT42Ed23yDGDvV2+tmMNIMaByEHhIgpuvMRrnVN0SacQSAp9pmKe1R/2i+Y6lQZiG1J6tKXSnPbNZS01XbcBHvEi1EdHdlHJaQPwAJDXw3SrIXcn2JbYMi2RAHPSAHbHLy5B0+lTnePGEDvueEb83HM5uI7RS2gQEwGJPtGWx82+Paq1+nXx6v3di0O3P2fk2IVVS44yj+YCnLpsUY242DTU2eXAvF0mOEowSJZ5sWzqGc9V00/jDrf4jdSwOu4M/dFhv1nSEvrHa7HLznAT6sMcCv/pApmzbM4R+NEBG55hU7QlhPEVhS92h7tSoVqovbXOvXTrMRFP/ldD7mBCpzyFE8WiBA4Ju1rNw15dNGhzddTzJD94F9RBYhqJGLyeEimZyq+oPGRXpEFOXBDbnuo1lvrupmJfqt43GsnqrebxLm/SS0rcB1Zx6mA4GSl6EZM/Y4A7t012B5SakyxRa1SJ8Dn7m+FP9aYO1eoKNKsKmKcXB6ZxONg7b0IoWYrxAWtgSqMip2DK+yUERN28+RuZioVe7cQBh5FhRzS61faNcokF3MuYvnU6ovvZ0GkiKYOKPJe475Sv9x/alk2YqbZOIkYBkOL6WpjjFLC9FDcv68IQuC4QmyBYjecV7B8uNdWtzNbjmSGun4NrwXO4G+hP2KJnuowQwnwB9pTuoB9v2pePDgTAawODlQAOJsheXPQpXz5JSBRPB/jCE12NjdYlRPCeS1S90FVtLhIAiDEN8DwK2h4CqF7PHlB4SkA9LIuqnhKHiPXv4Pf+TPVg2QctMwHNW/iUuapEgURXwUrn+dP5YafJeXQl8Qhg1uz3/6SmFCSxsfIeLVkq1+c2JJj0nHRZxCwtMGdTQnSXRWhdEgEjsSphqyHWkAcgUmkp3PSgXDV/A71ISAjnGDl0GGtW6dSJcbTde8zIZddWhPaRueWhub4U3F1yWl6V/e5PpgAtLs+pgF9grcIEoCqhXRgnq2RpyBUVtfAyMie9UqHpZLsDty0uQvPj8EXtjZHz6LhQmPASkFA3DPSaHXx04cXkvmAxhYlsmOatA9yDlkzRDXvohAvndX7/fAAUCEThNAmKIiFM65FAl+rdvARZclU62t98rqBdsz+V+GgE0xqUr8kHjrscJP9rKVl0Wi89E6obQ3OgdPCRTYRfadiDgCuVuheAGrJaksea3YBuoN+tiRr/6QFx7ophg/o/HQVtYFc+RH8tI5wjy2i6aBpOxec6gzrgkinBtrUKF92Tc8aUd70kEV7nyURnuKp14hXwp5mlWwJSyy8Ok03Euw/RynlYSM3iHQ1e7TfMTKbeLKyTiykdvoH4yHrunoZCc0TD7MMiWTyYdMgsn3ceAB0yBeag/ys+osOE00zvd9KIEOdrh25pmN4gEa5TvFF+zHwG8MvpDvZDF1MExmM68wDdE2+Xb6VxaqJIq453wkR+HkkX9nkszJQHkH5o5iTDLhukXlLxQvNzOBmg+phnydA8JNaE91ybMC/CKd6WR3kB2Qw2vwf7aHbd2t5q/m11Ihz/aK37YXZtoVZeOjg8ALsIzXAAAAAAAAAAAAA==" alt="رسم بياني ناتج عن price_chart.py" loading="lazy">
+</div>
+        <p>ومن الطرفية يمكنك عرض تاريخ أي منتج بالأمر <code>python monitor.py history headset</code>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>history_cli.py</span>
+    </div>
+<pre><span class="kw">from</span> monitor <span class="kw">import</span> main
+
+<span class="fn">print</span>(<span class="str">"رمز الخروج:"</span>, <span class="fn">main</span>([<span class="str">"history"</span>, <span class="str">"headset"</span>]))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>2025-03-10     249.50  ✅
+2025-03-11     249.50  ✅
+2025-03-12     224.00  ✅
+2025-03-13     224.00  ✅
+2025-03-14     224.00  ⛔
+2025-03-15     224.00  ⛔
+2025-03-16     199.00  ✅
+2025-03-17     199.00  ✅
+2025-03-18     209.00  ✅
+2025-03-19     209.00  ✅
+رمز الخروج: 0</pre>
+</div>
+</section>
+
+<section class="section-card" id="notify">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-bell"></i>
+        التنبيهات الحقيقية على Slack أو Discord
+    </h2>
+        <p>
+            حتى الآن طبعنا التنبيهات لأن <code>"webhook": null</code>. ضع رابط Webhook الخاص بقناتك في <code>watchlist.json</code> (الدرس 5)، وسيصل كل تنبيه إلى جوالك.
+            هنا نجرب على خادم Webhook تجريبي، ونتأكد من سلوك الفشل أيضًا:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>webhook_alerts.py</span>
+    </div>
+<pre><span class="kw">import</span> json
+<span class="kw">import</span> logging
+<span class="kw">import</span> sys
+
+<span class="kw">import</span> price_site
+<span class="kw">import</span> storage
+<span class="kw">from</span> monitor <span class="kw">import</span> check
+
+logging.<span class="fn">getLogger</span>(<span class="str">"monitor"</span>).<span class="fn">addHandler</span>(logging.<span class="fn">StreamHandler</span>(sys.stdout))
+logging.<span class="fn">getLogger</span>(<span class="str">"monitor"</span>).<span class="fn">setLevel</span>(logging.INFO)
+watchlist = json.<span class="fn">loads</span>(<span class="fn">open</span>(<span class="str">"watchlist.json"</span>, encoding=<span class="str">"utf-8"</span>).<span class="fn">read</span>())
+con = storage.<span class="fn">connect</span>(<span class="str">"prices.db"</span>)
+price_site.state[<span class="str">"day"</span>] = <span class="num">1</span>
+<span class="fn">check</span>(watchlist, con, <span class="str">"2025-03-11"</span>)              <span class="cm"># يوم أساس بلا تنبيهات</span>
+price_site.state[<span class="str">"day"</span>] = <span class="num">2</span>
+
+<span class="fn">print</span>(<span class="str">"── Webhook معطل ──"</span>)
+stats = <span class="fn">check</span>(watchlist, con, <span class="str">"2025-03-12"</span>, webhook=<span class="str">"http://127.0.0.1:9/broken"</span>)
+<span class="fn">print</span>(<span class="str">"تنبيهات مسجلة كمرسلة:"</span>, stats[<span class="str">"alerts"</span>])
+
+<span class="fn">print</span>(<span class="str">"\n── Webhook يعمل (إعادة التشغيل في اليوم نفسه) ──"</span>)
+stats = <span class="fn">check</span>(watchlist, con, <span class="str">"2025-03-12"</span>, webhook=<span class="str">"http://127.0.0.1:8765/slack/T000/B000"</span>)
+<span class="fn">print</span>(<span class="str">"تنبيهات مسجلة كمرسلة:"</span>, stats[<span class="str">"alerts"</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>2025-03-11: نجح 3 | فشل 0 | تنبيهات 0
+── Webhook معطل ──
+فشل إرسال التنبيه (ConnectionError) — سيُعاد في التشغيل التالي
+2025-03-12: نجح 3 | فشل 0 | تنبيهات 0
+تنبيهات مسجلة كمرسلة: 0
+
+── Webhook يعمل (إعادة التشغيل في اليوم نفسه) ──
+   📥 [Webhook /slack/T000/B000] وصلت رسالة من 3 أسطر
+2025-03-12: نجح 3 | فشل 0 | تنبيهات 1
+تنبيهات مسجلة كمرسلة: 1</pre>
+</div>
+        <p>
+            عندما فشل الإرسال لم يُسجَّل التنبيه، فأُرسل في التشغيل التالي. هذا نفس مبدأ المشروع الأول: <strong>سجّل الإنجاز بعد نجاح آخر خطوة</strong>.
+        </p>
+</section>
+
+<section class="section-card" id="tests">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-vial"></i>
+        الاختبارات الآلية
+    </h2>
+        <p>كل قواعد التنبيه، وتحليل الصفحات، وعدم تكرار التنبيه — مختبرة دون شبكة، باستخدام قاعدة SQLite في الذاكرة:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>test_monitor.py</span>
+    </div>
+<pre><span class="kw">import</span> unittest
+
+<span class="kw">import</span> fetcher
+<span class="kw">import</span> rules
+<span class="kw">import</span> storage
+
+ITEM = {<span class="str">"id"</span>: <span class="str">"x"</span>, <span class="str">"name"</span>: <span class="str">"منتج"</span>, <span class="str">"url"</span>: <span class="str">"http://shop/x"</span>, <span class="str">"target"</span>: <span class="num">100</span>, <span class="str">"drop_pct"</span>: <span class="num">10</span>}
+
+
+<span class="kw">def</span> <span class="fn">kinds</span>(alerts):
+    <span class="kw">return</span> [k <span class="kw">for</span> k, _ <span class="kw">in</span> alerts]
+
+
+<span class="kw">class</span> <span class="fn">RulesTests</span>(unittest.TestCase):
+    <span class="kw">def</span> <span class="fn">test_target_alerts_only_when_crossed</span>(self):
+        self.<span class="fn">assertEqual</span>(<span class="fn">kinds</span>(rules.<span class="fn">evaluate</span>(ITEM, [(<span class="num">120</span>, <span class="kw">True</span>)], <span class="num">99</span>, <span class="kw">True</span>)), [<span class="str">"target"</span>, <span class="str">"drop"</span>])
+        self.<span class="fn">assertNotIn</span>(<span class="str">"target"</span>, <span class="fn">kinds</span>(rules.<span class="fn">evaluate</span>(ITEM, [(<span class="num">120</span>, <span class="kw">True</span>), (<span class="num">99</span>, <span class="kw">True</span>)], <span class="num">95</span>, <span class="kw">True</span>)))
+
+    <span class="kw">def</span> <span class="fn">test_out_of_stock_gives_no_alerts</span>(self):
+        self.<span class="fn">assertEqual</span>(rules.<span class="fn">evaluate</span>(ITEM, [(<span class="num">120</span>, <span class="kw">True</span>)] * <span class="num">3</span>, <span class="num">90</span>, <span class="kw">False</span>), [])
+
+    <span class="kw">def</span> <span class="fn">test_back_in_stock</span>(self):
+        self.<span class="fn">assertIn</span>(<span class="str">"back_in_stock"</span>, <span class="fn">kinds</span>(rules.<span class="fn">evaluate</span>(ITEM, [(<span class="num">120</span>, <span class="kw">False</span>)], <span class="num">120</span>, <span class="kw">True</span>)))
+
+    <span class="kw">def</span> <span class="fn">test_small_drop_is_ignored</span>(self):
+        self.<span class="fn">assertEqual</span>(rules.<span class="fn">evaluate</span>(ITEM, [(<span class="num">200</span>, <span class="kw">True</span>)], <span class="num">185</span>, <span class="kw">True</span>), [])
+
+    <span class="kw">def</span> <span class="fn">test_lowest_needs_three_days</span>(self):
+        self.<span class="fn">assertEqual</span>(rules.<span class="fn">evaluate</span>(ITEM, [(<span class="num">200</span>, <span class="kw">True</span>), (<span class="num">199</span>, <span class="kw">True</span>)], <span class="num">198</span>, <span class="kw">True</span>), [])
+        self.<span class="fn">assertIn</span>(<span class="str">"lowest"</span>, <span class="fn">kinds</span>(rules.<span class="fn">evaluate</span>(ITEM, [(<span class="num">200</span>, <span class="kw">True</span>)] * <span class="num">3</span>, <span class="num">198</span>, <span class="kw">True</span>)))
+
+
+<span class="kw">class</span> <span class="fn">FetcherTests</span>(unittest.TestCase):
+    <span class="kw">def</span> <span class="fn">test_parse_price_with_currency_dot</span>(self):
+        self.<span class="fn">assertEqual</span>(fetcher.<span class="fn">parse_price</span>(<span class="str">"3,299.00 ر.س"</span>), <span class="num">3299.0</span>)
+
+    <span class="kw">def</span> <span class="fn">test_missing_selector_raises</span>(self):
+        <span class="kw">with</span> self.<span class="fn">assertRaises</span>(fetcher.FetchError):
+            fetcher.<span class="fn">parse_page</span>(<span class="str">'&lt;span class="amount"&gt;5&lt;/span&gt;'</span>, <span class="str">".price"</span>, <span class="str">".stock"</span>)
+
+    <span class="kw">def</span> <span class="fn">test_out_of_stock_detected</span>(self):
+        html = <span class="str">'&lt;span class="price"&gt;5&lt;/span&gt;&lt;span class="stock out"&gt;نفد&lt;/span&gt;'</span>
+        self.<span class="fn">assertEqual</span>(fetcher.<span class="fn">parse_page</span>(html, <span class="str">".price"</span>, <span class="str">".stock"</span>), (<span class="num">5.0</span>, <span class="kw">False</span>))
+
+
+<span class="kw">class</span> <span class="fn">StorageTests</span>(unittest.TestCase):
+    <span class="kw">def</span> <span class="fn">test_alert_is_sent_once</span>(self):
+        con = storage.<span class="fn">connect</span>(<span class="str">":memory:"</span>)                 <span class="cm"># قاعدة في الذاكرة للاختبار</span>
+        alerts = [(<span class="str">"drop"</span>, <span class="str">"انخفض"</span>)]
+        self.<span class="fn">assertEqual</span>(storage.<span class="fn">unsent</span>(con, <span class="str">"x"</span>, <span class="str">"2025-03-01"</span>, alerts), alerts)
+        storage.<span class="fn">mark_sent</span>(con, <span class="str">"x"</span>, <span class="str">"2025-03-01"</span>, alerts)
+        self.<span class="fn">assertEqual</span>(storage.<span class="fn">unsent</span>(con, <span class="str">"x"</span>, <span class="str">"2025-03-01"</span>, alerts), [])
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    unittest.<span class="fn">main</span>()</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>run_tests.py</span>
+    </div>
+<pre><span class="kw">import</span> io
+<span class="kw">import</span> unittest
+
+stream = io.<span class="fn">StringIO</span>()
+result = unittest.<span class="fn">TextTestRunner</span>(stream=stream, verbosity=<span class="num">2</span>).<span class="fn">run</span>(
+    unittest.defaultTestLoader.<span class="fn">loadTestsFromName</span>(<span class="str">"test_monitor"</span>))
+<span class="kw">for</span> line <span class="kw">in</span> stream.<span class="fn">getvalue</span>().<span class="fn">splitlines</span>():
+    <span class="kw">if</span> <span class="str">" ... "</span> <span class="kw">in</span> line:
+        <span class="fn">print</span>(line.<span class="fn">split</span>(<span class="str">" ("</span>)[<span class="num">0</span>], <span class="str">"..."</span>, line.<span class="fn">rsplit</span>(<span class="str">" "</span>, <span class="num">1</span>)[-<span class="num">1</span>])
+<span class="fn">print</span>(<span class="str">f"\nنُفّذ {result.testsRun} اختبارات | ناجح: {result.wasSuccessful()}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>test_missing_selector_raises ... ok
+test_out_of_stock_detected ... ok
+test_parse_price_with_currency_dot ... ok
+test_back_in_stock ... ok
+test_lowest_needs_three_days ... ok
+test_out_of_stock_gives_no_alerts ... ok
+test_small_drop_is_ignored ... ok
+test_target_alerts_only_when_crossed ... ok
+test_alert_is_sent_once ... ok
+
+نُفّذ 9 اختبارات | ناجح: True</pre>
+</div>
+</section>
+
+<section class="section-card" id="deploy">
+    <h2 class="section-title">
+        <span class="num">10</span>
+        <i class="fas fa-rocket"></i>
+        الجدولة والتطوير
+    </h2>
+        <p>المراقب يحفظ قراءة واحدة لكل يوم، فجدوِله مرة يوميًا (مثلًا 9:10 صباحًا):</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+        <span>crontab</span>
+    </div>
+<pre><span class="num">10</span> <span class="num">9</span> * * *  cd /home/sara/price_watch &amp;&amp; .venv/bin/python monitor.py check &gt;&gt; logs/cron.log <span class="num">2</span>&gt;&amp;<span class="num">1</span></pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+        <span>cmd</span>
+    </div>
+<pre>schtasks /Create /TN <span class="str">"PriceWatch"</span> /SC DAILY /ST <span class="num">09</span>:<span class="num">10</span> ^
+    /TR <span class="str">"C:\Users\Sara\price_watch\.venv\Scripts\pythonw.exe C:\Users\Sara\price_watch\monitor.py check"</span></pre>
+</div>
+        <p><strong>تحديات لتطوير المشروع:</strong></p>
+        <ul>
+            <li>أرسل تنبيه «صحة» إذا فشل جلب منتج ثلاثة أيام متتالية — غالبًا تغيّر تصميم الصفحة ويحتاج المحدد تحديثًا.</li>
+            <li>أضف أمر <code>add URL --target 199</code> يضيف منتجًا لقائمة المراقبة من الطرفية.</li>
+            <li>قارن سعر المنتج نفسه في متجرين، ونبّه عندما يصبح أحدهما أرخص بفرق واضح.</li>
+            <li>أرسل ملخصًا أسبوعيًا كل جمعة بالرسم البياني مرفقًا (اجمع المشروعين: matplotlib + البريد).</li>
+            <li>اجعل «أقل سعر» يتطلب عددًا من الأيام يُضبط لكل منتج في قائمة المراقبة.</li>
+        </ul>
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>مبروك! أنهيت تخصص الأتمتة.</strong> أصبحت تبني أدوات تعمل وحدها بأمان: تقرأ الملفات والمستندات والويب، وتحلل النصوص، وترسل الرسائل،
+                وتعمل في مواعيدها، وتتحمل الأعطال، وتُختبر آليًا. ابدأ الآن بأكثر مهمة مملة في يومك — ستتفاجأ بكم الوقت الذي ستستعيده.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">11</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! التنبيه عند تغيّر الحالة (العبور)، لا ما دامت الحالة مستمرة." data-hint="تذكّر نظام التنبيه الذكي في الدرس 5.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">قواعد التنبيه</span>
+    </div>
+    <p class="exercise-question">السعر المستهدف 199. الأسعار: أمس 205، اليوم 195، وغدًا 190 (والمنتج متوفر). متى يُرسل تنبيه «الهدف»؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> اليوم وغدًا، لأن السعر تحت الهدف في اليومين</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> اليوم فقط، لأنه يوم عبور السعر للهدف</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> غدًا فقط، لأنه الأقل</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> لا يُرسل أبدًا</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تفهم تصميم المراقب جيدًا." data-hint="الدالة النقية لا تعتمد إلا على مدخلاتها.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">استخدام <code>?</code> في استعلامات SQLite يحمي من حقن SQL.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">إذا فشل جلب منتج واحد يجب أن يتوقف المراقب كله.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">المفتاح الأساسي (product, day, kind) يمنع تسجيل التنبيه نفسه مرتين.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">دالة <code>rules.evaluate</code> تحتاج اتصالًا بالإنترنت لاختبارها.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">المنتج غير المتوفر لا يولّد تنبيهات أسعار حتى لو انخفض سعره.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! المفتاح الأساسي جعل القراءة الثانية لـ 03-11 تستبدل الأولى، والعمود REAL يعيد 219.0." data-hint="&lt;code&gt;INSERT OR REPLACE&lt;/code&gt; مع مفتاح مكرر يستبدل الصف ولا يضيف صفًا جديدًا.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">SQLite</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">import</span> sqlite3
+con = sqlite3.<span class="fn">connect</span>(<span class="str">":memory:"</span>)
+con.<span class="fn">execute</span>(<span class="str">"CREATE TABLE p (day TEXT PRIMARY KEY, price REAL)"</span>)
+con.<span class="fn">execute</span>(<span class="str">"INSERT OR REPLACE INTO p VALUES (?, ?)"</span>, (<span class="str">"03-10"</span>, <span class="num">250</span>))
+con.<span class="fn">execute</span>(<span class="str">"INSERT OR REPLACE INTO p VALUES (?, ?)"</span>, (<span class="str">"03-11"</span>, <span class="num">224</span>))
+con.<span class="fn">execute</span>(<span class="str">"INSERT OR REPLACE INTO p VALUES (?, ?)"</span>, (<span class="str">"03-11"</span>, <span class="num">219</span>))
+<span class="fn">print</span>(con.<span class="fn">execute</span>(<span class="str">"SELECT COUNT(*) FROM p"</span>).<span class="fn">fetchone</span>()[<span class="num">0</span>])
+<span class="fn">print</span>(con.<span class="fn">execute</span>(<span class="str">"SELECT MIN(price) FROM p"</span>).<span class="fn">fetchone</span>()[<span class="num">0</span>])</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر 1:</span><input type="text" class="blank-input" data-answers="2" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 2:</span><input type="text" class="blank-input" data-answers="219.0" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! نبحث عن شكل الرقم، ثم نحذف فواصل الآلاف قبل التحويل." data-hint="أول تطابق في أي مكان ← &lt;code&gt;search&lt;/code&gt;، والنص المطابق ← &lt;code&gt;group()&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">استخراج السعر</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لاستخراج السعر كرقم من نص مثل <code>"3,299.00 ر.س"</code>:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">import</span> re</span></div>
+        <div class="line"><span><span class="kw">match</span> = re.</span><input type="text" class="blank-input" data-answers="search" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"><span>(<span class="str">r'\d[\d,]*(?:\.\d+)?'</span>, text)</span></div>
+        <div class="line"><span>price = <span class="fn">float</span>(<span class="kw">match</span>.</span><input type="text" class="blank-input" data-answers="group" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"><span>().</span><input type="text" class="blank-input" data-answers="replace" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"><span>(<span class="str">','</span>, <span class="str">''</span>))</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! نقرأ التاريخ قبل حفظ اليوم، ونسجل الإرسال بعد نجاحه." data-hint="التاريخ يجب ألا يتضمن قراءة اليوم نفسه.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب ما يفعله المراقب لكل منتج في قائمة المراقبة. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) تقييم القواعد واستبعاد ما أُرسل من قبل</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">1) جلب الصفحة واستخراج السعر والتوفر</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">5) إرسال التنبيه ثم تسجيله كمرسل</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">3) حفظ قراءة اليوم</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) قراءة تاريخ الأيام السابقة من القاعدة</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر قواعد التنبيه</div>
+    <p style="color:var(--text-light); font-size:0.95em;">أدخل أسعار منتج يومًا بيوم (أضف <code>x</code> بعد السعر إذا كان غير متوفر، مثل <code>224x</code>)، والسعر المستهدف ونسبة الانخفاض، لترى التنبيهات التي سيرسلها المراقب كل يوم. المنطق مطابق لدالة <code>rules.evaluate</code> في المشروع.</p>
+    <div class="lab-row">
+        <label>السعر المستهدف:</label>
+        <input class="lab-input" id="rlTarget" type="number" value="199" style="width:100px;" oninput="runRules()">
+        <label>نسبة الانخفاض %:</label>
+        <input class="lab-input" id="rlDrop" type="number" value="8" min="1" style="width:80px;" oninput="runRules()">
+    </div>
+    <div class="lab-row">
+        <label>الأسعار:</label>
+        <input class="lab-input" id="rlPrices" style="flex:1; min-width:220px; direction:ltr;" oninput="runRules()"
+               value="249.5, 249.5, 224, 224, 224x, 224x, 199, 199, 209, 209">
+    </div>
+    <div class="lab-console" id="rlOut" style="direction:rtl; text-align:right;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">12</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> تصميم مراقب من وحدات: جلب، تخزين، قواعد، إشعار، ومنسّق.</li>
+                <li><i class="fas fa-check"></i> استخراج السعر والتوفر بمتانة، واستثناء خاص بالمشروع لكل أسباب الفشل.</li>
+                <li><i class="fas fa-check"></i> SQLite: الجداول والمفاتيح الأساسية و INSERT OR REPLACE والمعاملات والاستعلامات الآمنة بـ ?.</li>
+                <li><i class="fas fa-check"></i> قواعد تنبيه بتغيّر الحالة: عبور الهدف، والانخفاض النسبي، وأقل سعر، والعودة للتوفر.</li>
+                <li><i class="fas fa-check"></i> منع تكرار التنبيهات، وإعادة إرسال ما فشل إرساله.</li>
+                <li><i class="fas fa-check"></i> رسم تاريخ الأسعار من قاعدة البيانات بـ matplotlib.</li>
+                <li><i class="fas fa-check"></i> اختبار المنطق كاملًا دون شبكة، وجدولة المراقب يوميًا.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> اجعل منطق القرار دالة نقية لتختبره بلا شبكة.</li>
+                <li><i class="fas fa-lightbulb"></i> راقب «فشل الجلب المتكرر» كما تراقب الأسعار.</li>
+                <li><i class="fas fa-lightbulb"></i> قلّل التنبيهات حتى تثق بكل رسالة تصلك.</li>
+                <li><i class="fas fa-lightbulb"></i> احترم المواقع: طلب واحد لكل منتج يوميًا يكفي.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> أكملت تخصص الأتمتة بالكامل! ارجع إلى <strong>صفحة التخصص</strong> لمراجعة الدروس، أو ابدأ تخصصًا جديدًا من مسار بايثون الرئيسي.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="project1.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى مشروع 1: مساعد المكتب اليومي</span>
+        </a>
+        <a href="../index.html" class="nav-link next">
+            <span>العودة إلى صفحة تخصص الأتمتة</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · مراقب الأسعار
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '100%';
+            text.textContent = '100% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر قواعد التنبيه ========== */
+    function evaluateRules(target, dropPct, past, price, inStock) {
+        const alerts = [];
+        const prev = past.length ? past[past.length - 1] : null;
+        if (!inStock) return alerts;                       // سعر لا تستطيع الشراء به لا يهمك
+        if (prev && !prev[1]) alerts.push('عاد متوفرًا');
+        const reached = price <= target;
+        const wasReached = prev !== null && prev[1] && prev[0] <= target;
+        if (reached && !wasReached) alerts.push(`وصل للسعر المستهدف (${target.toLocaleString('en-US')})`);
+        if (prev && price <= prev[0] * (1 - dropPct / 100)) alerts.push(`انخفض ${Math.round((1 - price / prev[0]) * 100)}% عن الأمس`);
+        if (past.length >= 3 && price < Math.min(...past.map(p => p[0]))) alerts.push('أقل سعر منذ بدأنا المراقبة');
+        return alerts;
+    }
+
+    function runRules() {
+        const target = parseFloat(document.getElementById('rlTarget').value);
+        const drop = parseFloat(document.getElementById('rlDrop').value);
+        const raw = document.getElementById('rlPrices').value.split(/[,،\s]+/).filter(Boolean);
+        const out = document.getElementById('rlOut');
+        const readings = raw.map(t => [parseFloat(t), !/x$/i.test(t)]);
+        if (isNaN(target) || isNaN(drop) || !readings.length || readings.some(r => isNaN(r[0]))) {
+            out.innerHTML = '<span class="err">أدخل أرقامًا صحيحة (مثل 224 أو 224x لغير المتوفر).</span>';
+            return;
+        }
+        let sent = 0;
+        const lines = readings.map(([price, inStock], i) => {
+            const alerts = evaluateRules(target, drop, readings.slice(0, i), price, inStock);
+            if (alerts.length) sent++;
+            const head = `اليوم ${String(i + 1).padStart(2)}  ${price.toFixed(2).padStart(8)}  ${inStock ? '✅' : '⛔'}  `;
+            return alerts.length ? `<span style="color:var(--gold)">${head}🔔 ${escapeHtml(alerts.join(' • '))}</span>`
+                                 : `<span style="color:#888">${head}—</span>`;
+        });
+        out.innerHTML = lines.join('\n') + `\n\n<strong>رسائل مرسلة: ${sent} من ${readings.length} أيام</strong>`;
+    }
+
+    document.addEventListener('DOMContentLoaded', runRules);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

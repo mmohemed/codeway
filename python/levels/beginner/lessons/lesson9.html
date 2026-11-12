@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 9: الدوال في Python | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span class="sep">/</span>
+        <span>الدوال</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-cube"></i>
+            الدرس 9 · الدوال
+        </div>
+        <h1 class="lesson-title">الدوال في Python</h1>
+        <p class="lesson-intro">
+            الدوال هي <strong>قلب البرمجة المنظمة</strong>. بها تُقسّم برنامجك إلى قطع صغيرة
+            قابلة لإعادة الاستخدام، مما يجعل كودك أنظف وأسهل في الصيانة.
+            في هذا الدرس ستتعلم كيف تنشئ دالتك، تمرر لها معاملات، وتُرجع منها قيمًا.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 35 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 إنشاء واستخدام الدوال</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 مبتدئ</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 8</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#intro">1. مقدمة إلى الدوال</a>
+            <a href="#types">2. أنواع الدوال</a>
+            <a href="#anatomy">3. تركيب الدالة</a>
+            <a href="#create">4. إنشاء واستدعاء</a>
+            <a href="#params">5. المعاملات والقيم المرجعة</a>
+            <a href="#special">6. المعاملات الخاصة</a>
+            <a href="#lambda">7. الدوال المجهولة</a>
+            <a href="#scope">8. نطاق المتغيرات</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+    <!-- 1 -->
+    <section class="section-card" id="intro">
+        <h2 class="section-title">
+            <span class="num">1</span>
+            <i class="fas fa-lightbulb"></i>
+            مقدمة إلى الدوال
+        </h2>
+        <p>
+            تخيّل أنك تكتب برنامجًا يحتاج لحساب مجموع الأرقام 10 مرات في أماكن مختلفة.
+            هل ستكتب نفس الكود 10 مرات؟ <strong>بالطبع لا!</strong> هنا تأتي أهمية <strong>الدوال</strong>.
+        </p>
+        <p>
+            الدالة هي <strong>كتلة من الكود تُنفّذ مهمة محددة</strong>، ويمكن استدعاؤها
+            عدة مرات من أي مكان في البرنامج دون الحاجة لإعادة كتابتها.
+        </p>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>فائدة الدوال:</strong>
+                <ul style="margin-top:8px; padding-right:18px;">
+                    <li>تنظّم الكود وتجعل قراءته أسهل.</li>
+                    <li>تجنّب تكرار نفس الكود.</li>
+                    <li>تسهّل صيانة البرنامج وتعديله.</li>
+                    <li>تسمح بإعادة استخدام الكود في مشاريع أخرى.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="section-card" id="types">
+        <h2 class="section-title">
+            <span class="num">2</span>
+            <i class="fas fa-layer-group"></i>
+            أنواع الدوال في Python
+        </h2>
+        <p>لدينا ثلاثة أنواع رئيسية من الدوال في Python:</p>
+
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-cubes"></i> الدوال المضمّنة</h4>
+                <p>
+                    دوال جاهزة في Python لا نحتاج لتعريفها، مثل:
+                    <code>print()</code>، <code>len()</code>، <code>input()</code>،
+                    <code>type()</code>، <code>sum()</code>.
+                </p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-user-cog"></i> الدوال المعرّفة من المستخدم</h4>
+                <p>
+                    دوال يقوم المبرمج بإنشائها بنفسه باستخدام <code>def</code>
+                    لتلبية احتياجات برنامجه.
+                </p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-bolt"></i> الدوال المجهولة (Lambda)</h4>
+                <p>
+                    دوال صغيرة جسمها تعبير واحد فقط، تُعرّف باستخدام <code>lambda</code>،
+                    مفيدة للعمليات البسيطة.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="section-card" id="anatomy">
+        <h2 class="section-title">
+            <span class="num">3</span>
+            <i class="fas fa-puzzle-piece"></i>
+            تركيب الدالة
+        </h2>
+        <p>كل دالة في Python تتكون من أجزاء أساسية، لنفهم كل جزء:</p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>الصيغة العامة</span>
+            </div>
+<pre><span class="kw">def</span> <span class="fn">function_name</span>(parameters):
+    <span class="str">"""docstring - وصف الدالة"""</span>
+    <span class="cm"># كود الدالة</span>
+    <span class="kw">return</span> value</pre>
+        </div>
+
+        <p><strong>شرح كل جزء:</strong></p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الجزء</th><th>الوظيفة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>def</code></td><td>كلمة مفتاحية تُخبر Python أننا نُعرّف دالة.</td></tr>
+                    <tr><td><code>function_name</code></td><td>اسم الدالة (اختر اسمًا معبّرًا).</td></tr>
+                    <tr><td><code>(parameters)</code></td><td>القيم التي تستقبلها الدالة (اختيارية).</td></tr>
+                    <tr><td><code>:</code></td><td>نقطتان تُنهيان سطر التعريف.</td></tr>
+                    <tr><td><code>docstring</code></td><td>نص وصفي بين <code>""" """</code> (اختياري لكن مفيد).</td></tr>
+                    <tr><td><code>return</code></td><td>تُرجع قيمة من الدالة (اختياري).</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>مهم:</strong> كود الدالة يجب أن يكون <strong>مُزاحًا (Indented)</strong>
+                بشكل متسق (المتعارف عليه 4 مسافات)، تمامًا كما في الجمل الشرطية.
+            </div>
+        </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="section-card" id="create">
+        <h2 class="section-title">
+            <span class="num">4</span>
+            <i class="fas fa-cube"></i>
+            إنشاء واستدعاء الدوال
+        </h2>
+        <p>
+            لنبدأ بأبسط دالة: دالة بدون معاملات ولا تُرجع قيمة، فقط تطبع رسالة.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>simple_function.py</span>
+            </div>
+<pre><span class="cm"># تعريف دالة بسيطة</span>
+<span class="kw">def</span> <span class="fn">greet</span>():
+    <span class="fn">print</span>(<span class="str">"مرحبًا بك!"</span>)
+
+<span class="cm"># استدعاء الدالة</span>
+greet()
+greet()
+greet()</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>مرحبًا بك!
+مرحبًا بك!
+مرحبًا بك!</pre>
+        </div>
+
+        <p>
+            <strong>لاحظ:</strong> عرّفنا الدالة مرة واحدة، لكن استدعيناها 3 مرات
+            — هذا هو جوهر توفير الوقت.
+        </p>
+
+        <p>الآن دالة تستقبل معاملًا:</p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>greet_person.py</span>
+            </div>
+<pre><span class="kw">def</span> <span class="fn">greet_person</span>(name):
+    <span class="fn">print</span>(f<span class="str">"مرحبًا {name}!"</span>)
+
+greet_person(<span class="str">"أحمد"</span>)
+greet_person(<span class="str">"فاطمة"</span>)
+greet_person(<span class="str">"محمد"</span>)</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>مرحبًا أحمد!
+مرحبًا فاطمة!
+مرحبًا محمد!</pre>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>نصيحة:</strong> استخدم أسماء دوال وأسماء معاملات واضحة ومعبّرة.
+                <code>greet_person(name)</code> أفضل بكثير من <code>f(x)</code>.
+            </div>
+        </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="section-card" id="params">
+        <h2 class="section-title">
+            <span class="num">5</span>
+            <i class="fas fa-exchange-alt"></i>
+            المعاملات والقيم المرجعة
+        </h2>
+        <p>
+            يمكن للدوال استقبال قيم (<strong>Parameters</strong>) وإرجاع قيم
+            (<strong>Return Values</strong>) باستخدام الكلمة المفتاحية <code>return</code>.
+        </p>
+
+        <p><strong>مثال: دالة تجمع رقمين</strong></p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>add_numbers.py</span>
+            </div>
+<pre><span class="kw">def</span> <span class="fn">add_numbers</span>(a, b):
+    result = a + b
+    <span class="kw">return</span> result
+
+<span class="cm"># استدعاء الدالة وحفظ النتيجة</span>
+sum_result = add_numbers(<span class="num">5</span>, <span class="num">3</span>)
+<span class="fn">print</span>(<span class="str">"ناتج الجمع:"</span>, sum_result)</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>ناتج الجمع: 8</pre>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>الفرق بين print و return:</strong>
+                <ul style="margin-top:8px; padding-right:18px;">
+                    <li><code>print()</code> تعرض القيمة على الشاشة فقط.</li>
+                    <li><code>return</code> تُرجع القيمة للبرنامج ليستخدمها لاحقًا.</li>
+                </ul>
+            </div>
+        </div>
+
+        <p><strong>إرجاع قيم متعددة:</strong></p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>multi_return.py</span>
+            </div>
+<pre><span class="kw">def</span> <span class="fn">calculate</span>(x, y):
+    addition = x + y
+    subtraction = x - y
+    multiplication = x * y
+    <span class="kw">return</span> addition, subtraction, multiplication
+
+<span class="cm"># استقبال القيم المتعددة</span>
+add, sub, mult = calculate(<span class="num">10</span>, <span class="num">4</span>)
+<span class="fn">print</span>(f<span class="str">"الجمع: {add}, الطرح: {sub}, الضرب: {mult}"</span>)</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>الجمع: 14, الطرح: 6, الضرب: 40</pre>
+        </div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>انتبه:</strong> عندما تُرجع دالة أكثر من قيمة،
+                يُرجعها Python كـ <strong>Tuple</strong>، ويمكن تفكيكها في متغيرات.
+            </div>
+        </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="section-card" id="special">
+        <h2 class="section-title">
+            <span class="num">6</span>
+            <i class="fas fa-asterisk"></i>
+            المعاملات الخاصة
+        </h2>
+        <p>Python تدعم أنواعًا مختلفة من المعاملات تجعل الدوال أكثر مرونة:</p>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 1. المعاملات الافتراضية (Default)</p>
+        <p>نُعطي قيمة افتراضية للمعامل، تُستخدم إن لم يُمرَّر له شيء.</p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>default_args.py</span>
+            </div>
+<pre><span class="kw">def</span> <span class="fn">greet</span>(name, message=<span class="str">"مرحبًا"</span>):
+    <span class="fn">print</span>(f<span class="str">"{message} {name}"</span>)
+
+greet(<span class="str">"محمد"</span>)                <span class="cm"># يستخدم القيمة الافتراضية</span>
+greet(<span class="str">"فاطمة"</span>, <span class="str">"أهلاً وسهلاً"</span>) <span class="cm"># يتجاوز القيمة الافتراضية</span></pre>
+        </div>
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>مرحبًا محمد
+أهلاً وسهلاً فاطمة</pre>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 2. المعاملات المسمّاة (Keyword Arguments)</p>
+        <p>يمكنك تمرير القيم بأسماء المعاملات بغض النظر عن ترتيبها.</p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>keyword_args.py</span>
+            </div>
+<pre><span class="kw">def</span> <span class="fn">person_info</span>(name, age, city):
+    <span class="fn">print</span>(f<span class="str">"الاسم: {name}, العمر: {age}, المدينة: {city}"</span>)
+
+<span class="cm"># استخدام الأسماء (يمكن تغيير الترتيب)</span>
+person_info(age=<span class="num">25</span>, city=<span class="str">"الرياض"</span>, name=<span class="str">"خالد"</span>)</pre>
+        </div>
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>الاسم: خالد, العمر: 25, المدينة: الرياض</pre>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 3. عدد متغيّر من المعاملات (*args)</p>
+        <p>يمكن للدالة استقبال أي عدد من القيم كـ Tuple.</p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>args.py</span>
+            </div>
+<pre><span class="kw">def</span> <span class="fn">sum_all</span>(*numbers):
+    total = <span class="num">0</span>
+    <span class="kw">for</span> num <span class="kw">in</span> numbers:
+        total += num
+    <span class="kw">return</span> total
+
+<span class="fn">print</span>(<span class="str">"مجموع الأعداد:"</span>, sum_all(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>))</pre>
+        </div>
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>مجموع الأعداد: 15</pre>
+        </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="section-card" id="lambda">
+        <h2 class="section-title">
+            <span class="num">7</span>
+            <i class="fas fa-bolt"></i>
+            الدوال المجهولة (Lambda)
+        </h2>
+        <p>
+            الدوال المجهولة هي <strong>دوال صغيرة جسمها تعبير واحد فقط</strong> (single expression)
+            دون استخدام <code>def</code>. مفيدة للعمليات البسيطة.
+        </p>
+
+        <p><strong>الصيغة العامة:</strong></p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>الصيغة</span>
+            </div>
+<pre><span class="kw">lambda</span> arguments: expression</pre>
+        </div>
+
+        <p><strong>أمثلة عملية:</strong></p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>lambda_examples.py</span>
+            </div>
+<pre><span class="cm"># دالة lambda بسيطة</span>
+square = <span class="kw">lambda</span> x: x ** <span class="num">2</span>
+<span class="fn">print</span>(<span class="str">"مربع 5 هو:"</span>, square(<span class="num">5</span>))
+
+<span class="cm"># دالة lambda بمعاملين</span>
+multiply = <span class="kw">lambda</span> x, y: x * y
+<span class="fn">print</span>(<span class="str">"حاصل ضرب 4 و 6 هو:"</span>, multiply(<span class="num">4</span>, <span class="num">6</span>))
+
+<span class="cm"># استخدام lambda مع map و filter</span>
+numbers = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+squared = <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x**<span class="num">2</span>, numbers))
+<span class="fn">print</span>(<span class="str">"الأعداد المربعة:"</span>, squared)
+
+even_numbers = <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x % <span class="num">2</span> == <span class="num">0</span>, numbers))
+<span class="fn">print</span>(<span class="str">"الأعداد الزوجية:"</span>, even_numbers)</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>مربع 5 هو: 25
+حاصل ضرب 4 و 6 هو: 24
+الأعداد المربعة: [1, 4, 9, 16, 25]
+الأعداد الزوجية: [2, 4]</pre>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>متى تستخدم Lambda؟</strong> عندما تحتاج دالة بسيطة تُستخدم مرة واحدة،
+                خاصة مع <code>map()</code> و <code>filter()</code> و <code>sorted()</code>.
+                لا تستخدمها للدوال المعقدة — استخدم <code>def</code> بدلًا منها.
+            </div>
+        </div>
+    </section>
+
+    <!-- 8 -->
+    <section class="section-card" id="scope">
+        <h2 class="section-title">
+            <span class="num">8</span>
+            <i class="fas fa-project-diagram"></i>
+            نطاق المتغيرات (Scope)
+        </h2>
+        <p>
+            المتغيرات في Python لها نطاقان رئيسيان:
+            <strong>محلي (Local)</strong> داخل الدالة، و <strong>عام (Global)</strong> خارجها.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>scope.py</span>
+            </div>
+<pre><span class="cm"># متغير عام</span>
+global_var = <span class="str">"أنا متغير عام"</span>
+
+<span class="kw">def</span> <span class="fn">test_scope</span>():
+    <span class="cm"># متغير محلي</span>
+    local_var = <span class="str">"أنا متغير محلي"</span>
+    <span class="fn">print</span>(local_var)   <span class="cm"># يمكن الوصول للمحلي</span>
+    <span class="fn">print</span>(global_var)  <span class="cm"># يمكن الوصول للعام</span>
+
+test_scope()
+<span class="fn">print</span>(global_var)      <span class="cm"># يمكن الوصول للعام</span>
+<span class="cm"># print(local_var)   # خطأ! لا يمكن الوصول للمحلي خارج الدالة</span></pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>أنا متغير محلي
+أنا متغير عام
+أنا متغير عام</pre>
+        </div>
+
+        <p><strong>تعديل المتغير العام من داخل دالة:</strong></p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>global_keyword.py</span>
+            </div>
+<pre>counter = <span class="num">0</span>
+
+<span class="kw">def</span> <span class="fn">increment</span>():
+    <span class="kw">global</span> counter
+    counter += <span class="num">1</span>
+
+increment()
+increment()
+<span class="fn">print</span>(<span class="str">"القيمة النهائية للعداد:"</span>, counter)</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>القيمة النهائية للعداد: 2</pre>
+        </div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>تحذير:</strong> استخدام <code>global</code> كثيرًا يُعد ممارسة سيئة،
+                لأنه يُصعّب تتبع الأخطاء. حاول أن تجعل الدوال تستقبل ما تحتاجه كمعاملات،
+                وتُرجع نتائجها بدل تعديل المتغيرات العامة.
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. التمارين -->
+    <section class="section-card" id="exercises">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-pencil-alt"></i>
+            التمارين التفاعلية
+        </h2>
+        <p>اختبر فهمك للدرس من خلال أربعة تمارين متنوعة:</p>
+
+        <!-- تمرين 1 -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">1</span>
+                <h4>اختيار من متعدد</h4>
+                <span class="exercise-tag">الصيغة الصحيحة</span>
+            </div>
+            <p class="exercise-question">
+                أي من الأسطر التالية <strong>صحيح</strong> لتعريف دالة في Python؟
+                <em>(اختر كل الإجابات الصحيحة)</em>
+            </p>
+            <div class="options-list" id="q1-options">
+                <label class="option"><input type="checkbox" name="q1" value="1"> <code>def greet():</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="2"> <code>Def greet():</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="3"> <code>def greet(name):</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="4"> <code>function greet():</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="5"> <code>def greet(name, age):</code></label>
+            </div>
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ1()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ1()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q1-result"></div>
+        </div>
+
+        <!-- تمرين 2 -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">2</span>
+                <h4>صح أم خطأ</h4>
+                <span class="exercise-tag">اختر لكل عبارة</span>
+            </div>
+            <p class="exercise-question">
+                اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:
+            </p>
+            <div class="tf-list" id="q2-list">
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">تُعرَّف الدالة في Python بالكلمة المفتاحية <code>def</code>.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">يمكن للدالة أن تُرجع أكثر من قيمة واحدة.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="false">
+                    <span class="tf-statement">الدالة تُنفّذ تلقائيًا بمجرد تعريفها دون الحاجة لاستدعائها.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="false">
+                    <span class="tf-statement">لا يمكن استخدام <code>lambda</code> مع أكثر من معامل واحد.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">المتغيرات المعرّفة داخل الدالة لا يمكن الوصول إليها من خارجها.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ2()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ2()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q2-result"></div>
+        </div>
+
+        <!-- تمرين 3 -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">3</span>
+                <h4>توقّع الناتج</h4>
+                <span class="exercise-tag">ماذا سيطبع؟</span>
+            </div>
+            <p class="exercise-question">
+                بالنظر للكود التالي، ما الذي سيطبعه البرنامج؟ <em>(اكتب الناتج كما هو)</em>
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang"><i class="fab fa-python"></i> Python</span>
+                    <span>predict.py</span>
+                </div>
+<pre><span class="kw">def</span> <span class="fn">add</span>(a, b=<span class="num">10</span>):
+    <span class="kw">return</span> a + b
+
+<span class="fn">print</span>(add(<span class="num">5</span>))
+<span class="fn">print</span>(add(<span class="num">5</span>, <span class="num">20</span>))</pre>
+            </div>
+
+            <div class="code-fill">
+                <div class="line">
+                    <span class="cm">السطر الأول:</span>
+                    <input type="text" class="blank-input" id="b3a" placeholder="..." style="min-width:80px;">
+                </div>
+                <div class="line">
+                    <span class="cm">السطر الثاني:</span>
+                    <input type="text" class="blank-input" id="b3b" placeholder="..." style="min-width:80px;">
+                </div>
+            </div>
+
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ3()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ3()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q3-result"></div>
+        </div>
+
+        <!-- تمرين 4 -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">4</span>
+                <h4>رتّب الكود</h4>
+                <span class="exercise-tag">استخدم الأسهم</span>
+            </div>
+            <p class="exercise-question">
+                رتّب الأسطر التالية لتكوين دالة تحسب مساحة مستطيل.
+                <em>(من الأعلى إلى الأسفل)</em>
+            </p>
+
+            <div class="sortable-list" id="q4-list">
+                <div class="sortable-item" data-correct="3">
+                    <span class="order-num">1</span>
+                    <span>return length * width</span>
+                    <div class="sort-arrows">
+                        <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                        <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                </div>
+                <div class="sortable-item" data-correct="1">
+                    <span class="order-num">2</span>
+                    <span>def area(length, width):</span>
+                    <div class="sort-arrows">
+                        <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                        <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                </div>
+                <div class="sortable-item" data-correct="4">
+                    <span class="order-num">3</span>
+                    <span>print(area(5, 3))</span>
+                    <div class="sort-arrows">
+                        <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                        <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                </div>
+                <div class="sortable-item" data-correct="2">
+                    <span class="order-num">4</span>
+                    <span>"""حساب مساحة المستطيل"""</span>
+                    <div class="sort-arrows">
+                        <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                        <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ4()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ4()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q4-result"></div>
+        </div>
+
+    </section>
+
+    <!-- 10. الخلاصة -->
+    <section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> مفهوم الدوال وأهميتها في تنظيم الكود.</li>
+                <li><i class="fas fa-check"></i> أنواع الدوال: مضمّنة، معرّفة من المستخدم، مجهولة.</li>
+                <li><i class="fas fa-check"></i> تركيب الدالة باستخدام <code>def</code>.</li>
+                <li><i class="fas fa-check"></i> تمرير المعاملات واستقبال القيم.</li>
+                <li><i class="fas fa-check"></i> الفرق بين <code>print()</code> و <code>return</code>.</li>
+                <li><i class="fas fa-check"></i> المعاملات الافتراضية والمسمّاة و <code>*args</code>.</li>
+                <li><i class="fas fa-check"></i> الدوال المجهولة <code>lambda</code> واستخداماتها.</li>
+                <li><i class="fas fa-check"></i> نطاق المتغيرات المحلي والعام.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> حوّل الأكواد الطويلة إلى دوال صغيرة.</li>
+                <li><i class="fas fa-lightbulb"></i> اختر أسماء دوال وأسماء معاملات واضحة.</li>
+                <li><i class="fas fa-lightbulb"></i> استخدم <code>lambda</code> فقط للعمليات البسيطة.</li>
+                <li><i class="fas fa-lightbulb"></i> تجنّب المتغيرات العامة إلا للضرورة.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم التعامل مع
+                <strong>القوائم (Lists)</strong> — بنية بيانات قوية لتخزين مجموعات من القيم.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson8.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 8: الحلقات التكرارية</span>
+        </a>
+        <a href="lesson10.html" class="nav-link next">
+            <span>الدرس التالي: القوائم (Lists)</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · الدوال
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '60%';
+            text.textContent = '60% مكتمل';
+        }, 400);
+    });
+
+    /* ========== تمرين 1 ========== */
+    function checkQ1() {
+        const correct = ['1', '3', '5'];
+        const boxes = document.querySelectorAll('input[name="q1"]');
+        let right = 0, wrong = 0, pickedWrong = 0;
+
+        boxes.forEach(b => {
+            const label = b.closest('.option');
+            label.classList.remove('correct', 'wrong');
+            if (b.checked) {
+                if (correct.includes(b.value)) {
+                    label.classList.add('correct');
+                    right++;
+                } else {
+                    label.classList.add('wrong');
+                    wrong++;
+                    pickedWrong++;
+                }
+            } else if (correct.includes(b.value)) {
+                wrong++;
+            }
+        });
+
+        const msg = document.getElementById('q1-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (![...boxes].some(b => b.checked)) {
+            msg.classList.add('mid');
+            msg.innerHTML = '<i class="fas fa-info-circle"></i> اختر إجابة واحدة على الأقل ثم اضغط «تحقق».';
+            return;
+        }
+
+        if (right === correct.length && wrong === 0) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> ممتاز! الصيغة الصحيحة: <code>def</code> بحروف صغيرة، مع أو بدون معاملات 🎉';
+        } else if (right > 0) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${correct.length}${pickedWrong ? `، لكنك اخترت ${pickedWrong === 1 ? 'خيارًا خاطئًا' : pickedWrong === 2 ? 'خيارين خاطئين' : pickedWrong + ' خيارات خاطئة'} (باللون الأحمر)` : ''}. تذكّر: <code>def</code> بحروف صغيرة، الباقي غير صحيح.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة صحيحة. الصيغة: <code>def greet():</code>.';
+        }
+    }
+
+    function resetQ1() {
+        document.querySelectorAll('input[name="q1"]').forEach(b => b.checked = false);
+        document.querySelectorAll('#q1-options .option').forEach(l => l.classList.remove('correct', 'wrong'));
+        const msg = document.getElementById('q1-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== تمرين 2 ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkQ2() {
+        const items = document.querySelectorAll('#q2-list .tf-item');
+        let right = 0, answered = 0;
+
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+
+            if (selected === undefined) return;
+            answered++;
+
+            if ((selected === 'true') === correct) {
+                item.classList.add('correct');
+                right++;
+            } else {
+                item.classList.add('wrong');
+            }
+        });
+
+        const msg = document.getElementById('q2-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (answered < items.length) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`;
+        } else if (right === items.length) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> رائع! جميع إجاباتك صحيحة 🎉';
+        } else if (right > 0) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${items.length}. العبارات الخاطئة باللون الأحمر.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> لم تصب أي عبارة. راجع الدرس ثم أعد المحاولة.';
+        }
+    }
+
+    function resetQ2() {
+        document.querySelectorAll('#q2-list .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        const msg = document.getElementById('q2-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== تمرين 3 ========== */
+    function checkQ3() {
+        const b3a = document.getElementById('b3a');
+        const b3b = document.getElementById('b3b');
+        const v1 = b3a.value.trim();
+        const v2 = b3b.value.trim();
+
+        b3a.classList.remove('correct', 'wrong');
+        b3b.classList.remove('correct', 'wrong');
+
+        let right = 0;
+
+        // add(5) → 5 + 10 = 15
+        if (v1 === '15') { b3a.classList.add('correct'); right++; }
+        else { b3a.classList.add('wrong'); }
+
+        // add(5, 20) → 5 + 20 = 25
+        if (v2 === '25') { b3b.classList.add('correct'); right++; }
+        else { b3b.classList.add('wrong'); }
+
+        const msg = document.getElementById('q3-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (right === 2) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> إجابة صحيحة تمامًا! 🎉 <code>add(5)</code> يستخدم القيمة الافتراضية (10) = 15، و <code>add(5, 20)</code> = 25.';
+        } else if (right === 1) {
+            msg.classList.add('mid');
+            msg.innerHTML = '<i class="fas fa-info-circle"></i> أصبت في إجابة واحدة. تذكّر: b=10 قيمة افتراضية.';
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> حاول مرة أخرى. القيمة الافتراضية لـ b هي 10.';
+        }
+    }
+
+    function resetQ3() {
+        const b3a = document.getElementById('b3a');
+        const b3b = document.getElementById('b3b');
+        b3a.value = ''; b3b.value = '';
+        b3a.classList.remove('correct', 'wrong');
+        b3b.classList.remove('correct', 'wrong');
+        const msg = document.getElementById('q3-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== تمرين 4 ========== */
+    function moveItem(btn, direction) {
+        const list = document.getElementById('q4-list');
+        const item = btn.closest('.sortable-item');
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+
+        if (direction === -1 && index > 0) {
+            list.insertBefore(item, items[index - 1]);
+        } else if (direction === 1 && index < items.length - 1) {
+            list.insertBefore(items[index + 1], item);
+        }
+        updateOrderNumbers();
+    }
+
+    function updateOrderNumbers() {
+        const items = document.querySelectorAll('#q4-list .sortable-item');
+        items.forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+        });
+    }
+
+    function checkQ4() {
+        const items = document.querySelectorAll('#q4-list .sortable-item');
+        let right = 0;
+
+        items.forEach((item, index) => {
+            const correct = parseInt(item.dataset.correct);
+            item.classList.remove('correct', 'wrong');
+            if (correct === index + 1) {
+                item.classList.add('correct');
+                right++;
+            } else {
+                item.classList.add('wrong');
+            }
+        });
+
+        const msg = document.getElementById('q4-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (right === items.length) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> ترتيب صحيح تمامًا! 🎉 <code>def</code> ← docstring ← return ← استدعاء الدالة.';
+        } else if (right >= 2) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> ${right} من 4 أسطر في مكانها الصحيح. الترتيب: التعريف ← الوصف ← الإرجاع ← الاستدعاء.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> الترتيب غير صحيح. ابدأ بـ <code>def area(length, width):</code> ثم الوصف، ثم return، وأخيرًا الاستدعاء.';
+        }
+    }
+
+    // نحفظ الترتيب المخلوط الأصلي عند تحميل الصفحة، لنستعيده عند «إعادة» دون كشف الحل
+    const q4Initial = Array.from(document.getElementById('q4-list').children);
+
+    function resetQ4() {
+        const list = document.getElementById('q4-list');
+        q4Initial.forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            list.appendChild(item);
+        });
+        updateOrderNumbers();
+        const msg = document.getElementById('q4-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

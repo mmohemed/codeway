@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مثال: تحليل ملف CSV حقيقي | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">المستوى المتقدم</a>
+        <span class="sep">/</span>
+        <span>تحليل CSV</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-file-csv"></i>
+            درس إضافي · مشروع تحليل
+        </div>
+        <h1 class="lesson-title">تحليل ملف CSV حقيقي خطوة بخطوة</h1>
+        <p class="lesson-intro">
+            البيانات في الحياة الحقيقية <strong>ليست نظيفة أبدًا</strong>: صفوف مكررة، قيم ناقصة، أسماء مكتوبة بأشكال مختلفة، وأرقام مخزنة كنصوص. في هذا الدرس ستأخذ ملف مبيعات متجر إلكترونيات (153 طلبًا) وتمر بكل مراحل التحليل: <strong>الفحص ← التنظيف ← التحليل ← التقرير</strong>، تمامًا كما يعمل محللو البيانات.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 80 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 من ملف فوضوي إلى تقرير</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 متقدم</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد درس NumPy و Pandas</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#intro">1. السيناريو</a>
+            <a href="#load">2. التحميل</a>
+            <a href="#quality">3. فحص الجودة</a>
+            <a href="#clean">4. التنظيف</a>
+            <a href="#analysis">5. التحليل</a>
+            <a href="#charts">6. الرسوم البيانية</a>
+            <a href="#report">7. تصدير التقرير</a>
+            <a href="#workflow">8. المنهجية</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="intro">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        السيناريو والأسئلة
+    </h2>
+        <p>
+            أنت محلل بيانات في متجر إلكترونيات له فروع في <strong>الرياض وجدة والدمام ومكة</strong>. أرسل لك المدير ملف
+            <code>sales_raw.csv</code> فيه طلبات النصف الأول من عام 2024، ويريد إجابات عن هذه الأسئلة:
+        </p>
+        <div class="note-box">
+            <strong>❓ أسئلة الإدارة:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> كم إجمالي الإيرادات وعدد الطلبات؟</li>
+                <li><i class="fas fa-angle-left"></i> أي مدينة تحقق أعلى إيرادات؟ وأي منتج؟</li>
+                <li><i class="fas fa-angle-left"></i> كيف تتغير المبيعات من شهر لآخر؟</li>
+                <li><i class="fas fa-angle-left"></i> ما طرق الدفع الأكثر استخدامًا؟</li>
+                <li><i class="fas fa-angle-left"></i> ما المنتج الأكثر مبيعًا في كل مدينة؟</li>
+            </ul>
+        </div>
+        <p>هذه أول أسطر من الملف كما وصل:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>sales_raw.csv</span>
+    </div>
+<pre>order_id,date,city,product,quantity,unit_price,payment
+<span class="num">1001</span>,<span class="num">2024</span>-<span class="num">01</span>-<span class="num">01</span>,جدة,شاشة,<span class="num">4.0</span>,<span class="num">850</span>,نقدًا
+<span class="num">1002</span>,<span class="num">2024</span>-<span class="num">01</span>-<span class="num">02</span>,مكة,سماعة,<span class="num">1.0</span>,<span class="num">220</span>,نقدًا
+<span class="num">1003</span>,<span class="num">2024</span>-<span class="num">01</span>-<span class="num">05</span>,جدة,لابتوب,<span class="num">4.0</span>,<span class="num">3200</span>,بطاقة
+<span class="num">1004</span>,<span class="num">2024</span>-<span class="num">01</span>-<span class="num">08</span>,الرياض ,فأرة,<span class="num">3.0</span>,<span class="num">75</span>,تحويل
+...</pre>
+</div>
+        <p>
+            <button class="btn btn-primary" onclick="downloadCsv()"><i class="fas fa-download"></i> حمّل الملف sales_raw.csv وجرّب بنفسك</button>
+        </p>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>نصيحة:</strong> حمّل الملف وضعه بجانب ملف Python أو في Jupyter، ثم نفّذ كل خطوة من خطوات الدرس بنفسك
+                وقارن نتائجك بالنتائج المعروضة هنا.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="load">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-download"></i>
+        الخطوة 1: التحميل والنظرة الأولى
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>step1_load.py</span>
+    </div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.<span class="fn">read_csv</span>(<span class="str">"sales_raw.csv"</span>)
+
+<span class="fn">print</span>(<span class="str">"الشكل:"</span>, df.shape)
+<span class="fn">print</span>(df.<span class="fn">head</span>())
+<span class="fn">print</span>()
+df.<span class="fn">info</span>()</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الشكل: (153, 7)
+   order_id        date     city      product  quantity unit_price payment
+0      1001  2024-01-01      جدة         شاشة       4.0        850   نقدًا
+1      1002  2024-01-02      مكة        سماعة       1.0        220   نقدًا
+2      1003  2024-01-05      جدة       لابتوب       4.0       3200   بطاقة
+3      1004  2024-01-08  الرياض          فأرة       3.0         75   تحويل
+4      1005  2024-01-08   الرياض  لوحة مفاتيح       3.0        150   بطاقة
+
+&lt;class 'pandas.DataFrame'&gt;
+RangeIndex: 153 entries, 0 to 152
+Data columns (total 7 columns):
+ #   Column      Non-Null Count  Dtype  
+---  ------      --------------  -----  
+ 0   order_id    153 non-null    int64  
+ 1   date        153 non-null    str    
+ 2   city        153 non-null    str    
+ 3   product     153 non-null    str    
+ 4   quantity    151 non-null    float64
+ 5   unit_price  152 non-null    str    
+ 6   payment     153 non-null    str    
+dtypes: float64(1), int64(1), str(5)
+memory usage: 8.5 KB</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>لاحظ مشاكل فورًا:</strong> عمود <code>unit_price</code> نوعه نص (<code>str</code>) وليس رقمًا — يعني أن فيه قيمًا غير رقمية.
+                و <code>quantity</code> نوعه <code>float64</code> بدل عدد صحيح، وعدد القيم فيه 151 من 153 — يعني أن هناك قيمًا مفقودة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="quality">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-stethoscope"></i>
+        الخطوة 2: فحص جودة البيانات
+    </h2>
+        <p>قبل أي تحليل، نبحث عن المشاكل بشكل منهجي:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>step2_quality.py</span>
+    </div>
+<pre>df = pd.<span class="fn">read_csv</span>(<span class="str">"sales_raw.csv"</span>)
+
+<span class="fn">print</span>(<span class="str">"القيم المفقودة:"</span>)
+<span class="fn">print</span>(df.<span class="fn">isna</span>().<span class="fn">sum</span>()[<span class="kw">lambda</span> s: s &gt; <span class="num">0</span>])
+
+<span class="fn">print</span>(<span class="str">"\nالصفوف المكررة:"</span>, df.<span class="fn">duplicated</span>().<span class="fn">sum</span>())
+
+<span class="fn">print</span>(<span class="str">"\nأسماء المدن كما هي (لاحظ المسافات والأخطاء):"</span>)
+<span class="fn">print</span>(df[<span class="str">"city"</span>].<span class="fn">map</span>(repr).<span class="fn">value_counts</span>())
+
+<span class="fn">print</span>(<span class="str">"\nأسعار غير رقمية:"</span>)
+bad = df[~df[<span class="str">"unit_price"</span>].<span class="fn">fillna</span>(<span class="str">"0"</span>).str.<span class="fn">fullmatch</span>(<span class="str">r"\d+"</span>)]
+<span class="fn">print</span>(bad[[<span class="str">"order_id"</span>, <span class="str">"product"</span>, <span class="str">"unit_price"</span>]])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>القيم المفقودة:
+quantity      2
+unit_price    1
+dtype: int64
+
+الصفوف المكررة: 3
+
+أسماء المدن كما هي (لاحظ المسافات والأخطاء):
+city
+'الرياض'      69
+'جدة'         40
+'الدمام'      22
+'مكة'         17
+'جده'          2
+'الرياض '      1
+' جدة'         1
+'الرياض  '     1
+Name: count, dtype: int64
+
+أسعار غير رقمية:
+    order_id product unit_price
+25      1026  لابتوب      3,200
+58      1059  لابتوب      3,200
+88      1089    فأرة    75 ريال</pre>
+</div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المشكلة</th><th>العدد</th><th>الحل</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>صفوف مكررة</td><td>3</td><td><code>drop_duplicates()</code></td></tr>
+                    <tr><td>مدن بمسافات زائدة أو خطأ إملائي «جده»</td><td>5</td><td><code>str.strip()</code> + <code>replace()</code></td></tr>
+                    <tr><td>أسعار مكتوبة كنص «3,200» و «75 ريال»</td><td>3</td><td>حذف الرموز ثم <code>to_numeric()</code></td></tr>
+                    <tr><td>سعر مفقود</td><td>1</td><td>تعويضه بالسعر المعتاد للمنتج</td></tr>
+                    <tr><td>كمية مفقودة</td><td>2</td><td>حذف الطلب (لا يمكن تخمين الكمية)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>لماذا <code>map(repr)</code>؟</strong> لأن <code>"الرياض "</code> و <code>"الرياض"</code> تبدوان متطابقتين عند الطباعة!
+                <code>repr</code> يُظهر علامات التنصيص فتنكشف المسافات المخفية.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="clean">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-broom"></i>
+        الخطوة 3: تنظيف البيانات
+    </h2>
+        <p>هذا كود التنظيف الكامل. كل خطوة تعالج مشكلة اكتشفناها:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>step3_clean.py</span>
+    </div>
+<pre>df = pd.<span class="fn">read_csv</span>(<span class="str">"sales_raw.csv"</span>)
+
+<span class="cm"># 1) حذف الصفوف المكررة</span>
+df = df.<span class="fn">drop_duplicates</span>()
+
+<span class="cm"># 2) توحيد أسماء المدن: حذف المسافات الزائدة وتصحيح الأخطاء الإملائية</span>
+df[<span class="str">"city"</span>] = df[<span class="str">"city"</span>].str.<span class="fn">strip</span>().<span class="fn">replace</span>({<span class="str">"جده"</span>: <span class="str">"جدة"</span>})
+
+<span class="cm"># 3) تحويل السعر من نص إلى رقم: حذف أي شيء ليس رقمًا أو نقطة</span>
+df[<span class="str">"unit_price"</span>] = pd.<span class="fn">to_numeric</span>(
+    df[<span class="str">"unit_price"</span>].str.<span class="fn">replace</span>(<span class="str">r"[^\d.]"</span>, <span class="str">""</span>, regex=<span class="kw">True</span>), errors=<span class="str">"coerce"</span>
+)
+
+<span class="cm"># 4) تعويض السعر المفقود بالسعر المعتاد لنفس المنتج</span>
+df[<span class="str">"unit_price"</span>] = df[<span class="str">"unit_price"</span>].<span class="fn">fillna</span>(
+    df.<span class="fn">groupby</span>(<span class="str">"product"</span>)[<span class="str">"unit_price"</span>].<span class="fn">transform</span>(<span class="str">"median"</span>)
+)
+
+<span class="cm"># 5) حذف الطلبات التي لا نعرف كميتها، ثم تحويل الكمية لعدد صحيح</span>
+df = df.<span class="fn">dropna</span>(subset=[<span class="str">"quantity"</span>])
+df[<span class="str">"quantity"</span>] = df[<span class="str">"quantity"</span>].<span class="fn">astype</span>(int)
+
+<span class="cm"># 6) تحويل التاريخ وإضافة أعمدة مشتقة</span>
+df[<span class="str">"date"</span>] = pd.<span class="fn">to_datetime</span>(df[<span class="str">"date"</span>])
+df[<span class="str">"month"</span>] = df[<span class="str">"date"</span>].dt.month
+df[<span class="str">"revenue"</span>] = df[<span class="str">"quantity"</span>] * df[<span class="str">"unit_price"</span>]
+<span class="fn">print</span>(<span class="str">"الشكل بعد التنظيف:"</span>, df.shape)
+<span class="fn">print</span>(<span class="str">"المدن:"</span>, <span class="fn">sorted</span>(df[<span class="str">"city"</span>].<span class="fn">unique</span>()))
+<span class="fn">print</span>(<span class="str">"أنواع الأعمدة المهمة:"</span>, df[[<span class="str">"quantity"</span>, <span class="str">"unit_price"</span>, <span class="str">"date"</span>]].dtypes.<span class="fn">astype</span>(str).<span class="fn">to_dict</span>())
+<span class="fn">print</span>(<span class="str">"قيم مفقودة متبقية:"</span>, <span class="fn">int</span>(df.<span class="fn">isna</span>().<span class="fn">sum</span>().<span class="fn">sum</span>()))
+<span class="fn">print</span>(df[[<span class="str">"date"</span>, <span class="str">"city"</span>, <span class="str">"product"</span>, <span class="str">"quantity"</span>, <span class="str">"unit_price"</span>, <span class="str">"revenue"</span>]].<span class="fn">head</span>(<span class="num">4</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الشكل بعد التنظيف: (148, 9)
+المدن: ['الدمام', 'الرياض', 'جدة', 'مكة']
+أنواع الأعمدة المهمة: {'quantity': 'int64', 'unit_price': 'float64', 'date': 'datetime64[us]'}
+قيم مفقودة متبقية: 0
+        date    city product  quantity  unit_price  revenue
+0 2024-01-01     جدة    شاشة         4       850.0   3400.0
+1 2024-01-02     مكة   سماعة         1       220.0    220.0
+2 2024-01-05     جدة  لابتوب         4      3200.0  12800.0
+3 2024-01-08  الرياض    فأرة         3        75.0    225.0</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>قاعدة ذهبية:</strong> لا تعدّل الملف الأصلي أبدًا. احتفظ بالبيانات الخام كما هي، واكتب كود تنظيف
+                يمكن إعادة تشغيله في أي وقت. هكذا إذا وصلك ملف الشهر القادم، تشغّل نفس الكود عليه.
+            </div>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>قرارات التنظيف تؤثر على النتائج:</strong> حذفنا طلبين لأن كميتهما مفقودة. في عمل حقيقي يجب أن
+                <strong>توثّق</strong> هذا القرار وتذكره في تقريرك، وربما تسأل مصدر البيانات عن القيم الصحيحة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="analysis">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-search-dollar"></i>
+        الخطوة 4: التحليل والإجابة عن الأسئلة
+    </h2>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> س1: الأرقام الإجمالية</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>q1_totals.py</span>
+    </div>
+<pre><span class="fn">print</span>(<span class="str">f"إجمالي الإيرادات: {df['revenue'].sum():,.0f} ريال"</span>)
+<span class="fn">print</span>(<span class="str">f"عدد الطلبات: {len(df)}"</span>)
+<span class="fn">print</span>(<span class="str">f"متوسط قيمة الطلب: {df['revenue'].mean():,.0f} ريال"</span>)
+<span class="fn">print</span>(<span class="str">f"عدد القطع المباعة: {df['quantity'].sum()}"</span>)
+<span class="fn">print</span>(<span class="str">f"الفترة: من {df['date'].min():%Y-%m-%d} إلى {df['date'].max():%Y-%m-%d}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>إجمالي الإيرادات: 264,830 ريال
+عدد الطلبات: 148
+متوسط قيمة الطلب: 1,789 ريال
+عدد القطع المباعة: 381
+الفترة: من 2024-01-01 إلى 2024-06-30</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> س2: الإيرادات حسب المدينة والمنتج</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>q2_city_product.py</span>
+    </div>
+<pre>by_city = (df.<span class="fn">groupby</span>(<span class="str">"city"</span>)
+             .<span class="fn">agg</span>(orders=(<span class="str">"order_id"</span>, <span class="str">"count"</span>), revenue=(<span class="str">"revenue"</span>, <span class="str">"sum"</span>))
+             .<span class="fn">sort_values</span>(<span class="str">"revenue"</span>, ascending=<span class="kw">False</span>))
+by_city[<span class="str">"share_%"</span>] = (by_city[<span class="str">"revenue"</span>] / by_city[<span class="str">"revenue"</span>].<span class="fn">sum</span>() * <span class="num">100</span>).<span class="fn">round</span>(<span class="num">1</span>)
+<span class="fn">print</span>(by_city)
+<span class="fn">print</span>()
+by_product = df.<span class="fn">groupby</span>(<span class="str">"product"</span>)[[<span class="str">"quantity"</span>, <span class="str">"revenue"</span>]].<span class="fn">sum</span>().<span class="fn">sort_values</span>(<span class="str">"revenue"</span>, ascending=<span class="kw">False</span>)
+<span class="fn">print</span>(by_product)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>        orders   revenue  share_%
+city                             
+الرياض      68  113460.0     42.8
+جدة         42  102625.0     38.8
+مكة         17   30215.0     11.4
+الدمام      21   18530.0      7.0
+
+             quantity   revenue
+product                        
+لابتوب             53  169600.0
+شاشة               68   57800.0
+سماعة              89   19580.0
+لوحة مفاتيح        67   10050.0
+فأرة              104    7800.0</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>ملاحظة تحليلية:</strong> «الفأرة» قد تكون من أكثر المنتجات طلبًا، لكن «اللابتوب» يحقق معظم الإيرادات
+                بسبب سعره. لذلك يجب دائمًا أن تسأل: هل نقيس <strong>عدد القطع</strong> أم <strong>الإيرادات</strong>؟
+            </div>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> س3: الاتجاه الشهري (مع رسم نصي)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>q3_monthly.py</span>
+    </div>
+<pre>months = {<span class="num">1</span>: <span class="str">"يناير"</span>, <span class="num">2</span>: <span class="str">"فبراير"</span>, <span class="num">3</span>: <span class="str">"مارس"</span>, <span class="num">4</span>: <span class="str">"أبريل"</span>, <span class="num">5</span>: <span class="str">"مايو"</span>, <span class="num">6</span>: <span class="str">"يونيو"</span>}
+monthly = df.<span class="fn">groupby</span>(<span class="str">"month"</span>)[<span class="str">"revenue"</span>].<span class="fn">sum</span>()
+
+top = monthly.<span class="fn">max</span>()
+<span class="kw">for</span> m, value <span class="kw">in</span> monthly.<span class="fn">items</span>():
+    bar = <span class="str">"█"</span> * <span class="fn">round</span>(value / top * <span class="num">30</span>)
+    <span class="fn">print</span>(<span class="str">f"{months[m]:&lt;7} {bar} {value:,.0f}"</span>)
+
+change = monthly.<span class="fn">pct_change</span>().<span class="fn">mul</span>(<span class="num">100</span>).<span class="fn">round</span>(<span class="num">1</span>)
+<span class="fn">print</span>(<span class="str">"\nالتغير عن الشهر السابق (%):"</span>, change.<span class="fn">dropna</span>().<span class="fn">to_dict</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>يناير   ██████████████████████ 44,455
+فبراير  █████████████████ 34,145
+مارس    ██████████████████████ 44,355
+أبريل   ██████████████████████████████ 59,860
+مايو    ████████████████████ 39,955
+يونيو   █████████████████████ 42,060
+
+التغير عن الشهر السابق (%): {2: -23.2, 3: 29.9, 4: 35.0, 5: -33.3, 6: 5.3}</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> س4: طرق الدفع</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>q4_payment.py</span>
+    </div>
+<pre><span class="fn">print</span>(df[<span class="str">"payment"</span>].<span class="fn">value_counts</span>(normalize=<span class="kw">True</span>).<span class="fn">mul</span>(<span class="num">100</span>).<span class="fn">round</span>(<span class="num">1</span>).<span class="fn">astype</span>(str) + <span class="str">"%"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>payment
+بطاقة    61.5%
+تحويل    20.9%
+نقدًا    17.6%
+Name: proportion, dtype: str</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> س5: جدول محوري — المدن × المنتجات</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>q5_pivot.py</span>
+    </div>
+<pre>pivot = df.<span class="fn">pivot_table</span>(index=<span class="str">"city"</span>, columns=<span class="str">"product"</span>, values=<span class="str">"quantity"</span>,
+                       aggfunc=<span class="str">"sum"</span>, fill_value=<span class="num">0</span>)
+<span class="fn">print</span>(pivot)
+<span class="fn">print</span>(<span class="str">"\nالمنتج الأكثر مبيعًا (بالقطع) في كل مدينة:"</span>)
+<span class="fn">print</span>(pivot.<span class="fn">idxmax</span>(axis=<span class="num">1</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>product  سماعة  شاشة  فأرة  لابتوب  لوحة مفاتيح
+city                                           
+الدمام      14    10    12       1           19
+الرياض      53    24    48      23           28
+جدة         15    29    21      22           18
+مكة          7     5    23       7            2
+
+المنتج الأكثر مبيعًا (بالقطع) في كل مدينة:
+city
+الدمام    لوحة مفاتيح
+الرياض          سماعة
+جدة              شاشة
+مكة              فأرة
+dtype: str</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>pivot_table</strong> هي نفسها «الجدول المحوري» في Excel: صفوف من عمود، وأعمدة من عمود آخر، وقيم مجمّعة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="charts">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-chart-bar"></i>
+        الخطوة 5: الرسوم البيانية
+    </h2>
+        <p>
+            الأرقام وحدها لا تكفي، فالمدير يفضّل الرسوم. باستخدام مكتبة <code>matplotlib</code>
+            (<code>pip install matplotlib</code>) يمكنك تحويل نتائجك إلى رسوم في بضعة أسطر:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>charts.py</span>
+    </div>
+<pre><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">12</span>, <span class="num">4</span>))
+
+df.<span class="fn">groupby</span>(<span class="str">"month"</span>)[<span class="str">"revenue"</span>].<span class="fn">sum</span>().<span class="fn">plot</span>(kind=<span class="str">"line"</span>, marker=<span class="str">"o"</span>, ax=axes[<span class="num">0</span>],
+                                           title=<span class="str">"Monthly revenue"</span>)
+df.<span class="fn">groupby</span>(<span class="str">"city"</span>)[<span class="str">"revenue"</span>].<span class="fn">sum</span>().<span class="fn">sort_values</span>().<span class="fn">plot</span>(kind=<span class="str">"barh"</span>, ax=axes[<span class="num">1</span>],
+                                                         title=<span class="str">"Revenue by city"</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">savefig</span>(<span class="str">"sales_charts.png"</span>, dpi=<span class="num">150</span>)   <span class="cm"># حفظ الرسم كصورة</span>
+plt.<span class="fn">show</span>()</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>العربية في matplotlib:</strong> من الإصدار 3.11 تكتب matplotlib العربية متصلة وبالاتجاه الصحيح تلقائيًا.
+                أما في الإصدارات الأقدم فتظهر الحروف مقطعة، والحل تثبيت مكتبتي <code>arabic-reshaper</code> و <code>python-bidi</code>
+                لإعادة تشكيل النص قبل رسمه (ستجد دالة جاهزة لذلك في تخصص تحليل البيانات)، أو استخدام عناوين إنجليزية كما في المثال.
+            </div>
+        </div>
+        <p>جرّب الرسم التفاعلي في <strong>مختبر البيانات</strong> أسفل الصفحة لترى النتائج كأعمدة بيانية مباشرة.</p>
+</section>
+
+<section class="section-card" id="report">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-file-export"></i>
+        الخطوة 6: تصدير التقرير
+    </h2>
+        <p>أخيرًا نصدّر النتائج إلى ملف Excel بعدة أوراق، وملف ملخص نصي يُرسل للمدير:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>step6_report.py</span>
+    </div>
+<pre>by_city = df.<span class="fn">groupby</span>(<span class="str">"city"</span>)[<span class="str">"revenue"</span>].<span class="fn">agg</span>([<span class="str">"count"</span>, <span class="str">"sum"</span>, <span class="str">"mean"</span>]).<span class="fn">round</span>(<span class="num">0</span>)
+by_product = df.<span class="fn">groupby</span>(<span class="str">"product"</span>)[[<span class="str">"quantity"</span>, <span class="str">"revenue"</span>]].<span class="fn">sum</span>()
+monthly = df.<span class="fn">groupby</span>(<span class="str">"month"</span>)[<span class="str">"revenue"</span>].<span class="fn">sum</span>()
+
+<span class="kw">with</span> pd.<span class="fn">ExcelWriter</span>(<span class="str">"sales_report.xlsx"</span>) <span class="kw">as</span> writer:
+    df.<span class="fn">to_excel</span>(writer, sheet_name=<span class="str">"البيانات النظيفة"</span>, index=<span class="kw">False</span>)
+    by_city.<span class="fn">to_excel</span>(writer, sheet_name=<span class="str">"حسب المدينة"</span>)
+    by_product.<span class="fn">to_excel</span>(writer, sheet_name=<span class="str">"حسب المنتج"</span>)
+    monthly.<span class="fn">to_excel</span>(writer, sheet_name=<span class="str">"شهري"</span>)
+
+best_city = by_city[<span class="str">"sum"</span>].<span class="fn">idxmax</span>()
+best_product = by_product[<span class="str">"revenue"</span>].<span class="fn">idxmax</span>()
+months = {<span class="num">1</span>: <span class="str">"يناير"</span>, <span class="num">2</span>: <span class="str">"فبراير"</span>, <span class="num">3</span>: <span class="str">"مارس"</span>, <span class="num">4</span>: <span class="str">"أبريل"</span>, <span class="num">5</span>: <span class="str">"مايو"</span>, <span class="num">6</span>: <span class="str">"يونيو"</span>}
+best_month = months[monthly.<span class="fn">idxmax</span>()]
+summary = <span class="str">f"""ملخص مبيعات النصف الأول 2024
+- إجمالي الإيرادات: {df['revenue'].sum():,.0f} ريال من {len(df)} طلبًا
+- أعلى مدينة: {best_city} ({by_city.loc[best_city, 'sum']:,.0f} ريال)
+- أعلى منتج إيرادًا: {best_product}
+- أفضل شهر: {best_month}
+- ملاحظة: حُذفت 3 طلبات مكررة وطلبان بكمية مفقودة."""</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"summary.txt"</span>, <span class="str">"w"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    f.<span class="fn">write</span>(summary)
+
+<span class="fn">print</span>(summary)
+<span class="fn">print</span>(<span class="str">"\nأوراق ملف Excel:"</span>, <span class="fn">list</span>(pd.<span class="fn">read_excel</span>(<span class="str">"sales_report.xlsx"</span>, sheet_name=<span class="kw">None</span>)))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>ملخص مبيعات النصف الأول 2024
+- إجمالي الإيرادات: 264,830 ريال من 148 طلبًا
+- أعلى مدينة: الرياض (113,460 ريال)
+- أعلى منتج إيرادًا: لابتوب
+- أفضل شهر: أبريل
+- ملاحظة: حُذفت 3 طلبات مكررة وطلبان بكمية مفقودة.
+
+أوراق ملف Excel: ['البيانات النظيفة', 'حسب المدينة', 'حسب المنتج', 'شهري']</pre>
+</div>
+</section>
+
+<section class="section-card" id="workflow">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-project-diagram"></i>
+        منهجية التحليل: خلاصة الطريقة
+    </h2>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-question"></i> 1. الأسئلة أولًا</h4>
+                <p>حدد ما تريد معرفته قبل كتابة الكود، حتى لا تضيع في البيانات.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-stethoscope"></i> 2. افحص ونظّف</h4>
+                <p>المفقود، والمكرر، والأنواع، والتهجئة. التنظيف يأخذ عادة 60–80% من وقت المحلل!</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-chart-pie"></i> 3. حلّل وتحقق</h4>
+                <p>groupby و pivot_table، وراجع هل النتائج منطقية (مثلًا: هل المجموع يساوي مجموع الأجزاء؟).</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-bullhorn"></i> 4. قدّم القصة</h4>
+                <p>رسوم واضحة وملخص بلغة بسيطة، مع ذكر قرارات التنظيف وحدود البيانات.</p>
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! قيمة واحدة غير رقمية تكفي ليصبح العمود كله نصيًا." data-hint="Pandas تحاول تخمين نوع كل عمود، وتفشل إن وجدت قيمة غير رقمية.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">فحص البيانات</span>
+    </div>
+    <p class="exercise-question">بعد قراءة ملف CSV ظهر أن نوع عمود السعر <code>str</code> بدل رقم. ما السبب الأرجح؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> الملف كبير جدًا</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> بعض القيم في العمود ليست أرقامًا صافية (مثل «850 ريال»)</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> Pandas تقرأ كل الأعمدة كنصوص دائمًا</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> يجب استخدام <code>read_excel</code> بدل <code>read_csv</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تفكيرك كمحلل بيانات في الاتجاه الصحيح." data-hint="المسافة الزائدة تجعل النصين مختلفين، والملف الأصلي لا يُعدّل يدويًا.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>df.duplicated().sum()</code> تُرجع عدد الصفوف المكررة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يُفضّل تعديل ملف البيانات الأصلي يدويًا بدل كتابة كود تنظيف.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>"الرياض "</code> و <code>"الرياض"</code> تُعتبران قيمة واحدة في <code>groupby</code>.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>pd.to_numeric(..., errors="coerce")</code> تحوّل القيم غير القابلة للتحويل إلى <code>NaN</code>.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>pivot_table</code> تشبه الجدول المحوري في Excel.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! بعد التنظيف أصبحت «جدة» تظهر 3 مرات، والقيم المختلفة اثنتان فقط." data-hint="&lt;code&gt;strip&lt;/code&gt; تحذف المسافات، و &lt;code&gt;replace&lt;/code&gt; تصحح «جده» إلى «جدة».">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود التالي؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre>s = pd.<span class="fn">Series</span>([<span class="str">" جدة"</span>, <span class="str">"جده"</span>, <span class="str">"جدة "</span>, <span class="str">"الرياض"</span>])
+clean = s.str.<span class="fn">strip</span>().<span class="fn">replace</span>({<span class="str">"جده"</span>: <span class="str">"جدة"</span>})
+<span class="fn">print</span>(clean.<span class="fn">nunique</span>())
+<span class="fn">print</span>(clean.<span class="fn">value_counts</span>().iloc[<span class="num">0</span>])</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="2" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="3" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذه خطوات تنظيف حقيقية تستخدمها في كل مشروع." data-hint="حذف المكرر، حذف المسافات، حذف الناقص، تحويل التاريخ، ثم الإيراد = الكمية × السعر.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">التنظيف</span>
+    </div>
+    <p class="exercise-question">أكمل كود التنظيف التالي:</p>
+    <div class="code-fill">
+        <div class="line"><span>df = df.</span><input type="text" class="blank-input" data-answers="drop_duplicates" placeholder="..." style="min-width:240px;" autocomplete="off" spellcheck="false"><span>()</span></div>
+        <div class="line"><span>df[<span class="str">'city'</span>] = df[<span class="str">'city'</span>].str.</span><input type="text" class="blank-input" data-answers="strip" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"><span>()</span></div>
+        <div class="line"><span>df = df.</span><input type="text" class="blank-input" data-answers="dropna" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"><span>(subset=[<span class="str">'quantity'</span>])</span></div>
+        <div class="line"><span>df[<span class="str">'date'</span>] = pd.</span><input type="text" class="blank-input" data-answers="to_datetime" placeholder="..." style="min-width:184px;" autocomplete="off" spellcheck="false"><span>(df[<span class="str">'date'</span>])</span></div>
+        <div class="line"><span>df[<span class="str">'revenue'</span>] = df[<span class="str">'quantity'</span>] </span><input type="text" class="blank-input" data-answers="*" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span> df[<span class="str">'unit_price'</span>]</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! هذه هي منهجية التحليل الاحترافية." data-hint="ابدأ بالأسئلة، وانتهِ بالتقرير.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب مراحل مشروع تحليل البيانات. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="3" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">3) تنظيف البيانات وتوثيق القرارات</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">5) الرسوم والتقرير النهائي</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">1) تحديد أسئلة العمل</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="4" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">4) التحليل (groupby / pivot_table)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) تحميل البيانات وفحص جودتها</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر البيانات: اسأل بياناتك</div>
+    <p style="color:var(--text-light); font-size:0.95em;">هذه البيانات النظيفة من الدرس (148 طلبًا). اختر <strong>البُعد</strong> و<strong>المقياس</strong> لترى النتيجة كرسم بياني مع كود Pandas المكافئ.</p>
+    <div class="lab-row">
+        <label>جمّع حسب:</label>
+        <select class="lab-select" id="dimSel"><option value="city">المدينة city</option><option value="product">المنتج product</option><option value="month">الشهر month</option><option value="payment">طريقة الدفع payment</option></select>
+        <label>المقياس:</label>
+        <select class="lab-select" id="metSel"><option value="revenue_sum">مجموع الإيرادات</option><option value="count">عدد الطلبات</option><option value="quantity_sum">عدد القطع</option><option value="revenue_mean">متوسط قيمة الطلب</option></select>
+        <label>فلترة المدينة:</label>
+        <select class="lab-select" id="cityFilter"><option value="">الكل</option><option>الرياض</option><option>جدة</option><option>الدمام</option><option>مكة</option></select>
+        <button class="btn btn-primary" onclick="runAgg()"><i class="fas fa-chart-bar"></i> اعرض</button>
+    </div>
+    <div class="lab-console" id="aggCode" style="min-height:0;"></div>
+    <div id="aggChart" style="margin-top:14px;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> البدء من أسئلة العمل قبل كتابة أي كود.</li>
+                <li><i class="fas fa-check"></i> الفحص المنهجي للجودة: المفقود، المكرر، الأنواع الخاطئة، والتهجئة غير الموحدة.</li>
+                <li><i class="fas fa-check"></i> تنظيف النصوص بـ <code>str.strip()</code> و <code>replace()</code> والأرقام بـ <code>to_numeric</code>.</li>
+                <li><i class="fas fa-check"></i> تعويض القيم المفقودة بذكاء عبر <code>groupby().transform()</code>.</li>
+                <li><i class="fas fa-check"></i> الأعمدة المشتقة: الإيراد والشهر من التاريخ.</li>
+                <li><i class="fas fa-check"></i> الإجابة عن الأسئلة بـ <code>groupby</code> و <code>agg</code> و <code>pivot_table</code> و <code>pct_change</code>.</li>
+                <li><i class="fas fa-check"></i> الرسوم البيانية بـ matplotlib، والتصدير لملف Excel متعدد الأوراق وملخص نصي.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> احتفظ بالبيانات الخام دون تعديل، واكتب تنظيفك ككود قابل لإعادة التشغيل.</li>
+                <li><i class="fas fa-lightbulb"></i> وثّق كل قرار تنظيف (ماذا حذفت ولماذا) في تقريرك.</li>
+                <li><i class="fas fa-lightbulb"></i> تحقق من منطقية النتائج دائمًا قبل تقديمها.</li>
+                <li><i class="fas fa-lightbulb"></i> حمّل الملف وطبّق الدرس بنفسك، ثم أضف أسئلة جديدة من عندك.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> انتقل الآن إلى <strong>المشروع 1: نظام إدارة مهام متقدم مع حفظ للبيانات</strong> لتجمع البرمجة الكائنية والملفات في مشروع واحد.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="data1.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى: مقدمة في NumPy و Pandas</span>
+        </a>
+        <a href="project1.html" class="nav-link next">
+            <span>التالي: مشروع 1 — نظام إدارة مهام متقدم</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · تحليل CSV
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '81%';
+            text.textContent = '81% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر البيانات ========== */
+    const SALES = [{"date": "2024-01-01", "city": "جدة", "product": "شاشة", "quantity": 4, "unit_price": 850.0, "payment": "نقدًا", "month": 1, "revenue": 3400.0}, {"date": "2024-01-02", "city": "مكة", "product": "سماعة", "quantity": 1, "unit_price": 220.0, "payment": "نقدًا", "month": 1, "revenue": 220.0}, {"date": "2024-01-05", "city": "جدة", "product": "لابتوب", "quantity": 4, "unit_price": 3200.0, "payment": "بطاقة", "month": 1, "revenue": 12800.0}, {"date": "2024-01-08", "city": "الرياض", "product": "فأرة", "quantity": 3, "unit_price": 75.0, "payment": "تحويل", "month": 1, "revenue": 225.0}, {"date": "2024-01-08", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 3, "unit_price": 150.0, "payment": "بطاقة", "month": 1, "revenue": 450.0}, {"date": "2024-01-10", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 2, "unit_price": 150.0, "payment": "بطاقة", "month": 1, "revenue": 300.0}, {"date": "2024-01-11", "city": "الرياض", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "تحويل", "month": 1, "revenue": 300.0}, {"date": "2024-01-12", "city": "الرياض", "product": "شاشة", "quantity": 3, "unit_price": 850.0, "payment": "بطاقة", "month": 1, "revenue": 2550.0}, {"date": "2024-01-12", "city": "الرياض", "product": "لابتوب", "quantity": 4, "unit_price": 3200.0, "payment": "بطاقة", "month": 1, "revenue": 12800.0}, {"date": "2024-01-14", "city": "جدة", "product": "لوحة مفاتيح", "quantity": 1, "unit_price": 150.0, "payment": "بطاقة", "month": 1, "revenue": 150.0}, {"date": "2024-01-14", "city": "مكة", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "تحويل", "month": 1, "revenue": 300.0}, {"date": "2024-01-15", "city": "الدمام", "product": "شاشة", "quantity": 4, "unit_price": 850.0, "payment": "بطاقة", "month": 1, "revenue": 3400.0}, {"date": "2024-01-16", "city": "الدمام", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "نقدًا", "month": 1, "revenue": 660.0}, {"date": "2024-01-23", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 1, "unit_price": 150.0, "payment": "نقدًا", "month": 1, "revenue": 150.0}, {"date": "2024-01-23", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 1, "unit_price": 150.0, "payment": "نقدًا", "month": 1, "revenue": 150.0}, {"date": "2024-01-24", "city": "جدة", "product": "شاشة", "quantity": 4, "unit_price": 850.0, "payment": "بطاقة", "month": 1, "revenue": 3400.0}, {"date": "2024-01-25", "city": "جدة", "product": "فأرة", "quantity": 1, "unit_price": 75.0, "payment": "بطاقة", "month": 1, "revenue": 75.0}, {"date": "2024-01-26", "city": "الرياض", "product": "فأرة", "quantity": 1, "unit_price": 75.0, "payment": "بطاقة", "month": 1, "revenue": 75.0}, {"date": "2024-01-26", "city": "مكة", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "بطاقة", "month": 1, "revenue": 300.0}, {"date": "2024-01-28", "city": "الدمام", "product": "فأرة", "quantity": 3, "unit_price": 75.0, "payment": "بطاقة", "month": 1, "revenue": 225.0}, {"date": "2024-01-28", "city": "الرياض", "product": "شاشة", "quantity": 2, "unit_price": 850.0, "payment": "بطاقة", "month": 1, "revenue": 1700.0}, {"date": "2024-01-28", "city": "مكة", "product": "لوحة مفاتيح", "quantity": 2, "unit_price": 150.0, "payment": "بطاقة", "month": 1, "revenue": 300.0}, {"date": "2024-01-29", "city": "الرياض", "product": "فأرة", "quantity": 3, "unit_price": 75.0, "payment": "بطاقة", "month": 1, "revenue": 225.0}, {"date": "2024-01-31", "city": "الرياض", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "تحويل", "month": 1, "revenue": 300.0}, {"date": "2024-02-01", "city": "الرياض", "product": "لابتوب", "quantity": 1, "unit_price": 3200.0, "payment": "بطاقة", "month": 2, "revenue": 3200.0}, {"date": "2024-02-01", "city": "الرياض", "product": "لابتوب", "quantity": 2, "unit_price": 3200.0, "payment": "بطاقة", "month": 2, "revenue": 6400.0}, {"date": "2024-02-04", "city": "جدة", "product": "فأرة", "quantity": 2, "unit_price": 75.0, "payment": "بطاقة", "month": 2, "revenue": 150.0}, {"date": "2024-02-04", "city": "مكة", "product": "فأرة", "quantity": 2, "unit_price": 75.0, "payment": "بطاقة", "month": 2, "revenue": 150.0}, {"date": "2024-02-05", "city": "جدة", "product": "فأرة", "quantity": 2, "unit_price": 75.0, "payment": "بطاقة", "month": 2, "revenue": 150.0}, {"date": "2024-02-08", "city": "جدة", "product": "شاشة", "quantity": 2, "unit_price": 850.0, "payment": "بطاقة", "month": 2, "revenue": 1700.0}, {"date": "2024-02-10", "city": "جدة", "product": "شاشة", "quantity": 4, "unit_price": 850.0, "payment": "بطاقة", "month": 2, "revenue": 3400.0}, {"date": "2024-02-11", "city": "الرياض", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "تحويل", "month": 2, "revenue": 660.0}, {"date": "2024-02-13", "city": "مكة", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "بطاقة", "month": 2, "revenue": 300.0}, {"date": "2024-02-14", "city": "الرياض", "product": "لابتوب", "quantity": 1, "unit_price": 3200.0, "payment": "نقدًا", "month": 2, "revenue": 3200.0}, {"date": "2024-02-14", "city": "الدمام", "product": "لوحة مفاتيح", "quantity": 2, "unit_price": 150.0, "payment": "تحويل", "month": 2, "revenue": 300.0}, {"date": "2024-02-16", "city": "الدمام", "product": "فأرة", "quantity": 2, "unit_price": 75.0, "payment": "بطاقة", "month": 2, "revenue": 150.0}, {"date": "2024-02-17", "city": "الرياض", "product": "سماعة", "quantity": 4, "unit_price": 220.0, "payment": "نقدًا", "month": 2, "revenue": 880.0}, {"date": "2024-02-18", "city": "جدة", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "بطاقة", "month": 2, "revenue": 660.0}, {"date": "2024-02-18", "city": "الرياض", "product": "لابتوب", "quantity": 1, "unit_price": 3200.0, "payment": "بطاقة", "month": 2, "revenue": 3200.0}, {"date": "2024-02-19", "city": "جدة", "product": "لوحة مفاتيح", "quantity": 4, "unit_price": 150.0, "payment": "بطاقة", "month": 2, "revenue": 600.0}, {"date": "2024-02-20", "city": "جدة", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "بطاقة", "month": 2, "revenue": 660.0}, {"date": "2024-02-22", "city": "الرياض", "product": "سماعة", "quantity": 4, "unit_price": 220.0, "payment": "بطاقة", "month": 2, "revenue": 880.0}, {"date": "2024-02-22", "city": "جدة", "product": "فأرة", "quantity": 3, "unit_price": 75.0, "payment": "نقدًا", "month": 2, "revenue": 225.0}, {"date": "2024-02-22", "city": "الرياض", "product": "سماعة", "quantity": 4, "unit_price": 220.0, "payment": "بطاقة", "month": 2, "revenue": 880.0}, {"date": "2024-02-24", "city": "الدمام", "product": "فأرة", "quantity": 2, "unit_price": 75.0, "payment": "بطاقة", "month": 2, "revenue": 150.0}, {"date": "2024-02-26", "city": "جدة", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "تحويل", "month": 2, "revenue": 300.0}, {"date": "2024-02-27", "city": "الرياض", "product": "شاشة", "quantity": 3, "unit_price": 850.0, "payment": "نقدًا", "month": 2, "revenue": 2550.0}, {"date": "2024-02-29", "city": "جدة", "product": "شاشة", "quantity": 4, "unit_price": 850.0, "payment": "تحويل", "month": 2, "revenue": 3400.0}, {"date": "2024-03-01", "city": "الرياض", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "بطاقة", "month": 3, "revenue": 660.0}, {"date": "2024-03-02", "city": "الرياض", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "بطاقة", "month": 3, "revenue": 660.0}, {"date": "2024-03-03", "city": "الدمام", "product": "لوحة مفاتيح", "quantity": 2, "unit_price": 150.0, "payment": "تحويل", "month": 3, "revenue": 300.0}, {"date": "2024-03-04", "city": "الرياض", "product": "فأرة", "quantity": 1, "unit_price": 75.0, "payment": "بطاقة", "month": 3, "revenue": 75.0}, {"date": "2024-03-04", "city": "جدة", "product": "لوحة مفاتيح", "quantity": 4, "unit_price": 150.0, "payment": "تحويل", "month": 3, "revenue": 600.0}, {"date": "2024-03-05", "city": "جدة", "product": "لابتوب", "quantity": 2, "unit_price": 3200.0, "payment": "بطاقة", "month": 3, "revenue": 6400.0}, {"date": "2024-03-14", "city": "الرياض", "product": "شاشة", "quantity": 4, "unit_price": 850.0, "payment": "بطاقة", "month": 3, "revenue": 3400.0}, {"date": "2024-03-14", "city": "مكة", "product": "شاشة", "quantity": 4, "unit_price": 850.0, "payment": "بطاقة", "month": 3, "revenue": 3400.0}, {"date": "2024-03-17", "city": "الرياض", "product": "سماعة", "quantity": 4, "unit_price": 220.0, "payment": "تحويل", "month": 3, "revenue": 880.0}, {"date": "2024-03-18", "city": "الرياض", "product": "لابتوب", "quantity": 4, "unit_price": 3200.0, "payment": "بطاقة", "month": 3, "revenue": 12800.0}, {"date": "2024-03-24", "city": "الدمام", "product": "لوحة مفاتيح", "quantity": 3, "unit_price": 150.0, "payment": "بطاقة", "month": 3, "revenue": 450.0}, {"date": "2024-03-26", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 1, "unit_price": 150.0, "payment": "بطاقة", "month": 3, "revenue": 150.0}, {"date": "2024-03-27", "city": "جدة", "product": "لابتوب", "quantity": 2, "unit_price": 3200.0, "payment": "بطاقة", "month": 3, "revenue": 6400.0}, {"date": "2024-03-28", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 3, "unit_price": 150.0, "payment": "تحويل", "month": 3, "revenue": 450.0}, {"date": "2024-03-29", "city": "جدة", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "بطاقة", "month": 3, "revenue": 660.0}, {"date": "2024-03-31", "city": "الدمام", "product": "لابتوب", "quantity": 1, "unit_price": 3200.0, "payment": "بطاقة", "month": 3, "revenue": 3200.0}, {"date": "2024-03-31", "city": "الرياض", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "بطاقة", "month": 3, "revenue": 660.0}, {"date": "2024-03-31", "city": "الرياض", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "بطاقة", "month": 3, "revenue": 660.0}, {"date": "2024-03-31", "city": "جدة", "product": "شاشة", "quantity": 3, "unit_price": 850.0, "payment": "نقدًا", "month": 3, "revenue": 2550.0}, {"date": "2024-04-02", "city": "الرياض", "product": "فأرة", "quantity": 2, "unit_price": 75.0, "payment": "نقدًا", "month": 4, "revenue": 150.0}, {"date": "2024-04-04", "city": "جدة", "product": "سماعة", "quantity": 1, "unit_price": 220.0, "payment": "بطاقة", "month": 4, "revenue": 220.0}, {"date": "2024-04-04", "city": "مكة", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "تحويل", "month": 4, "revenue": 300.0}, {"date": "2024-04-05", "city": "مكة", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "بطاقة", "month": 4, "revenue": 660.0}, {"date": "2024-04-05", "city": "الرياض", "product": "لابتوب", "quantity": 4, "unit_price": 3200.0, "payment": "تحويل", "month": 4, "revenue": 12800.0}, {"date": "2024-04-06", "city": "الرياض", "product": "لابتوب", "quantity": 2, "unit_price": 3200.0, "payment": "تحويل", "month": 4, "revenue": 6400.0}, {"date": "2024-04-08", "city": "الرياض", "product": "فأرة", "quantity": 1, "unit_price": 75.0, "payment": "بطاقة", "month": 4, "revenue": 75.0}, {"date": "2024-04-08", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 4, "unit_price": 150.0, "payment": "بطاقة", "month": 4, "revenue": 600.0}, {"date": "2024-04-11", "city": "جدة", "product": "لابتوب", "quantity": 1, "unit_price": 3200.0, "payment": "نقدًا", "month": 4, "revenue": 3200.0}, {"date": "2024-04-12", "city": "جدة", "product": "لوحة مفاتيح", "quantity": 4, "unit_price": 150.0, "payment": "تحويل", "month": 4, "revenue": 600.0}, {"date": "2024-04-13", "city": "الرياض", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "نقدًا", "month": 4, "revenue": 300.0}, {"date": "2024-04-14", "city": "جدة", "product": "سماعة", "quantity": 2, "unit_price": 220.0, "payment": "نقدًا", "month": 4, "revenue": 440.0}, {"date": "2024-04-14", "city": "الدمام", "product": "شاشة", "quantity": 4, "unit_price": 850.0, "payment": "نقدًا", "month": 4, "revenue": 3400.0}, {"date": "2024-04-15", "city": "جدة", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "بطاقة", "month": 4, "revenue": 300.0}, {"date": "2024-04-16", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 2, "unit_price": 150.0, "payment": "تحويل", "month": 4, "revenue": 300.0}, {"date": "2024-04-17", "city": "الدمام", "product": "لوحة مفاتيح", "quantity": 4, "unit_price": 150.0, "payment": "بطاقة", "month": 4, "revenue": 600.0}, {"date": "2024-04-17", "city": "الرياض", "product": "لابتوب", "quantity": 1, "unit_price": 3200.0, "payment": "بطاقة", "month": 4, "revenue": 3200.0}, {"date": "2024-04-18", "city": "الدمام", "product": "سماعة", "quantity": 4, "unit_price": 220.0, "payment": "بطاقة", "month": 4, "revenue": 880.0}, {"date": "2024-04-19", "city": "جدة", "product": "سماعة", "quantity": 1, "unit_price": 220.0, "payment": "نقدًا", "month": 4, "revenue": 220.0}, {"date": "2024-04-21", "city": "الرياض", "product": "فأرة", "quantity": 2, "unit_price": 75.0, "payment": "تحويل", "month": 4, "revenue": 150.0}, {"date": "2024-04-22", "city": "جدة", "product": "لابتوب", "quantity": 2, "unit_price": 3200.0, "payment": "بطاقة", "month": 4, "revenue": 6400.0}, {"date": "2024-04-23", "city": "الرياض", "product": "فأرة", "quantity": 3, "unit_price": 75.0, "payment": "بطاقة", "month": 4, "revenue": 225.0}, {"date": "2024-04-23", "city": "الرياض", "product": "فأرة", "quantity": 3, "unit_price": 75.0, "payment": "بطاقة", "month": 4, "revenue": 225.0}, {"date": "2024-04-25", "city": "جدة", "product": "لابتوب", "quantity": 4, "unit_price": 3200.0, "payment": "بطاقة", "month": 4, "revenue": 12800.0}, {"date": "2024-04-26", "city": "جدة", "product": "لابتوب", "quantity": 1, "unit_price": 3200.0, "payment": "نقدًا", "month": 4, "revenue": 3200.0}, {"date": "2024-04-26", "city": "الرياض", "product": "سماعة", "quantity": 2, "unit_price": 220.0, "payment": "بطاقة", "month": 4, "revenue": 440.0}, {"date": "2024-04-27", "city": "الرياض", "product": "فأرة", "quantity": 1, "unit_price": 75.0, "payment": "تحويل", "month": 4, "revenue": 75.0}, {"date": "2024-04-30", "city": "الدمام", "product": "شاشة", "quantity": 2, "unit_price": 850.0, "payment": "تحويل", "month": 4, "revenue": 1700.0}, {"date": "2024-05-01", "city": "الدمام", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "بطاقة", "month": 5, "revenue": 660.0}, {"date": "2024-05-03", "city": "الرياض", "product": "شاشة", "quantity": 4, "unit_price": 850.0, "payment": "تحويل", "month": 5, "revenue": 3400.0}, {"date": "2024-05-05", "city": "الدمام", "product": "سماعة", "quantity": 2, "unit_price": 220.0, "payment": "بطاقة", "month": 5, "revenue": 440.0}, {"date": "2024-05-06", "city": "الرياض", "product": "لابتوب", "quantity": 1, "unit_price": 3200.0, "payment": "نقدًا", "month": 5, "revenue": 3200.0}, {"date": "2024-05-06", "city": "الرياض", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "نقدًا", "month": 5, "revenue": 300.0}, {"date": "2024-05-08", "city": "الرياض", "product": "سماعة", "quantity": 4, "unit_price": 220.0, "payment": "بطاقة", "month": 5, "revenue": 880.0}, {"date": "2024-05-09", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 1, "unit_price": 150.0, "payment": "بطاقة", "month": 5, "revenue": 150.0}, {"date": "2024-05-09", "city": "الرياض", "product": "فأرة", "quantity": 2, "unit_price": 75.0, "payment": "بطاقة", "month": 5, "revenue": 150.0}, {"date": "2024-05-11", "city": "الرياض", "product": "لابتوب", "quantity": 2, "unit_price": 3200.0, "payment": "بطاقة", "month": 5, "revenue": 6400.0}, {"date": "2024-05-14", "city": "الدمام", "product": "فأرة", "quantity": 1, "unit_price": 75.0, "payment": "بطاقة", "month": 5, "revenue": 75.0}, {"date": "2024-05-14", "city": "مكة", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "بطاقة", "month": 5, "revenue": 300.0}, {"date": "2024-05-15", "city": "الرياض", "product": "شاشة", "quantity": 1, "unit_price": 850.0, "payment": "بطاقة", "month": 5, "revenue": 850.0}, {"date": "2024-05-19", "city": "الرياض", "product": "شاشة", "quantity": 2, "unit_price": 850.0, "payment": "تحويل", "month": 5, "revenue": 1700.0}, {"date": "2024-05-19", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 3, "unit_price": 150.0, "payment": "تحويل", "month": 5, "revenue": 450.0}, {"date": "2024-05-19", "city": "مكة", "product": "شاشة", "quantity": 1, "unit_price": 850.0, "payment": "بطاقة", "month": 5, "revenue": 850.0}, {"date": "2024-05-19", "city": "مكة", "product": "لابتوب", "quantity": 2, "unit_price": 3200.0, "payment": "بطاقة", "month": 5, "revenue": 6400.0}, {"date": "2024-05-20", "city": "الدمام", "product": "سماعة", "quantity": 2, "unit_price": 220.0, "payment": "بطاقة", "month": 5, "revenue": 440.0}, {"date": "2024-05-24", "city": "الرياض", "product": "شاشة", "quantity": 3, "unit_price": 850.0, "payment": "نقدًا", "month": 5, "revenue": 2550.0}, {"date": "2024-05-24", "city": "الرياض", "product": "سماعة", "quantity": 4, "unit_price": 220.0, "payment": "بطاقة", "month": 5, "revenue": 880.0}, {"date": "2024-05-24", "city": "الرياض", "product": "سماعة", "quantity": 4, "unit_price": 220.0, "payment": "تحويل", "month": 5, "revenue": 880.0}, {"date": "2024-05-25", "city": "جدة", "product": "شاشة", "quantity": 2, "unit_price": 850.0, "payment": "بطاقة", "month": 5, "revenue": 1700.0}, {"date": "2024-05-26", "city": "مكة", "product": "لابتوب", "quantity": 2, "unit_price": 3200.0, "payment": "بطاقة", "month": 5, "revenue": 6400.0}, {"date": "2024-05-26", "city": "الدمام", "product": "لوحة مفاتيح", "quantity": 3, "unit_price": 150.0, "payment": "بطاقة", "month": 5, "revenue": 450.0}, {"date": "2024-05-29", "city": "الرياض", "product": "فأرة", "quantity": 2, "unit_price": 75.0, "payment": "نقدًا", "month": 5, "revenue": 150.0}, {"date": "2024-05-29", "city": "جدة", "product": "لوحة مفاتيح", "quantity": 1, "unit_price": 150.0, "payment": "نقدًا", "month": 5, "revenue": 150.0}, {"date": "2024-05-30", "city": "الدمام", "product": "لوحة مفاتيح", "quantity": 1, "unit_price": 150.0, "payment": "نقدًا", "month": 5, "revenue": 150.0}, {"date": "2024-06-03", "city": "الدمام", "product": "لوحة مفاتيح", "quantity": 4, "unit_price": 150.0, "payment": "تحويل", "month": 6, "revenue": 600.0}, {"date": "2024-06-05", "city": "جدة", "product": "شاشة", "quantity": 3, "unit_price": 850.0, "payment": "بطاقة", "month": 6, "revenue": 2550.0}, {"date": "2024-06-05", "city": "الرياض", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "نقدًا", "month": 6, "revenue": 300.0}, {"date": "2024-06-06", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 1, "unit_price": 150.0, "payment": "بطاقة", "month": 6, "revenue": 150.0}, {"date": "2024-06-07", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 4, "unit_price": 150.0, "payment": "بطاقة", "month": 6, "revenue": 600.0}, {"date": "2024-06-08", "city": "الرياض", "product": "شاشة", "quantity": 2, "unit_price": 850.0, "payment": "بطاقة", "month": 6, "revenue": 1700.0}, {"date": "2024-06-09", "city": "جدة", "product": "سماعة", "quantity": 1, "unit_price": 220.0, "payment": "بطاقة", "month": 6, "revenue": 220.0}, {"date": "2024-06-09", "city": "الدمام", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "تحويل", "month": 6, "revenue": 300.0}, {"date": "2024-06-14", "city": "مكة", "product": "سماعة", "quantity": 2, "unit_price": 220.0, "payment": "بطاقة", "month": 6, "revenue": 440.0}, {"date": "2024-06-14", "city": "مكة", "product": "لابتوب", "quantity": 3, "unit_price": 3200.0, "payment": "تحويل", "month": 6, "revenue": 9600.0}, {"date": "2024-06-16", "city": "جدة", "product": "فأرة", "quantity": 4, "unit_price": 75.0, "payment": "بطاقة", "month": 6, "revenue": 300.0}, {"date": "2024-06-17", "city": "الرياض", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "تحويل", "month": 6, "revenue": 660.0}, {"date": "2024-06-18", "city": "الرياض", "product": "سماعة", "quantity": 2, "unit_price": 220.0, "payment": "بطاقة", "month": 6, "revenue": 440.0}, {"date": "2024-06-18", "city": "جدة", "product": "لوحة مفاتيح", "quantity": 1, "unit_price": 150.0, "payment": "تحويل", "month": 6, "revenue": 150.0}, {"date": "2024-06-19", "city": "الرياض", "product": "سماعة", "quantity": 3, "unit_price": 220.0, "payment": "بطاقة", "month": 6, "revenue": 660.0}, {"date": "2024-06-20", "city": "جدة", "product": "سماعة", "quantity": 1, "unit_price": 220.0, "payment": "بطاقة", "month": 6, "revenue": 220.0}, {"date": "2024-06-23", "city": "مكة", "product": "فأرة", "quantity": 1, "unit_price": 75.0, "payment": "بطاقة", "month": 6, "revenue": 75.0}, {"date": "2024-06-25", "city": "جدة", "product": "فأرة", "quantity": 1, "unit_price": 75.0, "payment": "بطاقة", "month": 6, "revenue": 75.0}, {"date": "2024-06-26", "city": "جدة", "product": "لابتوب", "quantity": 4, "unit_price": 3200.0, "payment": "بطاقة", "month": 6, "revenue": 12800.0}, {"date": "2024-06-26", "city": "جدة", "product": "لابتوب", "quantity": 1, "unit_price": 3200.0, "payment": "نقدًا", "month": 6, "revenue": 3200.0}, {"date": "2024-06-26", "city": "جدة", "product": "شاشة", "quantity": 3, "unit_price": 850.0, "payment": "تحويل", "month": 6, "revenue": 2550.0}, {"date": "2024-06-27", "city": "الرياض", "product": "فأرة", "quantity": 3, "unit_price": 75.0, "payment": "بطاقة", "month": 6, "revenue": 225.0}, {"date": "2024-06-27", "city": "جدة", "product": "لابتوب", "quantity": 1, "unit_price": 3200.0, "payment": "بطاقة", "month": 6, "revenue": 3200.0}, {"date": "2024-06-27", "city": "مكة", "product": "سماعة", "quantity": 1, "unit_price": 220.0, "payment": "نقدًا", "month": 6, "revenue": 220.0}, {"date": "2024-06-28", "city": "الرياض", "product": "فأرة", "quantity": 1, "unit_price": 75.0, "payment": "بطاقة", "month": 6, "revenue": 75.0}, {"date": "2024-06-29", "city": "جدة", "product": "لوحة مفاتيح", "quantity": 3, "unit_price": 150.0, "payment": "بطاقة", "month": 6, "revenue": 450.0}, {"date": "2024-06-30", "city": "الرياض", "product": "لوحة مفاتيح", "quantity": 2, "unit_price": 150.0, "payment": "تحويل", "month": 6, "revenue": 300.0}];
+    const RAW_CSV = "order_id,date,city,product,quantity,unit_price,payment\n1001,2024-01-01,جدة,شاشة,4.0,850,نقدًا\n1002,2024-01-02,مكة,سماعة,1.0,220,نقدًا\n1003,2024-01-05,جدة,لابتوب,4.0,3200,بطاقة\n1004,2024-01-08,الرياض ,فأرة,3.0,75,تحويل\n1005,2024-01-08,الرياض,لوحة مفاتيح,3.0,150,بطاقة\n1006,2024-01-08,الرياض,شاشة,,850,بطاقة\n1007,2024-01-10,الرياض,لوحة مفاتيح,2.0,150,بطاقة\n1008,2024-01-11,الرياض,فأرة,4.0,75,تحويل\n1009,2024-01-12,الرياض,شاشة,3.0,850,بطاقة\n1010,2024-01-12,الرياض,لابتوب,4.0,3200,بطاقة\n1011,2024-01-14,جده,لوحة مفاتيح,1.0,150,بطاقة\n1012,2024-01-14,مكة,فأرة,4.0,75,تحويل\n1013,2024-01-15,الدمام,شاشة,4.0,850,بطاقة\n1014,2024-01-16,الدمام,سماعة,3.0,220,نقدًا\n1015,2024-01-23,الرياض,لوحة مفاتيح,1.0,150,نقدًا\n1016,2024-01-23,الرياض,لوحة مفاتيح,1.0,150,نقدًا\n1017,2024-01-24,جدة,شاشة,4.0,850,بطاقة\n1018,2024-01-25,جدة,فأرة,1.0,75,بطاقة\n1019,2024-01-26,الرياض,فأرة,1.0,75,بطاقة\n1020,2024-01-26,مكة,فأرة,4.0,75,بطاقة\n1021,2024-01-28,الدمام,فأرة,3.0,75,بطاقة\n1022,2024-01-28,الرياض,شاشة,2.0,850,بطاقة\n1023,2024-01-28,مكة,لوحة مفاتيح,2.0,150,بطاقة\n1024,2024-01-29,الرياض,فأرة,3.0,75,بطاقة\n1025,2024-01-31,الرياض,فأرة,4.0,75,تحويل\n1026,2024-02-01,الرياض,لابتوب,1.0,\"3,200\",بطاقة\n1027,2024-02-01,الرياض,لابتوب,2.0,3200,بطاقة\n1028,2024-02-04,جدة,فأرة,2.0,75,بطاقة\n1029,2024-02-04,مكة,فأرة,2.0,75,بطاقة\n1030,2024-02-05,جدة,فأرة,2.0,75,بطاقة\n1031,2024-02-08,جدة,شاشة,2.0,,بطاقة\n1032,2024-02-10,جدة,شاشة,4.0,850,بطاقة\n1033,2024-02-11,الرياض,سماعة,3.0,220,تحويل\n1034,2024-02-13,مكة,فأرة,4.0,75,بطاقة\n1035,2024-02-14,الرياض,لابتوب,1.0,3200,نقدًا\n1036,2024-02-14,الدمام,لوحة مفاتيح,2.0,150,تحويل\n1037,2024-02-16,الدمام,فأرة,2.0,75,بطاقة\n1038,2024-02-17,الرياض,سماعة,4.0,220,نقدًا\n1039,2024-02-18,جدة,سماعة,3.0,220,بطاقة\n1040,2024-02-18,الرياض,لابتوب,1.0,3200,بطاقة\n1041,2024-02-19, جدة,لوحة مفاتيح,4.0,150,بطاقة\n1042,2024-02-20,جدة,سماعة,3.0,220,بطاقة\n1043,2024-02-22,الرياض,سماعة,4.0,220,بطاقة\n1044,2024-02-22,جدة,فأرة,3.0,75,نقدًا\n1045,2024-02-22,الرياض,سماعة,4.0,220,بطاقة\n1046,2024-02-24,الدمام,فأرة,2.0,75,بطاقة\n1047,2024-02-26,جدة,فأرة,4.0,75,تحويل\n1048,2024-02-27,الرياض,شاشة,3.0,850,نقدًا\n1049,2024-02-29,جدة,شاشة,4.0,850,تحويل\n1050,2024-03-01,الرياض,سماعة,3.0,220,بطاقة\n1051,2024-03-02,الرياض,سماعة,3.0,220,بطاقة\n1052,2024-03-03,الدمام,لوحة مفاتيح,2.0,150,تحويل\n1053,2024-03-04,الرياض,فأرة,1.0,75,بطاقة\n1054,2024-03-04,جدة,لوحة مفاتيح,4.0,150,تحويل\n1055,2024-03-05,جدة,لابتوب,2.0,3200,بطاقة\n1056,2024-03-14,الرياض,شاشة,4.0,850,بطاقة\n1057,2024-03-14,مكة,شاشة,4.0,850,بطاقة\n1058,2024-03-17,الرياض,سماعة,4.0,220,تحويل\n1059,2024-03-18,الرياض,لابتوب,4.0,\"3,200\",بطاقة\n1060,2024-03-24,الدمام,لوحة مفاتيح,3.0,150,بطاقة\n1061,2024-03-24,جدة,لوحة مفاتيح,,150,بطاقة\n1062,2024-03-26,الرياض,لوحة مفاتيح,1.0,150,بطاقة\n1063,2024-03-27,جدة,لابتوب,2.0,3200,بطاقة\n1064,2024-03-28,الرياض,لوحة مفاتيح,3.0,150,تحويل\n1065,2024-03-29,جدة,سماعة,3.0,220,بطاقة\n1066,2024-03-31,الدمام,لابتوب,1.0,3200,بطاقة\n1067,2024-03-31,الرياض,سماعة,3.0,220,بطاقة\n1068,2024-03-31,الرياض,سماعة,3.0,220,بطاقة\n1069,2024-03-31,جدة,شاشة,3.0,850,نقدًا\n1070,2024-04-02,الرياض,فأرة,2.0,75,نقدًا\n1071,2024-04-04,جدة,سماعة,1.0,220,بطاقة\n1072,2024-04-04,مكة,فأرة,4.0,75,تحويل\n1073,2024-04-05,مكة,سماعة,3.0,220,بطاقة\n1074,2024-04-05,الرياض,لابتوب,4.0,3200,تحويل\n1075,2024-04-06,الرياض,لابتوب,2.0,3200,تحويل\n1076,2024-04-08,الرياض,فأرة,1.0,75,بطاقة\n1077,2024-04-08,الرياض,لوحة مفاتيح,4.0,150,بطاقة\n1078,2024-04-11,جده,لابتوب,1.0,3200,نقدًا\n1079,2024-04-12,جدة,لوحة مفاتيح,4.0,150,تحويل\n1080,2024-04-13,الرياض,فأرة,4.0,75,نقدًا\n1081,2024-04-14,جدة,سماعة,2.0,220,نقدًا\n1082,2024-04-14,الدمام,شاشة,4.0,850,نقدًا\n1083,2024-04-15,جدة,فأرة,4.0,75,بطاقة\n1084,2024-04-16,الرياض,لوحة مفاتيح,2.0,150,تحويل\n1085,2024-04-17,الدمام,لوحة مفاتيح,4.0,150,بطاقة\n1086,2024-04-17,الرياض,لابتوب,1.0,3200,بطاقة\n1087,2024-04-18,الدمام,سماعة,4.0,220,بطاقة\n1088,2024-04-19,جدة,سماعة,1.0,220,نقدًا\n1089,2024-04-21,الرياض,فأرة,2.0,75 ريال,تحويل\n1090,2024-04-22,جدة,لابتوب,2.0,3200,بطاقة\n1091,2024-04-23,الرياض,فأرة,3.0,75,بطاقة\n1092,2024-04-23,الرياض,فأرة,3.0,75,بطاقة\n1093,2024-04-25,جدة,لابتوب,4.0,3200,بطاقة\n1094,2024-04-26,جدة,لابتوب,1.0,3200,نقدًا\n1095,2024-04-26,الرياض,سماعة,2.0,220,بطاقة\n1096,2024-04-27,الرياض  ,فأرة,1.0,75,تحويل\n1097,2024-04-30,الدمام,شاشة,2.0,850,تحويل\n1098,2024-05-01,الدمام,سماعة,3.0,220,بطاقة\n1099,2024-05-03,الرياض,شاشة,4.0,850,تحويل\n1100,2024-05-05,الدمام,سماعة,2.0,220,بطاقة\n1101,2024-05-06,الرياض,لابتوب,1.0,3200,نقدًا\n1102,2024-05-06,الرياض,فأرة,4.0,75,نقدًا\n1103,2024-05-08,الرياض,سماعة,4.0,220,بطاقة\n1104,2024-05-09,الرياض,لوحة مفاتيح,1.0,150,بطاقة\n1105,2024-05-09,الرياض,فأرة,2.0,75,بطاقة\n1106,2024-05-11,الرياض,لابتوب,2.0,3200,بطاقة\n1107,2024-05-14,الدمام,فأرة,1.0,75,بطاقة\n1108,2024-05-14,مكة,فأرة,4.0,75,بطاقة\n1109,2024-05-15,الرياض,شاشة,1.0,850,بطاقة\n1110,2024-05-19,الرياض,شاشة,2.0,850,تحويل\n1111,2024-05-19,الرياض,لوحة مفاتيح,3.0,150,تحويل\n1112,2024-05-19,مكة,شاشة,1.0,850,بطاقة\n1113,2024-05-19,مكة,لابتوب,2.0,3200,بطاقة\n1114,2024-05-20,الدمام,سماعة,2.0,220,بطاقة\n1115,2024-05-24,الرياض,شاشة,3.0,850,نقدًا\n1116,2024-05-24,الرياض,سماعة,4.0,220,بطاقة\n1117,2024-05-24,الرياض,سماعة,4.0,220,تحويل\n1118,2024-05-25,جدة,شاشة,2.0,850,بطاقة\n1119,2024-05-26,مكة,لابتوب,2.0,3200,بطاقة\n1120,2024-05-26,الدمام,لوحة مفاتيح,3.0,150,بطاقة\n1121,2024-05-29,الرياض,فأرة,2.0,75,نقدًا\n1122,2024-05-29,جدة,لوحة مفاتيح,1.0,150,نقدًا\n1123,2024-05-30,الدمام,لوحة مفاتيح,1.0,150,نقدًا\n1124,2024-06-03,الدمام,لوحة مفاتيح,4.0,150,تحويل\n1125,2024-06-05,جدة,شاشة,3.0,850,بطاقة\n1126,2024-06-05,الرياض,فأرة,4.0,75,نقدًا\n1127,2024-06-06,الرياض,لوحة مفاتيح,1.0,150,بطاقة\n1128,2024-06-07,الرياض,لوحة مفاتيح,4.0,150,بطاقة\n1129,2024-06-08,الرياض,شاشة,2.0,850,بطاقة\n1130,2024-06-09,جدة,سماعة,1.0,220,بطاقة\n1131,2024-06-09,الدمام,فأرة,4.0,75,تحويل\n1132,2024-06-14,مكة,سماعة,2.0,220,بطاقة\n1133,2024-06-14,مكة,لابتوب,3.0,3200,تحويل\n1134,2024-06-16,جدة,فأرة,4.0,75,بطاقة\n1135,2024-06-17,الرياض,سماعة,3.0,220,تحويل\n1136,2024-06-18,الرياض,سماعة,2.0,220,بطاقة\n1137,2024-06-18,جدة,لوحة مفاتيح,1.0,150,تحويل\n1138,2024-06-19,الرياض,سماعة,3.0,220,بطاقة\n1139,2024-06-20,جدة,سماعة,1.0,220,بطاقة\n1140,2024-06-23,مكة,فأرة,1.0,75,بطاقة\n1141,2024-06-25,جدة,فأرة,1.0,75,بطاقة\n1142,2024-06-26,جدة,لابتوب,4.0,3200,بطاقة\n1143,2024-06-26,جدة,لابتوب,1.0,3200,نقدًا\n1144,2024-06-26,جدة,شاشة,3.0,850,تحويل\n1145,2024-06-27,الرياض,فأرة,3.0,75,بطاقة\n1146,2024-06-27,جدة,لابتوب,1.0,3200,بطاقة\n1147,2024-06-27,مكة,سماعة,1.0,220,نقدًا\n1148,2024-06-28,الرياض,فأرة,1.0,75,بطاقة\n1149,2024-06-29,جدة,لوحة مفاتيح,3.0,150,بطاقة\n1150,2024-06-30,الرياض,لوحة مفاتيح,2.0,150,تحويل\n1021,2024-01-28,الدمام,فأرة,3.0,75,بطاقة\n1022,2024-01-28,الرياض,شاشة,2.0,850,بطاقة\n1101,2024-05-06,الرياض,لابتوب,1.0,3200,نقدًا\n";
+    const MONTHS = { 1: 'يناير', 2: 'فبراير', 3: 'مارس', 4: 'أبريل', 5: 'مايو', 6: 'يونيو' };
+
+    function downloadCsv() {
+        const blob = new Blob(['﻿' + RAW_CSV], { type: 'text/csv;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'sales_raw.csv';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+
+    function runAgg() {
+        const dim = document.getElementById('dimSel').value;
+        const met = document.getElementById('metSel').value;
+        const city = document.getElementById('cityFilter').value;
+        const rows = city ? SALES.filter(r => r.city === city) : SALES;
+        const groups = {};
+        rows.forEach(r => { (groups[r[dim]] = groups[r[dim]] || []).push(r); });
+        const calc = list => met === 'count' ? list.length
+            : met === 'quantity_sum' ? list.reduce((a, r) => a + r.quantity, 0)
+            : met === 'revenue_sum' ? list.reduce((a, r) => a + r.revenue, 0)
+            : list.reduce((a, r) => a + r.revenue, 0) / list.length;
+        let result = Object.keys(groups).map(k => [k, calc(groups[k])]);
+        if (dim === 'month') result.sort((a, b) => a[0] - b[0]); else result.sort((a, b) => b[1] - a[1]);
+
+        const pandasMet = { revenue_sum: '["revenue"].sum()', count: '["order_id"].count()', quantity_sum: '["quantity"].sum()', revenue_mean: '["revenue"].mean().round()' }[met];
+        document.getElementById('aggCode').textContent =
+            (city ? `data = df[df["city"] == "${city}"]\n` : 'data = df\n') +
+            `result = data.groupby("${dim}")${pandasMet}` + (dim === 'month' ? '' : '.sort_values(ascending=False)') + '\nprint(result)';
+
+        const max = Math.max(...result.map(r => r[1]));
+        document.getElementById('aggChart').innerHTML = result.map(([k, v]) => `
+            <div style="display:flex; align-items:center; gap:10px; margin:6px 0;">
+                <span style="width:90px; color:var(--text-light); font-size:0.9em;">${dim === 'month' ? MONTHS[k] : escapeHtml(k)}</span>
+                <div style="flex:1; background:rgba(255,255,255,0.05); border-radius:6px; overflow:hidden;">
+                    <div style="width:${(v / max * 100).toFixed(1)}%; background:linear-gradient(90deg, var(--gold-soft), var(--gold)); height:22px;"></div>
+                </div>
+                <span style="width:90px; direction:ltr; text-align:left; color:var(--gold); font-family:Consolas, monospace;">${Math.round(v).toLocaleString('en-US')}</span>
+            </div>`).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', runAgg);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

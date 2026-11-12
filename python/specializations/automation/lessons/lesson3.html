@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 3: أتمتة Excel و Word و PDF | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص الأتمتة</a>
+        <span class="sep">/</span>
+        <span>أتمتة المستندات</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-file-alt"></i>
+            الدرس 3 · المستندات
+        </div>
+        <h1 class="lesson-title">أتمتة المستندات: Excel و Word و PDF</h1>
+        <p class="lesson-intro">
+            معظم العمل المكتبي يدور حول ثلاثة أنواع من الملفات: جداول <strong>Excel</strong>، ومستندات <strong>Word</strong>، وملفات <strong>PDF</strong>. في هذا الدرس ستنشئ تقرير Excel منسقًا بالمعادلات والألوان والرسوم، وتولّد عشرات الشهادات والخطابات من قالب Word واحد، وتدمج ملفات PDF وتقسّمها وتستخرج نصوصها وتضيف إليها علامة مائية وكلمة مرور.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 80 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 تقارير ومستندات بضغطة زر</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 2</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#libs">1. المكتبات</a>
+            <a href="#excel">2. تقرير Excel</a>
+            <a href="#read_excel">3. قراءة Excel ودمجه</a>
+            <a href="#word">4. مستندات Word</a>
+            <a href="#pdf">5. ملفات PDF</a>
+            <a href="#pipeline">6. مثال متكامل</a>
+            <a href="#exercises">7. تمارين تفاعلية</a>
+            <a href="#summary">8. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="libs">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-toolbox"></i>
+        المكتبات التي سنستخدمها
+    </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الملف</th><th>المكتبة</th><th>التثبيت</th><th>تستطيع</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Excel <code>.xlsx</code></td><td><code>openpyxl</code></td><td><code>pip install openpyxl</code></td><td>قراءة وكتابة الخلايا، المعادلات، التنسيق، الرسوم</td></tr>
+                    <tr><td>Word <code>.docx</code></td><td><code>python-docx</code></td><td><code>pip install python-docx</code></td><td>العناوين، الفقرات، الجداول، الصور</td></tr>
+                    <tr><td>PDF (قراءة وتعديل)</td><td><code>pypdf</code></td><td><code>pip install "pypdf[crypto]"</code></td><td>الدمج، التقسيم، النصوص، التدوير، التشفير (يتطلب التشفير AES حزمة <code>cryptography</code> التي يثبّتها الخيار <code>[crypto]</code>)</td></tr>
+                    <tr><td>PDF (إنشاء)</td><td><code>reportlab</code></td><td><code>pip install reportlab</code></td><td>رسم صفحات PDF من الصفر</td></tr>
+                    <tr><td>CSV</td><td><code>csv</code> / <code>pandas</code></td><td>مدمجة / <code>pip install pandas</code></td><td>البيانات الجدولية البسيطة</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>لا تحتاج Microsoft Office!</strong> كل هذه المكتبات تقرأ الملفات وتكتبها مباشرة، فتعمل سكربتاتك حتى على خادم Linux بلا Office.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="excel">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-file-excel"></i>
+        إنشاء تقرير Excel منسق
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>excel_report.py</span>
+    </div>
+<pre><span class="kw">from</span> openpyxl <span class="kw">import</span> Workbook
+<span class="kw">from</span> openpyxl.chart <span class="kw">import</span> BarChart, Reference
+<span class="kw">from</span> openpyxl.formatting.rule <span class="kw">import</span> CellIsRule
+<span class="kw">from</span> openpyxl.styles <span class="kw">import</span> Alignment, Border, Font, PatternFill, Side
+
+sales = [
+    (<span class="str">"الرياض"</span>, <span class="num">48200</span>, <span class="num">51000</span>), (<span class="str">"جدة"</span>, <span class="num">39500</span>, <span class="num">36800</span>), (<span class="str">"الدمام"</span>, <span class="num">21800</span>, <span class="num">25400</span>),
+    (<span class="str">"مكة"</span>, <span class="num">26400</span>, <span class="num">24100</span>), (<span class="str">"المدينة"</span>, <span class="num">18300</span>, <span class="num">21900</span>),
+]
+
+wb = <span class="fn">Workbook</span>()
+ws = wb.active
+ws.title = <span class="str">"مبيعات الربع"</span>
+ws.sheet_view.rightToLeft = <span class="kw">True</span>                       <span class="cm"># اتجاه عربي</span>
+
+ws.<span class="fn">append</span>([<span class="str">"الفرع"</span>, <span class="str">"يناير"</span>, <span class="str">"فبراير"</span>, <span class="str">"الإجمالي"</span>, <span class="str">"النمو %"</span>])
+<span class="kw">for</span> row, (branch, jan, feb) <span class="kw">in</span> <span class="fn">enumerate</span>(sales, start=<span class="num">2</span>):
+    ws.<span class="fn">append</span>([branch, jan, feb, <span class="str">f"=B{row}+C{row}"</span>, <span class="str">f"=(C{row}-B{row})/B{row}"</span>])
+last = <span class="fn">len</span>(sales) + <span class="num">1</span>
+ws.<span class="fn">append</span>([<span class="str">"المجموع"</span>, <span class="str">f"=SUM(B2:B{last})"</span>, <span class="str">f"=SUM(C2:C{last})"</span>, <span class="str">f"=SUM(D2:D{last})"</span>, <span class="kw">None</span>])
+
+<span class="cm"># ---- التنسيق ----</span>
+gold = <span class="fn">PatternFill</span>(<span class="str">"solid"</span>, fgColor=<span class="str">"D4AF37"</span>)
+thin = <span class="fn">Side</span>(style=<span class="str">"thin"</span>, color=<span class="str">"999999"</span>)
+<span class="kw">for</span> cell <span class="kw">in</span> ws[<span class="num">1</span>]:
+    cell.font = <span class="fn">Font</span>(bold=<span class="kw">True</span>)
+    cell.fill = gold
+    cell.alignment = <span class="fn">Alignment</span>(horizontal=<span class="str">"center"</span>)
+<span class="kw">for</span> row <span class="kw">in</span> ws.<span class="fn">iter_rows</span>(min_row=<span class="num">2</span>, max_row=last + <span class="num">1</span>):
+    <span class="kw">for</span> cell <span class="kw">in</span> row:
+        cell.border = <span class="fn">Border</span>(top=thin, bottom=thin)
+    <span class="kw">for</span> cell <span class="kw">in</span> row[<span class="num">1</span>:<span class="num">4</span>]:
+        cell.number_format = <span class="str">"#,##0"</span>
+    row[<span class="num">4</span>].number_format = <span class="str">"0.0%"</span>
+<span class="kw">for</span> cell <span class="kw">in</span> ws[last + <span class="num">1</span>]:
+    cell.font = <span class="fn">Font</span>(bold=<span class="kw">True</span>)
+<span class="kw">for</span> col, width <span class="kw">in</span> <span class="fn">zip</span>(<span class="str">"ABCDE"</span>, [<span class="num">14</span>, <span class="num">12</span>, <span class="num">12</span>, <span class="num">14</span>, <span class="num">10</span>]):
+    ws.column_dimensions[col].width = width
+ws.freeze_panes = <span class="str">"A2"</span>
+
+<span class="cm"># تلوين النمو السالب بالأحمر تلقائيًا</span>
+ws.conditional_formatting.<span class="fn">add</span>(<span class="str">f"E2:E{last}"</span>, <span class="fn">CellIsRule</span>(operator=<span class="str">"lessThan"</span>, formula=[<span class="str">"0"</span>],
+                              font=<span class="fn">Font</span>(color=<span class="str">"C00000"</span>), fill=<span class="fn">PatternFill</span>(<span class="str">"solid"</span>, fgColor=<span class="str">"FDE2E2"</span>)))
+
+<span class="cm"># ---- رسم بياني داخل الملف ----</span>
+chart = <span class="fn">BarChart</span>()
+chart.title = <span class="str">"المبيعات حسب الفرع"</span>
+chart.<span class="fn">add_data</span>(<span class="fn">Reference</span>(ws, min_col=<span class="num">2</span>, max_col=<span class="num">3</span>, min_row=<span class="num">1</span>, max_row=last), titles_from_data=<span class="kw">True</span>)
+chart.<span class="fn">set_categories</span>(<span class="fn">Reference</span>(ws, min_col=<span class="num">1</span>, min_row=<span class="num">2</span>, max_row=last))
+chart.width, chart.height = <span class="num">16</span>, <span class="num">8</span>
+ws.<span class="fn">add_chart</span>(chart, <span class="str">"G2"</span>)
+
+wb.<span class="fn">save</span>(<span class="str">"sales_q1.xlsx"</span>)
+<span class="fn">print</span>(<span class="str">"✅ حُفظ sales_q1.xlsx"</span>)
+<span class="kw">for</span> row <span class="kw">in</span> ws.<span class="fn">iter_rows</span>(min_row=<span class="num">1</span>, max_row=<span class="num">3</span>, values_only=<span class="kw">True</span>):
+    <span class="fn">print</span>(row)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>✅ حُفظ sales_q1.xlsx
+('الفرع', 'يناير', 'فبراير', 'الإجمالي', 'النمو %')
+('الرياض', 48200, 51000, '=B2+C2', '=(C2-B2)/B2')
+('جدة', 39500, 36800, '=B3+C3', '=(C3-B3)/B3')</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>المعادلات لا تُحسب في Python!</strong> openpyxl يكتب المعادلة <code>=B2+C2</code> كنص، وExcel هو من يحسبها عند فتح الملف.
+                لذلك عند القراءة بـ <code>load_workbook(f, data_only=True)</code> ستجد القيمة <code>None</code> لملف لم يُفتح ويُحفظ في Excel بعد.
+                إذا احتجت الأرقام في Python، احسبها بنفسك أو بـ pandas.
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الأداة</th><th>الاستخدام</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>ws.append([...])</code></td><td>إضافة صف في نهاية الجدول</td></tr>
+                    <tr><td><code>ws["B2"] = 100</code> / <code>ws.cell(row=2, column=2)</code></td><td>الكتابة في خلية محددة</td></tr>
+                    <tr><td><code>cell.number_format = "#,##0"</code></td><td>تنسيق الأرقام (فواصل الآلاف، نسبة، عملة)</td></tr>
+                    <tr><td><code>Font / PatternFill / Border / Alignment</code></td><td>الخط، والتعبئة، والحدود، والمحاذاة</td></tr>
+                    <tr><td><code>conditional_formatting.add</code></td><td>تنسيق شرطي يتغير حسب القيمة</td></tr>
+                    <tr><td><code>BarChart / LineChart / PieChart</code></td><td>رسوم بيانية حقيقية داخل Excel</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="read_excel">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-table"></i>
+        قراءة عدة ملفات Excel ودمجها
+    </h2>
+        <p>كل فرع يرسل ملفه، والمطلوب ملف واحد يجمعها. نقرأ بـ openpyxl أو بـ pandas (الأسهل للجداول):</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>merge_excel.py</span>
+    </div>
+<pre><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> openpyxl <span class="kw">import</span> Workbook, load_workbook
+
+<span class="fn">Path</span>(<span class="str">"branches"</span>).<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+<span class="kw">for</span> branch, rows <span class="kw">in</span> {<span class="str">"riyadh"</span>: [(<span class="str">"قلم"</span>, <span class="num">120</span>), (<span class="str">"دفتر"</span>, <span class="num">80</span>)], <span class="str">"jeddah"</span>: [(<span class="str">"قلم"</span>, <span class="num">95</span>), (<span class="str">"حقيبة"</span>, <span class="num">30</span>)]}.<span class="fn">items</span>():
+    wb = <span class="fn">Workbook</span>()
+    wb.active.<span class="fn">append</span>([<span class="str">"المنتج"</span>, <span class="str">"الكمية"</span>])
+    <span class="kw">for</span> r <span class="kw">in</span> rows:
+        wb.active.<span class="fn">append</span>(r)
+    wb.<span class="fn">save</span>(<span class="str">f"branches/{branch}.xlsx"</span>)
+
+<span class="cm"># 1) القراءة بـ openpyxl: خلية خلية</span>
+ws = <span class="fn">load_workbook</span>(<span class="str">"branches/riyadh.xlsx"</span>).active
+<span class="fn">print</span>(<span class="str">"openpyxl:"</span>, [row <span class="kw">for</span> row <span class="kw">in</span> ws.<span class="fn">iter_rows</span>(min_row=<span class="num">2</span>, values_only=<span class="kw">True</span>)])
+
+<span class="cm"># 2) القراءة والدمج بـ pandas: كل الملفات في سطرين</span>
+frames = [pd.<span class="fn">read_excel</span>(f).<span class="fn">assign</span>(الفرع=f.stem) <span class="kw">for</span> f <span class="kw">in</span> <span class="fn">sorted</span>(<span class="fn">Path</span>(<span class="str">"branches"</span>).<span class="fn">glob</span>(<span class="str">"*.xlsx"</span>))]
+combined = pd.<span class="fn">concat</span>(frames, ignore_index=<span class="kw">True</span>)
+<span class="fn">print</span>(combined)
+summary = combined.<span class="fn">groupby</span>(<span class="str">"المنتج"</span>)[<span class="str">"الكمية"</span>].<span class="fn">sum</span>()
+<span class="kw">with</span> pd.<span class="fn">ExcelWriter</span>(<span class="str">"all_branches.xlsx"</span>) <span class="kw">as</span> writer:
+    combined.<span class="fn">to_excel</span>(writer, sheet_name=<span class="str">"التفاصيل"</span>, index=<span class="kw">False</span>)
+    summary.<span class="fn">to_excel</span>(writer, sheet_name=<span class="str">"الملخص"</span>)
+<span class="fn">print</span>(<span class="str">"\nالملخص:"</span>, summary.<span class="fn">to_dict</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>openpyxl: [('قلم', 120), ('دفتر', 80)]
+  المنتج  الكمية   الفرع
+0    قلم      95  jeddah
+1  حقيبة      30  jeddah
+2    قلم     120  riyadh
+3   دفتر      80  riyadh
+
+الملخص: {'حقيبة': 30, 'دفتر': 80, 'قلم': 215}</pre>
+</div>
+</section>
+
+<section class="section-card" id="word">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-file-word"></i>
+        توليد مستندات Word من قالب
+    </h2>
+        <p>
+            مركز تدريب يريد إصدار <strong>شهادة لكل متدرب</strong>. بدل كتابة 40 شهادة يدويًا، نكتب الشهادة مرة واحدة كدالة، ونولّد الملفات من قائمة الأسماء
+            (تُسمى هذه العملية <strong>دمج المراسلات Mail Merge</strong>):
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>certificates.py</span>
+    </div>
+<pre><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">from</span> docx <span class="kw">import</span> Document
+<span class="kw">from</span> docx.enum.text <span class="kw">import</span> WD_ALIGN_PARAGRAPH
+<span class="kw">from</span> docx.oxml.ns <span class="kw">import</span> qn
+<span class="kw">from</span> docx.shared <span class="kw">import</span> Pt, RGBColor
+
+
+<span class="kw">def</span> <span class="fn">rtl</span>(paragraph):
+    <span class="str">"""جعل الفقرة من اليمين لليسار (للنصوص العربية)."""</span>
+    paragraph.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    paragraph._p.<span class="fn">get_or_add_pPr</span>().<span class="fn">append</span>(paragraph._p.<span class="fn">makeelement</span>(<span class="fn">qn</span>(<span class="str">"w:bidi"</span>), {}))
+    <span class="kw">return</span> paragraph
+
+
+<span class="kw">def</span> <span class="fn">certificate</span>(name, course, hours, grade, out_dir):
+    doc = <span class="fn">Document</span>()
+    title = <span class="fn">rtl</span>(doc.<span class="fn">add_paragraph</span>())
+    run = title.<span class="fn">add_run</span>(<span class="str">"شهادة إتمام دورة"</span>)
+    run.bold, run.font.size, run.font.color.rgb = <span class="kw">True</span>, <span class="fn">Pt</span>(<span class="num">28</span>), <span class="fn">RGBColor</span>(<span class="num">0</span>xB8, <span class="num">0</span>x91, <span class="num">0</span>x2A)
+    <span class="fn">rtl</span>(doc.<span class="fn">add_paragraph</span>(<span class="str">"تشهد منصة CodeWay بأن المتدرب/ة"</span>))
+    who = <span class="fn">rtl</span>(doc.<span class="fn">add_paragraph</span>())
+    who.<span class="fn">add_run</span>(name).bold = <span class="kw">True</span>
+    <span class="fn">rtl</span>(doc.<span class="fn">add_paragraph</span>(<span class="str">f"قد أتم/ت بنجاح دورة «{course}» بواقع {hours} ساعة تدريبية بتقدير {grade}."</span>))
+
+    table = doc.<span class="fn">add_table</span>(rows=<span class="num">2</span>, cols=<span class="num">3</span>)
+    table.style = <span class="str">"Table Grid"</span>
+    <span class="kw">for</span> i, (k, v) <span class="kw">in</span> <span class="fn">enumerate</span>([(<span class="str">"الدورة"</span>, course), (<span class="str">"الساعات"</span>, hours), (<span class="str">"التقدير"</span>, grade)]):
+        table.<span class="fn">cell</span>(<span class="num">0</span>, i).text, table.<span class="fn">cell</span>(<span class="num">1</span>, i).text = k, <span class="fn">str</span>(v)
+
+    path = out_dir / <span class="str">f"certificate_{name.replace(' ', '_')}.docx"</span>
+    doc.<span class="fn">save</span>(path)
+    <span class="kw">return</span> path
+
+
+students = [(<span class="str">"سارة أحمد"</span>, <span class="str">"ممتاز"</span>), (<span class="str">"علي حسن"</span>, <span class="str">"جيد جدًا"</span>), (<span class="str">"منى خالد"</span>, <span class="str">"ممتاز"</span>)]
+out = <span class="fn">Path</span>(<span class="str">"certificates"</span>)
+out.<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+<span class="kw">for</span> name, grade <span class="kw">in</span> students:
+    <span class="fn">print</span>(<span class="str">"📄"</span>, <span class="fn">certificate</span>(name, <span class="str">"أتمتة المهام بـ Python"</span>, <span class="num">24</span>, grade, out).name)
+
+check = <span class="fn">Document</span>(out / <span class="str">"certificate_سارة_أحمد.docx"</span>)
+<span class="fn">print</span>(<span class="str">"\nأول ثلاث فقرات في شهادة سارة:"</span>, [p.text <span class="kw">for</span> p <span class="kw">in</span> check.paragraphs[:<span class="num">3</span>]])
+<span class="fn">print</span>(<span class="str">"الجدول:"</span>, [[c.text <span class="kw">for</span> c <span class="kw">in</span> row.cells] <span class="kw">for</span> row <span class="kw">in</span> check.tables[<span class="num">0</span>].rows])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>📄 certificate_سارة_أحمد.docx
+📄 certificate_علي_حسن.docx
+📄 certificate_منى_خالد.docx
+
+أول ثلاث فقرات في شهادة سارة: ['شهادة إتمام دورة', 'تشهد منصة CodeWay بأن المتدرب/ة', 'سارة أحمد']
+الجدول: [['الدورة', 'الساعات', 'التقدير'], ['أتمتة المهام بـ Python', '24', 'ممتاز']]</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>طريقة أسهل للقوالب المعقدة:</strong> صمّم الشهادة في Word بشكلها النهائي وضع فيها علامات مثل <code>{{name}}</code>،
+                ثم استخدم مكتبة <code>docxtpl</code> لتعبئتها. هكذا يعدّل المصمم القالب في Word دون لمس الكود.
+                ولتحويل Word إلى PDF استخدم مكتبة <code>docx2pdf</code> (تحتاج Word) أو LibreOffice: <code>soffice --headless --convert-to pdf file.docx</code>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="pdf">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-file-pdf"></i>
+        التعامل مع ملفات PDF
+    </h2>
+        <p>لدينا فاتورتان بصيغة PDF (أنشأناهما بـ reportlab لنجرّب عليهما):</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>make_pdfs.py</span>
+    </div>
+<pre><span class="kw">from</span> reportlab.lib.pagesizes <span class="kw">import</span> A4
+<span class="kw">from</span> reportlab.pdfgen <span class="kw">import</span> canvas
+
+
+<span class="kw">def</span> <span class="fn">make_pdf</span>(path, title, pages):
+    c = canvas.<span class="fn">Canvas</span>(path, pagesize=A4)
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, pages + <span class="num">1</span>):
+        c.<span class="fn">setFont</span>(<span class="str">"Helvetica-Bold"</span>, <span class="num">20</span>)
+        c.<span class="fn">drawString</span>(<span class="num">72</span>, <span class="num">760</span>, <span class="str">f"{title}"</span>)
+        c.<span class="fn">setFont</span>(<span class="str">"Helvetica"</span>, <span class="num">12</span>)
+        c.<span class="fn">drawString</span>(<span class="num">72</span>, <span class="num">730</span>, <span class="str">f"Page {i} of {pages} - Invoice total: {i * 1250} SAR"</span>)
+        c.<span class="fn">showPage</span>()
+    c.<span class="fn">save</span>()
+
+
+<span class="fn">make_pdf</span>(<span class="str">"invoice_jan.pdf"</span>, <span class="str">"January Invoice"</span>, <span class="num">2</span>)
+<span class="fn">make_pdf</span>(<span class="str">"invoice_feb.pdf"</span>, <span class="str">"February Invoice"</span>, <span class="num">3</span>)</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> القراءة واستخراج النص</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>pdf_read.py</span>
+    </div>
+<pre><span class="kw">from</span> pypdf <span class="kw">import</span> PdfReader
+
+reader = <span class="fn">PdfReader</span>(<span class="str">"invoice_feb.pdf"</span>)
+<span class="fn">print</span>(<span class="str">"عدد الصفحات:"</span>, <span class="fn">len</span>(reader.pages))
+<span class="fn">print</span>(<span class="str">"نص الصفحة الثانية:"</span>, reader.pages[<span class="num">1</span>].<span class="fn">extract_text</span>().<span class="fn">replace</span>(<span class="str">"\n"</span>, <span class="str">" | "</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>عدد الصفحات: 3
+نص الصفحة الثانية: February Invoice | Page 2 of 3 - Invoice total: 2500 SAR |</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الدمج والتقسيم والتدوير</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>pdf_merge_split.py</span>
+    </div>
+<pre><span class="kw">from</span> pypdf <span class="kw">import</span> PdfReader, PdfWriter
+
+<span class="cm"># دمج ملفين في ملف واحد</span>
+merged = <span class="fn">PdfWriter</span>()
+<span class="kw">for</span> name <span class="kw">in</span> [<span class="str">"invoice_jan.pdf"</span>, <span class="str">"invoice_feb.pdf"</span>]:
+    <span class="kw">for</span> page <span class="kw">in</span> <span class="fn">PdfReader</span>(name).pages:
+        merged.<span class="fn">add_page</span>(page)
+merged.<span class="fn">add_outline_item</span>(<span class="str">"فبراير"</span>, <span class="num">2</span>)            <span class="cm"># فهرس جانبي يقفز لصفحة فبراير</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"invoices_q1.pdf"</span>, <span class="str">"wb"</span>) <span class="kw">as</span> f:
+    merged.<span class="fn">write</span>(f)
+<span class="fn">print</span>(<span class="str">"المدمج:"</span>, <span class="fn">len</span>(<span class="fn">PdfReader</span>(<span class="str">"invoices_q1.pdf"</span>).pages), <span class="str">"صفحات"</span>)
+
+<span class="cm"># تقسيم: كل صفحة في ملف مستقل</span>
+<span class="kw">for</span> i, page <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="fn">PdfReader</span>(<span class="str">"invoice_feb.pdf"</span>).pages, start=<span class="num">1</span>):
+    single = <span class="fn">PdfWriter</span>()
+    single.<span class="fn">add_page</span>(page)
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="str">f"feb_page_{i}.pdf"</span>, <span class="str">"wb"</span>) <span class="kw">as</span> f:
+        single.<span class="fn">write</span>(f)
+<span class="fn">print</span>(<span class="str">"ملفات التقسيم:"</span>, [<span class="str">f"feb_page_{i}.pdf"</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">4</span>)])
+
+<span class="cm"># استخراج صفحات محددة وتدوير إحداها</span>
+pick = <span class="fn">PdfWriter</span>()
+src = <span class="fn">PdfReader</span>(<span class="str">"invoices_q1.pdf"</span>)
+<span class="kw">for</span> index <span class="kw">in</span> [<span class="num">0</span>, <span class="num">4</span>]:
+    pick.<span class="fn">add_page</span>(src.pages[index])
+pick.pages[<span class="num">1</span>].<span class="fn">rotate</span>(<span class="num">90</span>)
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"selected.pdf"</span>, <span class="str">"wb"</span>) <span class="kw">as</span> f:
+    pick.<span class="fn">write</span>(f)
+<span class="fn">print</span>(<span class="str">"المختار:"</span>, [p.<span class="fn">extract_text</span>().<span class="fn">splitlines</span>()[<span class="num">0</span>] <span class="kw">for</span> p <span class="kw">in</span> <span class="fn">PdfReader</span>(<span class="str">"selected.pdf"</span>).pages])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>المدمج: 5 صفحات
+ملفات التقسيم: ['feb_page_1.pdf', 'feb_page_2.pdf', 'feb_page_3.pdf']
+المختار: ['January Invoice', 'February Invoice']</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> علامة مائية وكلمة مرور</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>pdf_watermark_encrypt.py</span>
+    </div>
+<pre><span class="kw">from</span> pypdf <span class="kw">import</span> PdfReader, PdfWriter
+<span class="kw">from</span> reportlab.pdfgen <span class="kw">import</span> canvas
+
+<span class="cm"># 1) إنشاء صفحة العلامة المائية</span>
+c = canvas.<span class="fn">Canvas</span>(<span class="str">"stamp.pdf"</span>)
+c.<span class="fn">setFont</span>(<span class="str">"Helvetica-Bold"</span>, <span class="num">60</span>)
+c.<span class="fn">setFillGray</span>(<span class="num">0.5</span>, <span class="num">0.25</span>)                         <span class="cm"># رمادي شفاف</span>
+c.<span class="fn">saveState</span>()
+c.<span class="fn">translate</span>(<span class="num">300</span>, <span class="num">400</span>)
+c.<span class="fn">rotate</span>(<span class="num">45</span>)
+c.<span class="fn">drawCentredString</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="str">"CONFIDENTIAL"</span>)
+c.<span class="fn">restoreState</span>()
+c.<span class="fn">save</span>()
+stamp = <span class="fn">PdfReader</span>(<span class="str">"stamp.pdf"</span>).pages[<span class="num">0</span>]
+
+<span class="cm"># 2) دمج العلامة فوق كل صفحة ثم التشفير</span>
+writer = <span class="fn">PdfWriter</span>(clone_from=<span class="str">"invoice_jan.pdf"</span>)
+<span class="kw">for</span> page <span class="kw">in</span> writer.pages:
+    page.<span class="fn">merge_page</span>(stamp)
+writer.<span class="fn">encrypt</span>(user_password=<span class="str">"1234"</span>, algorithm=<span class="str">"AES-256"</span>)
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"invoice_jan_protected.pdf"</span>, <span class="str">"wb"</span>) <span class="kw">as</span> f:
+    writer.<span class="fn">write</span>(f)
+
+locked = <span class="fn">PdfReader</span>(<span class="str">"invoice_jan_protected.pdf"</span>)
+<span class="fn">print</span>(<span class="str">"مشفّر؟"</span>, locked.is_encrypted)
+<span class="fn">print</span>(<span class="str">"فك التشفير بكلمة خاطئة:"</span>, locked.<span class="fn">decrypt</span>(<span class="str">"0000"</span>).name)
+<span class="fn">print</span>(<span class="str">"فك التشفير بالصحيحة:"</span>, locked.<span class="fn">decrypt</span>(<span class="str">"1234"</span>).name)
+<span class="fn">print</span>(<span class="str">"النص بعد العلامة:"</span>, locked.pages[<span class="num">0</span>].<span class="fn">extract_text</span>().<span class="fn">splitlines</span>()[:<span class="num">2</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>مشفّر؟ True
+فك التشفير بكلمة خاطئة: NOT_DECRYPTED
+فك التشفير بالصحيحة: OWNER_PASSWORD
+النص بعد العلامة: ['January Invoice', 'Page 1 of 2 - Invoice total: 1250 SAR']</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>العربية في إنشاء PDF:</strong> مكتبة reportlab لا تدعم تشكيل الحروف العربية تلقائيًا (استخدمنا الإنجليزية في الأمثلة).
+                لإنشاء PDF عربي: اكتب المستند في Word أو HTML ثم حوّله إلى PDF، أو استخدم مكتبة <code>weasyprint</code> التي تحوّل HTML بالعربية إلى PDF.
+                أما <strong>قراءة</strong> ودمج وتقسيم ملفات PDF العربية بـ pypdf فتعمل بشكل طبيعي.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="pipeline">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-cogs"></i>
+        مثال متكامل: من CSV إلى تقرير جاهز للإرسال
+    </h2>
+        <p>كل أول شهر: بيانات الطلبات تصل CSV، والمطلوب تقرير Excel منسق لكل مدير قسم. سكربت واحد يفعل كل شيء:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>monthly_reports.py</span>
+    </div>
+<pre><span class="kw">import</span> csv
+<span class="kw">import</span> io
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">from</span> openpyxl <span class="kw">import</span> Workbook
+<span class="kw">from</span> openpyxl.styles <span class="kw">import</span> Font, PatternFill
+
+raw = <span class="str">"""department,employee,orders,amount
+المبيعات,أحمد,14,52000
+المبيعات,ريم,19,61500
+الدعم,خالد,32,0
+المبيعات,سعود,9,27800
+الدعم,هند,41,0
+"""</span>
+
+by_dept = <span class="fn">defaultdict</span>(list)
+<span class="kw">for</span> row <span class="kw">in</span> csv.<span class="fn">DictReader</span>(io.<span class="fn">StringIO</span>(raw)):
+    by_dept[row[<span class="str">"department"</span>]].<span class="fn">append</span>(row)
+
+out = <span class="fn">Path</span>(<span class="str">"reports_march"</span>)
+out.<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+<span class="kw">for</span> dept, rows <span class="kw">in</span> by_dept.<span class="fn">items</span>():
+    wb = <span class="fn">Workbook</span>()
+    ws = wb.active
+    ws.sheet_view.rightToLeft = <span class="kw">True</span>
+    ws.<span class="fn">append</span>([<span class="str">"الموظف"</span>, <span class="str">"الطلبات"</span>, <span class="str">"المبلغ"</span>])
+    <span class="kw">for</span> cell <span class="kw">in</span> ws[<span class="num">1</span>]:
+        cell.font, cell.fill = <span class="fn">Font</span>(bold=<span class="kw">True</span>), <span class="fn">PatternFill</span>(<span class="str">"solid"</span>, fgColor=<span class="str">"D4AF37"</span>)
+    <span class="kw">for</span> r <span class="kw">in</span> <span class="fn">sorted</span>(rows, key=<span class="kw">lambda</span> r: -<span class="fn">int</span>(r[<span class="str">"orders"</span>])):
+        ws.<span class="fn">append</span>([r[<span class="str">"employee"</span>], <span class="fn">int</span>(r[<span class="str">"orders"</span>]), <span class="fn">int</span>(r[<span class="str">"amount"</span>])])
+    ws.<span class="fn">append</span>([<span class="str">"المجموع"</span>, <span class="str">f"=SUM(B2:B{len(rows) + 1})"</span>, <span class="str">f"=SUM(C2:C{len(rows) + 1})"</span>])
+    ws[<span class="str">f"A{len(rows) + 2}"</span>].font = <span class="fn">Font</span>(bold=<span class="kw">True</span>)
+    path = out / <span class="str">f"{dept}_2025-03.xlsx"</span>
+    wb.<span class="fn">save</span>(path)
+    <span class="fn">print</span>(<span class="str">f"📊 {path.name}: {len(rows)} موظفين، الأعلى طلبات: {max(rows, key=lambda r: int(r['orders']))['employee']}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>📊 المبيعات_2025-03.xlsx: 3 موظفين، الأعلى طلبات: ريم
+📊 الدعم_2025-03.xlsx: 2 موظفين، الأعلى طلبات: هند</pre>
+</div>
+        <p>في الدرس 5 ستضيف لهذا السكربت خطوة أخيرة: <strong>إرسال كل تقرير بالبريد لمدير القسم تلقائيًا</strong>.</p>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! pypdf للقراءة والدمج والتقسيم." data-hint="ابحث عن المكتبة المتخصصة في PDF.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">المكتبة المناسبة</span>
+    </div>
+    <p class="exercise-question">تريد دمج 12 ملف PDF (فواتير الشهور) في ملف واحد. أي مكتبة تستخدم؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> openpyxl</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="2"> python-docx</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="3"> pypdf</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> csv</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تعرف حدود كل مكتبة وقدراتها." data-hint="المعادلات يحسبها Excel عند الفتح، والمكتبات لا تحتاج Office.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">openpyxl يحسب نتائج المعادلات مثل <code>=SUM(A1:A5)</code> داخل Python.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>ws.sheet_view.rightToLeft = True</code> يجعل ورقة Excel من اليمين لليسار.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">يمكن توليد عشرات الشهادات من قالب واحد بحلقة <code>for</code>.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">pypdf يستطيع تشفير ملف PDF بكلمة مرور.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">تحتاج تثبيت Microsoft Office حتى تعمل openpyxl.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! لاحظ أن C2 ما زالت معادلة نصية، لا 30." data-hint="صفّان فقط، والمعادلة تُخزن كنص.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">openpyxl</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">from</span> openpyxl <span class="kw">import</span> Workbook
+wb = <span class="fn">Workbook</span>()
+ws = wb.active
+ws.<span class="fn">append</span>([<span class="str">"a"</span>, <span class="str">"b"</span>])
+ws.<span class="fn">append</span>([<span class="num">10</span>, <span class="num">20</span>])
+ws[<span class="str">"C2"</span>] = <span class="str">"=A2+B2"</span>
+<span class="fn">print</span>(ws.max_row)
+<span class="fn">print</span>(ws[<span class="str">"B2"</span>].value)
+<span class="fn">print</span>(ws[<span class="str">"C2"</span>].value)</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="2" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="20" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثالث:</span><input type="text" class="blank-input" data-answers="=A2+B2" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذا سكربت دمج كامل في 6 أسطر." data-hint="الكاتب &lt;code&gt;PdfWriter&lt;/code&gt;، والبحث &lt;code&gt;glob&lt;/code&gt;، والصفحات &lt;code&gt;pages&lt;/code&gt;، والإضافة &lt;code&gt;add_page&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">دمج PDF</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لدمج كل ملفات PDF في مجلد <code>invoices</code>:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">from</span> pypdf <span class="kw">import</span> PdfReader, </span><input type="text" class="blank-input" data-answers="PdfWriter" placeholder="..." style="min-width:156px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span>writer = <span class="fn">PdfWriter</span>()</span></div>
+        <div class="line"><span><span class="kw">for</span> f <span class="kw">in</span> <span class="fn">sorted</span>(<span class="fn">Path</span>(<span class="str">'invoices'</span>).</span><input type="text" class="blank-input" data-answers="glob" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'*.pdf'</span>)):</span></div>
+        <div class="line"><span>    <span class="kw">for</span> page <span class="kw">in</span> <span class="fn">PdfReader</span>(f).</span><input type="text" class="blank-input" data-answers="pages" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"><span>:</span></div>
+        <div class="line"><span>        writer.</span><input type="text" class="blank-input" data-answers="add_page" placeholder="..." style="min-width:142px;" autocomplete="off" spellcheck="false"><span>(page)</span></div>
+        <div class="line"><span>writer.<span class="fn">write</span>(<span class="str">'all.pdf'</span>)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب صحيح! إنشاء ← عناوين ← بيانات ← تنسيق ← حفظ." data-hint="الحفظ دائمًا في النهاية.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب خطوات إنشاء تقرير Excel منسق. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">for cell in ws[1]: cell.font = Font(bold=True)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">wb = Workbook(); ws = wb.active</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">wb.save(&#x27;report.xlsx&#x27;)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">for row in data: ws.append(row)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">ws.append([&#x27;الفرع&#x27;, &#x27;المبيعات&#x27;])</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر دمج المراسلات (Mail Merge)</div>
+    <p style="color:var(--text-light); font-size:0.95em;">اكتب قالب رسالة بعلامات مثل <code>{name}</code> و <code>{amount}</code>، وعدّل بيانات المستلمين، ثم شاهد الرسائل المولّدة والكود المكافئ. جرّب حذف عمود مستخدم في القالب لترى رسالة الخطأ، أو اكتب مبلغًا بفاصلة مثل <code>1,250</code> لترى لماذا يجب وضع هذه القيم بين علامتي تنصيص في CSV.</p>
+    <div class="lab-row" style="align-items:stretch;">
+        <div style="flex:1; min-width:240px;">
+            <label>القالب:</label>
+            <textarea class="lab-input" id="mmTpl" rows="5" style="width:100%; font-family:Cairo, sans-serif;" oninput="runMerge()">عزيزي/عزيزتي {name}،
+نذكّرك بأن فاتورتك رقم {invoice} بمبلغ {amount} ريال تستحق بتاريخ {due}.
+شكرًا لتعاملك معنا.</textarea>
+        </div>
+        <div style="flex:1; min-width:240px;">
+            <label>البيانات (CSV):</label>
+            <textarea class="lab-input" id="mmData" rows="5" style="width:100%; direction:ltr;" oninput="runMerge()">name,invoice,amount,due
+سارة,1001,1250,2025-04-01
+خالد,1002,980,2025-04-03
+منى,1003,4600,2025-04-05</textarea>
+        </div>
+    </div>
+    <div class="lab-console" id="mmOut" style="direction:rtl; text-align:right; font-family:Cairo, sans-serif;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">8</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> اختيار المكتبة المناسبة: openpyxl، python-docx، pypdf، reportlab.</li>
+                <li><i class="fas fa-check"></i> إنشاء تقرير Excel بالمعادلات والتنسيق والتنسيق الشرطي والرسوم البيانية واتجاه عربي.</li>
+                <li><i class="fas fa-check"></i> أن المعادلات يحسبها Excel لا Python، وقراءة الملفات ودمجها بـ pandas.</li>
+                <li><i class="fas fa-check"></i> توليد مستندات Word من قالب برمجي (Mail Merge) مع فقرات عربية وجداول.</li>
+                <li><i class="fas fa-check"></i> قراءة PDF واستخراج النص، والدمج، والتقسيم، والتدوير، والفهرس.</li>
+                <li><i class="fas fa-check"></i> إضافة علامة مائية وتشفير PDF بكلمة مرور.</li>
+                <li><i class="fas fa-check"></i> سكربت متكامل يحوّل CSV إلى تقارير Excel لكل قسم.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> ابدأ بأتمتة التقرير الذي تكرهه أكثر في عملك.</li>
+                <li><i class="fas fa-lightbulb"></i> صمّم القوالب في Word واستخدم docxtpl للتعبئة.</li>
+                <li><i class="fas fa-lightbulb"></i> احفظ كل تقرير باسم فيه التاريخ لتجنب الاستبدال.</li>
+                <li><i class="fas fa-lightbulb"></i> تحقق دائمًا من الملف الناتج بقراءته برمجيًا بعد إنشائه.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>معالجة النصوص والتعابير النمطية (Regex)</strong> لاستخراج الأرقام والتواريخ والبريد من أي نص.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson2.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 2: أتمتة الملفات</span>
+        </a>
+        <a href="lesson4.html" class="nav-link next">
+            <span>الدرس التالي: معالجة النصوص والتعابير النمطية</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · أتمتة المستندات
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '30%';
+            text.textContent = '30% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر دمج المراسلات ========== */
+    function parseCsv(text) {
+        const lines = text.trim().split(/\r?\n/).filter(Boolean);
+        const head = lines[0].split(',').map(s => s.trim());
+        return { head, rows: lines.slice(1).map(l => l.split(',').map(s => s.trim())) };
+    }
+
+    function runMerge() {
+        const tpl = document.getElementById('mmTpl').value;
+        const { head, rows } = parseCsv(document.getElementById('mmData').value);
+        const out = document.getElementById('mmOut');
+        const needed = [...new Set((tpl.match(/\{(\w+)\}/g) || []).map(t => t.slice(1, -1)))];
+        const missing = needed.filter(n => !head.includes(n));
+        let html = `<span style="color:#888">for row in csv.DictReader(f):\n    text = template.format(**row)</span><br><br>`;
+        if (missing.length) {
+            out.innerHTML = html + `<span class="err">KeyError: '${escapeHtml(missing[0])}' — العمود غير موجود في البيانات</span>`;
+            return;
+        }
+        rows.forEach((r, i) => {
+            if (r.length !== head.length) {
+                html += `<span class="err">⚠️ الصف ${i + 2}: عدد القيم (${r.length}) لا يساوي عدد الأعمدة (${head.length}) — هل في القيمة فاصلة؟</span><br><br>`;
+                return;
+            }
+            const row = Object.fromEntries(head.map((h, j) => [h, r[j]]));
+            html += `<div style="border:1px solid rgba(255,215,0,0.25); border-radius:8px; padding:10px; margin-bottom:8px; white-space:pre-wrap;">📧 رسالة ${i + 1}\n` +
+                escapeHtml(tpl.replace(/\{(\w+)\}/g, (_, k) => row[k])) + '</div>';
+        });
+        out.innerHTML = html;
+    }
+
+    document.addEventListener('DOMContentLoaded', runMerge);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

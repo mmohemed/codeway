@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بناء REST APIs في Django | CodeWay</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prism.js للتلوين -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-dark: #d4af37;
+            --primary-light: #ffed4a;
+            --dark: #0a0a0a;
+            --dark-light: #1a1a1a;
+            --dark-surface: #222;
+            --text: #ffffff;
+            --text-light: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --border-color: rgba(255, 215, 0, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #00c851;
+            --info: #00b4ff;
+            --warning: #ff8800;
+            --danger: #ff4444;
+            --api-get: #4caf50;
+            --api-post: #2196f3;
+            --api-put: #ff9800;
+            --api-delete: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            z-index: 1001;
+            background: transparent;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.97);
+            backdrop-filter: blur(20px);
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .nav-links .back-home {
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary) !important;
+            border-radius: 50px;
+        }
+
+        .nav-links .back-home:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+            z-index: 999;
+            border: none;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.6);
+        }
+
+        .hero {
+            padding: 120px 20px 60px;
+            background: linear-gradient(135deg, var(--dark), var(--dark-light));
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05), transparent 70%);
+            border-radius: 50%;
+            animation: floatBubble 25s ease-in-out infinite;
+        }
+
+        @keyframes floatBubble {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, 30px) scale(1.1); }
+        }
+
+        .hero-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .hero-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--primary);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 i {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .hero-meta i {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .content-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .content-card h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .content-card h2 i {
+            font-size: 1.5rem;
+        }
+
+        .content-card h3 {
+            color: var(--primary-light);
+            font-size: 1.3rem;
+            margin: 25px 0 15px;
+        }
+
+        .content-card h4 {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin: 20px 0 10px;
+        }
+
+        .content-card p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .content-card ul, .content-card ol {
+            color: var(--text-light);
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+
+        .content-card li {
+            margin-bottom: 8px;
+        }
+
+        .content-card li strong {
+            color: var(--primary);
+        }
+
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+        }
+
+        .code-block .code-label {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--primary);
+            color: #000;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: rgba(0, 180, 255, 0.08);
+            border-right: 4px solid var(--info);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .info-box i {
+            color: var(--info);
+            margin-left: 10px;
+        }
+
+        .warning-box {
+            background: rgba(255, 136, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning-box i {
+            color: var(--warning);
+            margin-left: 10px;
+        }
+
+        .success-box {
+            background: rgba(0, 200, 81, 0.08);
+            border-right: 4px solid var(--success);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .success-box i {
+            color: var(--success);
+            margin-left: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.08);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .comparison-table td {
+            color: var(--text-light);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(255, 215, 0, 0.03);
+        }
+
+        /* API Simulator */
+        .api-simulator {
+            background: var(--dark-surface);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .api-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .api-tabs button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .api-tabs button.active {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--primary);
+        }
+
+        .api-tabs button:hover {
+            background: rgba(255, 215, 0, 0.05);
+            color: var(--text);
+        }
+
+        .api-tabs .method-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 6px;
+        }
+
+        .api-tabs .method-badge.get { background: var(--api-get); color: #fff; }
+        .api-tabs .method-badge.post { background: var(--api-post); color: #fff; }
+        .api-tabs .method-badge.put { background: var(--api-put); color: #fff; }
+        .api-tabs .method-badge.delete { background: var(--api-delete); color: #fff; }
+
+        .api-content {
+            min-height: 200px;
+        }
+
+        .api-panel {
+            display: none;
+        }
+
+        .api-panel.active {
+            display: block;
+        }
+
+        .api-panel .api-url {
+            background: var(--dark);
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+            font-family: 'Fira Code', monospace;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            direction: ltr;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .api-panel .api-url .method-label {
+            font-weight: 700;
+            padding: 2px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .api-panel .api-url .method-label.get { background: var(--api-get); color: #fff; }
+        .api-panel .api-url .method-label.post { background: var(--api-post); color: #fff; }
+        .api-panel .api-url .method-label.put { background: var(--api-put); color: #fff; }
+        .api-panel .api-url .method-label.delete { background: var(--api-delete); color: #fff; }
+
+        .api-panel .api-body {
+            background: var(--dark);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        .api-panel .api-body pre {
+            margin: 0;
+            color: var(--text-light);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+        }
+
+        .api-panel .api-response {
+            background: var(--dark);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            margin-top: 15px;
+        }
+
+        .api-panel .api-response .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .api-panel .api-response .response-status {
+            font-weight: 700;
+            padding: 2px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .api-panel .api-response .response-status.success {
+            background: rgba(0, 200, 81, 0.15);
+            color: var(--success);
+        }
+
+        .api-panel .api-response .response-status.error {
+            background: rgba(255, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .api-panel .api-response .response-body {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            white-space: pre-wrap;
+        }
+
+        .api-panel .api-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .api-panel .api-actions button {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .api-panel .api-actions .btn-send {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .api-panel .api-actions .btn-send:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .api-panel .api-actions .btn-clear {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .api-panel .api-actions .btn-clear:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .api-panel .api-form-group {
+            margin-bottom: 15px;
+        }
+
+        .api-panel .api-form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .api-panel .api-form-group input,
+        .api-panel .api-form-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .api-panel .api-form-group input:focus,
+        .api-panel .api-form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .api-panel .api-form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .lesson-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .lesson-footer .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .lesson-footer .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .lesson-footer .btn-primary:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .lesson-footer .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .lesson-footer .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .btn-complete {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-complete:hover {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        .btn-complete.done {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--dark-light);
+            border-top: 2px solid var(--primary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 { font-size: 2.4rem; }
+        }
+
+        @media (max-width: 768px) {
+            .hero { padding: 100px 15px 40px; }
+            .hero h1 { font-size: 1.8rem; }
+            .hero p { font-size: 1rem; }
+            .hero-meta { gap: 15px; }
+            .content-card { padding: 20px; }
+            .content-card h2 { font-size: 1.4rem; }
+            .nav-links a { font-size: 0.85rem; padding: 6px 12px; }
+            .back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; }
+            .comparison-table { font-size: 0.85rem; }
+            .comparison-table th, .comparison-table td { padding: 8px 10px; }
+            .api-tabs button { font-size: 0.8rem; padding: 6px 12px; }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 { font-size: 1.5rem; }
+            .content-card { padding: 15px; }
+            .lesson-footer { flex-direction: column; align-items: stretch; }
+            .lesson-footer .btn { justify-content: center; }
+            .api-url { flex-direction: column; align-items: flex-start !important; }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .token.comment { color: #6a9955; }
+        .token.string { color: #ce9178; }
+        .token.keyword { color: #569cd6; }
+        .token.function { color: #dcdcaa; }
+        .token.class-name { color: #4ec9b0; }
+        .token.decorator { color: #c586c0; }
+        .token.operator { color: #d4d4d4; }
+        .token.number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- شريط التقدم -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <a href="../index.html" class="logo">
+            <i class="fab fa-django"></i>
+            <span>Django</span>
+        </a>
+        <div class="nav-links">
+            <a href="#content">الدرس</a>
+            <a href="#simulator">المحاكي</a>
+            <a href="../index.html" class="back-home">
+                <i class="fas fa-arrow-right"></i> العودة
+            </a>
+        </div>
+    </nav>
+
+    <!-- زر العودة للأعلى -->
+    <button class="back-to-top" id="backToTop" aria-label="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-breadcrumb">
+                <a href="../index.html">الرئيسية</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <a href="../django/index.html">Django</a>
+                <i class="fas fa-chevron-left" style="font-size: 0.6rem;"></i>
+                <span style="color: var(--text);">الدرس الثامن</span>
+            </div>
+
+            <div class="hero-badge">
+                <i class="fas fa-api"></i> الدرس 8 من 10
+            </div>
+
+            <h1><i class="fas fa-api"></i> بناء REST APIs</h1>
+            <p>تعلم كيفية إنشاء واجهات برمجة تطبيقات احترافية باستخدام Django REST Framework.</p>
+
+            <div class="hero-meta">
+                <span><i class="far fa-clock"></i> مدة القراءة: 13 دقيقة</span>
+                <span><i class="fas fa-signal"></i> مستوى: متقدم</span>
+                <span><i class="fas fa-code"></i> REST API</span>
+                <span><i class="fas fa-arrow-right"></i> DRF</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="container" id="content">
+        <!-- مقدمة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-info-circle"></i> ما هو Django REST Framework؟</h2>
+            <p>
+                <strong>Django REST Framework (DRF)</strong> هو إطار عمل قوي ومرن لبناء <strong>واجهات برمجة التطبيقات (APIs)</strong> 
+                باستخدام Django. يوفر DRF مجموعة من الأدوات والميزات التي تجعل عملية بناء APIs سهلة وسريعة.
+            </p>
+            <p>
+                الميزات الرئيسية لـ DRF:
+            </p>
+            <ul>
+                <li><strong>المُسلسِلات (Serializers):</strong> تحويل النماذج إلى JSON والعكس.</li>
+                <li><strong>ViewSets:</strong> مجموعة من الدوال الجاهزة للعمليات CRUD.</li>
+                <li><strong>المصادقة (Authentication):</strong> دعم لأنواع متعددة من المصادقة.</li>
+                <li><strong>الصلاحيات (Permissions):</strong> التحكم في الوصول إلى الـ API.</li>
+                <li><strong>التوثيق التلقائي:</strong> إنشاء وثائق API تلقائياً.</li>
+                <li><strong>واجهة تفاعلية:</strong> واجهة Browsable API لتجربة الـ API.</li>
+            </ul>
+
+            <div class="info-box">
+                <i class="fas fa-lightbulb"></i>
+                <strong>ملاحظة:</strong> DRF هو الإطار الأكثر شعبية لبناء APIs في Django، ويستخدم في تطبيقات ضخمة مثل Instagram و YouTube.
+            </div>
+        </div>
+
+        <!-- تثبيت DRF -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-download"></i> تثبيت وتكوين DRF</h2>
+            
+            <h3>1. تثبيت DRF</h3>
+            <div class="code-block">
+                <div class="code-label">Terminal</div>
+                <pre><code class="language-bash">pip install djangorestframework</code></pre>
+            </div>
+
+            <h3>2. إضافة DRF إلى INSTALLED_APPS</h3>
+            <div class="code-block">
+                <div class="code-label">settings.py</div>
+                <pre><code class="language-python">INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    # ... التطبيقات الأخرى
+    'rest_framework',
+]</code></pre>
+            </div>
+
+            <h3>3. تكوين DRF (اختياري)</h3>
+            <div class="code-block">
+                <div class="code-label">settings.py</div>
+                <pre><code class="language-python">REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+}</code></pre>
+            </div>
+
+            <div class="success-box">
+                <i class="fas fa-check-circle"></i>
+                <strong>نصيحة:</strong> استخدم <code style="background:rgba(0,200,81,0.1);padding:2px 8px;border-radius:4px;color:var(--success);">TokenAuthentication</code> لتأمين APIs الخاصة بك.
+            </div>
+        </div>
+
+        <!-- المُسلسِلات -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-exchange-alt"></i> المُسلسِلات (Serializers)</h2>
+            <p>
+                <strong>المُسلسِلات</strong> هي قلب DRF. تقوم بتحويل النماذج المعقدة (مثل queryset) إلى 
+                JSON يمكن إرساله عبر الـ API، والعكس.
+            </p>
+
+            <h3>إنشاء مُسلسِل</h3>
+            <div class="code-block">
+                <div class="code-label">serializers.py</div>
+                <pre><code class="language-python">from rest_framework import serializers
+from .models import Post
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'content', 'author', 'created_at', 'published']
+        read_only_fields = ['id', 'author', 'created_at']</code></pre>
+            </div>
+
+            <h3>مُسلسِل مخصص</h3>
+            <div class="code-block">
+                <div class="code-label">serializers.py</div>
+                <pre><code class="language-python">class PostSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    title = serializers.CharField(max_length=200)
+    content = serializers.CharField()
+    author = serializers.CharField()
+    created_at = serializers.DateTimeField(read_only=True)
+    
+    def create(self, validated_data):
+        return Post.objects.create(**validated_data)
+    
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.content = validated_data.get('content', instance.content)
+        instance.save()
+        return instance</code></pre>
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>ملاحظة:</strong> <code style="background:rgba(0,180,255,0.1);padding:2px 8px;border-radius:4px;color:var(--info);">ModelSerializer</code> هو الأسهل والأكثر استخداماً لأنه يقوم تلقائياً بإنشاء الحقول بناءً على النموذج.
+            </div>
+        </div>
+
+        <!-- الـ Views -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-eye"></i> الـ Views في DRF</h2>
+            <p>يوفر DRF عدة طرق لإنشاء الـ Views:</p>
+
+            <h3>1. ViewSets (الطريقة الموصى بها)</h3>
+            <div class="code-block">
+                <div class="code-label">views.py</div>
+                <pre><code class="language-python">from rest_framework import viewsets
+from .models import Post
+from .serializers import PostSerializer
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)</code></pre>
+            </div>
+
+            <h3>2. Generic Views</h3>
+            <div class="code-block">
+                <div class="code-label">views.py</div>
+                <pre><code class="language-python">from rest_framework import generics
+from .models import Post
+from .serializers import PostSerializer
+
+class PostListCreateView(generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class PostRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer</code></pre>
+            </div>
+
+            <h3>3. تعريف المسارات (URLs)</h3>
+            <div class="code-block">
+                <div class="code-label">urls.py</div>
+                <pre><code class="language-python">from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import PostViewSet
+
+router = DefaultRouter()
+router.register(r'posts', PostViewSet)
+
+urlpatterns = [
+    path('api/', include(router.urls)),
+]</code></pre>
+            </div>
+        </div>
+
+        <!-- المصادقة والصلاحيات -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-shield-alt"></i> المصادقة والصلاحيات</h2>
+            <p>يوفر DRF نظاماً متكاملاً للمصادقة والصلاحيات:</p>
+
+            <h3>أنواع المصادقة</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>النوع</th>
+                        <th>الوصف</th>
+                        <th>الاستخدام</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">SessionAuthentication</code></td>
+                        <td>يستخدم جلسات Django العادية</td>
+                        <td>المتصفحات</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">TokenAuthentication</code></td>
+                        <td>يستخدم رمز مميز (Token)</td>
+                        <td>تطبيقات الهاتف، SPA</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">JWT Authentication</code></td>
+                        <td>JSON Web Token</td>
+                        <td>الأنظمة الموزعة</td>
+                    </tr>
+                    <tr>
+                        <td><code style="background:rgba(255,215,0,0.1);padding:2px 8px;border-radius:4px;color:var(--primary);">BasicAuthentication</code></td>
+                        <td>اسم المستخدم وكلمة المرور</td>
+                        <td>التطبيقات القديمة</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>الصلاحيات المدمجة</h3>
+            <div class="code-block">
+                <div class="code-label">views.py</div>
+                <pre><code class="language-python">from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAdminUser,
+    IsAuthenticatedOrReadOnly,
+    DjangoModelPermissions,
+)
+
+class PostViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]</code></pre>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>تنبيه:</strong> تأكد من إعداد المصادقة بشكل صحيح لحماية APIs الخاصة بك من الوصول غير المصرح به.
+            </div>
+        </div>
+
+        <!-- محاكي API التفاعلي -->
+        <div class="content-card fade-in" id="simulator">
+            <h2><i class="fas fa-laptop-code"></i> محاكي REST API التفاعلي</h2>
+            <p>جرب إرسال طلبات API باستخدام هذا المحاكي التفاعلي:</p>
+
+            <div class="api-simulator">
+                <div class="api-tabs" id="apiTabs">
+                    <button class="active" data-method="get">
+                        <span class="method-badge get">GET</span> جلب المنشورات
+                    </button>
+                    <button data-method="post">
+                        <span class="method-badge post">POST</span> إنشاء منشور
+                    </button>
+                    <button data-method="put">
+                        <span class="method-badge put">PUT</span> تحديث منشور
+                    </button>
+                    <button data-method="delete">
+                        <span class="method-badge delete">DELETE</span> حذف منشور
+                    </button>
+                </div>
+
+                <div class="api-content">
+                    <!-- GET -->
+                    <div class="api-panel active" id="api-get">
+                        <div class="api-url">
+                            <span class="method-label get">GET</span>
+                            <span>/api/posts/</span>
+                        </div>
+                        <div class="api-actions">
+                            <button class="btn-send" onclick="apiSendRequest('get')">
+                                <i class="fas fa-play"></i> إرسال الطلب
+                            </button>
+                            <button class="btn-clear" onclick="apiClearResponse('get')">
+                                <i class="fas fa-eraser"></i> مسح
+                            </button>
+                        </div>
+                        <div class="api-response" id="apiGetResponse" style="display:none;">
+                            <div class="response-header">
+                                <span class="response-status success">✓ 200 OK</span>
+                                <span style="color: var(--text-secondary); font-size: 0.8rem;">Response Time: ~120ms</span>
+                            </div>
+                            <div class="response-body" id="apiGetBody"></div>
+                        </div>
+                    </div>
+
+                    <!-- POST -->
+                    <div class="api-panel" id="api-post">
+                        <div class="api-url">
+                            <span class="method-label post">POST</span>
+                            <span>/api/posts/</span>
+                        </div>
+                        <div class="api-form-group">
+                            <label>العنوان</label>
+                            <input type="text" id="postTitle" placeholder="أدخل عنوان المنشور">
+                        </div>
+                        <div class="api-form-group">
+                            <label>المحتوى</label>
+                            <textarea id="postContent" placeholder="أدخل محتوى المنشور"></textarea>
+                        </div>
+                        <div class="api-actions">
+                            <button class="btn-send" onclick="apiSendRequest('post')">
+                                <i class="fas fa-paper-plane"></i> إرسال الطلب
+                            </button>
+                            <button class="btn-clear" onclick="apiClearResponse('post')">
+                                <i class="fas fa-eraser"></i> مسح
+                            </button>
+                        </div>
+                        <div class="api-response" id="apiPostResponse" style="display:none;">
+                            <div class="response-header">
+                                <span class="response-status success">✓ 201 Created</span>
+                                <span style="color: var(--text-secondary); font-size: 0.8rem;">Response Time: ~150ms</span>
+                            </div>
+                            <div class="response-body" id="apiPostBody"></div>
+                        </div>
+                    </div>
+
+                    <!-- PUT -->
+                    <div class="api-panel" id="api-put">
+                        <div class="api-url">
+                            <span class="method-label put">PUT</span>
+                            <span>/api/posts/{id}/</span>
+                        </div>
+                        <div class="api-form-group">
+                            <label>رقم المنشور (ID)</label>
+                            <input type="number" id="putPostId" placeholder="أدخل رقم المنشور" value="1">
+                        </div>
+                        <div class="api-form-group">
+                            <label>العنوان الجديد</label>
+                            <input type="text" id="putTitle" placeholder="أدخل العنوان الجديد">
+                        </div>
+                        <div class="api-form-group">
+                            <label>المحتوى الجديد</label>
+                            <textarea id="putContent" placeholder="أدخل المحتوى الجديد"></textarea>
+                        </div>
+                        <div class="api-actions">
+                            <button class="btn-send" onclick="apiSendRequest('put')">
+                                <i class="fas fa-sync"></i> إرسال الطلب
+                            </button>
+                            <button class="btn-clear" onclick="apiClearResponse('put')">
+                                <i class="fas fa-eraser"></i> مسح
+                            </button>
+                        </div>
+                        <div class="api-response" id="apiPutResponse" style="display:none;">
+                            <div class="response-header">
+                                <span class="response-status success">✓ 200 OK</span>
+                                <span style="color: var(--text-secondary); font-size: 0.8rem;">Response Time: ~130ms</span>
+                            </div>
+                            <div class="response-body" id="apiPutBody"></div>
+                        </div>
+                    </div>
+
+                    <!-- DELETE -->
+                    <div class="api-panel" id="api-delete">
+                        <div class="api-url">
+                            <span class="method-label delete">DELETE</span>
+                            <span>/api/posts/{id}/</span>
+                        </div>
+                        <div class="api-form-group">
+                            <label>رقم المنشور (ID)</label>
+                            <input type="number" id="deletePostId" placeholder="أدخل رقم المنشور" value="1">
+                        </div>
+                        <div class="api-actions">
+                            <button class="btn-send" onclick="apiSendRequest('delete')">
+                                <i class="fas fa-trash"></i> إرسال الطلب
+                            </button>
+                            <button class="btn-clear" onclick="apiClearResponse('delete')">
+                                <i class="fas fa-eraser"></i> مسح
+                            </button>
+                        </div>
+                        <div class="api-response" id="apiDeleteResponse" style="display:none;">
+                            <div class="response-header">
+                                <span class="response-status success">✓ 204 No Content</span>
+                                <span style="color: var(--text-secondary); font-size: 0.8rem;">Response Time: ~100ms</span>
+                            </div>
+                            <div class="response-body" id="apiDeleteBody"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الخلاصة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-flag-checkered"></i> خلاصة الدرس</h2>
+            <ul>
+                <li>✅ <strong>Django REST Framework</strong> هو الإطار الأفضل لبناء APIs في Django.</li>
+                <li>✅ <strong>المُسلسِلات (Serializers)</strong> تحول النماذج إلى JSON والعكس.</li>
+                <li>✅ استخدم <strong>ViewSets</strong> و <strong>ModelViewSet</strong> لتقليل الكود المكرر.</li>
+                <li>✅ هناك عدة أنواع من <strong>المصادقة</strong>: Token, Session, JWT.</li>
+                <li>✅ استخدم <strong>الصلاحيات</strong> للتحكم في الوصول إلى الـ API.</li>
+                <li>✅ DRF يوفر <strong>واجهة Browsable API</strong> لاختبار الـ API بسهولة.</li>
+            </ul>
+        </div>
+
+        <!-- اختبار معرفة -->
+        <div class="content-card fade-in">
+            <h2><i class="fas fa-question"></i> اختبر معلوماتك</h2>
+            <div id="quizSection">
+                <p><strong>ما هو دور المُسلسِلات (Serializers) في Django REST Framework؟</strong></p>
+                <div style="display:flex;flex-direction:column;gap:10px;margin:15px 0;">
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="convert">
+                        <input type="radio" name="quiz" value="convert" style="accent-color:var(--primary);width:18px;height:18px;">
+                        تحويل النماذج إلى JSON والعكس
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="auth">
+                        <input type="radio" name="quiz" value="auth" style="accent-color:var(--primary);width:18px;height:18px;">
+                        التحقق من صحة المستخدمين
+                    </label>
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border-radius:8px;border:1px solid var(--border-color);transition:var(--transition);" class="quiz-option" data-answer="routing">
+                        <input type="radio" name="quiz" value="routing" style="accent-color:var(--primary);width:18px;height:18px;">
+                        تحديد مسارات الـ API
+                    </label>
+                </div>
+                <button id="checkQuizBtn" style="background:var(--primary);color:#000;border:none;padding:12px 30px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;transition:var(--transition);font-family:'Cairo',sans-serif;">
+                    <i class="fas fa-check"></i> تحقق الإجابة
+                </button>
+                <div id="quizResult" style="margin-top:15px;padding:15px;border-radius:10px;display:none;"></div>
+            </div>
+        </div>
+
+        <!-- تذييل الدرس -->
+        <div class="lesson-footer">
+            <div style="display:flex;gap:15px;flex-wrap:wrap;">
+                <button class="btn-complete" id="markCompleteBtn">
+                    <i class="fas fa-circle" id="completeIcon"></i>
+                    <span id="completeText">تحديد كمكتمل</span>
+                </button>
+                <a href="lesson7.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i> الدرس السابق
+                </a>
+            </div>
+            <a href="lesson9.html" class="btn btn-primary">
+                الدرس التالي <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- فوتر -->
+    <footer>
+        <p>© 2026 <a href="../index.html">CodeWay</a> — تخصص Django — الدرس الثامن: بناء REST APIs</p>
+    </footer>
+
+    <!-- Prism.js للتلوين -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+    <script>
+        // =============================================
+        // شريط التقدم
+        // =============================================
+        function updateProgressBar() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // =============================================
+        // زر العودة للأعلى
+        // =============================================
+        function toggleBackToTop() {
+            const btn = document.getElementById('backToTop');
+            if (document.documentElement.scrollTop > 300 || document.body.scrollTop > 300) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // =============================================
+        // تأثير الظهور التدريجي
+        // =============================================
+        function checkFadeIn() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 80) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        // =============================================
+        // محاكي API التفاعلي
+        // =============================================
+        let apiPosts = [
+            { id: 1, title: 'أول منشور في Django', content: 'محتوى أول منشور', author: 'admin', created_at: '2026-01-15T10:00:00Z' },
+            { id: 2, title: 'فهم REST APIs', content: 'محتوى عن REST APIs', author: 'admin', created_at: '2026-01-16T11:00:00Z' },
+            { id: 3, title: 'بناء APIs مع DRF', content: 'محتوى عن Django REST Framework', author: 'admin', created_at: '2026-01-17T12:00:00Z' }
+        ];
+
+        let nextId = 4;
+
+        // تبديل علامات التبويب
+        document.querySelectorAll('#apiTabs button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('#apiTabs button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const method = this.getAttribute('data-method');
+                document.querySelectorAll('.api-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('api-' + method).classList.add('active');
+            });
+        });
+
+        function apiSendRequest(method) {
+            const responseDiv = document.getElementById('api' + method.charAt(0).toUpperCase() + method.slice(1) + 'Response');
+            const bodyDiv = document.getElementById('api' + method.charAt(0).toUpperCase() + method.slice(1) + 'Body');
+
+            responseDiv.style.display = 'block';
+
+            switch(method) {
+                case 'get':
+                    bodyDiv.textContent = JSON.stringify(apiPosts, null, 2);
+                    break;
+
+                case 'post': {
+                    const title = document.getElementById('postTitle').value.trim();
+                    const content = document.getElementById('postContent').value.trim();
+
+                    if (!title || !content) {
+                        responseDiv.querySelector('.response-status').className = 'response-status error';
+                        responseDiv.querySelector('.response-status').textContent = '✗ 400 Bad Request';
+                        bodyDiv.textContent = JSON.stringify({
+                            error: 'العنوان والمحتوى مطلوبان'
+                        }, null, 2);
+                        return;
+                    }
+
+                    const newPost = {
+                        id: nextId++,
+                        title: title,
+                        content: content,
+                        author: 'admin',
+                        created_at: new Date().toISOString()
+                    };
+                    apiPosts.push(newPost);
+
+                    responseDiv.querySelector('.response-status').className = 'response-status success';
+                    responseDiv.querySelector('.response-status').textContent = '✓ 201 Created';
+                    bodyDiv.textContent = JSON.stringify(newPost, null, 2);
+
+                    document.getElementById('postTitle').value = '';
+                    document.getElementById('postContent').value = '';
+                    break;
+                }
+
+                case 'put': {
+                    const id = parseInt(document.getElementById('putPostId').value);
+                    const title = document.getElementById('putTitle').value.trim();
+                    const content = document.getElementById('putContent').value.trim();
+
+                    const post = apiPosts.find(p => p.id === id);
+                    if (!post) {
+                        responseDiv.querySelector('.response-status').className = 'response-status error';
+                        responseDiv.querySelector('.response-status').textContent = '✗ 404 Not Found';
+                        bodyDiv.textContent = JSON.stringify({
+                            error: 'المنشور غير موجود'
+                        }, null, 2);
+                        return;
+                    }
+
+                    if (title) post.title = title;
+                    if (content) post.content = content;
+
+                    responseDiv.querySelector('.response-status').className = 'response-status success';
+                    responseDiv.querySelector('.response-status').textContent = '✓ 200 OK';
+                    bodyDiv.textContent = JSON.stringify(post, null, 2);
+
+                    document.getElementById('putTitle').value = '';
+                    document.getElementById('putContent').value = '';
+                    break;
+                }
+
+                case 'delete': {
+                    const id = parseInt(document.getElementById('deletePostId').value);
+                    const index = apiPosts.findIndex(p => p.id === id);
+
+                    if (index === -1) {
+                        responseDiv.querySelector('.response-status').className = 'response-status error';
+                        responseDiv.querySelector('.response-status').textContent = '✗ 404 Not Found';
+                        bodyDiv.textContent = JSON.stringify({
+                            error: 'المنشور غير موجود'
+                        }, null, 2);
+                        return;
+                    }
+
+                    apiPosts.splice(index, 1);
+
+                    responseDiv.querySelector('.response-status').className = 'response-status success';
+                    responseDiv.querySelector('.response-status').textContent = '✓ 204 No Content';
+                    bodyDiv.textContent = 'تم حذف المنشور بنجاح';
+
+                    document.getElementById('deletePostId').value = '';
+                    break;
+                }
+            }
+        }
+
+        function apiClearResponse(method) {
+            const responseDiv = document.getElementById('api' + method.charAt(0).toUpperCase() + method.slice(1) + 'Response');
+            responseDiv.style.display = 'none';
+        }
+
+        // =============================================
+        // اختبار المعرفة
+        // =============================================
+        document.getElementById('checkQuizBtn').addEventListener('click', function() {
+            const selected = document.querySelector('input[name="quiz"]:checked');
+            const resultDiv = document.getElementById('quizResult');
+            
+            if (!selected) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> الرجاء اختيار إجابة أولاً.';
+                return;
+            }
+
+            const answer = selected.value;
+            resultDiv.style.display = 'block';
+            
+            if (answer === 'convert') {
+                resultDiv.className = 'success-box';
+                resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ إجابة صحيحة! المُسلسِلات تقوم بتحويل النماذج إلى JSON والعكس، وهي المكون الأساسي في Django REST Framework.';
+            } else if (answer === 'auth') {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. المصادقة هي وظيفة منفصلة يتم التعامل معها من خلال <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">authentication_classes</code> و <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">permission_classes</code>.`;
+            } else {
+                resultDiv.className = 'warning-box';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ إجابة غير صحيحة. تحديد مسارات الـ API يتم في ملف <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">urls.py</code> باستخدام <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">DefaultRouter</code> أو <code style="background:rgba(255,136,0,0.1);padding:2px 8px;border-radius:4px;color:var(--warning);">path()</code>.`;
+            }
+        });
+
+        document.querySelectorAll('.quiz-option').forEach(label => {
+            label.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+
+        // =============================================
+        // إكمال الدرس - localStorage
+        // =============================================
+        const LESSON_ID = 8;
+        const STORAGE_KEY = 'django_lessons_completed';
+
+        function isLessonCompleted() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return false;
+            const completed = JSON.parse(saved);
+            return completed.includes(LESSON_ID);
+        }
+
+        function toggleLessonComplete() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            let completed = saved ? JSON.parse(saved) : [];
+            const index = completed.indexOf(LESSON_ID);
+            
+            if (index > -1) {
+                completed.splice(index, 1);
+            } else {
+                completed.push(LESSON_ID);
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+            updateCompleteButton();
+        }
+
+        function updateCompleteButton() {
+            const btn = document.getElementById('markCompleteBtn');
+            const icon = document.getElementById('completeIcon');
+            const text = document.getElementById('completeText');
+            
+            if (isLessonCompleted()) {
+                btn.classList.add('done');
+                icon.className = 'fas fa-check-circle';
+                text.textContent = 'مكتمل ✓';
+            } else {
+                btn.classList.remove('done');
+                icon.className = 'fas fa-circle';
+                text.textContent = 'تحديد كمكتمل';
+            }
+        }
+
+        document.getElementById('markCompleteBtn').addEventListener('click', toggleLessonComplete);
+
+        // =============================================
+        // الأحداث العامة
+        // =============================================
+        window.addEventListener('scroll', function() {
+            updateProgressBar();
+            toggleBackToTop();
+            checkFadeIn();
+        });
+
+        window.addEventListener('load', function() {
+            checkFadeIn();
+            updateCompleteButton();
+        });
+    </script>
+</body>
+</html>

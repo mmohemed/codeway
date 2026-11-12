@@ -1,0 +1,2153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 14: بناء API بسيطة | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">المستوى المتقدم</a>
+        <span class="sep">/</span>
+        <span>بناء API</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-plug"></i>
+            الدرس 14 · واجهات برمجية
+        </div>
+        <h1 class="lesson-title">بناء API بسيطة باستخدام Flask</h1>
+        <p class="lesson-intro">
+            تطبيقات الجوال، ومواقع الويب الحديثة، وحتى الأجهزة الذكية تتواصل مع الخوادم عبر <strong>API</strong>. في هذا الدرس ستفهم كيف يعمل بروتوكول <strong>HTTP</strong>، ثم تبني أول API حقيقية بلغة Python باستخدام <strong>Flask</strong>: مسارات، معاملات، استقبال JSON وإرجاعه، رموز الحالة، واختبار الـ API بالكود.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 60 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 أول API تستقبل وتُرجع JSON</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 متقدم</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 13</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#intro">1. ما هي API؟</a>
+            <a href="#http">2. أساسيات HTTP</a>
+            <a href="#setup">3. أول تطبيق Flask</a>
+            <a href="#testing">4. الاختبار بالكود</a>
+            <a href="#routes">5. المسارات والمعاملات</a>
+            <a href="#json">6. استقبال وإرجاع JSON</a>
+            <a href="#errors">7. معالجة الأخطاء</a>
+            <a href="#consume">8. استهلاك API خارجية</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="intro">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        ما هي الـ API؟
+    </h2>
+        <p>
+            <strong>API</strong> اختصار لـ <em>Application Programming Interface</em> أي «واجهة برمجة التطبيقات».
+            ببساطة: هي <strong>طريقة متفق عليها لتتحدث البرامج مع بعضها</strong>.
+        </p>
+        <p>
+            تخيّل مطعمًا: أنت (<strong>العميل</strong>) لا تدخل المطبخ (<strong>الخادم</strong>)، بل تطلب من <strong>النادل</strong>
+            من خلال <strong>قائمة طعام</strong> محددة، فيحمل طلبك للمطبخ ويعود لك بالنتيجة. الـ API هي النادل وقائمة الطعام معًا.
+        </p>
+
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-mobile-alt"></i> العميل (Client)</h4>
+                <p>تطبيق جوال، أو موقع ويب، أو برنامج Python يرسل <strong>طلبًا (Request)</strong>.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-server"></i> الخادم (Server)</h4>
+                <p>برنامجك الذي يستقبل الطلب، ويعالجه، ويرسل <strong>ردًا (Response)</strong>.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-code"></i> لغة التخاطب: JSON</h4>
+                <p>البيانات تُرسل غالبًا بصيغة JSON التي تشبه قواميس وقوائم Python تمامًا.</p>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>أمثلة من الواقع:</strong> تطبيق الطقس يطلب من API الطقس درجة الحرارة، وتطبيق التوصيل يطلب من API
+                الخرائط موقعك، وزر «الدفع» يتواصل مع API البنك. كل هذه الطلبات تتم عبر HTTP.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="http">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-exchange-alt"></i>
+        أساسيات HTTP
+    </h2>
+        <p>كل طلب HTTP يتكون من أجزاء أساسية:</p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-globe"></i> HTTP</span>
+                <span>شكل الطلب والرد</span>
+            </div>
+<pre><span class="cm"># الطلب (Request)</span>
+<span class="kw">POST</span> /books HTTP/1.1                  <span class="cm">← الطريقة + المسار</span>
+Host: api.example.com
+Content-Type: application/json           <span class="cm">← الترويسات (Headers)</span>
+
+{<span class="str">"title"</span>: <span class="str">"Clean Code"</span>, <span class="str">"author"</span>: <span class="str">"Robert Martin"</span>}   <span class="cm">← الجسم (Body)</span>
+
+<span class="cm"># الرد (Response)</span>
+HTTP/1.1 <span class="num">201</span> CREATED                     <span class="cm">← رمز الحالة</span>
+Content-Type: application/json
+
+{<span class="str">"id"</span>: <span class="num">3</span>, <span class="str">"title"</span>: <span class="str">"Clean Code"</span>, <span class="str">"author"</span>: <span class="str">"Robert Martin"</span>}</pre>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> طرق الطلب (HTTP Methods)</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الطريقة</th><th>المعنى</th><th>مثال</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>GET</code></td><td>جلب بيانات (قراءة فقط)</td><td><code>GET /books</code></td></tr>
+                    <tr><td><code>POST</code></td><td>إنشاء عنصر جديد</td><td><code>POST /books</code></td></tr>
+                    <tr><td><code>PUT</code> / <code>PATCH</code></td><td>تعديل عنصر (كامل / جزئي)</td><td><code>PUT /books/3</code></td></tr>
+                    <tr><td><code>DELETE</code></td><td>حذف عنصر</td><td><code>DELETE /books/3</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> رموز الحالة (Status Codes)</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الرمز</th><th>المعنى</th><th>متى نستخدمه؟</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>200 OK</code></td><td>نجاح</td><td>الطلب تم وهذه النتيجة.</td></tr>
+                    <tr><td><code>201 Created</code></td><td>تم الإنشاء</td><td>بعد POST ناجح.</td></tr>
+                    <tr><td><code>204 No Content</code></td><td>نجاح بدون محتوى</td><td>بعد DELETE ناجح.</td></tr>
+                    <tr><td><code>400 Bad Request</code></td><td>طلب غير صالح</td><td>بيانات ناقصة أو خاطئة من العميل.</td></tr>
+                    <tr><td><code>401 / 403</code></td><td>غير مصرح / ممنوع</td><td>تسجيل دخول مطلوب / لا تملك الصلاحية.</td></tr>
+                    <tr><td><code>404 Not Found</code></td><td>غير موجود</td><td>العنصر أو المسار غير موجود.</td></tr>
+                    <tr><td><code>500 Server Error</code></td><td>خطأ في الخادم</td><td>خطأ برمجي في كودك أنت!</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>قاعدة سهلة للحفظ:</strong> <code>2xx</code> نجاح ✅، <code>4xx</code> خطأ من العميل 🙋،
+                <code>5xx</code> خطأ من الخادم 💥.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="setup">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-download"></i>
+        تجهيز Flask وأول تطبيق
+    </h2>
+        <p>
+            <strong>Flask</strong> إطار عمل خفيف ومرن لبناء تطبيقات الويب والـ APIs. ثبّته داخل بيئة افتراضية (venv)
+            من الطرفية:
+        </p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+                <span>التثبيت</span>
+            </div>
+<pre>python -m venv venv
+venv\Scripts\activate        <span class="cm"># على Windows</span>
+source venv/bin/activate     <span class="cm"># على Linux / macOS</span>
+pip install flask</pre>
+        </div>
+
+        <p>أنشئ ملفًا باسم <code>app.py</code>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>app.py</span>
+    </div>
+<pre><span class="kw">from</span> flask <span class="kw">import</span> Flask
+
+app = <span class="fn">Flask</span>(__name__)            <span class="cm"># إنشاء التطبيق</span>
+
+
+@app.<span class="fn">get</span>(<span class="str">"/"</span>)                    <span class="cm"># عندما يطلب أحد المسار "/" بالطريقة GET</span>
+<span class="kw">def</span> <span class="fn">home</span>():
+    <span class="kw">return</span> {<span class="str">"message"</span>: <span class="str">"مرحبًا بك في أول API لي!"</span>, <span class="str">"version"</span>: <span class="num">1</span>}
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    app.<span class="fn">run</span>(debug=<span class="kw">True</span>)          <span class="cm"># تشغيل خادم التطوير</span></pre>
+</div>
+
+        <p>شغّله بـ <code>python app.py</code>، ستظهر رسالة مثل:</p>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre> * Serving Flask app 'app'
+ * Debug mode: on
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit</pre>
+</div>
+        <p>
+            الآن افتح المتصفح على <code>http://127.0.0.1:5000/</code> وسترى الرد بصيغة JSON.
+            لاحظ أن Flask <strong>يحوّل القاموس تلقائيًا إلى JSON</strong> عند إرجاعه.
+        </p>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>debug=True للتطوير فقط:</strong> يعيد تشغيل الخادم تلقائيًا عند تعديل الكود ويعرض تفاصيل الأخطاء،
+                لكنه <strong>خطير</strong> على خادم حقيقي لأنه يكشف كودك. لا تستخدمه أبدًا عند النشر.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="testing">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-vial"></i>
+        اختبار الـ API من داخل Python
+    </h2>
+        <p>
+            بدل فتح المتصفح في كل مرة، يوفر Flask <strong>عميل اختبار (test_client)</strong> يرسل طلبات وهمية لتطبيقك
+            دون تشغيل خادم. هكذا سنجرّب كل الأمثلة في هذا الدرس، وهكذا تُكتب الاختبارات الآلية في المشاريع الحقيقية:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>test_home.py</span>
+    </div>
+<pre><span class="kw">from</span> flask <span class="kw">import</span> Flask
+
+app = <span class="fn">Flask</span>(__name__)
+app.json.ensure_ascii = <span class="kw">False</span>      <span class="cm"># لعرض العربية كما هي في JSON</span>
+
+
+@app.<span class="fn">get</span>(<span class="str">"/"</span>)
+<span class="kw">def</span> <span class="fn">home</span>():
+    <span class="kw">return</span> {<span class="str">"message"</span>: <span class="str">"مرحبًا بك في أول API لي!"</span>, <span class="str">"version"</span>: <span class="num">1</span>}
+
+
+client = app.<span class="fn">test_client</span>()
+response = client.<span class="fn">get</span>(<span class="str">"/"</span>)
+
+<span class="fn">print</span>(<span class="str">"رمز الحالة:"</span>, response.status_code)
+<span class="fn">print</span>(<span class="str">"نوع المحتوى:"</span>, response.content_type)
+<span class="fn">print</span>(<span class="str">"البيانات كقاموس:"</span>, response.<span class="fn">get_json</span>())
+<span class="fn">print</span>(<span class="str">"النص الخام:"</span>, response.<span class="fn">get_data</span>(as_text=<span class="kw">True</span>).<span class="fn">strip</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>رمز الحالة: 200
+نوع المحتوى: application/json
+البيانات كقاموس: {'message': 'مرحبًا بك في أول API لي!', 'version': 1}
+النص الخام: {"message":"مرحبًا بك في أول API لي!","version":1}</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> من الطرفية: curl</p>
+        <p>عندما يكون الخادم يعمل، يمكنك اختباره من الطرفية بأداة <code>curl</code> المثبتة في معظم الأنظمة:</p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+                <span>curl</span>
+            </div>
+<pre>curl http://127.0.0.1:5000/books
+curl -X POST http://127.0.0.1:5000/books -H "Content-Type: application/json" -d "{\"title\": \"Python\", \"author\": \"Ali\"}"</pre>
+        </div>
+        <p>أو بأدوات رسومية مثل <strong>Postman</strong> و <strong>Thunder Client</strong> (إضافة في VS Code).</p>
+</section>
+
+<section class="section-card" id="routes">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-route"></i>
+        المسارات والمعاملات
+    </h2>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 1. معاملات المسار (Path Parameters)</p>
+        <p>جزء متغير داخل الرابط نفسه، مثل رقم الكتاب في <code>/books/2</code>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>path_params.py</span>
+    </div>
+<pre><span class="kw">from</span> flask <span class="kw">import</span> Flask
+
+app = <span class="fn">Flask</span>(__name__)
+app.json.ensure_ascii = <span class="kw">False</span>
+
+
+@app.<span class="fn">get</span>(<span class="str">"/hello/&lt;name&gt;"</span>)
+<span class="kw">def</span> <span class="fn">hello</span>(name):
+    <span class="kw">return</span> {<span class="str">"greeting"</span>: <span class="str">f"أهلًا يا {name}"</span>}
+
+
+@app.<span class="fn">get</span>(<span class="str">"/square/&lt;int:n&gt;"</span>)          <span class="cm"># int: يقبل أرقامًا فقط ويحوّلها</span>
+<span class="kw">def</span> <span class="fn">square</span>(n):
+    <span class="kw">return</span> {<span class="str">"n"</span>: n, <span class="str">"square"</span>: n * n}
+
+
+client = app.<span class="fn">test_client</span>()
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/hello/سارة"</span>).<span class="fn">get_json</span>())
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/square/12"</span>).<span class="fn">get_json</span>())
+<span class="fn">print</span>(<span class="str">"نص بدل رقم ←"</span>, client.<span class="fn">get</span>(<span class="str">"/square/abc"</span>).status_code)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'greeting': 'أهلًا يا سارة'}
+{'n': 12, 'square': 144}
+نص بدل رقم ← 404</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>المحوّلات:</strong> <code>&lt;int:x&gt;</code> للأعداد الصحيحة، <code>&lt;float:x&gt;</code> للعشرية،
+                و <code>&lt;path:x&gt;</code> لنص يحتوي على <code>/</code>. وإذا لم تطابق القيمة النوع، يرد Flask بـ 404 تلقائيًا.
+            </div>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 2. معاملات الاستعلام (Query Parameters)</p>
+        <p>تأتي بعد علامة <code>?</code> في الرابط، وتُستخدم عادة للبحث والفلترة والترتيب: <code>/search?q=بايثون&amp;limit=2</code></p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>query_params.py</span>
+    </div>
+<pre><span class="kw">from</span> flask <span class="kw">import</span> Flask, request
+
+app = <span class="fn">Flask</span>(__name__)
+app.json.ensure_ascii = <span class="kw">False</span>
+
+COURSES = [<span class="str">"أساسيات بايثون"</span>, <span class="str">"بايثون للويب"</span>, <span class="str">"تحليل البيانات"</span>, <span class="str">"بايثون المتقدم"</span>]
+
+
+@app.<span class="fn">get</span>(<span class="str">"/search"</span>)
+<span class="kw">def</span> <span class="fn">search</span>():
+    q = request.args.<span class="fn">get</span>(<span class="str">"q"</span>, <span class="str">""</span>)                        <span class="cm"># نص البحث</span>
+    limit = request.args.<span class="fn">get</span>(<span class="str">"limit"</span>, default=<span class="num">10</span>, type=int)
+    results = [c <span class="kw">for</span> c <span class="kw">in</span> COURSES <span class="kw">if</span> q <span class="kw">in</span> c]
+    <span class="kw">return</span> {<span class="str">"query"</span>: q, <span class="str">"count"</span>: <span class="fn">len</span>(results), <span class="str">"results"</span>: results[:limit]}
+
+
+client = app.<span class="fn">test_client</span>()
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/search?q=بايثون&amp;limit=2"</span>).<span class="fn">get_json</span>())
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/search?q=البيانات"</span>).<span class="fn">get_json</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'count': 3, 'query': 'بايثون', 'results': ['أساسيات بايثون', 'بايثون للويب']}
+{'count': 1, 'query': 'البيانات', 'results': ['تحليل البيانات']}</pre>
+</div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المصدر</th><th>كيف نقرؤه في Flask</th><th>مثال</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>معامل المسار</td><td>معامل في الدالة</td><td><code>/books/&lt;int:book_id&gt;</code></td></tr>
+                    <tr><td>معامل الاستعلام</td><td><code>request.args.get("q")</code></td><td><code>/search?q=...</code></td></tr>
+                    <tr><td>جسم JSON</td><td><code>request.get_json()</code></td><td>بيانات POST / PUT</td></tr>
+                    <tr><td>الترويسات</td><td><code>request.headers.get("Authorization")</code></td><td>مفاتيح الدخول</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="json">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-file-code"></i>
+        استقبال JSON وإرجاعه
+    </h2>
+        <p>
+            لنبنِ API صغيرة لإدارة <strong>الكتب</strong>: عرض الكل، عرض كتاب واحد، وإضافة كتاب.
+            هذا هو الكود الكامل لـ <code>books_api.py</code>:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>books_api.py</span>
+    </div>
+<pre><span class="kw">from</span> flask <span class="kw">import</span> Flask, jsonify, request
+
+app = <span class="fn">Flask</span>(__name__)
+app.json.ensure_ascii = <span class="kw">False</span>
+
+books = [
+    {<span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"title"</span>: <span class="str">"مقدمة ابن خلدون"</span>, <span class="str">"author"</span>: <span class="str">"ابن خلدون"</span>, <span class="str">"year"</span>: <span class="num">1377</span>},
+    {<span class="str">"id"</span>: <span class="num">2</span>, <span class="str">"title"</span>: <span class="str">"Clean Code"</span>, <span class="str">"author"</span>: <span class="str">"Robert Martin"</span>, <span class="str">"year"</span>: <span class="num">2008</span>},
+]
+
+
+@app.<span class="fn">get</span>(<span class="str">"/books"</span>)
+<span class="kw">def</span> <span class="fn">list_books</span>():
+    <span class="kw">return</span> books                      <span class="cm"># Flask يحوّل القائمة إلى JSON</span>
+
+
+@app.<span class="fn">get</span>(<span class="str">"/books/&lt;int:book_id&gt;"</span>)
+<span class="kw">def</span> <span class="fn">get_book</span>(book_id):
+    <span class="kw">for</span> book <span class="kw">in</span> books:
+        <span class="kw">if</span> book[<span class="str">"id"</span>] == book_id:
+            <span class="kw">return</span> book
+    <span class="kw">return</span> {<span class="str">"error"</span>: <span class="str">"الكتاب غير موجود"</span>}, <span class="num">404</span>       <span class="cm"># (البيانات، رمز الحالة)</span>
+
+
+@app.<span class="fn">post</span>(<span class="str">"/books"</span>)
+<span class="kw">def</span> <span class="fn">add_book</span>():
+    data = request.<span class="fn">get_json</span>(silent=<span class="kw">True</span>) <span class="kw">or</span> {}
+    <span class="kw">if</span> <span class="kw">not</span> data.<span class="fn">get</span>(<span class="str">"title"</span>) <span class="kw">or</span> <span class="kw">not</span> data.<span class="fn">get</span>(<span class="str">"author"</span>):
+        <span class="kw">return</span> {<span class="str">"error"</span>: <span class="str">"الحقلان title و author مطلوبان"</span>}, <span class="num">400</span>
+    book = {<span class="str">"id"</span>: <span class="fn">max</span>((b[<span class="str">"id"</span>] <span class="kw">for</span> b <span class="kw">in</span> books), default=<span class="num">0</span>) + <span class="num">1</span>,
+            <span class="str">"title"</span>: data[<span class="str">"title"</span>], <span class="str">"author"</span>: data[<span class="str">"author"</span>],
+            <span class="str">"year"</span>: data.<span class="fn">get</span>(<span class="str">"year"</span>)}
+    books.<span class="fn">append</span>(book)
+    <span class="kw">return</span> book, <span class="num">201</span></pre>
+</div>
+
+        <p>لنختبر كل مسار:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>test_books.py</span>
+    </div>
+<pre><span class="cm"># 1) عرض كل الكتب</span>
+r = client.<span class="fn">get</span>(<span class="str">"/books"</span>)
+<span class="fn">print</span>(r.status_code, [b[<span class="str">"title"</span>] <span class="kw">for</span> b <span class="kw">in</span> r.<span class="fn">get_json</span>()])
+
+<span class="cm"># 2) عرض كتاب واحد</span>
+r = client.<span class="fn">get</span>(<span class="str">"/books/2"</span>)
+<span class="fn">print</span>(r.status_code, r.<span class="fn">get_json</span>())
+
+<span class="cm"># 3) كتاب غير موجود</span>
+r = client.<span class="fn">get</span>(<span class="str">"/books/99"</span>)
+<span class="fn">print</span>(r.status_code, r.<span class="fn">get_json</span>())
+
+<span class="cm"># 4) إضافة كتاب جديد</span>
+r = client.<span class="fn">post</span>(<span class="str">"/books"</span>, json={<span class="str">"title"</span>: <span class="str">"الخيميائي"</span>, <span class="str">"author"</span>: <span class="str">"باولو كويلو"</span>, <span class="str">"year"</span>: <span class="num">1988</span>})
+<span class="fn">print</span>(r.status_code, r.<span class="fn">get_json</span>())
+
+<span class="cm"># 5) بيانات ناقصة</span>
+r = client.<span class="fn">post</span>(<span class="str">"/books"</span>, json={<span class="str">"title"</span>: <span class="str">"بدون مؤلف"</span>})
+<span class="fn">print</span>(r.status_code, r.<span class="fn">get_json</span>())
+
+<span class="fn">print</span>(<span class="str">"عدد الكتب الآن:"</span>, <span class="fn">len</span>(client.<span class="fn">get</span>(<span class="str">"/books"</span>).<span class="fn">get_json</span>()))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>200 ['مقدمة ابن خلدون', 'Clean Code']
+200 {'author': 'Robert Martin', 'id': 2, 'title': 'Clean Code', 'year': 2008}
+404 {'error': 'الكتاب غير موجود'}
+201 {'author': 'باولو كويلو', 'id': 3, 'title': 'الخيميائي', 'year': 1988}
+400 {'error': 'الحقلان title و author مطلوبان'}
+عدد الكتب الآن: 3</pre>
+</div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>كيف نرجع رمز الحالة؟</strong> أرجع <strong>صفًا</strong> من عنصرين: <code>return data, 201</code>.
+                وإذا لم تحدد رمزًا يكون الافتراضي <code>200</code>. لاحظ أيضًا <code>get_json(silent=True)</code>: تُرجع
+                <code>None</code> بدل الخطأ إن لم يرسل العميل JSON صالحًا.
+            </div>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>لا تثق أبدًا ببيانات العميل!</strong> تحقق دائمًا من وجود الحقول المطلوبة ونوعها قبل استخدامها،
+                وأرجع <code>400</code> مع رسالة واضحة. هذا يحمي تطبيقك ويساعد من يستخدم الـ API.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="errors">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-shield-alt"></i>
+        معالجة الأخطاء بشكل موحّد
+    </h2>
+        <p>
+            إذا طلب العميل مسارًا غير موجود، يرد Flask افتراضيًا بصفحة HTML. لكن في الـ API نريد ردودًا <strong>بصيغة JSON دائمًا</strong>.
+            نستخدم <code>@app.errorhandler</code>:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>error_handlers.py</span>
+    </div>
+<pre><span class="kw">from</span> flask <span class="kw">import</span> Flask, abort
+
+app = <span class="fn">Flask</span>(__name__)
+app.json.ensure_ascii = <span class="kw">False</span>
+
+
+@app.<span class="fn">errorhandler</span>(<span class="num">404</span>)
+<span class="kw">def</span> <span class="fn">not_found</span>(error):
+    <span class="kw">return</span> {<span class="str">"error"</span>: <span class="str">"المسار غير موجود"</span>, <span class="str">"status"</span>: <span class="num">404</span>}, <span class="num">404</span>
+
+
+@app.<span class="fn">errorhandler</span>(<span class="num">405</span>)
+<span class="kw">def</span> <span class="fn">wrong_method</span>(error):
+    <span class="kw">return</span> {<span class="str">"error"</span>: <span class="str">"طريقة الطلب غير مسموحة لهذا المسار"</span>, <span class="str">"status"</span>: <span class="num">405</span>}, <span class="num">405</span>
+
+
+@app.<span class="fn">get</span>(<span class="str">"/admin"</span>)
+<span class="kw">def</span> <span class="fn">admin</span>():
+    <span class="fn">abort</span>(<span class="num">404</span>)              <span class="cm"># abort تنهي الطلب فورًا برمز خطأ</span>
+
+
+client = app.<span class="fn">test_client</span>()
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/unknown"</span>).status_code, client.<span class="fn">get</span>(<span class="str">"/unknown"</span>).<span class="fn">get_json</span>())
+<span class="fn">print</span>(client.<span class="fn">delete</span>(<span class="str">"/admin"</span>).status_code, client.<span class="fn">delete</span>(<span class="str">"/admin"</span>).<span class="fn">get_json</span>())
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/admin"</span>).<span class="fn">get_json</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>404 {'error': 'المسار غير موجود', 'status': 404}
+405 {'error': 'طريقة الطلب غير مسموحة لهذا المسار', 'status': 405}
+{'error': 'المسار غير موجود', 'status': 404}</pre>
+</div>
+</section>
+
+<section class="section-card" id="consume">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-cloud-download-alt"></i>
+        استهلاك API خارجية بـ requests
+    </h2>
+        <p>
+            الوجه الآخر للعملة: برنامجك قد يكون هو <strong>العميل</strong> الذي يطلب بيانات من API خارجية.
+            المكتبة الأشهر لذلك هي <code>requests</code> (<code>pip install requests</code>):
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>weather_client.py</span>
+    </div>
+<pre><span class="kw">import</span> requests
+
+url = <span class="str">"https://api.github.com/users/python"</span>
+response = requests.<span class="fn">get</span>(url, timeout=<span class="num">10</span>)
+
+<span class="kw">if</span> response.status_code == <span class="num">200</span>:
+    data = response.<span class="fn">json</span>()          <span class="cm"># تحويل JSON إلى قاموس</span>
+    <span class="fn">print</span>(<span class="str">"الاسم:"</span>, data[<span class="str">"name"</span>])
+    <span class="fn">print</span>(<span class="str">"عدد المستودعات العامة:"</span>, data[<span class="str">"public_repos"</span>])
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"حدث خطأ:"</span>, response.status_code)
+
+<span class="cm"># إرسال بيانات</span>
+new = requests.<span class="fn">post</span>(<span class="str">"http://127.0.0.1:5000/books"</span>,
+                    json={<span class="str">"title"</span>: <span class="str">"Python"</span>, <span class="str">"author"</span>: <span class="str">"Ali"</span>}, timeout=<span class="num">10</span>)
+<span class="fn">print</span>(new.status_code, new.<span class="fn">json</span>())</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>عادات جيدة:</strong> حدد دائمًا <code>timeout</code> حتى لا يعلق برنامجك إذا تأخر الخادم،
+                وتحقق من <code>status_code</code> قبل استخدام البيانات، ولا تكتب مفاتيح الـ API السرية داخل الكود مباشرة
+                (احفظها في متغيرات البيئة).
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! الخطأ من العميل لأن بياناته ناقصة، لذلك نرد بـ 400." data-hint="أخطاء العميل تبدأ بالرقم 4، و 500 تعني خطأ في كود الخادم نفسه.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">رموز الحالة</span>
+    </div>
+    <p class="exercise-question">أرسل العميل طلب <code>POST</code> لإنشاء مستخدم، لكنه نسي حقل البريد الإلكتروني المطلوب. ما رمز الحالة المناسب للرد؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>200 OK</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="2"> <code>201 Created</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="3"> <code>400 Bad Request</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>500 Internal Server Error</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! أساسيات Flask واضحة لديك." data-hint="Flask يحوّل القواميس تلقائيًا، و debug خطير على الخوادم الحقيقية.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>GET</code> تُستخدم لجلب البيانات و <code>POST</code> لإنشاء عنصر جديد.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">في Flask يجب تحويل القاموس يدويًا إلى نص JSON قبل إرجاعه.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>request.args.get("q")</code> تقرأ معاملات الاستعلام بعد علامة ؟ في الرابط.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يمكن ترك <code>debug=True</code> مفعّلًا على الخادم الحقيقي بأمان.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>app.test_client()</code> يسمح باختبار الـ API دون تشغيل خادم.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! الكتاب 5 غير موجود (404)، والإضافة نجحت (201) برقم 3." data-hint="رقم الكتاب الجديد = أكبر رقم موجود + 1.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">باستخدام API الكتب في الدرس (تحتوي كتابين بالرقمين 1 و 2)، ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre>r1 = client.<span class="fn">get</span>(<span class="str">"/books/5"</span>)
+r2 = client.<span class="fn">post</span>(<span class="str">"/books"</span>, json={<span class="str">"title"</span>: <span class="str">"X"</span>, <span class="str">"author"</span>: <span class="str">"Y"</span>})
+<span class="fn">print</span>(r1.status_code)
+<span class="fn">print</span>(r2.status_code)
+<span class="fn">print</span>(r2.<span class="fn">get_json</span>()[<span class="str">"id"</span>])</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="404" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="201" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثالث:</span><input type="text" class="blank-input" data-answers="3" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! أنشأت مسارًا كاملًا بمعامل ورمز حالة." data-hint="التطبيق يُنشأ بـ &lt;code&gt;Flask(__name__)&lt;/code&gt;، والقراءة بطريقة GET، والعنصر غير الموجود رمزه 404.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">مسار بمعامل</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لإنشاء مسار يُرجع منتجًا حسب رقمه، أو 404 إن لم يوجد:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">from</span> flask <span class="kw">import</span> Flask</span></div>
+        <div class="line"><span>app = </span><input type="text" class="blank-input" data-answers="Flask" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"><span>(__name__)</span></div>
+        <div class="line"><span>products = {<span class="num">1</span>: <span class="str">'قلم'</span>, <span class="num">2</span>: <span class="str">'دفتر'</span>}</span></div>
+        <div class="line"><span>@app.</span><input type="text" class="blank-input" data-answers="get" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'/products/&lt;int:pid&gt;'</span>)</span></div>
+        <div class="line"><span><span class="kw">def</span> <span class="fn">get_product</span>(pid):</span></div>
+        <div class="line"><span>    <span class="kw">if</span> pid <span class="kw">in</span> products:</span></div>
+        <div class="line"><span>        <span class="kw">return</span> {<span class="str">'name'</span>: products[pid]}</span></div>
+        <div class="line"><span>    <span class="kw">return</span> {<span class="str">'error'</span>: <span class="str">'غير موجود'</span>}, </span><input type="text" class="blank-input" data-answers="404" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب صحيح! استيراد ← إنشاء التطبيق ← المسار ← الدالة ← الإرجاع." data-hint="الديكوريتر &lt;code&gt;@app.get&lt;/code&gt; يأتي مباشرة فوق الدالة.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب أسطر تطبيق Flask بسيط يُرجع رسالة ترحيب. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="3" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">@app.get(&#x27;/&#x27;)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">    return {&#x27;message&#x27;: &#x27;مرحبًا&#x27;}</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">from flask import Flask</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="4" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">def home():</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">app = Flask(__name__)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> محاكي الـ API التفاعلي</div>
+    <p style="color:var(--text-light); font-size:0.95em;">هذا محاكٍ لـ API الكتب التي بنيناها. اختر الطريقة، واكتب المسار، وأضف جسم JSON عند الحاجة، ثم أرسل الطلب. جرّب: <code>GET /books</code>، <code>GET /books/1</code>، <code>GET /books/9</code>، <code>POST /books</code> مع <code>{"title": "Python", "author": "Ali"}</code>، أو <code>DELETE /books</code>.</p>
+    <div class="lab-row">
+        <select class="lab-select" id="apiMethod" style="direction:ltr; min-width:100px;">
+            <option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option>
+        </select>
+        <input type="text" class="lab-input" id="apiPath" value="/books" style="flex:1; direction:ltr;">
+        <button class="btn btn-primary" onclick="sendApi()"><i class="fas fa-paper-plane"></i> إرسال</button>
+    </div>
+    <div class="lab-row">
+        <label>Body (JSON):</label>
+        <input type="text" class="lab-input" id="apiBody" value='{"title": "Python", "author": "Ali"}' style="flex:1; direction:ltr;">
+    </div>
+    <div class="lab-console" id="apiConsole"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> مفهوم الـ API والعلاقة بين العميل والخادم، و JSON كلغة تخاطب.</li>
+                <li><i class="fas fa-check"></i> أجزاء طلب HTTP، وطرق الطلب <code>GET/POST/PUT/DELETE</code>، ورموز الحالة.</li>
+                <li><i class="fas fa-check"></i> تثبيت Flask وإنشاء أول تطبيق وتشغيله.</li>
+                <li><i class="fas fa-check"></i> اختبار الـ API بـ <code>app.test_client()</code> و curl و Postman.</li>
+                <li><i class="fas fa-check"></i> معاملات المسار <code>&lt;int:id&gt;</code> ومعاملات الاستعلام <code>request.args</code>.</li>
+                <li><i class="fas fa-check"></i> استقبال JSON بـ <code>request.get_json()</code> وإرجاع البيانات مع رمز الحالة.</li>
+                <li><i class="fas fa-check"></i> توحيد ردود الأخطاء بـ <code>@app.errorhandler</code> و <code>abort()</code>.</li>
+                <li><i class="fas fa-check"></i> استهلاك API خارجية بمكتبة <code>requests</code>.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> اختر رمز الحالة الصحيح لكل رد؛ فهو جزء أساسي من «عقد» الـ API.</li>
+                <li><i class="fas fa-lightbulb"></i> تحقق من بيانات العميل دائمًا وأرجع رسائل خطأ واضحة.</li>
+                <li><i class="fas fa-lightbulb"></i> اكتب اختبارات بـ <code>test_client</code> لكل مسار جديد.</li>
+                <li><i class="fas fa-lightbulb"></i> لا تستخدم <code>debug=True</code> ولا تضع المفاتيح السرية في الكود.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستبني <strong>مشروع REST API كاملًا</strong> بعمليات CRUD (إنشاء، قراءة، تعديل، حذف) مع حفظ البيانات في ملف.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="web1.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 13: مقدمة في تطوير الويب</span>
+        </a>
+        <a href="web3.html" class="nav-link next">
+            <span>الدرس التالي: مشروع صغير REST API</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · بناء API
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '67%';
+            text.textContent = '67% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== محاكي API ========== */
+    const API_BOOKS = [
+        { id: 1, title: 'مقدمة ابن خلدون', author: 'ابن خلدون', year: 1377 },
+        { id: 2, title: 'Clean Code', author: 'Robert Martin', year: 2008 },
+    ];
+
+    function apiHandle(method, path, bodyText) {
+        const url = new URL(path, 'http://x');
+        const parts = url.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+        if (parts[0] !== 'books' || parts.length > 2) return [404, { error: 'المسار غير موجود', status: 404 }];
+        if (parts.length === 1) {
+            if (method === 'GET') {
+                const q = url.searchParams.get('q');
+                return [200, q ? API_BOOKS.filter(b => b.title.includes(q) || b.author.includes(q)) : API_BOOKS];
+            }
+            if (method === 'POST') {
+                let data;
+                try { data = JSON.parse(bodyText || '{}'); } catch (e) { data = {}; }
+                if (!data.title || !data.author) return [400, { error: 'الحقلان title و author مطلوبان' }];
+                const book = { id: Math.max(0, ...API_BOOKS.map(b => b.id)) + 1, title: data.title, author: data.author, year: data.year ?? null };
+                API_BOOKS.push(book);
+                return [201, book];
+            }
+            return [405, { error: 'طريقة الطلب غير مسموحة لهذا المسار', status: 405 }];
+        }
+        if (!/^\d+$/.test(parts[1])) return [404, { error: 'المسار غير موجود', status: 404 }];
+        if (method !== 'GET') return [405, { error: 'طريقة الطلب غير مسموحة لهذا المسار', status: 405 }];
+        const book = API_BOOKS.find(b => b.id === parseInt(parts[1]));
+        return book ? [200, book] : [404, { error: 'الكتاب غير موجود' }];
+    }
+
+    const STATUS_TEXT = { 200: 'OK', 201: 'CREATED', 400: 'BAD REQUEST', 404: 'NOT FOUND', 405: 'METHOD NOT ALLOWED' };
+
+    function sendApi() {
+        const method = document.getElementById('apiMethod').value;
+        const path = document.getElementById('apiPath').value.trim() || '/';
+        const body = document.getElementById('apiBody').value;
+        const [status, data] = apiHandle(method, path, body);
+        const out = document.getElementById('apiConsole');
+        const line = document.createElement('div');
+        const color = status < 300 ? '#a5d6a7' : '#ef9a9a';
+        line.innerHTML = `<span class="prompt">${method}</span> ${escapeHtml(path)}` +
+            (method === 'POST' || method === 'PUT' ? `  <span style="color:#888">${escapeHtml(body)}</span>` : '') +
+            `\n<span style="color:${color}">HTTP ${status} ${STATUS_TEXT[status]}</span>\n${escapeHtml(JSON.stringify(data, null, 2))}\n`;
+        out.appendChild(line);
+        out.scrollTop = out.scrollHeight;
+    }
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

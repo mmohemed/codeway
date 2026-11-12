@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 12: القواميس (Dictionaries) | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span class="sep">/</span>
+        <span>القواميس</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-book"></i>
+            الدرس 12 · القواميس
+        </div>
+        <h1 class="lesson-title">القواميس (Dictionaries) في Python</h1>
+        <p class="lesson-intro">
+            في القوائم والصفوف نصل للعنصر عن طريق رقمه. لكن ماذا لو أردنا الوصول للمعلومة عن طريق <strong>اسمها</strong>؟ هنا يأتي دور <strong>القاموس (Dictionary)</strong>: بنية بيانات تخزّن المعلومات على شكل أزواج <strong>مفتاح: قيمة</strong>، وهي من أكثر الأدوات استخدامًا في Python على الإطلاق.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 45 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 تخزين البيانات بالمفاتيح</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 مبتدئ</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 11</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#intro">1. مقدمة</a>
+            <a href="#create">2. إنشاء القواميس</a>
+            <a href="#access">3. الوصول للقيم</a>
+            <a href="#modify">4. التعديل والحذف</a>
+            <a href="#loop">5. التكرار</a>
+            <a href="#nested">6. القواميس المتداخلة</a>
+            <a href="#patterns">7. أنماط شائعة</a>
+            <a href="#methods">8. ملخص الدوال</a>
+            <a href="#practice">9. مثال تطبيقي</a>
+            <a href="#exercises">10. تمارين تفاعلية</a>
+            <a href="#summary">11. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="intro">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        مقدمة إلى القواميس
+    </h2>
+        <p>
+            فكّر في <strong>القاموس اللغوي</strong>: تبحث عن الكلمة (المفتاح) فتجد معناها (القيمة).
+            أو فكّر في <strong>دفتر جهات الاتصال</strong> في هاتفك: تبحث عن الاسم فتجد الرقم.
+            القاموس في Python يعمل بنفس الفكرة تمامًا.
+        </p>
+        <p>
+            لو أردنا تخزين بيانات طالب باستخدام قائمة، سنكتب: <code>["سارة", 21, "الرياض"]</code>،
+            وعندها يجب أن <strong>نتذكر</strong> أن الفهرس 1 يعني العمر! أما بالقاموس فالأمر أوضح بكثير:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>why_dict.py</span>
+    </div>
+<pre><span class="cm"># باستخدام قائمة: ماذا يعني student_list[1]؟ يجب أن تتذكر!</span>
+student_list = [<span class="str">"سارة"</span>, <span class="num">21</span>, <span class="str">"الرياض"</span>]
+<span class="fn">print</span>(student_list[<span class="num">1</span>])
+
+<span class="cm"># باستخدام قاموس: المعنى واضح من اسم المفتاح</span>
+student = {<span class="str">"name"</span>: <span class="str">"سارة"</span>, <span class="str">"age"</span>: <span class="num">21</span>, <span class="str">"city"</span>: <span class="str">"الرياض"</span>}
+<span class="fn">print</span>(student[<span class="str">"age"</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>21
+21</pre>
+</div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>خصائص القاموس:</strong>
+                <ul style="margin-top:8px; padding-right:18px;">
+                    <li>يتكون من أزواج <strong>مفتاح: قيمة (key: value)</strong> بين أقواس معقوصة <code>{ }</code>.</li>
+                    <li><strong>المفاتيح فريدة</strong>: لا يمكن تكرار نفس المفتاح مرتين.</li>
+                    <li><strong>قابل للتعديل</strong>: يمكنك إضافة وحذف وتغيير الأزواج.</li>
+                    <li><strong>يحافظ على ترتيب الإدخال</strong> (منذ Python 3.7).</li>
+                    <li>البحث فيه بالمفتاح <strong>سريع جدًا</strong> حتى لو احتوى ملايين العناصر.</li>
+                </ul>
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="create">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-plus-square"></i>
+        إنشاء القواميس
+    </h2>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 1. باستخدام الأقواس المعقوصة { }</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>create_dict.py</span>
+    </div>
+<pre>phone_book = {
+    <span class="str">"أحمد"</span>: <span class="str">"0501234567"</span>,
+    <span class="str">"منى"</span>: <span class="str">"0559876543"</span>,
+    <span class="str">"خالد"</span>: <span class="str">"0533334444"</span>,
+}
+empty = {}
+
+<span class="fn">print</span>(phone_book)
+<span class="fn">print</span>(<span class="fn">len</span>(phone_book), <span class="str">"جهات اتصال"</span>)
+<span class="fn">print</span>(empty, <span class="fn">type</span>(empty))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'أحمد': '0501234567', 'منى': '0559876543', 'خالد': '0533334444'}
+3 جهات اتصال
+{} &lt;class 'dict'&gt;</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 2. باستخدام الدالة dict()</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>dict_function.py</span>
+    </div>
+<pre>car = <span class="fn">dict</span>(brand=<span class="str">"Toyota"</span>, model=<span class="str">"Camry"</span>, year=<span class="num">2024</span>)
+<span class="fn">print</span>(car)
+
+<span class="cm"># من قائمة صفوف (مفتاح، قيمة)</span>
+capitals = <span class="fn">dict</span>([(<span class="str">"السعودية"</span>, <span class="str">"الرياض"</span>), (<span class="str">"مصر"</span>, <span class="str">"القاهرة"</span>)])
+<span class="fn">print</span>(capitals)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'brand': 'Toyota', 'model': 'Camry', 'year': 2024}
+{'السعودية': 'الرياض', 'مصر': 'القاهرة'}</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> ما الذي يصلح أن يكون مفتاحًا؟</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>النوع</th><th>يصلح كمفتاح؟</th><th>مثال</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>نص <code>str</code></td><td>✅ نعم (الأكثر شيوعًا)</td><td><code>{"name": "علي"}</code></td></tr>
+                    <tr><td>رقم <code>int / float</code></td><td>✅ نعم</td><td><code>{101: "غرفة الاجتماعات"}</code></td></tr>
+                    <tr><td>صف <code>tuple</code></td><td>✅ نعم</td><td><code>{(24.7, 46.6): "الرياض"}</code></td></tr>
+                    <tr><td>قائمة <code>list</code></td><td>❌ لا (لأنها قابلة للتعديل)</td><td>تنتج <code>TypeError</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>أما <strong>القيم</strong> فيمكن أن تكون من أي نوع: أرقام، نصوص، قوائم، بل وقواميس أخرى.</p>
+
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>list_key_error.py</span>
+    </div>
+<pre>data = {[<span class="str">"a"</span>, <span class="str">"b"</span>]: <span class="num">1</span>}</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">Traceback (most recent call last):
+  File "list_key_error.py", line 1, in &lt;module&gt;
+    data = {["a", "b"]: 1}
+           ^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'list'</pre>
+</div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>المفاتيح المكررة:</strong> إذا كتبت نفس المفتاح مرتين، تبقى <strong>آخر قيمة فقط</strong>
+                دون أي رسالة خطأ، لذلك انتبه لذلك.
+            </div>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>duplicate_keys.py</span>
+    </div>
+<pre>scores = {<span class="str">"علي"</span>: <span class="num">80</span>, <span class="str">"منى"</span>: <span class="num">95</span>, <span class="str">"علي"</span>: <span class="num">99</span>}
+<span class="fn">print</span>(scores)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'علي': 99, 'منى': 95}</pre>
+</div>
+</section>
+
+<section class="section-card" id="access">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-search"></i>
+        الوصول إلى القيم
+    </h2>
+        <p>نصل إلى القيمة بكتابة <strong>المفتاح</strong> بين قوسين مربعين:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>access.py</span>
+    </div>
+<pre>student = {<span class="str">"name"</span>: <span class="str">"سارة"</span>, <span class="str">"age"</span>: <span class="num">21</span>, <span class="str">"city"</span>: <span class="str">"الرياض"</span>}
+
+<span class="fn">print</span>(student[<span class="str">"name"</span>])
+<span class="fn">print</span>(student[<span class="str">"city"</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>سارة
+الرياض</pre>
+</div>
+
+        <p>لكن إذا طلبت مفتاحًا <strong>غير موجود</strong> ستحصل على خطأ <code>KeyError</code>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>key_error.py</span>
+    </div>
+<pre>student = {<span class="str">"name"</span>: <span class="str">"سارة"</span>, <span class="str">"age"</span>: <span class="num">21</span>}
+<span class="fn">print</span>(student[<span class="str">"email"</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-bug"></i> المخرجات (رسالة الخطأ)</div>
+    <pre class="err-out">Traceback (most recent call last):
+  File "key_error.py", line 2, in &lt;module&gt;
+    print(student["email"])
+          ~~~~~~~^^^^^^^^^
+KeyError: 'email'</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الطريقة الآمنة: get()</p>
+        <p>
+            الدالة <code>get()</code> تُرجع القيمة إن وُجد المفتاح، وإلا تُرجع <code>None</code>
+            أو قيمة افتراضية تحددها أنت، <strong>دون أن يتوقف البرنامج</strong>.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>get_method.py</span>
+    </div>
+<pre>student = {<span class="str">"name"</span>: <span class="str">"سارة"</span>, <span class="str">"age"</span>: <span class="num">21</span>}
+
+<span class="fn">print</span>(student.<span class="fn">get</span>(<span class="str">"name"</span>))
+<span class="fn">print</span>(student.<span class="fn">get</span>(<span class="str">"email"</span>))                  <span class="cm"># None بدلًا من الخطأ</span>
+<span class="fn">print</span>(student.<span class="fn">get</span>(<span class="str">"email"</span>, <span class="str">"غير مسجّل"</span>))      <span class="cm"># قيمة افتراضية</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>سارة
+None
+غير مسجّل</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> التحقق من وجود مفتاح: in</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>in_check.py</span>
+    </div>
+<pre>stock = {<span class="str">"تفاح"</span>: <span class="num">30</span>, <span class="str">"موز"</span>: <span class="num">0</span>, <span class="str">"برتقال"</span>: <span class="num">12</span>}
+
+fruit = <span class="str">"موز"</span>
+<span class="kw">if</span> fruit <span class="kw">in</span> stock:
+    <span class="fn">print</span>(fruit, <span class="str">"موجود في المخزون، الكمية:"</span>, stock[fruit])
+<span class="kw">else</span>:
+    <span class="fn">print</span>(fruit, <span class="str">"غير موجود"</span>)
+
+<span class="fn">print</span>(<span class="str">"مانجو"</span> <span class="kw">in</span> stock)
+<span class="fn">print</span>(<span class="num">30</span> <span class="kw">in</span> stock)   <span class="cm"># in تبحث في المفاتيح وليس القيم!</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>موز موجود في المخزون، الكمية: 0
+False
+False</pre>
+</div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>متى أستخدم [] ومتى get()؟</strong> استخدم <code>d[key]</code> عندما تكون
+                <strong>متأكدًا</strong> من وجود المفتاح، واستخدم <code>d.get(key)</code> عندما قد يكون المفتاح غير موجود
+                (مثل بيانات قادمة من المستخدم).
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="modify">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-edit"></i>
+        الإضافة والتعديل والحذف
+    </h2>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الإضافة والتعديل بنفس الصيغة</p>
+        <p>
+            الصيغة <code>d[key] = value</code> تعمل بطريقتين: إذا كان المفتاح <strong>موجودًا</strong> تُعدّل قيمته،
+            وإن لم يكن موجودًا <strong>تُضيفه</strong>.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>add_update.py</span>
+    </div>
+<pre>user = {<span class="str">"name"</span>: <span class="str">"خالد"</span>, <span class="str">"age"</span>: <span class="num">30</span>}
+
+user[<span class="str">"age"</span>] = <span class="num">31</span>            <span class="cm"># تعديل (المفتاح موجود)</span>
+user[<span class="str">"email"</span>] = <span class="str">"k@mail.com"</span>  <span class="cm"># إضافة (مفتاح جديد)</span>
+
+<span class="fn">print</span>(user)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'name': 'خالد', 'age': 31, 'email': 'k@mail.com'}</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> تحديث عدة قيم: update()</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>update_method.py</span>
+    </div>
+<pre>settings = {<span class="str">"theme"</span>: <span class="str">"light"</span>, <span class="str">"lang"</span>: <span class="str">"ar"</span>}
+settings.<span class="fn">update</span>({<span class="str">"theme"</span>: <span class="str">"dark"</span>, <span class="str">"font_size"</span>: <span class="num">16</span>})
+<span class="fn">print</span>(settings)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'theme': 'dark', 'lang': 'ar', 'font_size': 16}</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> طرق الحذف</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الطريقة</th><th>الوظيفة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>del d[key]</code></td><td>يحذف الزوج (خطأ إن لم يوجد المفتاح).</td></tr>
+                    <tr><td><code>d.pop(key)</code></td><td>يحذف الزوج <strong>ويُرجع قيمته</strong>.</td></tr>
+                    <tr><td><code>d.pop(key, default)</code></td><td>مثل السابق، لكن يُرجع default إن لم يوجد المفتاح بدل الخطأ.</td></tr>
+                    <tr><td><code>d.popitem()</code></td><td>يحذف <strong>آخر</strong> زوج أُضيف ويُرجعه كصف.</td></tr>
+                    <tr><td><code>d.clear()</code></td><td>يفرّغ القاموس بالكامل.</td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>delete.py</span>
+    </div>
+<pre>cart = {<span class="str">"قلم"</span>: <span class="num">2</span>, <span class="str">"دفتر"</span>: <span class="num">3</span>, <span class="str">"مسطرة"</span>: <span class="num">1</span>, <span class="str">"ممحاة"</span>: <span class="num">4</span>}
+
+<span class="kw">del</span> cart[<span class="str">"قلم"</span>]
+<span class="fn">print</span>(<span class="str">"بعد del:"</span>, cart)
+
+qty = cart.<span class="fn">pop</span>(<span class="str">"دفتر"</span>)
+<span class="fn">print</span>(<span class="str">"حذفنا الدفتر وكانت كميته"</span>, qty)
+
+last = cart.<span class="fn">popitem</span>()
+<span class="fn">print</span>(<span class="str">"آخر عنصر محذوف:"</span>, last)
+
+<span class="fn">print</span>(<span class="str">"الباقي:"</span>, cart)
+
+cart.<span class="fn">clear</span>()
+<span class="fn">print</span>(<span class="str">"بعد clear:"</span>, cart)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>بعد del: {'دفتر': 3, 'مسطرة': 1, 'ممحاة': 4}
+حذفنا الدفتر وكانت كميته 3
+آخر عنصر محذوف: ('ممحاة', 4)
+الباقي: {'مسطرة': 1}
+بعد clear: {}</pre>
+</div>
+</section>
+
+<section class="section-card" id="loop">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-sync-alt"></i>
+        التكرار على القواميس
+    </h2>
+        <p>للقواميس ثلاث دوال مهمة تعطيك «نوافذ» على محتواها:</p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-key"></i> keys()</h4>
+                <p>تُرجع جميع <strong>المفاتيح</strong>.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-gem"></i> values()</h4>
+                <p>تُرجع جميع <strong>القيم</strong>.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-link"></i> items()</h4>
+                <p>تُرجع <strong>الأزواج</strong> كصفوف <code>(key, value)</code>.</p>
+            </div>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>views.py</span>
+    </div>
+<pre>prices = {<span class="str">"قهوة"</span>: <span class="num">12</span>, <span class="str">"شاي"</span>: <span class="num">8</span>, <span class="str">"عصير"</span>: <span class="num">15</span>}
+
+<span class="fn">print</span>(<span class="fn">list</span>(prices.<span class="fn">keys</span>()))
+<span class="fn">print</span>(<span class="fn">list</span>(prices.<span class="fn">values</span>()))
+<span class="fn">print</span>(<span class="fn">list</span>(prices.<span class="fn">items</span>()))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>['قهوة', 'شاي', 'عصير']
+[12, 8, 15]
+[('قهوة', 12), ('شاي', 8), ('عصير', 15)]</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> المرور على المفاتيح (الطريقة الافتراضية)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>loop_keys.py</span>
+    </div>
+<pre>prices = {<span class="str">"قهوة"</span>: <span class="num">12</span>, <span class="str">"شاي"</span>: <span class="num">8</span>, <span class="str">"عصير"</span>: <span class="num">15</span>}
+
+<span class="kw">for</span> drink <span class="kw">in</span> prices:
+    <span class="fn">print</span>(drink, <span class="str">"←"</span>, prices[drink], <span class="str">"ريال"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>قهوة ← 12 ريال
+شاي ← 8 ريال
+عصير ← 15 ريال</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> المرور على المفتاح والقيمة معًا (الأفضل)</p>
+        <p>باستخدام <code>items()</code> مع تفكيك الصف الذي تعلمته في الدرس السابق:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>loop_items.py</span>
+    </div>
+<pre>prices = {<span class="str">"قهوة"</span>: <span class="num">12</span>, <span class="str">"شاي"</span>: <span class="num">8</span>, <span class="str">"عصير"</span>: <span class="num">15</span>}
+
+total = <span class="num">0</span>
+<span class="kw">for</span> drink, price <span class="kw">in</span> prices.<span class="fn">items</span>():
+    <span class="fn">print</span>(<span class="str">f"{drink}: {price} ريال"</span>)
+    total += price
+
+<span class="fn">print</span>(<span class="str">"مجموع الأسعار:"</span>, total)
+<span class="fn">print</span>(<span class="str">"أغلى سعر:"</span>, <span class="fn">max</span>(prices.<span class="fn">values</span>()))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>قهوة: 12 ريال
+شاي: 8 ريال
+عصير: 15 ريال
+مجموع الأسعار: 35
+أغلى سعر: 15</pre>
+</div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>لا تعدّل حجم القاموس أثناء المرور عليه!</strong> إضافة أو حذف مفاتيح داخل حلقة
+                <code>for</code> على نفس القاموس تسبب الخطأ <code>RuntimeError</code>. إذا احتجت الحذف، مرّ على نسخة:
+                <code>for k in list(d):</code>
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="nested">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-sitemap"></i>
+        القواميس المتداخلة
+    </h2>
+        <p>
+            يمكن أن تكون قيمة المفتاح قائمةً أو قاموسًا آخر. هكذا نمثّل بيانات حقيقية معقدة،
+            وهي نفس الطريقة التي تُرسل بها البيانات في الإنترنت بصيغة <strong>JSON</strong>.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>nested.py</span>
+    </div>
+<pre>school = {
+    <span class="str">"name"</span>: <span class="str">"مدرسة النور"</span>,
+    <span class="str">"students"</span>: [
+        {<span class="str">"name"</span>: <span class="str">"علي"</span>, <span class="str">"grades"</span>: [<span class="num">90</span>, <span class="num">85</span>, <span class="num">92</span>]},
+        {<span class="str">"name"</span>: <span class="str">"ليلى"</span>, <span class="str">"grades"</span>: [<span class="num">78</span>, <span class="num">88</span>, <span class="num">95</span>]},
+    ],
+    <span class="str">"address"</span>: {<span class="str">"city"</span>: <span class="str">"جدة"</span>, <span class="str">"street"</span>: <span class="str">"شارع التحلية"</span>},
+}
+
+<span class="fn">print</span>(school[<span class="str">"address"</span>][<span class="str">"city"</span>])
+<span class="fn">print</span>(school[<span class="str">"students"</span>][<span class="num">1</span>][<span class="str">"name"</span>])
+<span class="fn">print</span>(school[<span class="str">"students"</span>][<span class="num">0</span>][<span class="str">"grades"</span>][-<span class="num">1</span>])
+
+<span class="kw">for</span> s <span class="kw">in</span> school[<span class="str">"students"</span>]:
+    avg = <span class="fn">sum</span>(s[<span class="str">"grades"</span>]) / <span class="fn">len</span>(s[<span class="str">"grades"</span>])
+    <span class="fn">print</span>(<span class="str">f"{s['name']}: المعدل {avg:.1f}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>جدة
+ليلى
+92
+علي: المعدل 89.0
+ليلى: المعدل 87.0</pre>
+</div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>اقرأ من اليسار لليمين:</strong> <code>school["students"][1]["name"]</code> تعني:
+                من القاموس خذ <code>students</code> (قائمة) ← خذ العنصر الثاني (قاموس) ← خذ <code>name</code>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="patterns">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-magic"></i>
+        أنماط شائعة مفيدة
+    </h2>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 1. عدّ التكرارات (Counting)</p>
+        <p>من أشهر استخدامات القواميس: عدّ كم مرة ظهر كل عنصر.</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>count_words.py</span>
+    </div>
+<pre>text = <span class="str">"بايثون سهلة و بايثون قوية و بايثون ممتعة"</span>
+counts = {}
+
+<span class="kw">for</span> word <span class="kw">in</span> text.<span class="fn">split</span>():
+    counts[word] = counts.<span class="fn">get</span>(word, <span class="num">0</span>) + <span class="num">1</span>
+
+<span class="fn">print</span>(counts)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'بايثون': 3, 'سهلة': 1, 'و': 2, 'قوية': 1, 'ممتعة': 1}</pre>
+</div>
+        <p>
+            لاحظ الحيلة: <code>counts.get(word, 0)</code> تُرجع 0 إن كانت الكلمة جديدة،
+            فنضيف 1 دون الحاجة لجملة <code>if</code>.
+        </p>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 2. التجميع (Grouping)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>grouping.py</span>
+    </div>
+<pre>students = [(<span class="str">"علي"</span>, <span class="str">"أ"</span>), (<span class="str">"سارة"</span>, <span class="str">"ب"</span>), (<span class="str">"محمد"</span>, <span class="str">"أ"</span>), (<span class="str">"نورة"</span>, <span class="str">"ب"</span>), (<span class="str">"يوسف"</span>, <span class="str">"أ"</span>)]
+classes = {}
+
+<span class="kw">for</span> name, section <span class="kw">in</span> students:
+    classes.<span class="fn">setdefault</span>(section, []).<span class="fn">append</span>(name)
+
+<span class="fn">print</span>(classes)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'أ': ['علي', 'محمد', 'يوسف'], 'ب': ['سارة', 'نورة']}</pre>
+</div>
+        <p>
+            الدالة <code>setdefault(key, default)</code> تُرجع قيمة المفتاح، وإن لم يكن موجودًا
+            تضيفه بالقيمة الافتراضية أولًا ثم تُرجعها.
+        </p>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 3. Dictionary Comprehension</p>
+        <p>كما في القوائم، يمكنك بناء قاموس في سطر واحد:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>dict_comprehension.py</span>
+    </div>
+<pre>squares = {n: n ** <span class="num">2</span> <span class="kw">for</span> n <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>)}
+<span class="fn">print</span>(squares)
+
+prices = {<span class="str">"قهوة"</span>: <span class="num">12</span>, <span class="str">"شاي"</span>: <span class="num">8</span>, <span class="str">"عصير"</span>: <span class="num">15</span>}
+with_tax = {item: price * <span class="num">1.15</span> <span class="kw">for</span> item, price <span class="kw">in</span> prices.<span class="fn">items</span>()}
+<span class="fn">print</span>(with_tax)
+
+cheap = {item: price <span class="kw">for</span> item, price <span class="kw">in</span> prices.<span class="fn">items</span>() <span class="kw">if</span> price &lt; <span class="num">13</span>}
+<span class="fn">print</span>(cheap)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+{'قهوة': 13.799999999999999, 'شاي': 9.2, 'عصير': 17.25}
+{'قهوة': 12, 'شاي': 8}</pre>
+</div>
+</section>
+
+<section class="section-card" id="methods">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-tools"></i>
+        ملخص دوال القواميس
+    </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الدالة</th><th>الوظيفة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>d[key]</code></td><td>قراءة القيمة (خطأ <code>KeyError</code> إن لم يوجد المفتاح).</td></tr>
+                    <tr><td><code>d.get(key, default)</code></td><td>قراءة آمنة مع قيمة افتراضية.</td></tr>
+                    <tr><td><code>d[key] = value</code></td><td>إضافة أو تعديل.</td></tr>
+                    <tr><td><code>d.update(other)</code></td><td>دمج قاموس آخر وتحديث القيم.</td></tr>
+                    <tr><td><code>d.pop(key)</code></td><td>حذف وإرجاع القيمة.</td></tr>
+                    <tr><td><code>d.popitem()</code></td><td>حذف آخر زوج وإرجاعه.</td></tr>
+                    <tr><td><code>d.keys() / values() / items()</code></td><td>المفاتيح / القيم / الأزواج.</td></tr>
+                    <tr><td><code>d.setdefault(key, default)</code></td><td>قراءة القيمة أو إضافتها إن لم توجد.</td></tr>
+                    <tr><td><code>d.copy()</code></td><td>نسخة مستقلة من القاموس.</td></tr>
+                    <tr><td><code>d.clear()</code></td><td>حذف كل المحتوى.</td></tr>
+                    <tr><td><code>len(d)</code> / <code>key in d</code></td><td>عدد الأزواج / هل المفتاح موجود؟</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>النسخ:</strong> الكتابة <code>b = a</code> لا تنسخ القاموس، بل تجعل المتغيرين يشيران لنفس القاموس!
+                أي تعديل على <code>b</code> سيظهر في <code>a</code>. استخدم <code>b = a.copy()</code> للحصول على نسخة مستقلة.
+            </div>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>copy_trap.py</span>
+    </div>
+<pre>a = {<span class="str">"x"</span>: <span class="num">1</span>}
+b = a          <span class="cm"># ليس نسخًا!</span>
+b[<span class="str">"x"</span>] = <span class="num">100</span>
+<span class="fn">print</span>(<span class="str">"a ="</span>, a)
+
+c = a.<span class="fn">copy</span>()   <span class="cm"># نسخة حقيقية</span>
+c[<span class="str">"x"</span>] = <span class="num">5</span>
+<span class="fn">print</span>(<span class="str">"a ="</span>, a, <span class="str">"| c ="</span>, c)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>a = {'x': 100}
+a = {'x': 100} | c = {'x': 5}</pre>
+</div>
+</section>
+
+<section class="section-card" id="practice">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-laptop-code"></i>
+        مثال تطبيقي: نظام مخزون متجر
+    </h2>
+        <p>لنبنِ نظام مخزون صغير يجمع كل ما تعلمناه:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>inventory.py</span>
+    </div>
+<pre>inventory = {
+    <span class="str">"لابتوب"</span>: {<span class="str">"price"</span>: <span class="num">3500</span>, <span class="str">"qty"</span>: <span class="num">4</span>},
+    <span class="str">"شاشة"</span>: {<span class="str">"price"</span>: <span class="num">900</span>, <span class="str">"qty"</span>: <span class="num">0</span>},
+    <span class="str">"فأرة"</span>: {<span class="str">"price"</span>: <span class="num">60</span>, <span class="str">"qty"</span>: <span class="num">25</span>},
+}
+
+<span class="kw">def</span> <span class="fn">sell</span>(item, amount):
+    product = inventory.<span class="fn">get</span>(item)
+    <span class="kw">if</span> product <span class="kw">is</span> <span class="kw">None</span>:
+        <span class="fn">print</span>(<span class="str">f"❌ المنتج '{item}' غير موجود"</span>)
+    <span class="kw">elif</span> product[<span class="str">"qty"</span>] &lt; amount:
+        <span class="fn">print</span>(<span class="str">f"⚠️ الكمية غير كافية من {item} (المتوفر {product['qty']})"</span>)
+    <span class="kw">else</span>:
+        product[<span class="str">"qty"</span>] -= amount
+        <span class="fn">print</span>(<span class="str">f"✅ تم بيع {amount} × {item} بمبلغ {amount * product['price']} ريال"</span>)
+
+<span class="fn">sell</span>(<span class="str">"لابتوب"</span>, <span class="num">2</span>)
+<span class="fn">sell</span>(<span class="str">"شاشة"</span>, <span class="num">1</span>)
+<span class="fn">sell</span>(<span class="str">"طابعة"</span>, <span class="num">1</span>)
+inventory[<span class="str">"كيبورد"</span>] = {<span class="str">"price"</span>: <span class="num">150</span>, <span class="str">"qty"</span>: <span class="num">10</span>}   <span class="cm"># إضافة منتج جديد</span>
+
+<span class="fn">print</span>(<span class="str">"\n📦 تقرير المخزون:"</span>)
+total_value = <span class="num">0</span>
+<span class="kw">for</span> name, info <span class="kw">in</span> inventory.<span class="fn">items</span>():
+    value = info[<span class="str">"price"</span>] * info[<span class="str">"qty"</span>]
+    total_value += value
+    status = <span class="str">"نفد"</span> <span class="kw">if</span> info[<span class="str">"qty"</span>] == <span class="num">0</span> <span class="kw">else</span> info[<span class="str">"qty"</span>]
+    <span class="fn">print</span>(<span class="str">f"- {name}: {status} | القيمة {value} ريال"</span>)
+<span class="fn">print</span>(<span class="str">"إجمالي قيمة المخزون:"</span>, total_value, <span class="str">"ريال"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>✅ تم بيع 2 × لابتوب بمبلغ 7000 ريال
+⚠️ الكمية غير كافية من شاشة (المتوفر 0)
+❌ المنتج 'طابعة' غير موجود
+
+📦 تقرير المخزون:
+- لابتوب: 2 | القيمة 7000 ريال
+- شاشة: نفد | القيمة 0 ريال
+- فأرة: 25 | القيمة 1500 ريال
+- كيبورد: 10 | القيمة 1500 ريال
+إجمالي قيمة المخزون: 10000 ريال</pre>
+</div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">10</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! &lt;code&gt;get()&lt;/code&gt; تُرجع القيمة الافتراضية عندما لا يوجد المفتاح." data-hint="ابحث عن الدالة التي تقبل قيمة افتراضية كمعامل ثانٍ.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">الوصول الآمن</span>
+    </div>
+    <p class="exercise-question">لدينا <code>user = {"name": "علي"}</code>. أي سطر يطبع <code>غير معروف</code> بدل أن يتوقف البرنامج بخطأ؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>print(user["age"])</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> <code>print(user.get("age", "غير معروف"))</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> <code>print(user.age)</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>print(user("age"))</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! فهمت خصائص القواميس جيدًا." data-hint="تذكّر: المفاتيح فريدة، و &lt;code&gt;in&lt;/code&gt; تبحث في المفاتيح.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يمكن أن يحتوي القاموس على مفتاحين بنفس الاسم وقيمتين مختلفتين.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">يمكن استخدام صف <code>tuple</code> كمفتاح في القاموس.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">العبارة <code>"x" in d</code> تبحث في <strong>قيم</strong> القاموس.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>d.items()</code> تُرجع أزواجًا على شكل صفوف <code>(key, value)</code>.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">الصيغة <code>d[key] = value</code> تضيف المفتاح إن لم يكن موجودًا.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="رائع! تتبعت الإضافة والتعديل والحذف بدقة." data-hint="&lt;code&gt;d[&quot;a&quot;] = 10&lt;/code&gt; تعديل وليس إضافة، و &lt;code&gt;pop&lt;/code&gt; تُرجع القيمة المحذوفة.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه البرنامج التالي؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre>d = {<span class="str">"a"</span>: <span class="num">1</span>, <span class="str">"b"</span>: <span class="num">2</span>}
+d[<span class="str">"c"</span>] = <span class="num">3</span>
+d[<span class="str">"a"</span>] = <span class="num">10</span>
+<span class="fn">print</span>(<span class="fn">len</span>(d))
+<span class="fn">print</span>(d[<span class="str">"a"</span>] + d[<span class="str">"c"</span>])
+<span class="fn">print</span>(d.<span class="fn">pop</span>(<span class="str">"b"</span>))
+<span class="fn">print</span>(<span class="fn">list</span>(d.<span class="fn">keys</span>()))</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="3" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="13" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثالث:</span><input type="text" class="blank-input" data-answers="2" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الرابع:</span><input type="text" class="blank-input" data-answers="[&#x27;a&#x27;, &#x27;c&#x27;]" placeholder="..." style="min-width:170px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذا نمط العدّ الشهير باستخدام القواميس." data-hint="ابدأ بقاموس فارغ، واستخدم &lt;code&gt;get&lt;/code&gt; للقيمة الافتراضية، و &lt;code&gt;items()&lt;/code&gt; للمرور على الأزواج.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">عدّ الحروف</span>
+    </div>
+    <p class="exercise-question">أكمل البرنامج ليعدّ كم مرة ظهر كل حرف في الكلمة، ثم يطبع الحرف وعدده:</p>
+    <div class="code-fill">
+        <div class="line"><span>word = <span class="str">'banana'</span></span></div>
+        <div class="line"><span>counts = </span><input type="text" class="blank-input" data-answers="{}||dict()" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span><span class="kw">for</span> ch <span class="kw">in</span> word:</span></div>
+        <div class="line"><span>    counts[ch] = counts.</span><input type="text" class="blank-input" data-answers="get" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>(ch, <span class="num">0</span>) + <span class="num">1</span></span></div>
+        <div class="line"><span><span class="kw">for</span> ch, n <span class="kw">in</span> counts.</span><input type="text" class="blank-input" data-answers="items()" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"><span>:</span></div>
+        <div class="line"><span>    <span class="fn">print</span>(ch, n)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب صحيح! إنشاء ← إضافة ← حلقة ← طباعة داخل الحلقة." data-hint="لا يمكن استخدام القاموس قبل إنشائه، وسطر الطباعة يأتي داخل الحلقة.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب الأسطر لبرنامج ينشئ قاموس درجات، يضيف طالبًا جديدًا، ثم يطبع كل طالب ودرجته. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="3" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">for name, mark in grades.items():</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="4" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">    print(name, mark)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">grades[&#x27;سعد&#x27;] = 77</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">grades = {&#x27;علي&#x27;: 90, &#x27;منى&#x27;: 85}</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر القواميس التفاعلي</div>
+    <p style="color:var(--text-light); font-size:0.95em;">ابنِ قاموسك بنفسك! اكتب مفتاحًا وقيمة ثم اختر العملية، وشاهد الكود المكافئ في Python ونتيجته. القيم الرقمية تُحفظ كأرقام، وغيرها يُحفظ كنص.</p>
+    <div class="lab-row">
+        <label>المفتاح:</label>
+        <input type="text" class="lab-input" id="dictKey" value="name" style="direction:ltr;">
+        <label>القيمة:</label>
+        <input type="text" class="lab-input" id="dictVal" value="سارة">
+    </div>
+    <div class="lab-row">
+        <button class="btn btn-primary" onclick="dictOp('set')"><i class="fas fa-plus"></i> d[key] = value</button>
+        <button class="btn btn-secondary" onclick="dictOp('get')">d[key]</button>
+        <button class="btn btn-secondary" onclick="dictOp('safe')">d.get(key)</button>
+        <button class="btn btn-secondary" onclick="dictOp('in')">key in d</button>
+        <button class="btn btn-secondary" onclick="dictOp('pop')">d.pop(key)</button>
+        <button class="btn btn-secondary" onclick="dictOp('items')">d.items()</button>
+        <button class="btn btn-secondary" onclick="dictOp('clear')">d.clear()</button>
+    </div>
+    <div class="lab-console" id="dictConsole"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">11</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> القاموس يخزن أزواج <strong>مفتاح: قيمة</strong> بين <code>{ }</code>، والمفاتيح فريدة.</li>
+                <li><i class="fas fa-check"></i> المفاتيح يجب أن تكون غير قابلة للتعديل (نص، رقم، صف)، والقيم من أي نوع.</li>
+                <li><i class="fas fa-check"></i> الوصول بـ <code>d[key]</code> والوصول الآمن بـ <code>d.get(key, default)</code>.</li>
+                <li><i class="fas fa-check"></i> الإضافة والتعديل بـ <code>d[key] = value</code> و <code>update()</code>.</li>
+                <li><i class="fas fa-check"></i> الحذف بـ <code>del</code> و <code>pop()</code> و <code>popitem()</code> و <code>clear()</code>.</li>
+                <li><i class="fas fa-check"></i> المرور على القاموس بـ <code>keys()</code> و <code>values()</code> و <code>items()</code>.</li>
+                <li><i class="fas fa-check"></i> القواميس المتداخلة لتمثيل البيانات المعقدة.</li>
+                <li><i class="fas fa-check"></i> أنماط العدّ والتجميع و Dictionary Comprehension.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> استخدم القاموس كلما احتجت للبحث عن معلومة باسمها.</li>
+                <li><i class="fas fa-lightbulb"></i> اعتد على <code>for k, v in d.items()</code> فهي الطريقة الأوضح.</li>
+                <li><i class="fas fa-lightbulb"></i> استخدم <code>get()</code> مع البيانات غير المضمونة لتجنب <code>KeyError</code>.</li>
+                <li><i class="fas fa-lightbulb"></i> تذكّر أن <code>b = a</code> لا تنسخ القاموس؛ استخدم <code>copy()</code>.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>المجموعات (Sets)</strong> — لتخزين عناصر فريدة بدون تكرار وإجراء عمليات رياضية عليها.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson11.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 11: الصفوف (Tuples)</span>
+        </a>
+        <a href="lesson13.html" class="nav-link next">
+            <span>الدرس التالي: المجموعات (Sets)</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · القواميس
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '80%';
+            text.textContent = '80% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر القواميس ========== */
+    const LAB_D = new Map([['name', 'سارة'], ['age', 21]]);
+    const labKeys = new Map([['string:name', 'name'], ['string:age', 'age']]);
+
+    function dictOp(op) {
+        const out = document.getElementById('dictConsole');
+        const key = parseLiteral(document.getElementById('dictKey').value);
+        const val = parseLiteral(document.getElementById('dictVal').value);
+        const id = keyOf(key);
+        const k = labKeys.has(id) ? labKeys.get(id) : key;
+        const kr = pyRepr(key);
+        try {
+            if (op === 'set') {
+                labKeys.set(id, key);
+                LAB_D.set(k, val);
+                consoleLine(out, `d[${kr}] = ${pyRepr(val)}`);
+                consoleLine(out, 'print(d)', pyRepr(LAB_D));
+            } else if (op === 'get') {
+                if (!LAB_D.has(k)) throw 'KeyError: ' + kr;
+                consoleLine(out, `d[${kr}]`, pyRepr(LAB_D.get(k)));
+            } else if (op === 'safe') {
+                const v = LAB_D.has(k) ? LAB_D.get(k) : null;
+                consoleLine(out, `print(d.get(${kr}))`, typeof v === 'string' ? v : pyRepr(v));
+            } else if (op === 'in') {
+                consoleLine(out, `${kr} in d`, pyRepr(LAB_D.has(k)));
+            } else if (op === 'pop') {
+                if (!LAB_D.has(k)) throw 'KeyError: ' + kr;
+                const v = LAB_D.get(k);
+                LAB_D.delete(k);
+                labKeys.delete(id);
+                consoleLine(out, `d.pop(${kr})`, pyRepr(v));
+                consoleLine(out, 'print(d)', pyRepr(LAB_D));
+            } else if (op === 'items') {
+                const items = Array.from(LAB_D.entries()).map(([a, b]) => new PyTuple([a, b]));
+                consoleLine(out, 'd.items()', 'dict_items(' + pyRepr(items) + ')');
+            } else if (op === 'clear') {
+                LAB_D.clear();
+                labKeys.clear();
+                consoleLine(out, 'd.clear()');
+                consoleLine(out, 'print(d)', '{}');
+            }
+        } catch (err) {
+            consoleLine(out, op === 'pop' ? `d.pop(${kr})` : `d[${kr}]`, err, true);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        consoleLine(document.getElementById('dictConsole'), "d = {'name': 'سارة', 'age': 21}");
+    });
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

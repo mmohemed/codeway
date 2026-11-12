@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 14: الوحدات والمكتبات (Modules) | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span class="sep">/</span>
+        <span>الوحدات والمكتبات</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-puzzle-piece"></i>
+            الدرس 14 · الوحدات
+        </div>
+        <h1 class="lesson-title">الوحدات والمكتبات (Modules) في Python</h1>
+        <p class="lesson-intro">
+            لماذا تكتب كل شيء من الصفر؟ تأتي Python مع <strong>مكتبة قياسية ضخمة</strong> فيها آلاف الأدوات الجاهزة: للرياضيات، والأرقام العشوائية، والتواريخ، وغيرها. في هذا الدرس ستتعلم كيف <strong>تستورد</strong> هذه الأدوات وتستخدمها، بل وكيف تنشئ <strong>وحدتك الخاصة</strong> لتنظيم مشاريعك.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 45 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 الاستيراد والمكتبة القياسية</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 مبتدئ</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 13</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#intro">1. مقدمة</a>
+            <a href="#import">2. طرق الاستيراد</a>
+            <a href="#math">3. وحدة math</a>
+            <a href="#random">4. وحدة random</a>
+            <a href="#datetime">5. وحدة datetime</a>
+            <a href="#more">6. وحدات أخرى</a>
+            <a href="#own">7. وحدتك الخاصة</a>
+            <a href="#pip">8. تثبيت المكتبات</a>
+            <a href="#practice">9. مثال تطبيقي</a>
+            <a href="#exercises">10. تمارين تفاعلية</a>
+            <a href="#summary">11. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="intro">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        ما هي الوحدة (Module)؟
+    </h2>
+        <p>
+            <strong>الوحدة (Module)</strong> ببساطة هي <strong>ملف Python</strong> (ينتهي بـ <code>.py</code>) يحتوي على
+            دوال ومتغيرات يمكنك استخدامها في برامج أخرى. أما <strong>المكتبة (Library)</strong> أو <strong>الحزمة (Package)</strong>
+            فهي مجموعة من الوحدات المنظمة معًا.
+        </p>
+        <p>
+            تخيّل صندوق أدوات: بدل أن تصنع مطرقة كلما احتجت لدق مسمار، تفتح الصندوق وتأخذها جاهزة.
+            هكذا تعمل الوحدات: <strong>استورد ← استخدم</strong>.
+        </p>
+
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-cubes"></i> المكتبة القياسية</h4>
+                <p>تأتي مع Python مباشرة دون تثبيت، مثل <code>math</code> و <code>random</code> و <code>datetime</code>.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-download"></i> مكتبات خارجية</h4>
+                <p>يطورها المجتمع وتُثبَّت بالأمر <code>pip</code>، مثل <code>requests</code> و <code>pandas</code>.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-user-cog"></i> وحداتك الخاصة</h4>
+                <p>ملفات <code>.py</code> تكتبها بنفسك لتقسيم مشروعك إلى أجزاء منظمة.</p>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>فلسفة Python:</strong> يُقال إن Python تأتي «والبطاريات مشمولة» (Batteries Included)،
+                أي أن معظم ما تحتاجه موجود فيها جاهزًا. تعلّم استخدام الوحدات يضاعف قدرتك البرمجية فورًا.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="import">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-file-import"></i>
+        طرق الاستيراد
+    </h2>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 1. استيراد الوحدة كاملة: import</p>
+        <p>نستخدم اسم الوحدة ثم نقطة ثم اسم الأداة:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>import_module.py</span>
+    </div>
+<pre><span class="kw">import</span> math
+
+<span class="fn">print</span>(math.<span class="fn">sqrt</span>(<span class="num">25</span>))
+<span class="fn">print</span>(math.pi)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>5.0
+3.141592653589793</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 2. استيراد أدوات محددة: from ... import</p>
+        <p>نستخدم الأداة مباشرة دون كتابة اسم الوحدة:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>from_import.py</span>
+    </div>
+<pre><span class="kw">from</span> math <span class="kw">import</span> sqrt, pi
+
+<span class="fn">print</span>(<span class="fn">sqrt</span>(<span class="num">49</span>))
+<span class="fn">print</span>(<span class="fn">round</span>(pi, <span class="num">2</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>7.0
+3.14</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 3. إعطاء اسم مختصر: as</p>
+        <p>مفيد للأسماء الطويلة، وستراه كثيرًا في مكتبات تحليل البيانات مثل <code>import pandas as pd</code>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>import_as.py</span>
+    </div>
+<pre><span class="kw">import</span> datetime <span class="kw">as</span> dt
+<span class="kw">from</span> math <span class="kw">import</span> factorial <span class="kw">as</span> fact
+
+<span class="fn">print</span>(dt.<span class="fn">date</span>(<span class="num">2025</span>, <span class="num">1</span>, <span class="num">15</span>))
+<span class="fn">print</span>(<span class="fn">fact</span>(<span class="num">5</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>2025-01-15
+120</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> 4. استيراد كل شيء: from ... import * (غير مستحسن)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>star_import.py</span>
+    </div>
+<pre><span class="kw">from</span> math <span class="kw">import</span> *   <span class="cm"># يستورد كل الأسماء — تجنّب ذلك!</span>
+
+<span class="fn">print</span>(<span class="fn">sqrt</span>(<span class="num">16</span>))      <span class="cm"># من أين جاءت sqrt؟ غير واضح عند قراءة الكود</span></pre>
+</div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>لماذا نتجنب <code>import *</code>؟</strong> لأنه يملأ برنامجك بأسماء كثيرة قد
+                <strong>تتعارض</strong> مع أسماء متغيراتك أو دوالك، ويجعل الكود صعب القراءة لأنك لا تعرف مصدر كل دالة.
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الصيغة</th><th>طريقة الاستخدام</th><th>متى أستخدمها؟</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>import math</code></td><td><code>math.sqrt(9)</code></td><td>الخيار الأوضح والأكثر أمانًا.</td></tr>
+                    <tr><td><code>from math import sqrt</code></td><td><code>sqrt(9)</code></td><td>عندما تحتاج أداة أو اثنتين تستخدمهما كثيرًا.</td></tr>
+                    <tr><td><code>import math as m</code></td><td><code>m.sqrt(9)</code></td><td>للأسماء الطويلة أو المتعارف عليها.</td></tr>
+                    <tr><td><code>from math import *</code></td><td><code>sqrt(9)</code></td><td>تجنّبها في البرامج الحقيقية.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>عادة جيدة:</strong> ضع جميع أسطر <code>import</code> في <strong>أعلى الملف</strong>،
+                حتى يعرف القارئ فورًا ما الذي يعتمد عليه برنامجك.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="math">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-square-root-alt"></i>
+        وحدة الرياضيات math
+    </h2>
+        <p>تحتوي على دوال وثوابت رياضية تتجاوز العمليات الأساسية:</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الأداة</th><th>الوظيفة</th><th>مثال ← الناتج</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>math.sqrt(x)</code></td><td>الجذر التربيعي</td><td><code>sqrt(16)</code> ← 4.0</td></tr>
+                    <tr><td><code>math.ceil(x)</code></td><td>التقريب لأعلى</td><td><code>ceil(4.1)</code> ← 5</td></tr>
+                    <tr><td><code>math.floor(x)</code></td><td>التقريب لأسفل</td><td><code>floor(4.9)</code> ← 4</td></tr>
+                    <tr><td><code>math.factorial(n)</code></td><td>المضروب n!</td><td><code>factorial(4)</code> ← 24</td></tr>
+                    <tr><td><code>math.pow(x, y)</code></td><td>الأس (يُرجع float)</td><td><code>pow(2, 3)</code> ← 8.0</td></tr>
+                    <tr><td><code>math.gcd(a, b)</code></td><td>القاسم المشترك الأكبر</td><td><code>gcd(12, 18)</code> ← 6</td></tr>
+                    <tr><td><code>math.pi / math.e</code></td><td>الثوابت π و e</td><td>3.14159… / 2.71828…</td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>math_demo.py</span>
+    </div>
+<pre><span class="kw">import</span> math
+
+radius = <span class="num">7</span>
+area = math.pi * radius ** <span class="num">2</span>
+<span class="fn">print</span>(<span class="str">"مساحة الدائرة:"</span>, <span class="fn">round</span>(area, <span class="num">2</span>))
+
+price = <span class="num">47.3</span>
+<span class="fn">print</span>(<span class="str">"التقريب لأعلى:"</span>, math.<span class="fn">ceil</span>(price))
+<span class="fn">print</span>(<span class="str">"التقريب لأسفل:"</span>, math.<span class="fn">floor</span>(price))
+
+<span class="fn">print</span>(<span class="str">"مضروب 6 ="</span>, math.<span class="fn">factorial</span>(<span class="num">6</span>))
+<span class="fn">print</span>(<span class="str">"القاسم المشترك الأكبر لـ 24 و 36 ="</span>, math.<span class="fn">gcd</span>(<span class="num">24</span>, <span class="num">36</span>))
+
+<span class="cm"># حساب الوتر في مثلث قائم (فيثاغورس)</span>
+a, b = <span class="num">3</span>, <span class="num">4</span>
+<span class="fn">print</span>(<span class="str">"الوتر ="</span>, math.<span class="fn">hypot</span>(a, b))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>مساحة الدائرة: 153.94
+التقريب لأعلى: 48
+التقريب لأسفل: 47
+مضروب 6 = 720
+القاسم المشترك الأكبر لـ 24 و 36 = 12
+الوتر = 5.0</pre>
+</div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>مثال عملي على ceil:</strong> إذا كان لديك 47 طالبًا وكل حافلة تتسع لـ 10،
+                فكم حافلة تحتاج؟ <code>math.ceil(47 / 10)</code> = 5 حافلات (وليس 4.7!).
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="random">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-dice"></i>
+        وحدة الأرقام العشوائية random
+    </h2>
+        <p>تُستخدم في الألعاب، والاختبارات، والسحب العشوائي، والمحاكاة:</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الدالة</th><th>الوظيفة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>random.randint(a, b)</code></td><td>عدد صحيح عشوائي بين a و b (<strong>شاملًا</strong> الطرفين).</td></tr>
+                    <tr><td><code>random.random()</code></td><td>عدد عشري عشوائي بين 0 و 1.</td></tr>
+                    <tr><td><code>random.uniform(a, b)</code></td><td>عدد عشري عشوائي بين a و b.</td></tr>
+                    <tr><td><code>random.choice(seq)</code></td><td>اختيار عنصر عشوائي من قائمة.</td></tr>
+                    <tr><td><code>random.sample(seq, k)</code></td><td>اختيار k عناصر مختلفة بدون تكرار.</td></tr>
+                    <tr><td><code>random.shuffle(list)</code></td><td>خلط عناصر القائمة في مكانها.</td></tr>
+                    <tr><td><code>random.seed(n)</code></td><td>تثبيت «البذرة» لتكرار نفس النتائج العشوائية.</td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>random_demo.py</span>
+    </div>
+<pre><span class="kw">import</span> random
+
+random.<span class="fn">seed</span>(<span class="num">7</span>)   <span class="cm"># لتحصل على نفس النتائج في كل تشغيل</span>
+
+<span class="fn">print</span>(<span class="str">"رمي النرد:"</span>, random.<span class="fn">randint</span>(<span class="num">1</span>, <span class="num">6</span>))
+<span class="fn">print</span>(<span class="str">"رقم عشري:"</span>, <span class="fn">round</span>(random.<span class="fn">random</span>(), <span class="num">3</span>))
+
+colors = [<span class="str">"أحمر"</span>, <span class="str">"أخضر"</span>, <span class="str">"أزرق"</span>, <span class="str">"أصفر"</span>]
+<span class="fn">print</span>(<span class="str">"لون عشوائي:"</span>, random.<span class="fn">choice</span>(colors))
+
+numbers = <span class="fn">list</span>(<span class="fn">range</span>(<span class="num">1</span>, <span class="num">50</span>))
+<span class="fn">print</span>(<span class="str">"أرقام اليانصيب:"</span>, <span class="fn">sorted</span>(random.<span class="fn">sample</span>(numbers, <span class="num">6</span>)))
+
+cards = [<span class="str">"A"</span>, <span class="str">"K"</span>, <span class="str">"Q"</span>, <span class="str">"J"</span>, <span class="str">"10"</span>]
+random.<span class="fn">shuffle</span>(cards)
+<span class="fn">print</span>(<span class="str">"الأوراق بعد الخلط:"</span>, cards)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>رمي النرد: 3
+رقم عشري: 0.948
+لون عشوائي: أصفر
+أرقام اليانصيب: [4, 5, 7, 24, 35, 42]
+الأوراق بعد الخلط: ['K', 'J', 'Q', 'A', '10']</pre>
+</div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>عن seed:</strong> بدون <code>random.seed()</code> ستحصل على نتائج مختلفة في كل تشغيل — وهذا ما
+                تريده عادة في الألعاب. استخدم <code>seed</code> فقط عندما تريد نتائج قابلة للتكرار (مثل الاختبار).
+                ونتائجك قد تختلف عن المعروضة هنا حسب إصدار Python.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="datetime">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-calendar-alt"></i>
+        وحدة التاريخ والوقت datetime
+    </h2>
+        <p>للتعامل مع التواريخ والأوقات وحساب الفروق بينها:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>datetime_basic.py</span>
+    </div>
+<pre><span class="kw">from</span> datetime <span class="kw">import</span> date, datetime, timedelta
+
+birthday = <span class="fn">date</span>(<span class="num">2000</span>, <span class="num">5</span>, <span class="num">17</span>)
+<span class="fn">print</span>(<span class="str">"تاريخ الميلاد:"</span>, birthday)
+<span class="fn">print</span>(<span class="str">"السنة:"</span>, birthday.year, <span class="str">"| الشهر:"</span>, birthday.month, <span class="str">"| اليوم:"</span>, birthday.day)
+
+meeting = <span class="fn">datetime</span>(<span class="num">2025</span>, <span class="num">3</span>, <span class="num">10</span>, <span class="num">14</span>, <span class="num">30</span>)
+<span class="fn">print</span>(<span class="str">"موعد الاجتماع:"</span>, meeting)
+
+<span class="cm"># إضافة وطرح مدد زمنية</span>
+deadline = <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">1</span>, <span class="num">1</span>) + <span class="fn">timedelta</span>(days=<span class="num">45</span>)
+<span class="fn">print</span>(<span class="str">"آخر موعد للتسليم:"</span>, deadline)
+
+<span class="cm"># الفرق بين تاريخين</span>
+start = <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">1</span>, <span class="num">1</span>)
+end = <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">12</span>, <span class="num">31</span>)
+<span class="fn">print</span>(<span class="str">"عدد الأيام بينهما:"</span>, (end - start).days)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>تاريخ الميلاد: 2000-05-17
+السنة: 2000 | الشهر: 5 | اليوم: 17
+موعد الاجتماع: 2025-03-10 14:30:00
+آخر موعد للتسليم: 2025-02-15
+عدد الأيام بينهما: 364</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> التاريخ الحالي والتنسيق</p>
+        <p>الدالة <code>strftime</code> تحوّل التاريخ إلى نص بالتنسيق الذي تريده:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>datetime_now.py</span>
+    </div>
+<pre><span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+now = datetime.<span class="fn">now</span>()
+<span class="fn">print</span>(<span class="str">"الآن:"</span>, now)
+<span class="fn">print</span>(now.<span class="fn">strftime</span>(<span class="str">"%Y-%m-%d"</span>))        <span class="cm"># سنة-شهر-يوم</span>
+<span class="fn">print</span>(now.<span class="fn">strftime</span>(<span class="str">"%H:%M"</span>))           <span class="cm"># ساعة:دقيقة</span>
+<span class="fn">print</span>(now.<span class="fn">strftime</span>(<span class="str">"%d/%m/%Y %I:%M %p"</span>))</pre>
+</div>
+        <p>مثال على المخرجات (ستختلف حسب وقت التشغيل):</p>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الآن: 2025-06-15 09:41:27.531204
+2025-06-15
+09:41
+15/06/2025 09:41 AM</pre>
+</div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الرمز</th><th>المعنى</th><th>مثال</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>%Y</code></td><td>السنة بأربعة أرقام</td><td>2025</td></tr>
+                    <tr><td><code>%m</code></td><td>الشهر</td><td>06</td></tr>
+                    <tr><td><code>%d</code></td><td>اليوم</td><td>15</td></tr>
+                    <tr><td><code>%H</code> / <code>%I</code></td><td>الساعة (24 / 12)</td><td>21 / 09</td></tr>
+                    <tr><td><code>%M</code></td><td>الدقائق</td><td>41</td></tr>
+                    <tr><td><code>%p</code></td><td>صباحًا/مساءً</td><td>AM / PM</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="more">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-toolbox"></i>
+        وحدات مفيدة أخرى
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>other_modules.py</span>
+    </div>
+<pre><span class="kw">import</span> string
+<span class="kw">import</span> statistics
+<span class="kw">import</span> time
+
+<span class="fn">print</span>(<span class="str">"الحروف الإنجليزية:"</span>, string.ascii_lowercase)
+<span class="fn">print</span>(<span class="str">"الأرقام:"</span>, string.digits)
+
+marks = [<span class="num">70</span>, <span class="num">85</span>, <span class="num">90</span>, <span class="num">85</span>, <span class="num">100</span>]
+<span class="fn">print</span>(<span class="str">"المتوسط:"</span>, statistics.<span class="fn">mean</span>(marks))
+<span class="fn">print</span>(<span class="str">"الوسيط:"</span>, statistics.<span class="fn">median</span>(marks))
+<span class="fn">print</span>(<span class="str">"المنوال:"</span>, statistics.<span class="fn">mode</span>(marks))
+
+start = time.<span class="fn">time</span>()
+total = <span class="fn">sum</span>(<span class="fn">range</span>(<span class="num">1</span>_000_000))
+elapsed = time.<span class="fn">time</span>() - start
+<span class="fn">print</span>(<span class="str">"المجموع:"</span>, total, <span class="str">"| استغرق أقل من ثانية؟"</span>, elapsed &lt; <span class="num">1</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الحروف الإنجليزية: abcdefghijklmnopqrstuvwxyz
+الأرقام: 0123456789
+المتوسط: 86
+الوسيط: 85
+المنوال: 85
+المجموع: 499999500000 | استغرق أقل من ثانية؟ True</pre>
+</div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الوحدة</th><th>الاستخدام</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>os</code></td><td>التعامل مع نظام التشغيل والملفات والمجلدات.</td></tr>
+                    <tr><td><code>time</code></td><td>قياس الوقت، والانتظار <code>time.sleep(2)</code>.</td></tr>
+                    <tr><td><code>statistics</code></td><td>المتوسط والوسيط والانحراف المعياري.</td></tr>
+                    <tr><td><code>string</code></td><td>ثوابت للحروف والأرقام والرموز.</td></tr>
+                    <tr><td><code>json</code></td><td>قراءة وكتابة بيانات JSON (ستستخدمه كثيرًا لاحقًا).</td></tr>
+                    <tr><td><code>collections</code></td><td>هياكل بيانات متقدمة مثل <code>Counter</code>.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> كيف أستكشف أي وحدة؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>explore.py</span>
+    </div>
+<pre><span class="kw">import</span> math
+
+names = <span class="fn">dir</span>(math)          <span class="cm"># قائمة بكل الأسماء داخل الوحدة</span>
+<span class="fn">print</span>(<span class="str">"sqrt"</span> <span class="kw">in</span> names)
+<span class="fn">print</span>(<span class="str">"floor"</span> <span class="kw">in</span> names, <span class="str">"factorial"</span> <span class="kw">in</span> names)
+<span class="fn">print</span>(math.floor.__doc__.<span class="fn">splitlines</span>()[<span class="num">0</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>True
+True True
+Return the floor of x as an Integral.</pre>
+</div>
+        <p>
+            الدالة <code>dir()</code> تعرض كل ما بداخل الوحدة، و <code>help(math.floor)</code> تعرض شرحًا كاملًا للدالة.
+            والمرجع الرسمي الشامل هو <strong>docs.python.org</strong>.
+        </p>
+</section>
+
+<section class="section-card" id="own">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-file-code"></i>
+        إنشاء وحدتك الخاصة
+    </h2>
+        <p>
+            أي ملف <code>.py</code> تكتبه هو وحدة! لنفترض أنك أنشأت ملفًا باسم <code>tools.py</code> فيه دوال
+            تستخدمها كثيرًا:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>tools.py</span>
+    </div>
+<pre><span class="str">"""أدوات مساعدة لمشروعي"""</span>
+
+TAX_RATE = <span class="num">0.15</span>
+
+<span class="kw">def</span> <span class="fn">add_tax</span>(price):
+    <span class="kw">return</span> <span class="fn">round</span>(price * (<span class="num">1</span> + TAX_RATE), <span class="num">2</span>)
+
+<span class="kw">def</span> <span class="fn">greet</span>(name):
+    <span class="kw">return</span> <span class="str">f"أهلًا يا {name}!"</span></pre>
+</div>
+
+        <p>الآن في ملف آخر <strong>داخل نفس المجلد</strong>، مثل <code>main.py</code>، تستوردها كأي وحدة:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>main.py</span>
+    </div>
+<pre><span class="kw">import</span> tools
+<span class="kw">from</span> tools <span class="kw">import</span> greet
+
+<span class="fn">print</span>(<span class="fn">greet</span>(<span class="str">"سارة"</span>))
+<span class="fn">print</span>(<span class="str">"السعر مع الضريبة:"</span>, tools.<span class="fn">add_tax</span>(<span class="num">100</span>))
+<span class="fn">print</span>(<span class="str">"نسبة الضريبة:"</span>, tools.TAX_RATE)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>أهلًا يا سارة!
+السعر مع الضريبة: 115.0
+نسبة الضريبة: 0.15</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الشرط if __name__ == "__main__"</p>
+        <p>
+            عند استيراد ملف، تُنفَّذ كل أوامره! لكي تضع كود تجربة لا يعمل إلا عند تشغيل الملف <strong>مباشرة</strong>
+            (وليس عند استيراده)، نستخدم هذا الشرط:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>name_main.py</span>
+    </div>
+<pre><span class="kw">def</span> <span class="fn">add_tax</span>(price):
+    <span class="kw">return</span> <span class="fn">round</span>(price * <span class="num">1.15</span>, <span class="num">2</span>)
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    <span class="cm"># هذا الجزء يعمل فقط عند تشغيل الملف مباشرة</span>
+    <span class="fn">print</span>(<span class="str">"اختبار:"</span>, <span class="fn">add_tax</span>(<span class="num">200</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>اختبار: 230.0</pre>
+</div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>كيف يعمل؟</strong> عند تشغيل الملف مباشرة تضع Python في المتغير <code>__name__</code> القيمة
+                <code>"__main__"</code>، أما عند استيراده فتكون القيمة اسم الوحدة (مثل <code>"tools"</code>)، فلا يُنفَّذ الجزء الداخلي.
+            </div>
+        </div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>خطأ شائع جدًا:</strong> لا تسمِّ ملفك باسم وحدة موجودة مثل <code>random.py</code> أو <code>math.py</code>!
+                عندها ستستورد Python ملفك بدل الوحدة الأصلية، وستظهر أخطاء غريبة مثل
+                <code>AttributeError: module 'random' has no attribute 'randint'</code>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="pip">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-download"></i>
+        تثبيت المكتبات الخارجية بـ pip
+    </h2>
+        <p>
+            هناك أكثر من <strong>500 ألف</strong> مكتبة خارجية على موقع <strong>PyPI</strong>.
+            تُثبَّت باستخدام أداة <code>pip</code> من <strong>الطرفية (Terminal)</strong> وليس من داخل ملف Python:
+        </p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+                <span>سطر الأوامر</span>
+            </div>
+<pre>pip install requests          # تثبيت مكتبة
+pip install --upgrade requests # تحديثها
+pip list                       # عرض المكتبات المثبتة
+pip uninstall requests         # إزالتها</pre>
+        </div>
+        <p>بعد التثبيت تستوردها مثل أي وحدة:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>use_requests.py</span>
+    </div>
+<pre><span class="kw">import</span> requests
+
+response = requests.<span class="fn">get</span>(<span class="str">"https://api.github.com"</span>)
+<span class="fn">print</span>(response.status_code)</pre>
+</div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>على Windows:</strong> إذا لم يعمل الأمر <code>pip</code> جرّب <code>py -m pip install requests</code>.
+                وفي المستوى المتقدم ستتعلم <strong>البيئات الافتراضية (venv)</strong> لعزل مكتبات كل مشروع.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="practice">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-laptop-code"></i>
+        مثال تطبيقي: مولّد كلمات مرور وحاسبة عمر
+    </h2>
+        <p>لنستخدم عدة وحدات معًا في برنامج واحد:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>password_age.py</span>
+    </div>
+<pre><span class="kw">import</span> random
+<span class="kw">import</span> string
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+
+random.<span class="fn">seed</span>(<span class="num">2025</span>)
+
+
+<span class="kw">def</span> <span class="fn">make_password</span>(length=<span class="num">12</span>):
+    chars = string.ascii_letters + string.digits + <span class="str">"!@#$%"</span>
+    <span class="kw">return</span> <span class="str">""</span>.<span class="fn">join</span>(random.<span class="fn">choice</span>(chars) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(length))
+
+
+<span class="kw">def</span> <span class="fn">age_on</span>(birth, today):
+    years = today.year - birth.year
+    <span class="kw">if</span> (today.month, today.day) &lt; (birth.month, birth.day):
+        years -= <span class="num">1</span>          <span class="cm"># لم يأتِ عيد ميلاده بعد هذه السنة</span>
+    <span class="kw">return</span> years
+
+
+<span class="fn">print</span>(<span class="str">"🔐 كلمة مرور قوية:"</span>, <span class="fn">make_password</span>())
+<span class="fn">print</span>(<span class="str">"🔐 كلمة مرور قصيرة:"</span>, <span class="fn">make_password</span>(<span class="num">8</span>))
+
+birth = <span class="fn">date</span>(<span class="num">2001</span>, <span class="num">9</span>, <span class="num">20</span>)
+today = <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">6</span>, <span class="num">15</span>)
+<span class="fn">print</span>(<span class="str">"🎂 العمر:"</span>, <span class="fn">age_on</span>(birth, today), <span class="str">"سنة"</span>)
+<span class="fn">print</span>(<span class="str">"📅 عدد الأيام التي عشتها:"</span>, (today - birth).days, <span class="str">"يومًا"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>🔐 كلمة مرور قوية: k9waVWDiWZmf
+🔐 كلمة مرور قصيرة: pBWm0gd$
+🎂 العمر: 23 سنة
+📅 عدد الأيام التي عشتها: 8669 يومًا</pre>
+</div>
+
+        <div class="note-box">
+            <strong>🔍 ماذا استخدمنا في هذا المثال؟</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> <code>string</code> للحصول على كل الحروف والأرقام جاهزة.</li>
+                <li><i class="fas fa-angle-left"></i> <code>random.choice</code> لاختيار حرف عشوائي في كل خطوة.</li>
+                <li><i class="fas fa-angle-left"></i> <code>date</code> لحساب العمر وعدد الأيام بدقة.</li>
+                <li><i class="fas fa-angle-left"></i> مقارنة الصفوف <code>(month, day)</code> التي تعلمتها في درس الصفوف!</li>
+            </ul>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>للأمان الحقيقي:</strong> في التطبيقات الحقيقية تُولَّد كلمات المرور باستخدام وحدة
+                <code>secrets</code> بدل <code>random</code>، لأنها مصممة للأغراض الأمنية.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">10</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! مع &lt;code&gt;from ... import&lt;/code&gt; نستخدم اسم الدالة مباشرة." data-hint="عند استيراد الدالة نفسها، لم يعد اسم الوحدة &lt;code&gt;math&lt;/code&gt; معرّفًا في البرنامج.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">صيغة الاستيراد</span>
+    </div>
+    <p class="exercise-question">كتبنا <code>from math import sqrt</code>. كيف نستدعي دالة الجذر التربيعي بعد ذلك؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>math.sqrt(16)</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> <code>sqrt(16)</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> <code>math(sqrt(16))</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>import sqrt(16)</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! فهمت الوحدات جيدًا." data-hint="&lt;code&gt;randint&lt;/code&gt; تشمل الطرفين، و &lt;code&gt;math&lt;/code&gt; من المكتبة القياسية الجاهزة.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>random.randint(1, 6)</code> قد تُرجع الرقم 6.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يجب تثبيت وحدة <code>math</code> بـ pip قبل استخدامها.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>math.ceil(4.2)</code> تُرجع 5.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يُفضّل استخدام <code>from module import *</code> في البرامج الكبيرة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">يمكن استيراد ملف <code>.py</code> كتبته بنفسك كوحدة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="رائع! لاحظ أن &lt;code&gt;sqrt&lt;/code&gt; تُرجع دائمًا عددًا عشريًا 9.0." data-hint="&lt;code&gt;floor&lt;/code&gt; تقرّب لأسفل، و &lt;code&gt;sqrt&lt;/code&gt; تُرجع float، و 3! = 6.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه البرنامج التالي؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">import</span> math
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+
+<span class="fn">print</span>(math.<span class="fn">floor</span>(<span class="num">7.9</span>))
+<span class="fn">print</span>(math.<span class="fn">sqrt</span>(<span class="num">81</span>))
+<span class="fn">print</span>(math.<span class="fn">factorial</span>(<span class="num">3</span>))
+<span class="fn">print</span>((<span class="fn">date</span>(<span class="num">2025</span>, <span class="num">1</span>, <span class="num">31</span>) - <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">1</span>, <span class="num">1</span>)).days)</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="7" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="9.0" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثالث:</span><input type="text" class="blank-input" data-answers="6" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الرابع:</span><input type="text" class="blank-input" data-answers="30" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! &lt;code&gt;randint&lt;/code&gt; للأرقام و &lt;code&gt;choice&lt;/code&gt; لاختيار عنصر من قائمة." data-hint="أولًا استورد الوحدة، ثم دالة الرقم الصحيح العشوائي، ثم دالة الاختيار من قائمة.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">لعبة النرد</span>
+    </div>
+    <p class="exercise-question">أكمل البرنامج ليرمي نردًا عشوائيًا (1 إلى 6) ويختار لاعبًا عشوائيًا:</p>
+    <div class="code-fill">
+        <div class="line"><input type="text" class="blank-input" data-answers="import" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"><span> random</span></div>
+        <div class="line"><span>dice = random.</span><input type="text" class="blank-input" data-answers="randint" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"><span>(<span class="num">1</span>, <span class="num">6</span>)</span></div>
+        <div class="line"><span>players = [<span class="str">'علي'</span>, <span class="str">'منى'</span>, <span class="str">'سعد'</span>]</span></div>
+        <div class="line"><span>player = random.</span><input type="text" class="blank-input" data-answers="choice" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"><span>(players)</span></div>
+        <div class="line"><span><span class="fn">print</span>(player, <span class="str">'حصل على'</span>, dice)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب صحيح! الاستيراد دائمًا أولًا، ثم البيانات، ثم الحساب والطباعة." data-hint="سطر &lt;code&gt;import&lt;/code&gt; يأتي في أعلى الملف دائمًا.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب الأسطر لبرنامج يحسب عدد الأيام المتبقية على موعد معيّن. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">remaining = (exam - today).days</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">today = date(2025, 6, 1)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">print(&#x27;باقي&#x27;, remaining, &#x27;يومًا&#x27;)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">from datetime import date</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">exam = date(2025, 6, 20)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر الوحدات: math و random</div>
+    <p style="color:var(--text-light); font-size:0.95em;">أدخل رقمًا وجرّب دوال <code>math</code>، أو اضغط أزرار <code>random</code> عدة مرات ولاحظ أن النتيجة تتغير في كل مرة.</p>
+    <div class="lab-row">
+        <label>x =</label>
+        <input type="number" class="lab-input" id="mathX" value="7.5" step="any" style="direction:ltr; max-width:140px;">
+        <button class="btn btn-secondary" onclick="mathOp('sqrt')">math.sqrt(x)</button>
+        <button class="btn btn-secondary" onclick="mathOp('ceil')">math.ceil(x)</button>
+        <button class="btn btn-secondary" onclick="mathOp('floor')">math.floor(x)</button>
+        <button class="btn btn-secondary" onclick="mathOp('factorial')">math.factorial(x)</button>
+    </div>
+    <div class="lab-row">
+        <button class="btn btn-primary" onclick="randOp('dice')"><i class="fas fa-dice"></i> random.randint(1, 6)</button>
+        <button class="btn btn-primary" onclick="randOp('choice')">random.choice(colors)</button>
+        <button class="btn btn-primary" onclick="randOp('sample')">random.sample(range(1, 50), 6)</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('modConsole').innerHTML=''"><i class="fas fa-eraser"></i> مسح</button>
+    </div>
+    <div class="lab-console" id="modConsole"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">11</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> الوحدة ملف Python، والمكتبة مجموعة وحدات، والمكتبة القياسية تأتي جاهزة مع Python.</li>
+                <li><i class="fas fa-check"></i> طرق الاستيراد: <code>import</code>، <code>from ... import</code>، <code>as</code>، ولماذا نتجنب <code>import *</code>.</li>
+                <li><i class="fas fa-check"></i> وحدة <code>math</code>: الجذر، التقريب، المضروب، والثوابت.</li>
+                <li><i class="fas fa-check"></i> وحدة <code>random</code>: <code>randint</code>, <code>choice</code>, <code>sample</code>, <code>shuffle</code>, <code>seed</code>.</li>
+                <li><i class="fas fa-check"></i> وحدة <code>datetime</code>: إنشاء التواريخ، <code>timedelta</code>، الفروق، والتنسيق بـ <code>strftime</code>.</li>
+                <li><i class="fas fa-check"></i> استكشاف الوحدات بـ <code>dir()</code> و <code>help()</code>.</li>
+                <li><i class="fas fa-check"></i> إنشاء وحداتك الخاصة واستخدام <code>if __name__ == "__main__"</code>.</li>
+                <li><i class="fas fa-check"></i> تثبيت المكتبات الخارجية بـ <code>pip</code>.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> قبل أن تكتب دالة معقدة، ابحث: ربما توجد في المكتبة القياسية.</li>
+                <li><i class="fas fa-lightbulb"></i> ضع أسطر الاستيراد في أعلى الملف دائمًا.</li>
+                <li><i class="fas fa-lightbulb"></i> لا تسمِّ ملفاتك بأسماء وحدات موجودة مثل <code>random.py</code>.</li>
+                <li><i class="fas fa-lightbulb"></i> قسّم مشاريعك الكبيرة إلى عدة ملفات (وحدات) منظمة.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم والأخير من مستوى المبتدئين ستتعلم <strong>قراءة رسائل الأخطاء وتصحيحها (Debugging)</strong> — مهارة يحتاجها كل مبرمج يوميًا.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson13.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 13: المجموعات (Sets)</span>
+        </a>
+        <a href="lesson15.html" class="nav-link next">
+            <span>الدرس التالي: قراءة الأخطاء وتصحيحها</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · الوحدات والمكتبات
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '93%';
+            text.textContent = '93% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر الوحدات ========== */
+    function mathOp(fn) {
+        const out = document.getElementById('modConsole');
+        const raw = document.getElementById('mathX').value.trim();
+        const x = parseFloat(raw);
+        const shown = raw === '' ? '?' : raw;
+        const code = `math.${fn}(${shown})`;
+        try {
+            if (isNaN(x)) throw "TypeError: must be real number, not str";
+            if (fn === 'sqrt') {
+                if (x < 0) throw 'ValueError: math domain error';
+                consoleLine(out, code, pyRepr(new PyFloat(Math.sqrt(x))));
+            } else if (fn === 'ceil') {
+                consoleLine(out, code, String(Math.ceil(x)));
+            } else if (fn === 'floor') {
+                consoleLine(out, code, String(Math.floor(x)));
+            } else if (fn === 'factorial') {
+                if (!Number.isInteger(x)) throw 'TypeError: factorial() only accepts integral values';
+                if (x < 0) throw 'ValueError: factorial() not defined for negative values';
+                if (x > 170) throw 'هذا المختبر يدعم الأرقام حتى 170 فقط';
+                let r = 1n;
+                for (let i = 2n; i <= BigInt(x); i++) r *= i;
+                consoleLine(out, code, r.toString());
+            }
+        } catch (err) {
+            consoleLine(out, code, err, true);
+        }
+    }
+
+    function randInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+    function randOp(kind) {
+        const out = document.getElementById('modConsole');
+        if (kind === 'dice') {
+            consoleLine(out, 'random.randint(1, 6)', String(randInt(1, 6)));
+        } else if (kind === 'choice') {
+            const colors = ['أحمر', 'أخضر', 'أزرق', 'أصفر'];
+            consoleLine(out, 'random.choice(colors)', pyRepr(colors[randInt(0, colors.length - 1)]));
+        } else {
+            const pool = Array.from({ length: 49 }, (_, i) => i + 1);
+            const pick = [];
+            for (let i = 0; i < 6; i++) pick.push(pool.splice(randInt(0, pool.length - 1), 1)[0]);
+            consoleLine(out, 'random.sample(range(1, 50), 6)', pyRepr(pick));
+        }
+    }
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

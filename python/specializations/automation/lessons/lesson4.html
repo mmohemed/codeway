@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 4: معالجة النصوص والتعابير النمطية | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص الأتمتة</a>
+        <span class="sep">/</span>
+        <span>النصوص و Regex</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-search"></i>
+            الدرس 4 · النصوص
+        </div>
+        <h1 class="lesson-title">معالجة النصوص والتعابير النمطية (Regex)</h1>
+        <p class="lesson-intro">
+            مئات الرسائل فيها أرقام فواتير ومبالغ وتواريخ؟ ملف سجلات من آلاف الأسطر؟ قائمة أسماء عربية مكتوبة بأشكال مختلفة؟ في هذا الدرس ستتعلم <strong>أدوات النصوص المدمجة</strong>، ثم <strong>التعابير النمطية (Regex)</strong> للبحث عن الأنماط، و<strong>المجموعات المسماة</strong> لاستخراج الحقول، و<strong>الاستبدال الذكي</strong> لإخفاء البيانات وتوحيد التواريخ، و<strong>تطبيع النص العربي</strong>، ثم تحلل <strong>ملف سجلات حقيقي</strong> وتتجنب أشهر الأخطاء.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 75 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 استخراج البيانات من أي نص</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 3</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#strings">1. أدوات النصوص</a>
+            <a href="#basics">2. أساسيات Regex</a>
+            <a href="#groups">3. المجموعات</a>
+            <a href="#sub">4. الاستبدال</a>
+            <a href="#arabic">5. النص العربي</a>
+            <a href="#logs">6. تحليل السجلات</a>
+            <a href="#pitfalls">7. الأخطاء الشائعة</a>
+            <a href="#exercises">8. تمارين تفاعلية</a>
+            <a href="#summary">9. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="strings">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-font"></i>
+        ابدأ بأدوات النصوص المدمجة
+    </h2>
+        <p>
+            قبل التعابير النمطية، تذكّر أن كثيرًا من مهام النصوص تُحل بدوال <code>str</code> البسيطة، وهي أسرع وأوضح للقارئ.
+            القاعدة الذهبية: <strong>إذا كان النص ثابتًا استخدم دوال النص، وإذا كان «نمطًا» متغيرًا استخدم Regex</strong>.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>string_tools.py</span>
+    </div>
+<pre>raw = <span class="str">"  Ahmed.ALI@Example.COM ;  sara@mail.com;; khaled@site.org  "</span>
+emails = [e.<span class="fn">strip</span>().<span class="fn">lower</span>() <span class="kw">for</span> e <span class="kw">in</span> raw.<span class="fn">split</span>(<span class="str">";"</span>) <span class="kw">if</span> e.<span class="fn">strip</span>()]
+<span class="fn">print</span>(emails)
+
+name = <span class="str">"تقرير المبيعات - مارس.xlsx"</span>
+<span class="fn">print</span>(name.<span class="fn">startswith</span>(<span class="str">"تقرير"</span>), name.<span class="fn">endswith</span>((<span class="str">".xlsx"</span>, <span class="str">".csv"</span>)))
+<span class="fn">print</span>(name.<span class="fn">replace</span>(<span class="str">" "</span>, <span class="str">"_"</span>))
+
+line = <span class="str">"INV-2025-0042 | 1,250.50 SAR | مدفوعة"</span>
+inv, amount, status = [part.<span class="fn">strip</span>() <span class="kw">for</span> part <span class="kw">in</span> line.<span class="fn">split</span>(<span class="str">"|"</span>)]
+value = <span class="fn">float</span>(amount.<span class="fn">replace</span>(<span class="str">" SAR"</span>, <span class="str">""</span>).<span class="fn">replace</span>(<span class="str">","</span>, <span class="str">""</span>))
+<span class="fn">print</span>(inv, value, status)
+<span class="fn">print</span>(<span class="str">"رقم الفاتورة يبدأ بـ INV؟"</span>, inv.<span class="fn">startswith</span>(<span class="str">"INV"</span>), <span class="str">"| رقمها:"</span>, inv.<span class="fn">rsplit</span>(<span class="str">"-"</span>, <span class="num">1</span>)[<span class="num">1</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>['ahmed.ali@example.com', 'sara@mail.com', 'khaled@site.org']
+True True
+تقرير_المبيعات_-_مارس.xlsx
+INV-2025-0042 1250.5 مدفوعة
+رقم الفاتورة يبدأ بـ INV؟ True | رقمها: 0042</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الدالة</th><th>ماذا تفعل</th><th>مثال</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>strip()</code></td><td>تحذف المسافات من الطرفين</td><td><code>" a ".strip()</code> ← <code>'a'</code></td></tr>
+                    <tr><td><code>split(sep)</code></td><td>تقسم النص إلى قائمة</td><td><code>"a;b".split(";")</code></td></tr>
+                    <tr><td><code>rsplit(sep, 1)</code></td><td>تقسم من اليمين مرة واحدة</td><td>آخر جزء بعد الشرطة</td></tr>
+                    <tr><td><code>replace(a, b)</code></td><td>تستبدل نصًا ثابتًا</td><td>حذف الفواصل من المبالغ</td></tr>
+                    <tr><td><code>startswith / endswith</code></td><td>تفحص البداية والنهاية (وتقبل مجموعة)</td><td><code>endswith((".xlsx", ".csv"))</code></td></tr>
+                    <tr><td><code>lower / upper</code></td><td>توحيد حالة الأحرف</td><td>مقارنة البريد الإلكتروني</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                لكن ماذا لو أردت <strong>كل أرقام الجوال</strong> في رسالة، أو <strong>كل التواريخ</strong> أيًا كان مكانها؟ هنا لا يكفي <code>split</code>
+                ونحتاج لغة لوصف «شكل» النص: التعابير النمطية.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="basics">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-asterisk"></i>
+        أساسيات التعابير النمطية
+    </h2>
+        <p>
+            التعبير النمطي (Regular Expression) هو «قالب» يصف شكل النص. مثلًا <code>05\d{8}</code> تعني: «05 ثم ثمانية أرقام» — أي رقم جوال سعودي.
+            نستخدم الوحدة المدمجة <code>re</code>، ونكتب الأنماط دائمًا كنص خام <code>r"..."</code> حتى لا تفسر بايثون الشرطة المائلة <code>\</code>.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>first_regex.py</span>
+    </div>
+<pre><span class="kw">import</span> re
+
+text = <span class="str">"اتصل على 0551234567 أو 0509876543، والطلب رقم 4471 بتاريخ 2025-03-14"</span>
+
+<span class="fn">print</span>(re.<span class="fn">findall</span>(<span class="str">r"05\d{8}"</span>, text))          <span class="cm"># كل أرقام الجوال</span>
+<span class="fn">print</span>(re.<span class="fn">findall</span>(<span class="str">r"\d+"</span>, text))              <span class="cm"># كل الأعداد</span>
+m = re.<span class="fn">search</span>(<span class="str">r"\d{4}-\d{2}-\d{2}"</span>, text)    <span class="cm"># أول تاريخ</span>
+<span class="fn">print</span>(m.<span class="fn">group</span>(), <span class="str">"| من الموضع"</span>, m.<span class="fn">start</span>(), <span class="str">"إلى"</span>, m.<span class="fn">end</span>())
+<span class="fn">print</span>(re.<span class="fn">search</span>(<span class="str">r"\d{3}-\d{3}"</span>, text))       <span class="cm"># لا يوجد تطابق ← None</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>['0551234567', '0509876543']
+['0551234567', '0509876543', '4471', '2025', '03', '14']
+2025-03-14 | من الموضع 58 إلى 68
+None</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الرمز</th><th>المعنى</th><th>مثال يطابق</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>\d</code></td><td>رقم</td><td><code>7</code></td></tr>
+                    <tr><td><code>\w</code></td><td>حرف أو رقم أو _ (يشمل الحروف العربية)</td><td><code>a</code>، <code>س</code>، <code>_</code></td></tr>
+                    <tr><td><code>\s</code></td><td>مسافة أو سطر جديد أو Tab</td><td><code>" "</code></td></tr>
+                    <tr><td><code>.</code></td><td>أي حرف ما عدا السطر الجديد</td><td><code>x</code>، <code>@</code></td></tr>
+                    <tr><td><code>[abc]</code> / <code>[0-9]</code></td><td>حرف واحد من المجموعة</td><td><code>[A-Z]</code> حرف إنجليزي كبير</td></tr>
+                    <tr><td><code>[^...]</code></td><td>أي حرف <strong>ليس</strong> في المجموعة</td><td><code>[^,]+</code> نص بلا فواصل</td></tr>
+                    <tr><td><code>+</code> / <code>*</code> / <code>?</code></td><td>مرة أو أكثر / صفر أو أكثر / اختياري</td><td><code>\d+</code>، <code>\s*</code>، <code>https?</code></td></tr>
+                    <tr><td><code>{n}</code> / <code>{n,m}</code></td><td>عدد محدد من التكرار</td><td><code>\d{4}</code> أربعة أرقام</td></tr>
+                    <tr><td><code>^</code> / <code>$</code></td><td>بداية النص / نهايته</td><td><code>^INV</code></td></tr>
+                    <tr><td><code>a|b</code></td><td>هذا أو ذاك</td><td><code>ERROR|WARNING</code></td></tr>
+                    <tr><td><code>\b</code></td><td>حد الكلمة</td><td><code>\bcat\b</code> لا تطابق داخل category</td></tr>
+                    <tr><td><code>\.</code> <code>\(</code> <code>\+</code></td><td>الرموز الخاصة كحرف عادي</td><td><code>\.</code> نقطة حقيقية</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الدالة</th><th>تُرجع</th><th>متى تستخدمها</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>re.search(p, t)</code></td><td>أول تطابق (كائن Match) أو <code>None</code></td><td>هل يوجد؟ وأين؟</td></tr>
+                    <tr><td><code>re.match(p, t)</code></td><td>تطابق من <strong>بداية</strong> النص فقط</td><td>فحص بداية السطر</td></tr>
+                    <tr><td><code>re.fullmatch(p, t)</code></td><td>تطابق للنص <strong>كاملًا</strong></td><td>التحقق من صحة المدخلات</td></tr>
+                    <tr><td><code>re.findall(p, t)</code></td><td>قائمة بكل التطابقات (نصوص)</td><td>استخراج سريع</td></tr>
+                    <tr><td><code>re.finditer(p, t)</code></td><td>كائنات Match واحدًا تلو الآخر</td><td>عندما تحتاج المجموعات والمواضع</td></tr>
+                    <tr><td><code>re.sub(p, r, t)</code></td><td>نص جديد بعد الاستبدال</td><td>التنظيف والإخفاء</td></tr>
+                    <tr><td><code>re.split(p, t)</code></td><td>قائمة بعد التقسيم بنمط</td><td>فواصل متعددة</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>تحقق دائمًا من <code>None</code>:</strong> إذا لم يجد <code>re.search</code> شيئًا ثم كتبت <code>m.group()</code> مباشرة
+                ستحصل على <code>AttributeError: 'NoneType' object has no attribute 'group'</code>. اكتب: <code>if m: ...</code>
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="groups">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-object-group"></i>
+        المجموعات: استخراج الحقول
+    </h2>
+        <p>
+            الأقواس <code>( )</code> تصنع <strong>مجموعة</strong> تلتقط جزءًا من التطابق. ومع <code>(?P&lt;name&gt;...)</code> تعطيها اسمًا،
+            فتحصل على قاموس جاهز بـ <code>groupdict()</code>. لنستخرج بيانات الفواتير من رسائل بريد مختلفة الصياغة:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>invoices_regex.py</span>
+    </div>
+<pre><span class="kw">import</span> re
+
+emails = <span class="str">"""
+فاتورة INV-2025-0042 من شركة النور بمبلغ 1,250.50 ريال بتاريخ 2025-03-14
+فاتورة INV-2025-0043 من مؤسسة الأفق بمبلغ 980 ريال بتاريخ 2025-03-15
+تذكير: الفاتورة INV-2025-0039 متأخرة بمبلغ 4,600.00 ريال بتاريخ 2025-02-28
+"""</span>
+
+pattern = re.<span class="fn">compile</span>(
+    <span class="str">r"(?P&lt;inv&gt;INV-\d{4}-\d{4})"</span>            <span class="cm"># رقم الفاتورة</span>
+    <span class="str">r".*?بمبلغ (?P&lt;amount&gt;[\d,]+(?:\.\d+)?)"</span>  <span class="cm"># المبلغ (بفواصل وكسور اختيارية)</span>
+    <span class="str">r" ريال بتاريخ (?P&lt;date&gt;\d{4}-\d{2}-\d{2})"</span>
+)
+
+invoices = []
+<span class="kw">for</span> m <span class="kw">in</span> pattern.<span class="fn">finditer</span>(emails):
+    row = m.<span class="fn">groupdict</span>()
+    row[<span class="str">"amount"</span>] = <span class="fn">float</span>(row[<span class="str">"amount"</span>].<span class="fn">replace</span>(<span class="str">","</span>, <span class="str">""</span>))
+    invoices.<span class="fn">append</span>(row)
+    <span class="fn">print</span>(row)
+
+<span class="fn">print</span>(<span class="str">f"الإجمالي: {sum(r['amount'] for r in invoices):,.2f} ريال"</span>)
+<span class="fn">print</span>(<span class="str">"المتأخرة قبل مارس:"</span>, [r[<span class="str">"inv"</span>] <span class="kw">for</span> r <span class="kw">in</span> invoices <span class="kw">if</span> r[<span class="str">"date"</span>] &lt; <span class="str">"2025-03-01"</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>{'inv': 'INV-2025-0042', 'amount': 1250.5, 'date': '2025-03-14'}
+{'inv': 'INV-2025-0043', 'amount': 980.0, 'date': '2025-03-15'}
+{'inv': 'INV-2025-0039', 'amount': 4600.0, 'date': '2025-02-28'}
+الإجمالي: 6,830.50 ريال
+المتأخرة قبل مارس: ['INV-2025-0039']</pre>
+</div>
+        <ul>
+            <li><code>(?:...)</code> مجموعة <strong>لا تلتقط</strong> — للتجميع فقط، مثل <code>(?:\.\d+)?</code> «كسر عشري اختياري».</li>
+            <li><code>.*?</code> «أي شيء بأقل قدر ممكن» حتى نصل إلى كلمة <code>بمبلغ</code> (سنفهمها أكثر في قسم الأخطاء).</li>
+            <li>مقارنة التواريخ كنصوص تعمل هنا لأن الصيغة <code>YYYY-MM-DD</code> مرتبة من الأكبر للأصغر.</li>
+        </ul>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الأنماط الطويلة بوضع VERBOSE</p>
+        <p>
+            مع <code>re.VERBOSE</code> تُتجاهل المسافات والأسطر داخل النمط، فتكتبه على عدة أسطر مع تعليقات — مثل الكود العادي:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>verbose_regex.py</span>
+    </div>
+<pre><span class="kw">import</span> re
+
+PHONE = re.<span class="fn">compile</span>(<span class="str">r"""
+    (?:\+966|00966|0)   # المقدمة الدولية أو الصفر
+    (?P&lt;number&gt;5\d{8})  # يبدأ بـ 5 ثم 8 أرقام
+"""</span>, re.VERBOSE)
+
+messages = [<span class="str">"جوالي 0551234567"</span>, <span class="str">"اتصل +966509876543"</span>, <span class="str">"الرقم 00966531112222"</span>, <span class="str">"هاتف المكتب 0114567890"</span>]
+<span class="kw">for</span> msg <span class="kw">in</span> messages:
+    m = PHONE.<span class="fn">search</span>(msg)
+    <span class="fn">print</span>(<span class="str">f"{msg:&lt;24} ← {'+966' + m['number'] if m else 'لا يوجد جوال'}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>جوالي 0551234567         ← +966551234567
+اتصل +966509876543       ← +966509876543
+الرقم 00966531112222     ← +966531112222
+هاتف المكتب 0114567890   ← لا يوجد جوال</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>توحيد الصيغة:</strong> لاحظ أننا حولنا كل الأشكال المختلفة إلى صيغة واحدة <code>+9665XXXXXXXX</code>. هذا ما تحتاجه قبل
+                حفظ الأرقام في قاعدة بيانات أو إرسال رسائل لها. و <code>m['number']</code> اختصار لـ <code>m.group('number')</code>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="sub">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-exchange-alt"></i>
+        الاستبدال الذكي بـ re.sub
+    </h2>
+        <p>
+            <code>re.sub</code> تستبدل كل تطابق. والمعامل الثاني إما نص (يمكن أن يحتوي <code>\1</code> للإشارة لمجموعة) أو <strong>دالة</strong>
+            تستقبل التطابق وتُرجع البديل — وهنا القوة الحقيقية:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>sub_examples.py</span>
+    </div>
+<pre><span class="kw">import</span> re
+
+<span class="cm"># 1) إخفاء البيانات الشخصية قبل مشاركة ملف</span>
+msg = <span class="str">"تواصل مع أحمد على 0551234567 أو ahmed.ali@example.com، وسارة 0509876543"</span>
+masked = re.<span class="fn">sub</span>(<span class="str">r"05\d{8}"</span>, <span class="kw">lambda</span> m: m.<span class="fn">group</span>()[:<span class="num">3</span>] + <span class="str">"*****"</span> + m.<span class="fn">group</span>()[-<span class="num">2</span>:], msg)
+masked = re.<span class="fn">sub</span>(<span class="str">r"[\w.+-]+@([\w-]+\.[\w.]+)"</span>, <span class="str">r"***@\1"</span>, masked)
+<span class="fn">print</span>(masked)
+
+<span class="cm"># 2) توحيد التواريخ من 14/03/2025 إلى 2025-03-14</span>
+dates = <span class="str">"تسليم 14/03/2025 ومراجعة 3/4/2025 وإغلاق 2025-04-20"</span>
+iso = re.<span class="fn">sub</span>(<span class="str">r"\b(\d{1,2})/(\d{1,2})/(\d{4})\b"</span>,
+             <span class="kw">lambda</span> m: <span class="str">f"{m[3]}-{int(m[2]):02d}-{int(m[1]):02d}"</span>, dates)
+<span class="fn">print</span>(iso)
+
+<span class="cm"># 3) تنظيف المسافات الزائدة</span>
+<span class="fn">print</span>(re.<span class="fn">sub</span>(<span class="str">r"\s+"</span>, <span class="str">" "</span>, <span class="str">"  كلمات   بمسافات \n\t كثيرة  "</span>).<span class="fn">strip</span>())
+
+<span class="cm"># 4) التقسيم بأكثر من فاصل (بما فيها الفاصلة العربية)</span>
+<span class="fn">print</span>(re.<span class="fn">split</span>(<span class="str">r"[,;،\s]+"</span>, <span class="str">"تفاح، موز;برتقال  , عنب"</span>))
+
+<span class="cm"># 5) كم مرة استبدلنا؟</span>
+new_text, count = re.<span class="fn">subn</span>(<span class="str">r"\bcolour\b"</span>, <span class="str">"color"</span>, <span class="str">"colour, Colour and colour"</span>)
+<span class="fn">print</span>(new_text, <span class="str">"| الاستبدالات:"</span>, count)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>تواصل مع أحمد على 055*****67 أو ***@example.com، وسارة 050*****43
+تسليم 2025-03-14 ومراجعة 2025-04-03 وإغلاق 2025-04-20
+كلمات بمسافات كثيرة
+['تفاح', 'موز', 'برتقال', 'عنب']
+color, Colour and color | الاستبدالات: 2</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                في المثال الأخير لم تُستبدل <code>Colour</code> لأن البحث حساس لحالة الأحرف. أضف <code>flags=re.IGNORECASE</code> (أو <code>re.I</code>) ليتجاهلها.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="arabic">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-language"></i>
+        النص العربي: التطبيع والأرقام
+    </h2>
+        <p>
+            العربية تُكتب بأشكال كثيرة: <code>أحمد</code> و <code>احمد</code> و <code>أَحْمَـــد</code> هي الاسم نفسه للإنسان، لكنها نصوص مختلفة للحاسوب.
+            لذلك قبل البحث أو المقارنة أو حذف التكرار، نقوم بـ<strong>التطبيع (Normalization)</strong>:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>arabic_normalize.py</span>
+    </div>
+<pre><span class="kw">import</span> re
+
+TASHKEEL = re.<span class="fn">compile</span>(<span class="str">r"[ً-ْـ]"</span>)   <span class="cm"># الحركات والتطويل (ـ)</span>
+AR_DIGITS = str.<span class="fn">maketrans</span>(<span class="str">"٠١٢٣٤٥٦٧٨٩"</span>, <span class="str">"0123456789"</span>)
+
+
+<span class="kw">def</span> <span class="fn">normalize_ar</span>(text):
+    text = TASHKEEL.<span class="fn">sub</span>(<span class="str">""</span>, text)
+    text = re.<span class="fn">sub</span>(<span class="str">"[إأآ]"</span>, <span class="str">"ا"</span>, text)
+    text = text.<span class="fn">replace</span>(<span class="str">"ى"</span>, <span class="str">"ي"</span>).<span class="fn">replace</span>(<span class="str">"ة"</span>, <span class="str">"ه"</span>)
+    <span class="kw">return</span> text.<span class="fn">translate</span>(AR_DIGITS)
+
+
+names = [<span class="str">"أحمد"</span>, <span class="str">"احمد"</span>, <span class="str">"أَحْمَـــد"</span>, <span class="str">"إحمد"</span>]
+<span class="fn">print</span>(<span class="str">"بعد التطبيع:"</span>, {<span class="fn">normalize_ar</span>(n) <span class="kw">for</span> n <span class="kw">in</span> names})
+
+query = <span class="str">"مدرسة"</span>
+docs = [<span class="str">"المدرسه الأولى"</span>, <span class="str">"مَدْرَسَة النور"</span>, <span class="str">"مكتبة المدرسة"</span>, <span class="str">"مدرّب السباحة"</span>]
+<span class="fn">print</span>(<span class="str">"نتائج البحث:"</span>, [d <span class="kw">for</span> d <span class="kw">in</span> docs <span class="kw">if</span> <span class="fn">normalize_ar</span>(query) <span class="kw">in</span> <span class="fn">normalize_ar</span>(d)])
+
+<span class="fn">print</span>(<span class="fn">normalize_ar</span>(<span class="str">"رقم الطلب ٤٤٧١ بتاريخ ٢٠٢٥/٠٣/١٤"</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>بعد التطبيع: {'احمد'}
+نتائج البحث: ['المدرسه الأولى', 'مَدْرَسَة النور', 'مكتبة المدرسة']
+رقم الطلب 4471 بتاريخ 2025/03/14</pre>
+</div>
+        <p>
+            وهناك تفصيل مهم: في بايثون <code>\d</code> تطابق <strong>الأرقام العربية الهندية أيضًا</strong> (٠١٢٣…)، و <code>int()</code> تفهمها!
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>arabic_digits.py</span>
+    </div>
+<pre><span class="kw">import</span> re
+
+text = <span class="str">"الطلب ٤٤٧١ والكمية 12"</span>
+<span class="fn">print</span>(re.<span class="fn">findall</span>(<span class="str">r"\d+"</span>, text))                  <span class="cm"># تشمل ٤٤٧١</span>
+<span class="fn">print</span>(<span class="fn">int</span>(<span class="str">"٤٤٧١"</span>) + <span class="num">1</span>)                          <span class="cm"># int تفهم الأرقام العربية</span>
+<span class="fn">print</span>(re.<span class="fn">findall</span>(<span class="str">r"\d+"</span>, text, flags=re.ASCII))  <span class="cm"># الأرقام الإنجليزية فقط</span>
+<span class="fn">print</span>(re.<span class="fn">findall</span>(<span class="str">r"[0-9]+"</span>, text))               <span class="cm"># نفس النتيجة بطريقة صريحة</span>
+
+<span class="cm"># استخراج الكلمات العربية فقط من نص مختلط</span>
+<span class="fn">print</span>(re.<span class="fn">findall</span>(<span class="str">r"[ء-ي]+"</span>, <span class="str">"تعلم Python لغة البرمجة 3.13 بسهولة"</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>['٤٤٧١', '12']
+4472
+['12']
+['12']
+['تعلم', 'لغة', 'البرمجة', 'بسهولة']</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>متى لا تطبّع؟</strong> التطبيع للبحث والمقارنة فقط. لا تحفظ النص المطبّع مكان الأصلي، فـ <code>مدرسة</code> و <code>مدرسه</code>
+                صحيحتان في البحث لكن الأولى هي الإملاء الصحيح للعرض. احفظ الأصل، وطبّع نسخة منه عند المقارنة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="logs">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-file-alt"></i>
+        مشروع مصغر: تحليل ملف سجلات
+    </h2>
+        <p>
+            خادم ويب يكتب ملف <code>app.log</code> فيه 400 سطر يوميًا. المدير يسأل: كم خطأ حدث؟ في أي ساعة؟ ومن أي عنوان IP؟
+            هذه مهمة مثالية لـ Regex مع <code>Counter</code>. شكل الأسطر:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>peek_log.py</span>
+    </div>
+<pre><span class="kw">with</span> <span class="fn">open</span>(<span class="str">"app.log"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    lines = f.<span class="fn">read</span>().<span class="fn">splitlines</span>()
+<span class="fn">print</span>(<span class="str">"عدد الأسطر:"</span>, <span class="fn">len</span>(lines))
+<span class="kw">for</span> line <span class="kw">in</span> lines[:<span class="num">3</span>]:
+    <span class="fn">print</span>(line)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>عدد الأسطر: 402
+2025-03-14 08:00:03 INFO    [10.0.0.5] GET /api/orders time=219ms status=200
+2025-03-14 08:00:04 INFO    [172.16.0.3] GET /login time=317ms status=200
+2025-03-14 08:00:25 INFO    [172.16.0.3] GET /login time=257ms status=200</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>analyze_log.py</span>
+    </div>
+<pre><span class="kw">import</span> re
+<span class="kw">from</span> collections <span class="kw">import</span> Counter
+
+LINE = re.<span class="fn">compile</span>(<span class="str">r"""
+    ^(?P&lt;date&gt;\d{4}-\d{2}-\d{2})\s
+    (?P&lt;hour&gt;\d{2}):\d{2}:\d{2}\s
+    (?P&lt;level&gt;INFO|WARNING|ERROR)\s+
+    \[(?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3})\]\s
+    (?P&lt;msg&gt;.*)$
+"""</span>, re.VERBOSE)
+
+levels, error_hours, error_ips = <span class="fn">Counter</span>(), <span class="fn">Counter</span>(), <span class="fn">Counter</span>()
+bad_lines = []
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"app.log"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    <span class="kw">for</span> number, line <span class="kw">in</span> <span class="fn">enumerate</span>(f, start=<span class="num">1</span>):
+        m = LINE.<span class="kw">match</span>(line.<span class="fn">rstrip</span>(<span class="str">"\n"</span>))
+        <span class="kw">if</span> <span class="kw">not</span> m:
+            bad_lines.<span class="fn">append</span>(number)
+            <span class="kw">continue</span>
+        levels[m[<span class="str">"level"</span>]] += <span class="num">1</span>
+        <span class="kw">if</span> m[<span class="str">"level"</span>] == <span class="str">"ERROR"</span>:
+            error_hours[m[<span class="str">"hour"</span>]] += <span class="num">1</span>
+            error_ips[m[<span class="str">"ip"</span>]] += <span class="num">1</span>
+
+<span class="fn">print</span>(<span class="str">"المستويات:"</span>, <span class="fn">dict</span>(levels))
+<span class="fn">print</span>(<span class="str">"أكثر ساعات الأخطاء:"</span>, error_hours.<span class="fn">most_common</span>(<span class="num">3</span>))
+<span class="fn">print</span>(<span class="str">"أكثر العناوين أخطاءً:"</span>, error_ips.<span class="fn">most_common</span>(<span class="num">2</span>))
+<span class="fn">print</span>(<span class="str">"أسطر غير مفهومة:"</span>, bad_lines)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"app.log"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    content = f.<span class="fn">read</span>()
+<span class="fn">print</span>(<span class="str">"رموز الحالة:"</span>, <span class="fn">Counter</span>(re.<span class="fn">findall</span>(<span class="str">r"status=(\d{3})"</span>, content)).<span class="fn">most_common</span>())
+slow = [<span class="fn">int</span>(t) <span class="kw">for</span> t <span class="kw">in</span> re.<span class="fn">findall</span>(<span class="str">r"time=(\d+)ms"</span>, content) <span class="kw">if</span> <span class="fn">int</span>(t) &gt; <span class="num">1000</span>]
+<span class="fn">print</span>(<span class="str">f"الطلبات البطيئة (&gt; 1 ثانية): {len(slow)} | أبطأها {max(slow)}ms"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>المستويات: {'INFO': 316, 'WARNING': 30, 'ERROR': 54}
+أكثر ساعات الأخطاء: [('14', 41), ('13', 4), ('16', 3)]
+أكثر العناوين أخطاءً: [('192.168.1.20', 34), ('10.0.0.5', 7)]
+أسطر غير مفهومة: [121, 301]
+رموز الحالة: [('200', 329), ('502', 29), ('500', 25), ('401', 17)]
+الطلبات البطيئة (&gt; 1 ثانية): 13 | أبطأها 3932ms</pre>
+</div>
+        <p>
+            في ثوانٍ ظهرت الصورة: <strong>41 من 54 خطأ</strong> وقعت في الساعة 14، و<strong>34 خطأ</strong> من العنوان <code>192.168.1.20</code>.
+            هذا ما يحتاجه فريق الدعم ليبدأ التحقيق، بدل قراءة 400 سطر يدويًا.
+        </p>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>لا تتجاهل الأسطر غير المفهومة بصمت.</strong> سجّل أرقامها كما فعلنا؛ فقد تكشف سطرًا مهمًا (مثل إعادة تشغيل الخادم) أو تغيّرًا في شكل السجلات
+                يعني أن نمطك يحتاج تحديثًا. ومن هنا الخطوة الطبيعية التالية: حفظ النتيجة في Excel (الدرس 3) أو إرسالها بالبريد (الدرس 5).
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="pitfalls">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-bug"></i>
+        التحقق من المدخلات وأشهر الأخطاء
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>pitfalls.py</span>
+    </div>
+<pre><span class="kw">import</span> re
+
+<span class="cm"># 1) search تجد التطابق في أي مكان، و fullmatch تشترط النص كاملًا</span>
+EMAIL = re.<span class="fn">compile</span>(<span class="str">r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+"</span>)
+<span class="kw">for</span> e <span class="kw">in</span> [<span class="str">"sara@mail.com"</span>, <span class="str">"sara@mail"</span>, <span class="str">"x sara@mail.com y"</span>]:
+    <span class="fn">print</span>(<span class="str">f"{e!r:20} search={bool(EMAIL.search(e))!s:5}  fullmatch={bool(EMAIL.fullmatch(e))}"</span>)
+
+<span class="cm"># 2) الجشع: .* تأخذ أطول نص ممكن، و .*? أقصر نص</span>
+html = <span class="str">"&lt;b&gt;مهم&lt;/b&gt; و &lt;b&gt;عاجل&lt;/b&gt;"</span>
+<span class="fn">print</span>(<span class="str">"جشع :"</span>, re.<span class="fn">findall</span>(<span class="str">r"&lt;b&gt;(.*)&lt;/b&gt;"</span>, html))
+<span class="fn">print</span>(<span class="str">"كسول:"</span>, re.<span class="fn">findall</span>(<span class="str">r"&lt;b&gt;(.*?)&lt;/b&gt;"</span>, html))
+
+<span class="cm"># 3) البحث عن نص فيه رموز خاصة: استخدم re.escape</span>
+price = <span class="str">"العرض (1+1) مجانًا"</span>
+<span class="fn">print</span>(<span class="str">"بدون escape:"</span>, re.<span class="fn">findall</span>(<span class="str">"(1+1)"</span>, price))
+<span class="fn">print</span>(<span class="str">"مع escape  :"</span>, re.<span class="fn">findall</span>(re.<span class="fn">escape</span>(<span class="str">"(1+1)"</span>), price))
+
+<span class="cm"># 4) findall مع مجموعة واحدة تُرجع المجموعة فقط</span>
+<span class="fn">print</span>(re.<span class="fn">findall</span>(<span class="str">r"INV-(\d+)"</span>, <span class="str">"INV-17 و INV-18"</span>), re.<span class="fn">findall</span>(<span class="str">r"INV-\d+"</span>, <span class="str">"INV-17 و INV-18"</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>'sara@mail.com'      search=True   fullmatch=True
+'sara@mail'          search=False  fullmatch=False
+'x sara@mail.com y'  search=True   fullmatch=False
+جشع : ['مهم&lt;/b&gt; و &lt;b&gt;عاجل']
+كسول: ['مهم', 'عاجل']
+بدون escape: []
+مع escape  : ['(1+1)']
+['17', '18'] ['INV-17', 'INV-18']</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الخطأ</th><th>النتيجة</th><th>الحل</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>التحقق بـ <code>search</code></td><td>يقبل <code>"x sara@mail.com y"</code> كبريد صحيح</td><td><code>fullmatch</code></td></tr>
+                    <tr><td><code>.*</code> بين علامتين</td><td>يبتلع كل ما بينهما حتى آخر علامة</td><td><code>.*?</code> أو <code>[^&lt;]*</code></td></tr>
+                    <tr><td>نسيان <code>r""</code></td><td><code>"\b"</code> تصبح حرف Backspace</td><td>اكتب الأنماط دائمًا <code>r"..."</code></td></tr>
+                    <tr><td>البحث عن نص من المستخدم كنمط</td><td>رموز مثل <code>+ ( .</code> تغيّر المعنى</td><td><code>re.escape(text)</code></td></tr>
+                    <tr><td>نمط واحد عملاق لكل شيء</td><td>صعب القراءة ويكسر بسهولة</td><td>عدة أنماط بسيطة + <code>VERBOSE</code></td></tr>
+                    <tr><td>Regex لتحليل HTML أو JSON كامل</td><td>هش جدًا</td><td>BeautifulSoup (الدرس 6) و <code>json</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                نمط البريد هنا «عملي» وليس كاملًا؛ معيار البريد الإلكتروني معقد جدًا. للتحقق النهائي، أرسل رسالة تأكيد للعنوان — فهي الطريقة الوحيدة المؤكدة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! &lt;code&gt;findall&lt;/code&gt; تُرجع كل التطابقات، و &lt;code&gt;search&lt;/code&gt; تُرجع الأول فقط." data-hint="تحتاج «كل» التطابقات، ولا تنسَ الشرطة المائلة قبل d.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">اختيار النمط</span>
+    </div>
+    <p class="exercise-question">تريد استخراج <strong>كل</strong> أرقام الجوال السعودية (05 ثم 8 أرقام) من رسالة. أي سطر صحيح؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>re.search(r"05\d{8}", text)</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> <code>re.findall(r"05\d{8}", text)</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> <code>re.findall("05d{8}", text)</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>text.split("05")</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تفهم سلوك دوال re جيدًا." data-hint="النصوص في بايثون لا تتغير، و match تبحث من البداية فقط.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">في بايثون، <code>\d</code> تطابق الأرقام العربية الهندية مثل <code>٤٤٧١</code>.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>re.match</code> تبحث عن النمط في أي مكان من النص.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>.*?</code> تأخذ أقصر نص ممكن (كسولة).</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>re.sub</code> تعدّل النص الأصلي في مكانه.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>re.fullmatch</code> مناسبة للتحقق من صحة رقم أدخله المستخدم.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! لاحظ أن المجموعة في السطر الثاني جعلت findall تُرجع الأرقام فقط." data-hint="&lt;code&gt;ID&lt;/code&gt; حرفان متتاليان بلا رقم بعد الأول. و &lt;code&gt;\d&lt;/code&gt; وحدها رقم واحد في كل تطابق.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">findall</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">import</span> re
+t = <span class="str">"ID: A12, B7, C305"</span>
+<span class="fn">print</span>(re.<span class="fn">findall</span>(<span class="str">r"[A-Z]\d+"</span>, t))
+<span class="fn">print</span>(re.<span class="fn">findall</span>(<span class="str">r"[A-Z](\d+)"</span>, t))
+<span class="fn">print</span>(<span class="fn">len</span>(re.<span class="fn">findall</span>(<span class="str">r"\d"</span>, t)))
+<span class="fn">print</span>(re.<span class="fn">sub</span>(<span class="str">r"\d"</span>, <span class="str">"#"</span>, <span class="str">"A12"</span>))</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر 1:</span><input type="text" class="blank-input" data-answers="[&#x27;A12&#x27;, &#x27;B7&#x27;, &#x27;C305&#x27;]" placeholder="..." style="min-width:324px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 2:</span><input type="text" class="blank-input" data-answers="[&#x27;12&#x27;, &#x27;7&#x27;, &#x27;305&#x27;]" placeholder="..." style="min-width:282px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 3:</span><input type="text" class="blank-input" data-answers="6" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 4:</span><input type="text" class="blank-input" data-answers="A##" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! &lt;code&gt;groupdict()&lt;/code&gt; تحول المجموعات المسماة إلى قاموس." data-hint="الدالة التي تجد أول تطابق في أي مكان هي &lt;code&gt;search&lt;/code&gt;، واسم المجموعة يُكتب بين &lt;code&gt;&amp;lt; &amp;gt;&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">المجموعات المسماة</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لاستخراج السنة والشهر من النص باستخدام مجموعات مسماة:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">import</span> re</span></div>
+        <div class="line"><span>m = re.</span><input type="text" class="blank-input" data-answers="search" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"><span>(r'(?P&lt;</span><input type="text" class="blank-input" data-answers="year" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"><span>&gt;\d{<span class="num">4</span>})-(?P&lt;month&gt;\d{<span class="num">2</span>})<span class="str">', '</span>تقرير <span class="num">2025</span>-<span class="num">03</span>')</span></div>
+        <div class="line"><span><span class="kw">if</span> m:</span></div>
+        <div class="line"><span>    <span class="fn">print</span>(m.</span><input type="text" class="blank-input" data-answers="groupdict" placeholder="..." style="min-width:156px;" autocomplete="off" spellcheck="false"><span>())  <span class="cm"># {'year': '2025', 'month': '03'}</span></span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب صحيح! مع مجموعتين تُرجع findall قائمة صفوف (Tuples)." data-hint="الاستيراد أولًا، ثم النمط والنص، ثم الحلقة.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب الأسطر لطباعة السنة والشهر لكل تقرير في النص. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">for year, month in pattern.findall(text):</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">import re</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">    print(year, month)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">text = &#x27;تقرير 2025-03 وتقرير 2025-04&#x27;</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">pattern = re.compile(r&#x27;(\d{4})-(\d{2})&#x27;)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر التعابير النمطية</div>
+    <p style="color:var(--text-light); font-size:0.95em;">اختر نمطًا جاهزًا أو اكتب نمطك، وعدّل النص لترى التطابقات مظللة مع المجموعات والكود المكافئ في بايثون. المختبر يعمل بمحرك JavaScript، ويحوّل صيغة بايثون <code>(?P&lt;name&gt;...)</code> تلقائيًا. فرق واحد مهم: <code>\d</code> هنا لا تطابق الأرقام العربية الهندية، بينما في بايثون تطابقها.</p>
+    <div class="lab-row">
+        <label>نمط جاهز:</label>
+        <select class="lab-select" id="rxPreset" onchange="loadPreset()">
+            <option value="phone">جوال سعودي</option>
+            <option value="email">بريد إلكتروني</option>
+            <option value="date">تاريخ YYYY-MM-DD</option>
+            <option value="invoice">فاتورة ومبلغ</option>
+            <option value="arabic">كلمات عربية</option>
+        </select>
+        <label><input type="checkbox" id="rxI" onchange="runRegex()"> IGNORECASE</label>
+    </div>
+    <div class="lab-row">
+        <label>النمط:</label>
+        <input class="lab-input" id="rxPattern" style="flex:1; min-width:220px; direction:ltr; font-family:monospace;" oninput="runRegex()" spellcheck="false">
+    </div>
+    <textarea class="lab-input" id="rxText" rows="4" style="width:100%; font-family:Cairo, sans-serif;" oninput="runRegex()">تواصل مع أحمد على 0551234567 أو ahmed.ali@example.com، وسارة +966509876543 (sara@mail.com).
+فاتورة INV-2025-0042 بمبلغ 1,250.50 ريال بتاريخ 2025-03-14، وفاتورة INV-2025-0043 بمبلغ 980 ريال بتاريخ 2025-03-15.
+هاتف المكتب 0114567890 ورقم خاطئ 05123.</textarea>
+    <div class="lab-console" id="rxHighlight" style="direction:rtl; text-align:right; font-family:Cairo, sans-serif; white-space:pre-wrap;"></div>
+    <div class="lab-console" id="rxOut" style="margin-top:8px;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> متى تكفي دوال النص (split و replace و strip) ومتى تحتاج Regex.</li>
+                <li><i class="fas fa-check"></i> رموز التعابير النمطية: \d و \w و \s والمجموعات [ ] والتكرار + * ? {n,m}.</li>
+                <li><i class="fas fa-check"></i> الفرق بين search و match و fullmatch و findall و finditer.</li>
+                <li><i class="fas fa-check"></i> المجموعات المسماة و groupdict ووضع VERBOSE للأنماط الطويلة.</li>
+                <li><i class="fas fa-check"></i> الاستبدال بنص أو بدالة لإخفاء البيانات وتوحيد التواريخ.</li>
+                <li><i class="fas fa-check"></i> تطبيع النص العربي وفهم سلوك \d مع الأرقام العربية الهندية.</li>
+                <li><i class="fas fa-check"></i> تحليل ملف سجلات كامل بـ Regex و Counter.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> جرّب نمطك على أمثلة صحيحة وخاطئة قبل تشغيله على آلاف الأسطر.</li>
+                <li><i class="fas fa-lightbulb"></i> اكتب الأنماط دائمًا كنصوص خام r"...".</li>
+                <li><i class="fas fa-lightbulb"></i> استخدم fullmatch للتحقق و search للبحث.</li>
+                <li><i class="fas fa-lightbulb"></i> احتفظ بالنص الأصلي وطبّع نسخة منه للمقارنة فقط.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>إرسال البريد الإلكتروني والتنبيهات</strong> تلقائيًا، مع المرفقات والقوالب.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson3.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 3: أتمتة Excel و Word و PDF</span>
+        </a>
+        <a href="lesson5.html" class="nav-link next">
+            <span>الدرس التالي: البريد الإلكتروني والتنبيهات</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · النصوص و Regex
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '40%';
+            text.textContent = '40% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر Regex ========== */
+    const RX_PRESETS = {
+        phone: '(?:\\+966|0)(?P<number>5\\d{8})',
+        email: '[\\w.+-]+@[\\w-]+(?:\\.[\\w-]+)+',
+        date: '(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})',
+        invoice: '(?P<inv>INV-\\d{4}-\\d{4}) بمبلغ (?P<amount>[\\d,]+(?:\\.\\d+)?)',
+        arabic: '[\\u0621-\\u064A]{4,}',
+    };
+
+    function loadPreset() {
+        document.getElementById('rxPattern').value = RX_PRESETS[document.getElementById('rxPreset').value];
+        runRegex();
+    }
+
+    function runRegex() {
+        const src = document.getElementById('rxPattern').value;
+        const text = document.getElementById('rxText').value;
+        const ignore = document.getElementById('rxI').checked;
+        const hl = document.getElementById('rxHighlight'), out = document.getElementById('rxOut');
+        const jsSrc = src.replace(/\(\?P</g, '(?<').replace(/\(\?P=(\w+)\)/g, '\\k<$1>');
+        let rx;
+        try {
+            if (!src) throw new Error('النمط فارغ');
+            rx = new RegExp(jsSrc, 'gu' + (ignore ? 'i' : ''));
+        } catch (e) {
+            hl.textContent = text;
+            out.innerHTML = `<span class="err">re.error: ${escapeHtml(e.message)}</span>`;
+            return;
+        }
+        const matches = [...text.matchAll(rx)].filter(m => m[0] !== '');
+        let html = '', pos = 0;
+        matches.forEach(m => {
+            html += escapeHtml(text.slice(pos, m.index)) +
+                `<mark style="background:rgba(255,215,0,0.35); color:inherit; border-radius:3px; padding:0 2px;">${escapeHtml(m[0])}</mark>`;
+            pos = m.index + m[0].length;
+        });
+        hl.innerHTML = html + escapeHtml(text.slice(pos));
+        const flags = ignore ? ', flags=re.IGNORECASE' : '';
+        const lines = [`<span style="color:#888">pattern = re.compile(r"${escapeHtml(src)}"${flags})</span>`,
+                       `عدد التطابقات: ${matches.length}`];
+        matches.forEach((m, i) => {
+            let line = `${i + 1}. ${escapeHtml(m[0])}`;
+            if (m.groups) line += '  →  ' + escapeHtml(JSON.stringify(m.groups).replace(/"/g, "'"));
+            else if (m.length > 1) line += '  →  groups ' + escapeHtml(JSON.stringify(m.slice(1)));
+            lines.push(line);
+        });
+        out.innerHTML = lines.join('\n');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPreset);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

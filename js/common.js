@@ -18,6 +18,10 @@
   CW.getCourse = id => CW.allCourses().find(c => c.id === id);
   CW.getField = id => CW.fields.find(f => f.id === id);
   CW.getPath = id => CW.paths.find(p => p.id === id);
+
+  // دورات لها أكاديمية مستقلة بصفحات دروس جاهزة: روابطها تذهب إلى الأكاديمية مباشرة
+  CW.academy = { python: "python/index.html", cpp: "cpp/index.php", csharp: "csharp/index.html" };
+  CW.courseHref = id => CW.academy[id] || "course.html?id=" + id;
   CW.lessonCount = c => c.modules.reduce((n, m) => n + m.l.length, 0);
   CW.param = name => new URLSearchParams(location.search).get(name);
   CW.esc = s => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
@@ -95,7 +99,7 @@
   CW.courseCard = c => {
     const pct = CW.progress.percent(c.id);
     return `
-      <a class="card tinted" style="--c:${c.color}" href="course.html?id=${c.id}">
+      <a class="card tinted" style="--c:${c.color}" href="${CW.courseHref(c.id)}">
         <div class="card-top">
           <span class="lang-badge" style="background:${c.color}">${CW.esc(c.short)}</span>
           <div><h3>${CW.esc(c.name)}</h3><span class="muted" style="font-size:13px">${c.kind || "لغة برمجة"}</span></div>
@@ -184,7 +188,7 @@
             <a class="logo" href="index.html"><span class="logo-mark">&lt;/&gt;</span><span class="ltr">Code<b>Way</b></span></a>
             <p class="muted">طريقك من أول سطر برمجي إلى أول وظيفة. لغات ومجالات ومسارات مهنية كاملة باللغة العربية.</p>
           </div>
-          ${col("اللغات", CW.languages.slice(0, 5).map(c => ["course.html?id=" + c.id, c.name]))}
+          ${col("اللغات", CW.languages.slice(0, 5).map(c => [CW.courseHref(c.id), c.name]))}
           ${col("المجالات", CW.fields.slice(0, 5).map(f => ["field.html?id=" + f.id, f.name]))}
           ${col("المسارات", CW.paths.slice(0, 5).map(p => ["path.html?id=" + p.id, p.name]))}
           ${col("المنصة", [["index.html#pricing", "الأسعار"], ["faq.html", "الأسئلة الشائعة"], ["contact.html", "تواصل معنا"], ["terms.html", "الشروط والأحكام"], ["privacy.html", "سياسة الخصوصية"]])}

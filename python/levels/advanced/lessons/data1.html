@@ -1,0 +1,2244 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس الإضافي: مقدمة في NumPy و Pandas | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">المستوى المتقدم</a>
+        <span class="sep">/</span>
+        <span>NumPy و Pandas</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-table"></i>
+            درس إضافي · تحليل البيانات
+        </div>
+        <h1 class="lesson-title">مقدمة في NumPy و Pandas</h1>
+        <p class="lesson-intro">
+            تحليل البيانات من أكثر مجالات Python طلبًا في سوق العمل. وأساسه مكتبتان: <strong>NumPy</strong> للحسابات السريعة على المصفوفات، و<strong>Pandas</strong> للتعامل مع الجداول كأنك تستخدم Excel لكن بقوة البرمجة. في هذا الدرس ستتعلم أهم ما تحتاجه منهما لتبدأ تحليل بياناتك الخاصة.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 75 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 المصفوفات والجداول وتحليلها</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 متقدم</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 15</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#intro">1. مقدمة</a>
+            <a href="#numpy">2. مصفوفات NumPy</a>
+            <a href="#series">3. السلسلة Series</a>
+            <a href="#dataframe">4. الجدول DataFrame</a>
+            <a href="#select">5. الاختيار والفلترة</a>
+            <a href="#modify">6. التعديل والتجميع</a>
+            <a href="#missing">7. المفقودة والملفات</a>
+            <a href="#exercises">8. تمارين تفاعلية</a>
+            <a href="#summary">9. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="intro">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        لماذا NumPy و Pandas؟
+    </h2>
+        <p>
+            قوائم Python رائعة، لكنها بطيئة مع ملايين الأرقام ولا تعرف شيئًا عن «الجداول». تخيّل أن لديك ملف مبيعات فيه
+            مليون صف وتريد معرفة متوسط المبيعات لكل مدينة: بالقوائم ستكتب عشرات الأسطر، وبـ Pandas <strong>سطرًا واحدًا</strong>.
+        </p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-th"></i> NumPy</h4>
+                <p>مصفوفات رقمية سريعة جدًا (مكتوبة بلغة C)، وعمليات رياضية على كل العناصر دفعة واحدة. هي الأساس الذي تُبنى عليه معظم مكتبات البيانات والذكاء الاصطناعي.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-table"></i> Pandas</h4>
+                <p>جداول بيانات (DataFrame) بأعمدة وأسماء: قراءة CSV و Excel، فلترة، تجميع، تنظيف، وتصدير.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-chart-line"></i> وماذا بعد؟</h4>
+                <p>بعدهما تأتي مكتبات الرسم (Matplotlib) وتعلم الآلة (scikit-learn) — ستجدها في تخصص تحليل البيانات.</p>
+            </div>
+        </div>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+                <span>التثبيت</span>
+            </div>
+<pre>pip install numpy pandas openpyxl     <span class="cm"># openpyxl لقراءة وكتابة ملفات Excel</span></pre>
+        </div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>بيئة مثالية للتجربة:</strong> جرّب <strong>Jupyter Notebook</strong> (<code>pip install notebook</code>)
+                أو <strong>Google Colab</strong> المجاني في المتصفح؛ ترى فيهما نتيجة كل خطوة والجداول بشكل منسق.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="numpy">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-th"></i>
+        NumPy: المصفوفات
+    </h2>
+        <p>العنصر الأساسي في NumPy هو المصفوفة <code>ndarray</code>. نستوردها بالاسم المختصر المتعارف عليه <code>np</code>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>numpy_basics.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+prices = np.<span class="fn">array</span>([<span class="num">120</span>, <span class="num">85</span>, <span class="num">230</span>, <span class="num">45</span>, <span class="num">310</span>])
+<span class="fn">print</span>(prices)
+<span class="fn">print</span>(<span class="str">"النوع:"</span>, <span class="fn">type</span>(prices).__name__, <span class="str">"| نوع العناصر:"</span>, prices.dtype)
+<span class="fn">print</span>(<span class="str">"الشكل:"</span>, prices.shape, <span class="str">"| عدد العناصر:"</span>, prices.size)
+
+<span class="cm"># مصفوفات جاهزة</span>
+<span class="fn">print</span>(np.<span class="fn">zeros</span>(<span class="num">4</span>))
+<span class="fn">print</span>(np.<span class="fn">arange</span>(<span class="num">0</span>, <span class="num">20</span>, <span class="num">5</span>))          <span class="cm"># مثل range</span>
+<span class="fn">print</span>(np.<span class="fn">linspace</span>(<span class="num">0</span>, <span class="num">1</span>, <span class="num">5</span>))         <span class="cm"># 5 قيم متساوية التباعد بين 0 و 1</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>[120  85 230  45 310]
+النوع: ndarray | نوع العناصر: int64
+الشكل: (5,) | عدد العناصر: 5
+[0. 0. 0. 0.]
+[ 0  5 10 15]
+[0.   0.25 0.5  0.75 1.  ]</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> العمليات المتجهة (Vectorization) — قلب NumPy</p>
+        <p>العملية تُطبق على <strong>كل العناصر</strong> مرة واحدة، بدون حلقة <code>for</code>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>vectorization.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+prices = np.<span class="fn">array</span>([<span class="num">120</span>, <span class="num">85</span>, <span class="num">230</span>, <span class="num">45</span>, <span class="num">310</span>])
+
+<span class="fn">print</span>(<span class="str">"بعد خصم 10%:"</span>, prices * <span class="num">0.9</span>)
+<span class="fn">print</span>(<span class="str">"مع الضريبة:"</span>, prices * <span class="num">1.15</span>)
+<span class="fn">print</span>(<span class="str">"أكبر من 100؟"</span>, prices &gt; <span class="num">100</span>)
+
+<span class="cm"># مقارنة مع القوائم العادية</span>
+py_list = [<span class="num">120</span>, <span class="num">85</span>, <span class="num">230</span>, <span class="num">45</span>, <span class="num">310</span>]
+<span class="fn">print</span>(<span class="str">"قائمة × 2:"</span>, py_list * <span class="num">2</span>)            <span class="cm"># تكرار القائمة!</span>
+<span class="fn">print</span>(<span class="str">"مصفوفة × 2:"</span>, np.<span class="fn">array</span>(py_list) * <span class="num">2</span>)  <span class="cm"># ضرب كل عنصر</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>بعد خصم 10%: [108.   76.5 207.   40.5 279. ]
+مع الضريبة: [138.    97.75 264.5   51.75 356.5 ]
+أكبر من 100؟ [ True False  True False  True]
+قائمة × 2: [120, 85, 230, 45, 310, 120, 85, 230, 45, 310]
+مصفوفة × 2: [240 170 460  90 620]</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>انتبه للفرق:</strong> <code>list * 2</code> يكرر القائمة، بينما <code>array * 2</code> يضرب كل عنصر.
+                هذا من أكثر ما يربك القادمين من القوائم العادية.
+            </div>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الإحصاءات والفلترة المنطقية</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>numpy_stats.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+scores = np.<span class="fn">array</span>([<span class="num">88</span>, <span class="num">92</span>, <span class="num">79</span>, <span class="num">65</span>, <span class="num">95</span>, <span class="num">70</span>, <span class="num">84</span>])
+
+<span class="fn">print</span>(<span class="str">"المتوسط:"</span>, scores.<span class="fn">mean</span>().<span class="fn">round</span>(<span class="num">2</span>))
+<span class="fn">print</span>(<span class="str">"الانحراف المعياري:"</span>, scores.<span class="fn">std</span>().<span class="fn">round</span>(<span class="num">2</span>))
+<span class="fn">print</span>(<span class="str">"الأعلى / الأدنى:"</span>, scores.<span class="fn">max</span>(), <span class="str">"/"</span>, scores.<span class="fn">min</span>())
+<span class="fn">print</span>(<span class="str">"فهرس أعلى درجة:"</span>, scores.<span class="fn">argmax</span>())
+
+passed = scores[scores &gt;= <span class="num">80</span>]          <span class="cm"># الفلترة المنطقية (Boolean Indexing)</span>
+<span class="fn">print</span>(<span class="str">"الناجحون بتقدير 80+:"</span>, passed, <span class="str">"| عددهم:"</span>, <span class="fn">len</span>(passed))
+<span class="fn">print</span>(<span class="str">"نسبة النجاح:"</span>, <span class="fn">round</span>((scores &gt;= <span class="num">70</span>).<span class="fn">mean</span>() * <span class="num">100</span>, <span class="num">1</span>), <span class="str">"%"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>المتوسط: 81.86
+الانحراف المعياري: 10.36
+الأعلى / الأدنى: 95 / 65
+فهرس أعلى درجة: 4
+الناجحون بتقدير 80+: [88 92 95 84] | عددهم: 4
+نسبة النجاح: 85.7 %</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> المصفوفات ثنائية الأبعاد</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>numpy_2d.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># صفوف = طلاب، أعمدة = مواد (رياضيات، علوم، لغة)</span>
+grades = np.<span class="fn">array</span>([
+    [<span class="num">90</span>, <span class="num">85</span>, <span class="num">78</span>],
+    [<span class="num">70</span>, <span class="num">88</span>, <span class="num">92</span>],
+    [<span class="num">60</span>, <span class="num">75</span>, <span class="num">80</span>],
+])
+<span class="fn">print</span>(<span class="str">"الشكل:"</span>, grades.shape)
+<span class="fn">print</span>(<span class="str">"درجة الطالب الثاني في العلوم:"</span>, grades[<span class="num">1</span>, <span class="num">1</span>])
+<span class="fn">print</span>(<span class="str">"كل درجات الرياضيات:"</span>, grades[:, <span class="num">0</span>])
+<span class="fn">print</span>(<span class="str">"متوسط كل مادة:"</span>, grades.<span class="fn">mean</span>(axis=<span class="num">0</span>).<span class="fn">round</span>(<span class="num">1</span>))
+<span class="fn">print</span>(<span class="str">"متوسط كل طالب:"</span>, grades.<span class="fn">mean</span>(axis=<span class="num">1</span>).<span class="fn">round</span>(<span class="num">1</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الشكل: (3, 3)
+درجة الطالب الثاني في العلوم: 88
+كل درجات الرياضيات: [90 70 60]
+متوسط كل مادة: [73.3 82.7 83.3]
+متوسط كل طالب: [84.3 83.3 71.7]</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>ما هو axis؟</strong> <code>axis=0</code> يعني «على امتداد الصفوف» فيعطي نتيجة لكل <strong>عمود</strong>،
+                و <code>axis=1</code> «على امتداد الأعمدة» فيعطي نتيجة لكل <strong>صف</strong>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="series">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-list-ol"></i>
+        Pandas: السلسلة Series
+    </h2>
+        <p>
+            <strong>Series</strong> هي عمود واحد من البيانات مع <strong>فهرس (index)</strong> يسمي كل قيمة —
+            كأنها خليط بين القائمة والقاموس:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>series_demo.py</span>
+    </div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+sales = pd.<span class="fn">Series</span>([<span class="num">1200</span>, <span class="num">950</span>, <span class="num">1800</span>, <span class="num">700</span>], index=[<span class="str">"يناير"</span>, <span class="str">"فبراير"</span>, <span class="str">"مارس"</span>, <span class="str">"أبريل"</span>])
+<span class="fn">print</span>(sales)
+<span class="fn">print</span>()
+<span class="fn">print</span>(<span class="str">"مبيعات مارس:"</span>, sales[<span class="str">"مارس"</span>])
+<span class="fn">print</span>(<span class="str">"المجموع:"</span>, sales.<span class="fn">sum</span>(), <span class="str">"| المتوسط:"</span>, sales.<span class="fn">mean</span>())
+<span class="fn">print</span>(<span class="str">"أفضل شهر:"</span>, sales.<span class="fn">idxmax</span>())
+<span class="fn">print</span>(<span class="str">"الأشهر فوق 1000:"</span>, <span class="fn">list</span>(sales[sales &gt; <span class="num">1000</span>].index))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>يناير     1200
+فبراير     950
+مارس      1800
+أبريل      700
+dtype: int64
+
+مبيعات مارس: 1800
+المجموع: 4650 | المتوسط: 1162.5
+أفضل شهر: مارس
+الأشهر فوق 1000: ['يناير', 'مارس']</pre>
+</div>
+</section>
+
+<section class="section-card" id="dataframe">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-table"></i>
+        Pandas: الجدول DataFrame
+    </h2>
+        <p>
+            <strong>DataFrame</strong> هو الجدول الكامل: صفوف وأعمدة، وكل عمود عبارة عن Series. هذه أهم بنية في تحليل البيانات.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>dataframe_create.py</span>
+    </div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.<span class="fn">DataFrame</span>({
+    <span class="str">"name"</span>: [<span class="str">"سارة"</span>, <span class="str">"علي"</span>, <span class="str">"منى"</span>, <span class="str">"خالد"</span>, <span class="str">"ليلى"</span>, <span class="str">"يوسف"</span>],
+    <span class="str">"city"</span>: [<span class="str">"الرياض"</span>, <span class="str">"جدة"</span>, <span class="str">"الرياض"</span>, <span class="str">"الدمام"</span>, <span class="str">"جدة"</span>, <span class="str">"الرياض"</span>],
+    <span class="str">"age"</span>: [<span class="num">22</span>, <span class="num">25</span>, <span class="num">21</span>, <span class="num">28</span>, <span class="num">24</span>, <span class="num">23</span>],
+    <span class="str">"score"</span>: [<span class="num">91</span>, <span class="num">78</span>, <span class="num">85</span>, <span class="num">66</span>, <span class="num">95</span>, <span class="num">72</span>],
+})
+
+<span class="fn">print</span>(df)
+<span class="fn">print</span>(<span class="str">"\nالشكل (صفوف، أعمدة):"</span>, df.shape)
+<span class="fn">print</span>(<span class="str">"الأعمدة:"</span>, <span class="fn">list</span>(df.columns))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   name    city  age  score
+0  سارة  الرياض   22     91
+1   علي     جدة   25     78
+2   منى  الرياض   21     85
+3  خالد  الدمام   28     66
+4  ليلى     جدة   24     95
+5  يوسف  الرياض   23     72
+
+الشكل (صفوف، أعمدة): (6, 4)
+الأعمدة: ['name', 'city', 'age', 'score']</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الاستكشاف الأولي: أول ما تفعله مع أي بيانات</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>explore.py</span>
+    </div>
+<pre><span class="fn">print</span>(df.<span class="fn">head</span>(<span class="num">3</span>))               <span class="cm"># أول 3 صفوف (tail للأخيرة)</span>
+<span class="fn">print</span>()
+<span class="fn">print</span>(df.<span class="fn">describe</span>().<span class="fn">round</span>(<span class="num">1</span>))   <span class="cm"># ملخص إحصائي للأعمدة الرقمية</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   name    city  age  score
+0  سارة  الرياض   22     91
+1   علي     جدة   25     78
+2   منى  الرياض   21     85
+
+        age  score
+count   6.0    6.0
+mean   23.8   81.2
+std     2.5   11.2
+min    21.0   66.0
+25%    22.2   73.5
+50%    23.5   81.5
+75%    24.8   89.5
+max    28.0   95.0</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الأمر</th><th>الوظيفة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>df.head(n)</code> / <code>df.tail(n)</code></td><td>أول / آخر n صفوف.</td></tr>
+                    <tr><td><code>df.shape</code></td><td>عدد الصفوف والأعمدة.</td></tr>
+                    <tr><td><code>df.info()</code></td><td>أنواع الأعمدة وعدد القيم غير الفارغة.</td></tr>
+                    <tr><td><code>df.describe()</code></td><td>العدد، المتوسط، الانحراف، الأدنى، الأعلى، الأرباع.</td></tr>
+                    <tr><td><code>df["col"].value_counts()</code></td><td>عدد مرات تكرار كل قيمة في عمود.</td></tr>
+                    <tr><td><code>df["col"].unique()</code></td><td>القيم المختلفة في العمود.</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="select">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-mouse-pointer"></i>
+        اختيار الأعمدة والصفوف
+    </h2>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> اختيار الأعمدة</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>select_columns.py</span>
+    </div>
+<pre><span class="fn">print</span>(df[<span class="str">"name"</span>].<span class="fn">tolist</span>())            <span class="cm"># عمود واحد ← Series</span>
+<span class="fn">print</span>(df[[<span class="str">"name"</span>, <span class="str">"score"</span>]].<span class="fn">head</span>(<span class="num">2</span>))  <span class="cm"># عدة أعمدة ← DataFrame (لاحظ القوسين المزدوجين)</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>['سارة', 'علي', 'منى', 'خالد', 'ليلى', 'يوسف']
+   name  score
+0  سارة     91
+1   علي     78</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> اختيار الصفوف: loc و iloc</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>loc_iloc.py</span>
+    </div>
+<pre><span class="fn">print</span>(df.iloc[<span class="num">0</span>])                     <span class="cm"># الصف الأول حسب الموقع</span>
+<span class="fn">print</span>()
+<span class="fn">print</span>(df.iloc[<span class="num">1</span>:<span class="num">3</span>])                   <span class="cm"># الصفوف 1 و 2</span>
+<span class="fn">print</span>()
+<span class="fn">print</span>(df.loc[df[<span class="str">"age"</span>] &gt; <span class="num">24</span>, [<span class="str">"name"</span>, <span class="str">"age"</span>]])   <span class="cm"># بشرط + أعمدة محددة</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>name       سارة
+city     الرياض
+age          22
+score        91
+Name: 0, dtype: object
+
+  name    city  age  score
+1  علي     جدة   25     78
+2  منى  الرياض   21     85
+
+   name  age
+1   علي   25
+3  خالد   28</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>الفرق:</strong> <code>iloc</code> تستخدم <strong>الأرقام</strong> (الموقع: i = integer)،
+                و <code>loc</code> تستخدم <strong>الأسماء</strong> (أسماء الفهرس والأعمدة) أو الشروط.
+            </div>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الفلترة بالشروط</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>filtering.py</span>
+    </div>
+<pre><span class="fn">print</span>(df[df[<span class="str">"score"</span>] &gt;= <span class="num">85</span>])                                <span class="cm"># شرط واحد</span>
+<span class="fn">print</span>()
+<span class="fn">print</span>(df[(df[<span class="str">"city"</span>] == <span class="str">"الرياض"</span>) &amp; (df[<span class="str">"score"</span>] &gt; <span class="num">80</span>)])    <span class="cm"># و</span>
+<span class="fn">print</span>()
+<span class="fn">print</span>(df[df[<span class="str">"city"</span>].<span class="fn">isin</span>([<span class="str">"جدة"</span>, <span class="str">"الدمام"</span>])][[<span class="str">"name"</span>, <span class="str">"city"</span>]])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   name    city  age  score
+0  سارة  الرياض   22     91
+2   منى  الرياض   21     85
+4  ليلى     جدة   24     95
+
+   name    city  age  score
+0  سارة  الرياض   22     91
+2   منى  الرياض   21     85
+
+   name    city
+1   علي     جدة
+3  خالد  الدمام
+4  ليلى     جدة</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>مهم جدًا:</strong> لدمج الشروط في Pandas استخدم <code>&amp;</code> (و) و <code>|</code> (أو) و <code>~</code> (ليس)،
+                وليس <code>and</code> و <code>or</code>، وضع <strong>كل شرط بين أقواس</strong>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="modify">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-magic"></i>
+        الأعمدة الجديدة والترتيب والتجميع
+    </h2>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> إنشاء أعمدة جديدة</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>new_columns.py</span>
+    </div>
+<pre>df[<span class="str">"passed"</span>] = df[<span class="str">"score"</span>] &gt;= <span class="num">75</span>
+df[<span class="str">"grade"</span>] = pd.<span class="fn">cut</span>(df[<span class="str">"score"</span>], bins=[<span class="num">0</span>, <span class="num">69</span>, <span class="num">79</span>, <span class="num">89</span>, <span class="num">100</span>],
+                     labels=[<span class="str">"مقبول"</span>, <span class="str">"جيد"</span>, <span class="str">"جيد جدًا"</span>, <span class="str">"ممتاز"</span>])
+df[<span class="str">"name_len"</span>] = df[<span class="str">"name"</span>].<span class="fn">apply</span>(len)          <span class="cm"># تطبيق دالة على كل قيمة</span>
+<span class="fn">print</span>(df)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   name    city  age  score  passed     grade  name_len
+0  سارة  الرياض   22     91    True     ممتاز         4
+1   علي     جدة   25     78    True       جيد         3
+2   منى  الرياض   21     85    True  جيد جدًا         3
+3  خالد  الدمام   28     66   False     مقبول         4
+4  ليلى     جدة   24     95    True     ممتاز         4
+5  يوسف  الرياض   23     72   False       جيد         4</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الترتيب</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>sorting.py</span>
+    </div>
+<pre><span class="fn">print</span>(df.<span class="fn">sort_values</span>(<span class="str">"score"</span>, ascending=<span class="kw">False</span>).<span class="fn">head</span>(<span class="num">3</span>)[[<span class="str">"name"</span>, <span class="str">"score"</span>]])
+<span class="fn">print</span>()
+<span class="fn">print</span>(df.<span class="fn">nlargest</span>(<span class="num">2</span>, <span class="str">"age"</span>)[[<span class="str">"name"</span>, <span class="str">"age"</span>]])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   name  score
+4  ليلى     95
+0  سارة     91
+2   منى     85
+
+   name  age
+3  خالد   28
+1   علي   25</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> التجميع groupby — أقوى أداة في Pandas</p>
+        <p>
+            «ما متوسط الدرجات في كل مدينة؟» هذا سؤال تجميع. الفكرة: <strong>قسّم</strong> الجدول لمجموعات،
+            <strong>طبّق</strong> عملية على كل مجموعة، ثم <strong>اجمع</strong> النتائج (Split-Apply-Combine):
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>groupby.py</span>
+    </div>
+<pre><span class="fn">print</span>(df.<span class="fn">groupby</span>(<span class="str">"city"</span>)[<span class="str">"score"</span>].<span class="fn">mean</span>().<span class="fn">round</span>(<span class="num">1</span>))
+<span class="fn">print</span>()
+summary = df.<span class="fn">groupby</span>(<span class="str">"city"</span>).<span class="fn">agg</span>(
+    students=(<span class="str">"name"</span>, <span class="str">"count"</span>),
+    avg_score=(<span class="str">"score"</span>, <span class="str">"mean"</span>),
+    oldest=(<span class="str">"age"</span>, <span class="str">"max"</span>),
+).<span class="fn">round</span>(<span class="num">1</span>).<span class="fn">sort_values</span>(<span class="str">"avg_score"</span>, ascending=<span class="kw">False</span>)
+<span class="fn">print</span>(summary)
+<span class="fn">print</span>()
+<span class="fn">print</span>(df[<span class="str">"city"</span>].<span class="fn">value_counts</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>city
+الدمام    66.0
+الرياض    82.7
+جدة       86.5
+Name: score, dtype: float64
+
+        students  avg_score  oldest
+city                               
+جدة            2       86.5      25
+الرياض         3       82.7      23
+الدمام         1       66.0      28
+
+city
+الرياض    3
+جدة       2
+الدمام    1
+Name: count, dtype: int64</pre>
+</div>
+</section>
+
+<section class="section-card" id="missing">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-broom"></i>
+        البيانات المفقودة والملفات
+    </h2>
+        <p>البيانات الحقيقية دائمًا فيها نواقص. Pandas تمثل القيمة المفقودة بـ <code>NaN</code>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>missing_data.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.<span class="fn">DataFrame</span>({
+    <span class="str">"product"</span>: [<span class="str">"قلم"</span>, <span class="str">"دفتر"</span>, <span class="str">"حقيبة"</span>, <span class="str">"مسطرة"</span>],
+    <span class="str">"price"</span>: [<span class="num">5.0</span>, np.nan, <span class="num">120.0</span>, <span class="num">3.5</span>],
+    <span class="str">"stock"</span>: [<span class="num">100</span>, <span class="num">40</span>, np.nan, <span class="num">250</span>],
+})
+<span class="fn">print</span>(df)
+<span class="fn">print</span>(<span class="str">"\nالقيم المفقودة في كل عمود:"</span>)
+<span class="fn">print</span>(df.<span class="fn">isna</span>().<span class="fn">sum</span>())
+
+<span class="fn">print</span>(<span class="str">"\nحذف الصفوف الناقصة:"</span>)
+<span class="fn">print</span>(df.<span class="fn">dropna</span>())
+
+<span class="fn">print</span>(<span class="str">"\nتعويض النواقص:"</span>)
+filled = df.<span class="fn">fillna</span>({<span class="str">"price"</span>: df[<span class="str">"price"</span>].<span class="fn">mean</span>(), <span class="str">"stock"</span>: <span class="num">0</span>})
+<span class="fn">print</span>(filled.<span class="fn">round</span>(<span class="num">2</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>  product  price  stock
+0     قلم    5.0  100.0
+1    دفتر    NaN   40.0
+2   حقيبة  120.0    NaN
+3   مسطرة    3.5  250.0
+
+القيم المفقودة في كل عمود:
+product    0
+price      1
+stock      1
+dtype: int64
+
+حذف الصفوف الناقصة:
+  product  price  stock
+0     قلم    5.0  100.0
+3   مسطرة    3.5  250.0
+
+تعويض النواقص:
+  product   price  stock
+0     قلم    5.00  100.0
+1    دفتر   42.83   40.0
+2   حقيبة  120.00    0.0
+3   مسطرة    3.50  250.0</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> القراءة والكتابة</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>files_io.py</span>
+    </div>
+<pre>df.<span class="fn">to_csv</span>(<span class="str">"students.csv"</span>, index=<span class="kw">False</span>, encoding=<span class="str">"utf-8-sig"</span>)   <span class="cm"># utf-8-sig ليفتح بالعربية في Excel</span>
+df.<span class="fn">to_excel</span>(<span class="str">"students.xlsx"</span>, index=<span class="kw">False</span>, sheet_name=<span class="str">"الطلاب"</span>)
+
+again = pd.<span class="fn">read_csv</span>(<span class="str">"students.csv"</span>)
+<span class="fn">print</span>(again.shape, <span class="fn">list</span>(again.columns))
+
+from_excel = pd.<span class="fn">read_excel</span>(<span class="str">"students.xlsx"</span>)
+<span class="fn">print</span>(from_excel[<span class="str">"name"</span>].<span class="fn">tolist</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>(6, 4) ['name', 'city', 'age', 'score']
+['سارة', 'علي', 'منى', 'خالد', 'ليلى', 'يوسف']</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>القراءة</th><th>الكتابة</th><th>الصيغة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>pd.read_csv()</code></td><td><code>df.to_csv()</code></td><td>CSV</td></tr>
+                    <tr><td><code>pd.read_excel()</code></td><td><code>df.to_excel()</code></td><td>Excel (يحتاج openpyxl)</td></tr>
+                    <tr><td><code>pd.read_json()</code></td><td><code>df.to_json()</code></td><td>JSON</td></tr>
+                    <tr><td><code>pd.read_sql()</code></td><td><code>df.to_sql()</code></td><td>قواعد البيانات</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>ملاحظة عن الإصدارات:</strong> المخرجات في هذا الدرس من pandas 3. قد يختلف شكل بعض المخرجات قليلًا
+                في الإصدارات الأقدم (مثل اسم نوع النصوص <code>object</code> بدل <code>str</code>)، لكن الأوامر نفسها تعمل.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! في NumPy العملية تُطبق على كل عنصر (Vectorization)." data-hint="تكرار القائمة يحدث مع قوائم Python العادية فقط.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">NumPy</span>
+    </div>
+    <p class="exercise-question">ما ناتج الكود التالي؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>question.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+a = np.<span class="fn">array</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+<span class="fn">print</span>(a * <span class="num">2</span>)</pre>
+</div>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>[1, 2, 3, 1, 2, 3]</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> <code>[2 4 6]</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> <code>[1, 2, 3, 2]</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> خطأ <code>TypeError</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! أساسيات Pandas و NumPy واضحة لديك." data-hint="&lt;code&gt;iloc&lt;/code&gt; = integer location، و &lt;code&gt;axis=0&lt;/code&gt; يعطي نتيجة لكل عمود.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>df["score"]</code> يُرجع Series، و <code>df[["score"]]</code> يُرجع DataFrame.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>iloc</code> تختار الصفوف بالأسماء و <code>loc</code> بالأرقام.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">لدمج شرطين في Pandas نستخدم <code>&amp;</code> مع وضع كل شرط بين أقواس.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>df.dropna()</code> تحذف الصفوف التي فيها قيم مفقودة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>axis=0</code> في <code>mean()</code> يحسب متوسط كل صف.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="رائع! &lt;code&gt;idxmax&lt;/code&gt; أعطتنا فهرس صاحبة أعلى درجة." data-hint="&lt;code&gt;shape[0]&lt;/code&gt; عدد الصفوف، وأعلى درجة في الجدول 95.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">باستخدام جدول الطلاب في الدرس (6 طلاب: 3 من الرياض، 2 من جدة، 1 من الدمام)، ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="fn">print</span>(df.shape[<span class="num">0</span>])
+<span class="fn">print</span>(<span class="fn">len</span>(df[df[<span class="str">"city"</span>] == <span class="str">"الرياض"</span>]))
+<span class="fn">print</span>(df[<span class="str">"score"</span>].<span class="fn">max</span>())
+<span class="fn">print</span>(df.loc[df[<span class="str">"score"</span>].<span class="fn">idxmax</span>(), <span class="str">"name"</span>])</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="6" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="3" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثالث:</span><input type="text" class="blank-input" data-answers="95" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الرابع:</span><input type="text" class="blank-input" data-answers="ليلى" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذا أشهر نمط في تحليل البيانات: groupby ← sum ← sort." data-hint="الاختصار المعتاد &lt;code&gt;pd&lt;/code&gt;، ثم &lt;code&gt;read_csv&lt;/code&gt;، ثم &lt;code&gt;groupby&lt;/code&gt; و &lt;code&gt;sum&lt;/code&gt;، والترتيب التنازلي &lt;code&gt;ascending=False&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">التجميع</span>
+    </div>
+    <p class="exercise-question">أكمل الكود ليقرأ ملف مبيعات ويحسب مجموع المبيعات لكل مدينة مرتبًا تنازليًا:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">import</span> pandas <span class="kw">as</span> </span><input type="text" class="blank-input" data-answers="pd" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span>df = pd.</span><input type="text" class="blank-input" data-answers="read_csv" placeholder="..." style="min-width:142px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'sales.csv'</span>)</span></div>
+        <div class="line"><span>totals = df.</span><input type="text" class="blank-input" data-answers="groupby" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'city'</span>)[<span class="str">'amount'</span>].</span><input type="text" class="blank-input" data-answers="sum" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>()</span></div>
+        <div class="line"><span><span class="fn">print</span>(totals.<span class="fn">sort_values</span>(ascending=</span><input type="text" class="blank-input" data-answers="False" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"><span>))</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! قراءة ← استكشاف ← تنظيف ← تحليل ← حفظ." data-hint="لا يمكن التحليل قبل القراءة والتنظيف.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب خطوات تحليل بيانات نموذجي بـ Pandas. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">result = df.groupby(&#x27;category&#x27;)[&#x27;price&#x27;].mean()</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">df = pd.read_csv(&#x27;data.csv&#x27;)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">result.to_csv(&#x27;report.csv&#x27;)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">df = df.dropna()</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">print(df.head()); print(df.describe())</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مستكشف DataFrame التفاعلي</div>
+    <p style="color:var(--text-light); font-size:0.95em;">هذا جدول الطلاب من الدرس. اختر فلترًا وترتيبًا أو تجميعًا، وشاهد كود Pandas المكافئ والنتيجة مباشرة.</p>
+    <div class="lab-row">
+        <label>فلترة:</label>
+        <select class="lab-select" id="dfCol" style="direction:ltr;"><option value="">بدون</option><option>score</option><option>age</option><option>city</option></select>
+        <select class="lab-select" id="dfOp" style="direction:ltr; min-width:70px;"><option>&gt;=</option><option>&lt;</option><option>==</option></select>
+        <input type="text" class="lab-input" id="dfVal" value="80" style="max-width:120px;">
+    </div>
+    <div class="lab-row">
+        <label>ترتيب حسب:</label>
+        <select class="lab-select" id="dfSort" style="direction:ltr;"><option value="">بدون</option><option>score</option><option>age</option><option>name</option></select>
+        <label><input type="checkbox" id="dfDesc" checked> تنازلي</label>
+        <label style="margin-right:12px;"><input type="checkbox" id="dfGroup"> تجميع حسب المدينة (متوسط الدرجات)</label>
+        <button class="btn btn-primary" onclick="runDf()"><i class="fas fa-play"></i> تنفيذ</button>
+    </div>
+    <div class="lab-console" id="dfCode" style="min-height:0;"></div>
+    <div class="table-wrap" id="dfTable"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> دور NumPy (المصفوفات السريعة) و Pandas (الجداول) في تحليل البيانات.</li>
+                <li><i class="fas fa-check"></i> إنشاء مصفوفات NumPy والعمليات المتجهة بدون حلقات.</li>
+                <li><i class="fas fa-check"></i> الإحصاءات والفلترة المنطقية والمصفوفات ثنائية الأبعاد و <code>axis</code>.</li>
+                <li><i class="fas fa-check"></i> Series و DataFrame وأوامر الاستكشاف الأولي <code>head/describe/value_counts</code>.</li>
+                <li><i class="fas fa-check"></i> اختيار الأعمدة والصفوف بـ <code>[]</code> و <code>loc</code> و <code>iloc</code> والفلترة بالشروط.</li>
+                <li><i class="fas fa-check"></i> إنشاء أعمدة جديدة، الترتيب، والتجميع بـ <code>groupby</code> و <code>agg</code>.</li>
+                <li><i class="fas fa-check"></i> التعامل مع القيم المفقودة <code>isna/dropna/fillna</code>.</li>
+                <li><i class="fas fa-check"></i> قراءة وكتابة ملفات CSV و Excel.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> ابدأ دائمًا بـ <code>head()</code> و <code>describe()</code> لتفهم بياناتك قبل تحليلها.</li>
+                <li><i class="fas fa-lightbulb"></i> تجنّب حلقات <code>for</code> على صفوف DataFrame؛ استخدم العمليات المتجهة.</li>
+                <li><i class="fas fa-lightbulb"></i> تدرّب على بيانات حقيقية من مواقع مثل Kaggle والبيانات المفتوحة الحكومية.</li>
+                <li><i class="fas fa-lightbulb"></i> استخدم Jupyter أو Colab لترى النتائج خطوة بخطوة.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس التالي ستطبّق كل هذا على <strong>ملف CSV حقيقي</strong>: تنظيف البيانات، وتحليل المبيعات، واستخراج تقرير كامل.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="web3.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 15: مشروع REST API</span>
+        </a>
+        <a href="data2.html" class="nav-link next">
+            <span>التالي: تحليل ملف CSV حقيقي</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · NumPy و Pandas
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '76%';
+            text.textContent = '76% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مستكشف DataFrame ========== */
+    const DF = [
+        { name: 'سارة', city: 'الرياض', age: 22, score: 91 },
+        { name: 'علي', city: 'جدة', age: 25, score: 78 },
+        { name: 'منى', city: 'الرياض', age: 21, score: 85 },
+        { name: 'خالد', city: 'الدمام', age: 28, score: 66 },
+        { name: 'ليلى', city: 'جدة', age: 24, score: 95 },
+        { name: 'يوسف', city: 'الرياض', age: 23, score: 72 },
+    ];
+
+    function renderTable(rows, cols, withIndex) {
+        const head = (withIndex ? '<th></th>' : '') + cols.map(c => `<th>${c}</th>`).join('');
+        const body = rows.map(r => '<tr>' + (withIndex ? `<td style="color:#888">${r.__i}</td>` : '') +
+            cols.map(c => `<td>${escapeHtml(r[c])}</td>`).join('') + '</tr>').join('');
+        document.getElementById('dfTable').innerHTML = rows.length
+            ? `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`
+            : '<p style="padding:12px; color:#ef9a9a;">Empty DataFrame — لا توجد صفوف تطابق الشرط</p>';
+    }
+
+    function runDf() {
+        const col = document.getElementById('dfCol').value;
+        const op = document.getElementById('dfOp').value;
+        const rawVal = document.getElementById('dfVal').value.trim();
+        const sortBy = document.getElementById('dfSort').value;
+        const desc = document.getElementById('dfDesc').checked;
+        const group = document.getElementById('dfGroup').checked;
+        let rows = DF.map((r, i) => ({ ...r, __i: i }));
+        let code = 'result = df';
+        if (col) {
+            const isNum = col !== 'city';
+            const val = isNum ? parseFloat(rawVal) : rawVal;
+            rows = rows.filter(r => op === '>=' ? r[col] >= val : op === '<' ? r[col] < val : r[col] == val);
+            code += `[df["${col}"] ${op} ${isNum ? rawVal : '"' + rawVal + '"'}]`;
+        }
+        if (group) {
+            const g = {};
+            rows.forEach(r => { (g[r.city] = g[r.city] || []).push(r.score); });
+            let out = Object.keys(g).sort().map(c => ({ city: c, score: Math.round(g[c].reduce((a, b) => a + b, 0) / g[c].length * 10) / 10, count: g[c].length }));
+            code += `.groupby("city")["score"].agg(["mean", "count"])`;
+            if (sortBy === 'score') { out.sort((a, b) => desc ? b.score - a.score : a.score - b.score); code += `.sort_values("mean", ascending=${desc ? 'False' : 'True'})`; }
+            document.getElementById('dfCode').textContent = code + '\nprint(result)';
+            renderTable(out.map(o => ({ city: o.city, mean: pyRepr(new PyFloat(o.score)), count: o.count })), ['city', 'mean', 'count'], false);
+            return;
+        }
+        if (sortBy) {
+            rows.sort((a, b) => {
+                const x = a[sortBy], y = b[sortBy];
+                const cmp = typeof x === 'number' ? x - y : String(x).localeCompare(String(y), 'ar');
+                return desc ? -cmp : cmp;
+            });
+            code += `.sort_values("${sortBy}", ascending=${desc ? 'False' : 'True'})`;
+        }
+        document.getElementById('dfCode').textContent = code + '\nprint(result)   # ' + rows.length + ' rows';
+        renderTable(rows, ['name', 'city', 'age', 'score'], true);
+    }
+
+    document.addEventListener('DOMContentLoaded', runDf);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

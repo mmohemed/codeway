@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 2: أتمتة الملفات والمجلدات | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص الأتمتة</a>
+        <span class="sep">/</span>
+        <span>أتمتة الملفات</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-folder-tree"></i>
+            الدرس 2 · الملفات
+        </div>
+        <h1 class="lesson-title">أتمتة الملفات والمجلدات</h1>
+        <p class="lesson-intro">
+            مجلد تنزيلات فيه 2,000 ملف؟ صور رحلة بأسماء مثل <code>IMG_4821.JPG</code>؟ نسخ احتياطي تنساه دائمًا؟ في هذا الدرس ستتعلم استكشاف الملفات وتصفيتها بـ <strong>pathlib</strong>، والنسخ والنقل بـ <strong>shutil</strong>، و<strong>الترتيب حسب النوع والتاريخ</strong>، و<strong>إعادة التسمية الجماعية</strong>، و<strong>الضغط والنسخ الاحتياطي</strong> مع حذف النسخ القديمة، و<strong>اكتشاف الملفات المكررة</strong> بالبصمة.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 70 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 مجلدات مرتبة تلقائيًا</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 1</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#explore">1. الاستكشاف والتصفية</a>
+            <a href="#shutil">2. النسخ والنقل</a>
+            <a href="#organize">3. الترتيب التلقائي</a>
+            <a href="#rename">4. إعادة التسمية</a>
+            <a href="#backup">5. النسخ الاحتياطي</a>
+            <a href="#duplicates">6. الملفات المكررة</a>
+            <a href="#watch">7. مراقبة مجلد</a>
+            <a href="#exercises">8. تمارين تفاعلية</a>
+            <a href="#summary">9. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="explore">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-search"></i>
+        استكشاف الملفات وتصفيتها
+    </h2>
+        <p>
+            في كل أمثلة الدرس نعمل على مجلد تنزيلات تجريبي. هذا كود إنشائه (انسخه لتجرّب بأمان دون لمس ملفاتك الحقيقية):
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>make_sample.py</span>
+    </div>
+<pre><span class="kw">import</span> os
+<span class="kw">import</span> time
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="cm"># مجلد تنزيلات تجريبي بملفات وأحجام وتواريخ مختلفة</span>
+downloads = <span class="fn">Path</span>(<span class="str">"Downloads"</span>)
+(downloads / <span class="str">"old_projects"</span>).<span class="fn">mkdir</span>(parents=<span class="kw">True</span>, exist_ok=<span class="kw">True</span>)
+samples = {
+    <span class="str">"report_final.pdf"</span>: (<span class="num">120</span>_000, <span class="str">"2025-01-14"</span>), <span class="str">"report_final (1).pdf"</span>: (<span class="num">120</span>_000, <span class="str">"2025-01-15"</span>),
+    <span class="str">"budget.xlsx"</span>: (<span class="num">45</span>_000, <span class="str">"2025-02-03"</span>), <span class="str">"IMG_4821.JPG"</span>: (<span class="num">2</span>_400_000, <span class="str">"2024-12-30"</span>),
+    <span class="str">"IMG_4822.JPG"</span>: (<span class="num">2</span>_350_000, <span class="str">"2024-12-30"</span>), <span class="str">"holiday video.mp4"</span>: (<span class="num">26</span>_000_000, <span class="str">"2025-01-02"</span>),
+    <span class="str">"setup_v2.exe"</span>: (<span class="num">22</span>_000_000, <span class="str">"2024-11-20"</span>), <span class="str">"notes.txt"</span>: (<span class="num">2</span>_000, <span class="str">"2025-03-01"</span>),
+    <span class="str">"old_projects/app.py"</span>: (<span class="num">8</span>_000, <span class="str">"2024-06-11"</span>), <span class="str">"old_projects/data.csv"</span>: (<span class="num">500</span>_000, <span class="str">"2024-06-12"</span>),
+}
+<span class="kw">for</span> name, (size, day) <span class="kw">in</span> samples.<span class="fn">items</span>():
+    f = downloads / name
+    content = (<span class="str">b"PDF-report-v1"</span> <span class="kw">if</span> name.<span class="fn">startswith</span>(<span class="str">"report"</span>) <span class="kw">else</span> name.<span class="fn">encode</span>()) * <span class="num">10</span>
+    f.<span class="fn">write_bytes</span>(content.<span class="fn">ljust</span>(size, <span class="str">b"."</span>))
+    ts = time.<span class="fn">mktime</span>(datetime.<span class="fn">strptime</span>(day, <span class="str">"%Y-%m-%d"</span>).<span class="fn">timetuple</span>())
+    os.<span class="fn">utime</span>(f, (ts, ts))</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>explore.py</span>
+    </div>
+<pre><span class="kw">def</span> <span class="fn">human</span>(size):
+    <span class="kw">for</span> unit <span class="kw">in</span> [<span class="str">"B"</span>, <span class="str">"KB"</span>, <span class="str">"MB"</span>, <span class="str">"GB"</span>]:
+        <span class="kw">if</span> size &lt; <span class="num">1024</span>:
+            <span class="kw">return</span> <span class="str">f"{size:.0f} {unit}"</span>
+        size /= <span class="num">1024</span>
+    <span class="kw">return</span> <span class="str">f"{size:.1f} TB"</span>
+
+
+<span class="fn">print</span>(<span class="str">"محتويات المجلد مباشرة (iterdir):"</span>)
+<span class="kw">for</span> item <span class="kw">in</span> <span class="fn">sorted</span>(downloads.<span class="fn">iterdir</span>()):
+    kind = <span class="str">"📁"</span> <span class="kw">if</span> item.<span class="fn">is_dir</span>() <span class="kw">else</span> <span class="str">"📄"</span>
+    <span class="fn">print</span>(<span class="str">f"  {kind} {item.name}"</span>)
+
+<span class="fn">print</span>(<span class="str">"\nكل الملفات حتى داخل المجلدات الفرعية (rglob):"</span>)
+files = [f <span class="kw">for</span> f <span class="kw">in</span> downloads.<span class="fn">rglob</span>(<span class="str">"*"</span>) <span class="kw">if</span> f.<span class="fn">is_file</span>()]
+<span class="kw">for</span> f <span class="kw">in</span> <span class="fn">sorted</span>(files, key=<span class="kw">lambda</span> f: f.<span class="fn">stat</span>().st_size, reverse=<span class="kw">True</span>)[:<span class="num">4</span>]:
+    modified = datetime.<span class="fn">fromtimestamp</span>(f.<span class="fn">stat</span>().st_mtime).<span class="fn">date</span>()
+    <span class="fn">print</span>(<span class="str">f"  {human(f.stat().st_size):&gt;8}  {modified}  {f.relative_to(downloads)}"</span>)
+
+<span class="fn">print</span>(<span class="str">"\nالحجم الكلي:"</span>, <span class="fn">human</span>(<span class="fn">sum</span>(f.<span class="fn">stat</span>().st_size <span class="kw">for</span> f <span class="kw">in</span> files)), <span class="str">"في"</span>, <span class="fn">len</span>(files), <span class="str">"ملفات"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>محتويات المجلد مباشرة (iterdir):
+  📄 IMG_4821.JPG
+  📄 IMG_4822.JPG
+  📄 budget.xlsx
+  📄 holiday video.mp4
+  📄 notes.txt
+  📁 old_projects
+  📄 report_final (1).pdf
+  📄 report_final.pdf
+  📄 setup_v2.exe
+
+كل الملفات حتى داخل المجلدات الفرعية (rglob):
+     25 MB  2025-01-02  holiday video.mp4
+     21 MB  2024-11-20  setup_v2.exe
+      2 MB  2024-12-30  IMG_4821.JPG
+      2 MB  2024-12-30  IMG_4822.JPG
+
+الحجم الكلي: 51 MB في 10 ملفات</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> التصفية بالامتداد والحجم والتاريخ</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>filters.py</span>
+    </div>
+<pre>files = [f <span class="kw">for</span> f <span class="kw">in</span> downloads.<span class="fn">rglob</span>(<span class="str">"*"</span>) <span class="kw">if</span> f.<span class="fn">is_file</span>()]
+
+pdfs = [f.name <span class="kw">for</span> f <span class="kw">in</span> downloads.<span class="fn">glob</span>(<span class="str">"*.pdf"</span>)]
+big = [f.name <span class="kw">for</span> f <span class="kw">in</span> files <span class="kw">if</span> f.<span class="fn">stat</span>().st_size &gt; <span class="num">20</span> * <span class="num">1024</span> * <span class="num">1024</span>]
+cutoff = <span class="fn">datetime</span>(<span class="num">2025</span>, <span class="num">1</span>, <span class="num">1</span>).<span class="fn">timestamp</span>()
+old = [f.name <span class="kw">for</span> f <span class="kw">in</span> files <span class="kw">if</span> f.<span class="fn">stat</span>().st_mtime &lt; cutoff]
+images = [f.name <span class="kw">for</span> f <span class="kw">in</span> files <span class="kw">if</span> f.suffix.<span class="fn">lower</span>() <span class="kw">in</span> {<span class="str">".jpg"</span>, <span class="str">".jpeg"</span>, <span class="str">".png"</span>}]
+
+<span class="fn">print</span>(<span class="str">"PDF:"</span>, pdfs)
+<span class="fn">print</span>(<span class="str">"أكبر من 20MB:"</span>, big)
+<span class="fn">print</span>(<span class="str">"أقدم من 2025:"</span>, old)
+<span class="fn">print</span>(<span class="str">"صور (بغض النظر عن حالة الأحرف):"</span>, images)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>PDF: ['report_final (1).pdf', 'report_final.pdf']
+أكبر من 20MB: ['holiday video.mp4', 'setup_v2.exe']
+أقدم من 2025: ['setup_v2.exe', 'IMG_4822.JPG', 'IMG_4821.JPG', 'data.csv', 'app.py']
+صور (بغض النظر عن حالة الأحرف): ['IMG_4822.JPG', 'IMG_4821.JPG']</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الأداة</th><th>الوظيفة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>folder.iterdir()</code></td><td>محتويات المجلد مباشرة (مستوى واحد)</td></tr>
+                    <tr><td><code>folder.glob("*.pdf")</code></td><td>البحث بنمط في المجلد نفسه</td></tr>
+                    <tr><td><code>folder.rglob("*.pdf")</code></td><td>البحث في المجلد وكل مجلداته الفرعية</td></tr>
+                    <tr><td><code>f.stat().st_size</code></td><td>الحجم بالبايت</td></tr>
+                    <tr><td><code>f.stat().st_mtime</code></td><td>وقت آخر تعديل (ثوانٍ منذ 1970)</td></tr>
+                    <tr><td><code>f.suffix / f.stem / f.name</code></td><td>الامتداد / الاسم بدون امتداد / الاسم الكامل</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="shutil">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-copy"></i>
+        النسخ والنقل والحذف بـ shutil
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>shutil_demo.py</span>
+    </div>
+<pre><span class="kw">import</span> shutil
+
+backup = <span class="fn">Path</span>(<span class="str">"Backup"</span>)
+backup.<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+
+shutil.<span class="fn">copy2</span>(downloads / <span class="str">"budget.xlsx"</span>, backup)             <span class="cm"># نسخ ملف مع تاريخه</span>
+shutil.<span class="fn">copytree</span>(downloads / <span class="str">"old_projects"</span>, backup / <span class="str">"old_projects"</span>, dirs_exist_ok=<span class="kw">True</span>)
+shutil.<span class="fn">move</span>(<span class="fn">str</span>(downloads / <span class="str">"notes.txt"</span>), backup / <span class="str">"notes.txt"</span>)   <span class="cm"># نقل</span>
+<span class="fn">print</span>(<span class="str">"في النسخة الاحتياطية:"</span>, <span class="fn">sorted</span>(p.name <span class="kw">for</span> p <span class="kw">in</span> backup.<span class="fn">rglob</span>(<span class="str">"*"</span>)))
+<span class="fn">print</span>(<span class="str">"notes.txt ما زال في التنزيلات؟"</span>, (downloads / <span class="str">"notes.txt"</span>).<span class="fn">exists</span>())
+
+total, used, free = shutil.<span class="fn">disk_usage</span>(<span class="str">"."</span>)
+<span class="fn">print</span>(<span class="str">"هل توجد مساحة حرة تكفي لنسخة احتياطية (أكثر من 1 GB)؟"</span>, free &gt; <span class="num">1024</span> ** <span class="num">3</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>في النسخة الاحتياطية: ['app.py', 'budget.xlsx', 'data.csv', 'notes.txt', 'old_projects']
+notes.txt ما زال في التنزيلات؟ False
+هل توجد مساحة حرة تكفي لنسخة احتياطية (أكثر من 1 GB)؟ True</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الدالة</th><th>الوظيفة</th><th>الخطورة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>shutil.copy2(src, dst)</code></td><td>نسخ ملف مع الحفاظ على تاريخه</td><td>🟢 آمنة</td></tr>
+                    <tr><td><code>shutil.copytree(src, dst)</code></td><td>نسخ مجلد كامل</td><td>🟢 آمنة</td></tr>
+                    <tr><td><code>shutil.move(src, dst)</code></td><td>نقل أو إعادة تسمية</td><td>🟡 قد تستبدل ملفًا موجودًا</td></tr>
+                    <tr><td><code>Path.unlink()</code></td><td>حذف ملف نهائيًا</td><td>🔴 لا يذهب لسلة المحذوفات</td></tr>
+                    <tr><td><code>shutil.rmtree(folder)</code></td><td>حذف مجلد بكل محتواه نهائيًا</td><td>🔴🔴 خطيرة جدًا</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>الحذف في Python نهائي!</strong> لا يمر بسلة المحذوفات. استخدم مكتبة <code>send2trash</code>
+                (<code>pip install send2trash</code> ثم <code>send2trash(path)</code>) لإرسال الملفات للسلة بدل حذفها، خاصة أثناء التجربة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="organize">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-sitemap"></i>
+        الترتيب حسب النوع والتاريخ
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>organize.py</span>
+    </div>
+<pre><span class="kw">import</span> shutil
+
+CATEGORIES = {
+    <span class="str">"Documents"</span>: {<span class="str">".pdf"</span>, <span class="str">".docx"</span>, <span class="str">".xlsx"</span>, <span class="str">".txt"</span>},
+    <span class="str">"Images"</span>: {<span class="str">".jpg"</span>, <span class="str">".jpeg"</span>, <span class="str">".png"</span>},
+    <span class="str">"Videos"</span>: {<span class="str">".mp4"</span>, <span class="str">".mov"</span>},
+    <span class="str">"Installers"</span>: {<span class="str">".exe"</span>, <span class="str">".msi"</span>, <span class="str">".dmg"</span>},
+}
+
+
+<span class="kw">def</span> <span class="fn">category_of</span>(path: Path) -&gt; str:
+    ext = path.suffix.<span class="fn">lower</span>()
+    <span class="kw">return</span> <span class="fn">next</span>((name <span class="kw">for</span> name, exts <span class="kw">in</span> CATEGORIES.<span class="fn">items</span>() <span class="kw">if</span> ext <span class="kw">in</span> exts), <span class="str">"Other"</span>)
+
+
+<span class="kw">def</span> <span class="fn">organize</span>(folder: Path, by_month: bool = <span class="kw">True</span>, dry_run: bool = <span class="kw">False</span>) -&gt; dict:
+    moved = {}
+    <span class="kw">for</span> f <span class="kw">in</span> <span class="fn">sorted</span>(folder.<span class="fn">iterdir</span>()):
+        <span class="kw">if</span> <span class="kw">not</span> f.<span class="fn">is_file</span>():
+            <span class="kw">continue</span>
+        target = folder / <span class="fn">category_of</span>(f)
+        <span class="kw">if</span> by_month:
+            target = target / datetime.<span class="fn">fromtimestamp</span>(f.<span class="fn">stat</span>().st_mtime).<span class="fn">strftime</span>(<span class="str">"%Y-%m"</span>)
+        <span class="kw">if</span> <span class="kw">not</span> dry_run:
+            target.<span class="fn">mkdir</span>(parents=<span class="kw">True</span>, exist_ok=<span class="kw">True</span>)
+            shutil.<span class="fn">move</span>(<span class="fn">str</span>(f), target / f.name)
+        moved[f.name] = <span class="fn">str</span>(target.<span class="fn">relative_to</span>(folder))
+    <span class="kw">return</span> moved
+
+
+<span class="kw">for</span> name, where <span class="kw">in</span> <span class="fn">organize</span>(downloads).<span class="fn">items</span>():
+    <span class="fn">print</span>(<span class="str">f"{name:&lt;22} → {where}"</span>)
+
+<span class="fn">print</span>(<span class="str">"\nالشجرة الناتجة:"</span>)
+<span class="kw">for</span> p <span class="kw">in</span> <span class="fn">sorted</span>(downloads.<span class="fn">rglob</span>(<span class="str">"*"</span>)):
+    <span class="kw">if</span> p.<span class="fn">is_dir</span>():
+        depth = <span class="fn">len</span>(p.<span class="fn">relative_to</span>(downloads).parts) - <span class="num">1</span>
+        <span class="fn">print</span>(<span class="str">"  "</span> * depth + <span class="str">"📁 "</span> + p.name)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>IMG_4821.JPG           → Images/2024-12
+IMG_4822.JPG           → Images/2024-12
+budget.xlsx            → Documents/2025-02
+holiday video.mp4      → Videos/2025-01
+notes.txt              → Documents/2025-03
+report_final (1).pdf   → Documents/2025-01
+report_final.pdf       → Documents/2025-01
+setup_v2.exe           → Installers/2024-11
+
+الشجرة الناتجة:
+📁 Documents
+  📁 2025-01
+  📁 2025-02
+  📁 2025-03
+📁 Images
+  📁 2024-12
+📁 Installers
+  📁 2024-11
+📁 Videos
+  📁 2025-01
+📁 old_projects</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>لاحظ:</strong> المجلد الفرعي <code>old_projects</code> لم يُلمس لأننا نعالج الملفات فقط (<code>is_file()</code>).
+                جرّب المختبر التفاعلي أسفل الصفحة لترى أثر اختيار «حسب النوع» أو «حسب الشهر».
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="rename">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-i-cursor"></i>
+        إعادة التسمية الجماعية
+    </h2>
+        <p>صور الرحلة بأسماء الكاميرا غير مفهومة. لنعيد تسميتها بالتاريخ ورقم متسلسل:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>batch_rename.py</span>
+    </div>
+<pre>photos = <span class="fn">sorted</span>(downloads.<span class="fn">glob</span>(<span class="str">"*.JPG"</span>), key=<span class="kw">lambda</span> f: (f.<span class="fn">stat</span>().st_mtime, f.name))
+
+plan = []
+<span class="kw">for</span> i, f <span class="kw">in</span> <span class="fn">enumerate</span>(photos, start=<span class="num">1</span>):
+    day = datetime.<span class="fn">fromtimestamp</span>(f.<span class="fn">stat</span>().st_mtime).<span class="fn">strftime</span>(<span class="str">"%Y-%m-%d"</span>)
+    new_name = <span class="str">f"{day}_Trip_{i:03d}{f.suffix.lower()}"</span>        <span class="cm"># 001، 002 … للترتيب الصحيح</span>
+    plan.<span class="fn">append</span>((f, f.<span class="fn">with_name</span>(new_name)))
+
+<span class="fn">print</span>(<span class="str">"الخطة (تجربة):"</span>)
+<span class="kw">for</span> old, new <span class="kw">in</span> plan:
+    <span class="fn">print</span>(<span class="str">f"  {old.name}  →  {new.name}"</span>)
+
+conflicts = [new <span class="kw">for</span> _, new <span class="kw">in</span> plan <span class="kw">if</span> new.<span class="fn">exists</span>()]
+<span class="kw">if</span> conflicts:
+    <span class="fn">print</span>(<span class="str">"⚠️ تعارض! لن نعيد التسمية:"</span>, conflicts)
+<span class="kw">else</span>:
+    <span class="kw">for</span> old, new <span class="kw">in</span> plan:
+        old.<span class="fn">rename</span>(new)
+    <span class="fn">print</span>(<span class="str">"✅ تمت إعادة تسمية"</span>, <span class="fn">len</span>(plan), <span class="str">"صور"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الخطة (تجربة):
+  IMG_4821.JPG  →  2024-12-30_Trip_001.jpg
+  IMG_4822.JPG  →  2024-12-30_Trip_002.jpg
+✅ تمت إعادة تسمية 2 صور</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>لماذا <code>{i:03d}</code>؟</strong> لأن الترتيب الأبجدي يضع <code>10</code> قبل <code>2</code>! مع الأصفار البادئة يصبح
+                <code>002</code> قبل <code>010</code> فيبقى الترتيب صحيحًا في أي مستكشف ملفات.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="backup">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-archive"></i>
+        الضغط والنسخ الاحتياطي الدوري
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>backup.py</span>
+    </div>
+<pre><span class="kw">import</span> shutil
+<span class="kw">import</span> zipfile
+
+backups = <span class="fn">Path</span>(<span class="str">"Backups"</span>)
+backups.<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+
+
+<span class="kw">def</span> <span class="fn">make_backup</span>(source: Path, when: datetime) -&gt; Path:
+    name = backups / <span class="str">f"{source.name}_{when:%Y-%m-%d_%H%M}"</span>
+    <span class="kw">return</span> <span class="fn">Path</span>(shutil.<span class="fn">make_archive</span>(<span class="fn">str</span>(name), <span class="str">"zip"</span>, source))    <span class="cm"># يُرجع مسار ملف zip</span>
+
+
+<span class="kw">def</span> <span class="fn">rotate</span>(keep: int = <span class="num">3</span>):
+    <span class="str">"""احتفظ بأحدث N نسخ فقط واحذف الأقدم."""</span>
+    archives = <span class="fn">sorted</span>(backups.<span class="fn">glob</span>(<span class="str">"*.zip"</span>))           <span class="cm"># الاسم يبدأ بالتاريخ فالترتيب زمني</span>
+    <span class="kw">for</span> old <span class="kw">in</span> archives[:-keep]:
+        old.<span class="fn">unlink</span>()
+        <span class="fn">print</span>(<span class="str">"🗑️ حُذفت نسخة قديمة:"</span>, old.name)
+
+
+<span class="kw">for</span> day <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>):                                <span class="cm"># محاكاة تشغيل يومي لخمسة أيام</span>
+    archive = <span class="fn">make_backup</span>(downloads, <span class="fn">datetime</span>(<span class="num">2025</span>, <span class="num">3</span>, day, <span class="num">23</span>, <span class="num">0</span>))
+<span class="fn">rotate</span>(keep=<span class="num">3</span>)
+
+<span class="fn">print</span>(<span class="str">"\nالنسخ المتبقية:"</span>, [a.name <span class="kw">for</span> a <span class="kw">in</span> <span class="fn">sorted</span>(backups.<span class="fn">glob</span>(<span class="str">"*.zip"</span>))])
+<span class="kw">with</span> zipfile.<span class="fn">ZipFile</span>(archive) <span class="kw">as</span> z:
+    names = z.<span class="fn">namelist</span>()
+    <span class="fn">print</span>(<span class="str">f"آخر نسخة فيها {len(names)} عناصر، منها:"</span>, names[:<span class="num">3</span>])
+    <span class="fn">print</span>(<span class="str">f"حجمها المضغوط: {archive.stat().st_size / 1024:.0f} KB"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>🗑️ حُذفت نسخة قديمة: Downloads_2025-03-01_2300.zip
+🗑️ حُذفت نسخة قديمة: Downloads_2025-03-02_2300.zip
+
+النسخ المتبقية: ['Downloads_2025-03-03_2300.zip', 'Downloads_2025-03-04_2300.zip', 'Downloads_2025-03-05_2300.zip']
+آخر نسخة فيها 11 عناصر، منها: ['old_projects/', 'holiday video.mp4', 'setup_v2.exe']
+حجمها المضغوط: 52 KB</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>عن الحجم المضغوط:</strong> 51 MB صارت 52 KB لأن ملفاتنا التجريبية مملوءة بنقاط متكررة يسهل ضغطها جدًا.
+                الصور والفيديو الحقيقية مضغوطة أصلًا، فلا يقل حجمها تقريبًا داخل ملف zip، بينما ملفات النصوص و CSV و Excel تنضغط جيدًا.
+            </div>
+        </div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>قاعدة 3-2-1 للنسخ الاحتياطي:</strong> 3 نسخ من بياناتك، على وسيطين مختلفين، وواحدة خارج مكانك (سحابة أو قرص خارجي).
+                سكربتك يمكنه نسخ الملف المضغوط تلقائيًا إلى مجلد OneDrive أو Google Drive المتزامن.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="duplicates">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-clone"></i>
+        اكتشاف الملفات المكررة بالبصمة
+    </h2>
+        <p>
+            الملفان <code>report_final.pdf</code> و <code>report_final (1).pdf</code> قد يكونان نسخة واحدة. الاسم لا يكفي للحكم، لكن
+            <strong>البصمة (Hash)</strong> تكفي: رقم يُحسب من محتوى الملف، فإذا تطابقت البصمتان فالمحتوى متطابق تمامًا.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>duplicates.py</span>
+    </div>
+<pre><span class="kw">import</span> hashlib
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+
+
+<span class="kw">def</span> <span class="fn">file_hash</span>(path: Path, chunk: int = <span class="num">1024</span> * <span class="num">1024</span>) -&gt; str:
+    h = hashlib.<span class="fn">sha256</span>()
+    <span class="kw">with</span> <span class="fn">open</span>(path, <span class="str">"rb"</span>) <span class="kw">as</span> f:
+        <span class="kw">while</span> block := f.<span class="fn">read</span>(chunk):            <span class="cm"># قراءة على دفعات: تعمل مع الملفات الضخمة</span>
+            h.<span class="fn">update</span>(block)
+    <span class="kw">return</span> h.<span class="fn">hexdigest</span>()
+
+
+<span class="kw">def</span> <span class="fn">find_duplicates</span>(folder: Path):
+    by_size = <span class="fn">defaultdict</span>(list)
+    <span class="kw">for</span> f <span class="kw">in</span> folder.<span class="fn">rglob</span>(<span class="str">"*"</span>):
+        <span class="kw">if</span> f.<span class="fn">is_file</span>():
+            by_size[f.<span class="fn">stat</span>().st_size].<span class="fn">append</span>(f)      <span class="cm"># 1) تصفية سريعة بالحجم أولًا</span>
+    groups = []
+    <span class="kw">for</span> same_size <span class="kw">in</span> by_size.<span class="fn">values</span>():
+        <span class="kw">if</span> <span class="fn">len</span>(same_size) &lt; <span class="num">2</span>:
+            <span class="kw">continue</span>
+        by_hash = <span class="fn">defaultdict</span>(list)
+        <span class="kw">for</span> f <span class="kw">in</span> same_size:
+            by_hash[<span class="fn">file_hash</span>(f)].<span class="fn">append</span>(f)          <span class="cm"># 2) البصمة فقط لمن تساوى حجمهم</span>
+        groups += [g <span class="kw">for</span> g <span class="kw">in</span> by_hash.<span class="fn">values</span>() <span class="kw">if</span> <span class="fn">len</span>(g) &gt; <span class="num">1</span>]
+    <span class="kw">return</span> groups
+
+
+<span class="kw">for</span> group <span class="kw">in</span> <span class="fn">find_duplicates</span>(downloads):
+    <span class="fn">print</span>(<span class="str">"🔁 ملفات متطابقة:"</span>, [f.name <span class="kw">for</span> f <span class="kw">in</span> group])
+    wasted = <span class="fn">sum</span>(f.<span class="fn">stat</span>().st_size <span class="kw">for</span> f <span class="kw">in</span> group[<span class="num">1</span>:])
+    <span class="fn">print</span>(<span class="str">f"   مساحة يمكن توفيرها: {wasted / 1024:.0f} KB"</span>)
+<span class="fn">print</span>(<span class="str">"بصمة SHA-256 (أول 16 حرفًا):"</span>, <span class="fn">file_hash</span>(downloads / <span class="str">"budget.xlsx"</span>)[:<span class="num">16</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>🔁 ملفات متطابقة: ['report_final (1).pdf', 'report_final.pdf']
+   مساحة يمكن توفيرها: 117 KB
+بصمة SHA-256 (أول 16 حرفًا): dd5639396d4f60d6</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>لماذا الحجم أولًا؟</strong> حساب البصمة يتطلب قراءة الملف كله، وهذا بطيء مع آلاف الملفات الكبيرة. الملفات مختلفة الحجم مختلفة حتمًا،
+                فنحسب البصمة فقط للملفات المتساوية في الحجم. هذه الحيلة تسرّع البحث كثيرًا.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="watch">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-eye"></i>
+        مراقبة مجلد ومعالجة الملفات الجديدة
+    </h2>
+        <p>أحيانًا تريد معالجة كل ملف جديد يصل لمجلد (مثل فواتير ممسوحة ضوئيًا). أبسط طريقة: <strong>الفحص الدوري</strong>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>watch_folder.py</span>
+    </div>
+<pre><span class="kw">import</span> time
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+INBOX = <span class="fn">Path</span>(<span class="str">"Inbox"</span>)
+seen = {p.name <span class="kw">for</span> p <span class="kw">in</span> INBOX.<span class="fn">iterdir</span>()}
+
+<span class="kw">while</span> <span class="kw">True</span>:                                    <span class="cm"># أوقفه بـ Ctrl+C</span>
+    current = {p.name <span class="kw">for</span> p <span class="kw">in</span> INBOX.<span class="fn">iterdir</span>()}
+    <span class="kw">for</span> name <span class="kw">in</span> <span class="fn">sorted</span>(current - seen):        <span class="cm"># فرق المجموعات = الملفات الجديدة</span>
+        <span class="fn">print</span>(<span class="str">"📥 ملف جديد:"</span>, name)
+        <span class="cm"># process(INBOX / name)  ← هنا تضع المعالجة: نقل، تحويل، إرسال…</span>
+    seen = current
+    time.<span class="fn">sleep</span>(<span class="num">5</span>)                              <span class="cm"># افحص كل 5 ثوانٍ</span></pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>للمراقبة الاحترافية</strong> استخدم مكتبة <code>watchdog</code> التي يخبرها نظام التشغيل فورًا بأي تغيير بدل الفحص الدوري،
+                فتستهلك موارد أقل وتستجيب أسرع.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! &lt;code&gt;rglob&lt;/code&gt; تبحث بشكل متكرر في كل المجلدات الفرعية." data-hint="الحرف r يعني recursive (متكرر).">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">البحث في المجلدات</span>
+    </div>
+    <p class="exercise-question">تريد كل ملفات Excel داخل مجلد <code>Reports</code> <strong>وكل مجلداته الفرعية</strong>. أي سطر تستخدم؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>Path("Reports").iterdir()</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="2"> <code>Path("Reports").glob("*.xlsx")</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="3"> <code>Path("Reports").rglob("*.xlsx")</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>Path("Reports").stat()</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تتعامل مع الملفات بأمان ووعي." data-hint="الحذف في Python نهائي، و rmtree تحذف مجلدًا كاملًا.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>Path.unlink()</code> ترسل الملف إلى سلة المحذوفات.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">تطابق بصمة SHA-256 لملفين يعني أن محتواهما متطابق.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">الترقيم <code>{i:03d}</code> يحافظ على الترتيب الصحيح للأسماء أبجديًا.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>shutil.rmtree</code> دالة آمنة يمكن تجربتها على أي مجلد.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>shutil.copy2</code> تحافظ على تاريخ تعديل الملف.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! &lt;code&gt;suffix&lt;/code&gt; آخر امتداد فقط، و &lt;code&gt;stem&lt;/code&gt; الاسم بدونه." data-hint="الامتداد هو ما بعد آخر نقطة.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">pathlib</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+p = <span class="fn">Path</span>(<span class="str">"Reports"</span>) / <span class="str">"2025"</span> / <span class="str">"sales_march.final.xlsx"</span>
+<span class="fn">print</span>(p.name)
+<span class="fn">print</span>(p.suffix)
+<span class="fn">print</span>(p.stem)
+<span class="fn">print</span>(p.parent.name)</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">name:</span><input type="text" class="blank-input" data-answers="sales_march.final.xlsx" placeholder="..." style="min-width:338px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">suffix:</span><input type="text" class="blank-input" data-answers=".xlsx" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">stem:</span><input type="text" class="blank-input" data-answers="sales_march.final" placeholder="..." style="min-width:268px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">parent.name:</span><input type="text" class="blank-input" data-answers="2025" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! سطر واحد يضغط مجلدًا كاملًا." data-hint="تاريخ اليوم &lt;code&gt;date.today()&lt;/code&gt;، والضغط &lt;code&gt;make_archive&lt;/code&gt; بصيغة zip.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">نسخ احتياطي</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لضغط مجلد <code>Documents</code> في ملف zip باسم يحتوي تاريخ اليوم:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">import</span> shutil</span></div>
+        <div class="line"><span><span class="kw">from</span> datetime <span class="kw">import</span> </span><input type="text" class="blank-input" data-answers="date" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span>name = f'backup_{date.</span><input type="text" class="blank-input" data-answers="today" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"><span>():%Y-%m-%d}'</span></div>
+        <div class="line"><span>shutil.</span><input type="text" class="blank-input" data-answers="make_archive" placeholder="..." style="min-width:198px;" autocomplete="off" spellcheck="false"><span>(name, </span><input type="text" class="blank-input" data-answers="&#x27;zip&#x27;" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"><span>, <span class="str">'Documents'</span>)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! التصفية بالحجم أولًا توفر الكثير من الوقت." data-hint="البصمة مكلفة، فاحسبها في النهاية لأقل عدد ممكن من الملفات.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب خطوات البحث الذكي عن الملفات المكررة. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) حساب البصمة للملفات المتساوية في الحجم فقط</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">1) المرور على كل الملفات بـ rglob</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">5) تجميع حسب البصمة وعرض المجموعات المكررة</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">3) استبعاد كل حجم ليس له إلا ملف واحد</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) تجميع الملفات حسب الحجم</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> محاكي منظّم الملفات</div>
+    <p style="color:var(--text-light); font-size:0.95em;">هذه ملفات مجلد تنزيلات. اختر قاعدة الترتيب، وشاهد الشجرة التي سيُنشئها السكربت قبل أن يلمس أي ملف (وضع التجربة).</p>
+    <div class="lab-row">
+        <label>رتّب حسب:</label>
+        <select class="lab-select" id="orgRule" onchange="runOrg()">
+            <option value="type">النوع فقط</option><option value="type_month">النوع ثم الشهر</option>
+            <option value="month">الشهر فقط</option><option value="ext">الامتداد</option>
+        </select>
+        <label><input type="checkbox" id="orgLower" onchange="runOrg()" checked> توحيد الأسماء (أحرف صغيرة، _ بدل المسافة)</label>
+    </div>
+    <div class="lab-row" style="align-items:flex-start;">
+        <div style="flex:1; min-width:220px;"><div style="color:var(--gold); font-size:0.85em;">قبل</div><div class="lab-console" id="orgBefore" style="margin-top:4px;"></div></div>
+        <div style="flex:1; min-width:220px;"><div style="color:var(--gold); font-size:0.85em;">بعد (تجربة)</div><div class="lab-console" id="orgAfter" style="margin-top:4px;"></div></div>
+    </div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> استكشاف الملفات بـ <code>iterdir</code> و <code>glob</code> و <code>rglob</code> وقراءة الحجم والتاريخ.</li>
+                <li><i class="fas fa-check"></i> التصفية حسب الامتداد والحجم والتاريخ.</li>
+                <li><i class="fas fa-check"></i> النسخ والنقل بـ <code>shutil</code> ومعرفة الدوال الخطيرة و <code>send2trash</code>.</li>
+                <li><i class="fas fa-check"></i> ترتيب الملفات تلقائيًا حسب النوع والشهر.</li>
+                <li><i class="fas fa-check"></i> إعادة التسمية الجماعية بالتاريخ والترقيم مع فحص التعارض.</li>
+                <li><i class="fas fa-check"></i> الضغط بـ <code>make_archive</code> والنسخ الاحتياطي الدوري مع حذف القديم.</li>
+                <li><i class="fas fa-check"></i> اكتشاف الملفات المكررة بالحجم ثم بصمة SHA-256.</li>
+                <li><i class="fas fa-check"></i> مراقبة مجلد بالفحص الدوري ومكتبة <code>watchdog</code>.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> جرّب كل سكربت ملفات على مجلد تجريبي أنشأته بكود مثل كود هذا الدرس.</li>
+                <li><i class="fas fa-lightbulb"></i> اجعل الافتراضي هو التجربة (<code>dry_run=True</code>) والتنفيذ خيارًا صريحًا.</li>
+                <li><i class="fas fa-lightbulb"></i> رتّب مجلد التنزيلات عندك فعليًا كأول مشروع أتمتة حقيقي لك.</li>
+                <li><i class="fas fa-lightbulb"></i> احسب البصمة للتحقق من سلامة النسخ الاحتياطية بعد نسخها.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>أتمتة Excel و Word و PDF</strong>: إنشاء تقارير منسقة وعقود ودمج ملفات PDF تلقائيًا.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson1.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 1: مدخل إلى الأتمتة</span>
+        </a>
+        <a href="lesson3.html" class="nav-link next">
+            <span>الدرس التالي: أتمتة Excel و Word و PDF</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · أتمتة الملفات
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '20%';
+            text.textContent = '20% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== محاكي المنظّم ========== */
+    const ORG_FILES = [
+        ['report_final.pdf', '2025-01-14'], ['Budget 2025.xlsx', '2025-02-03'], ['IMG_4821.JPG', '2024-12-30'],
+        ['IMG_4822.JPG', '2024-12-30'], ['holiday video.mp4', '2025-01-02'], ['setup_v2.exe', '2024-11-20'],
+        ['notes.txt', '2025-03-01'], ['Logo Final.png', '2025-02-17'], ['song.mp3', '2025-01-20'],
+    ];
+    const ORG_CATS = { Documents: ['.pdf', '.docx', '.xlsx', '.txt'], Images: ['.jpg', '.jpeg', '.png'], Videos: ['.mp4', '.mov'], Installers: ['.exe', '.msi'] };
+
+    function runOrg() {
+        const rule = document.getElementById('orgRule').value, lower = document.getElementById('orgLower').checked;
+        document.getElementById('orgBefore').textContent = '📁 Downloads/\n' + ORG_FILES.map(([n, d]) => `   📄 ${n}   (${d})`).join('\n');
+        const tree = {};
+        ORG_FILES.forEach(([name, date]) => {
+            const ext = name.slice(name.lastIndexOf('.')).toLowerCase();
+            const cat = Object.keys(ORG_CATS).find(c => ORG_CATS[c].includes(ext)) || 'Other';
+            const month = date.slice(0, 7);
+            const path = { type: [cat], type_month: [cat, month], month: [month], ext: [ext.slice(1).toUpperCase()] }[rule];
+            const finalName = lower ? name.trim().toLowerCase().replace(/\s+/g, '_') : name;
+            let node = tree;
+            path.forEach(p => { node[p] = node[p] || {}; node = node[p]; });
+            (node.__files = node.__files || []).push(finalName);
+        });
+        const lines = ['📁 Downloads/'];
+        (function walk(node, depth) {
+            Object.keys(node).filter(k => k !== '__files').sort().forEach(k => {
+                lines.push('   '.repeat(depth) + '📁 ' + k + '/');
+                walk(node[k], depth + 1);
+            });
+            (node.__files || []).sort().forEach(f => lines.push('   '.repeat(depth) + '📄 ' + f));
+        })(tree, 1);
+        document.getElementById('orgAfter').textContent = lines.join('\n');
+    }
+
+    document.addEventListener('DOMContentLoaded', runOrg);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

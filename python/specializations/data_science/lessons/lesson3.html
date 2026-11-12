@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 3: Pandas المتقدم | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص تحليل البيانات</a>
+        <span class="sep">/</span>
+        <span>Pandas المتقدم</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-table"></i>
+            الدرس 3 · معالجة الجداول
+        </div>
+        <h1 class="lesson-title">Pandas المتقدم: الدمج وإعادة التشكيل والسلاسل الزمنية</h1>
+        <p class="lesson-intro">
+            البيانات الحقيقية لا تأتي في جدول واحد مرتب: العملاء في جدول، والطلبات في آخر، والمنتجات في ثالث. في هذا الدرس ستتعلم <strong>دمج الجداول</strong> كما في SQL، و<strong>سلاسل العمليات (Method Chaining)</strong>، ومعالجة <strong>النصوص والتواريخ</strong>، و<strong>إعادة تشكيل</strong> الجداول، والتحليل <strong>الزمني</strong> بالنوافذ المتحركة.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 80 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 التعامل مع عدة جداول وتواريخ</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 2</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#merge">1. دمج الجداول</a>
+            <a href="#chaining">2. سلاسل العمليات</a>
+            <a href="#strings">3. معالجة النصوص</a>
+            <a href="#dates">4. التواريخ والزمن</a>
+            <a href="#reshape">5. إعادة التشكيل</a>
+            <a href="#groupby">6. groupby المتقدم</a>
+            <a href="#performance">7. الأداء</a>
+            <a href="#exercises">8. تمارين تفاعلية</a>
+            <a href="#summary">9. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="merge">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-link"></i>
+        دمج الجداول (merge)
+    </h2>
+        <p>لدينا ثلاثة جداول لمتجر إلكتروني، والسؤال: «كم أنفق كل عميل؟» — الإجابة تحتاج معلومات من الجداول الثلاثة:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>tables.py</span>
+    </div>
+<pre><span class="fn">print</span>(customers, <span class="str">"\n"</span>)
+<span class="fn">print</span>(orders, <span class="str">"\n"</span>)
+<span class="fn">print</span>(products)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   customer_id  name    city
+0            1  سارة  الرياض
+1            2   علي     جدة
+2            3   منى  الرياض
+3            4  خالد  الدمام 
+
+   order_id  customer_id product_id  qty       date
+0       101            1         P1    1 2025-01-05
+1       102            2         P2    2 2025-01-12
+2       103            1         P3    1 2025-02-03
+3       104            3         P1    3 2025-02-17
+4       105            5         P2    1 2025-02-20
+5       106            2         P3    4 2025-03-08 
+
+  product_id product  price
+0         P1   سماعة    220
+1         P2    شاحن     60
+2         P3   حافظة     35</pre>
+</div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>نوع الدمج <code>how=</code></th><th>ماذا يُبقي؟</th><th>يقابله في SQL</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>inner</code> (الافتراضي)</td><td>الصفوف المتطابقة في الجدولين فقط</td><td><code>INNER JOIN</code></td></tr>
+                    <tr><td><code>left</code></td><td>كل صفوف اليسار + ما يطابقها من اليمين (والباقي NaN)</td><td><code>LEFT JOIN</code></td></tr>
+                    <tr><td><code>right</code></td><td>كل صفوف اليمين + ما يطابقها من اليسار</td><td><code>RIGHT JOIN</code></td></tr>
+                    <tr><td><code>outer</code></td><td>كل الصفوف من الجدولين</td><td><code>FULL OUTER JOIN</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>merge_types.py</span>
+    </div>
+<pre>inner = orders.<span class="fn">merge</span>(customers, on=<span class="str">"customer_id"</span>)                 <span class="cm"># الطلب 105 لعميل غير موجود يختفي</span>
+<span class="fn">print</span>(<span class="str">"inner:"</span>, <span class="fn">len</span>(inner), <span class="str">"صفوف"</span>)
+
+left = customers.<span class="fn">merge</span>(orders, on=<span class="str">"customer_id"</span>, how=<span class="str">"left"</span>)      <span class="cm"># خالد بلا طلبات يبقى مع NaN</span>
+<span class="fn">print</span>(left[[<span class="str">"name"</span>, <span class="str">"order_id"</span>, <span class="str">"qty"</span>]], <span class="str">"\n"</span>)
+
+check = orders.<span class="fn">merge</span>(customers, on=<span class="str">"customer_id"</span>, how=<span class="str">"outer"</span>, indicator=<span class="kw">True</span>)
+<span class="fn">print</span>(check[<span class="str">"_merge"</span>].<span class="fn">value_counts</span>())
+<span class="fn">print</span>(<span class="str">"طلبات لعملاء مجهولين:"</span>, check.loc[check[<span class="str">"_merge"</span>] == <span class="str">"left_only"</span>, <span class="str">"order_id"</span>].<span class="fn">tolist</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>inner: 5 صفوف
+   name  order_id  qty
+0  سارة     101.0  1.0
+1  سارة     103.0  1.0
+2   علي     102.0  2.0
+3   علي     106.0  4.0
+4   منى     104.0  3.0
+5  خالد       NaN  NaN 
+
+_merge
+both          5
+left_only     1
+right_only    1
+Name: count, dtype: int64
+طلبات لعملاء مجهولين: [105.0]</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong><code>indicator=True</code></strong> يضيف عمود <code>_merge</code> يوضح مصدر كل صف — أداة ممتازة لاكتشاف مشاكل جودة البيانات
+                مثل طلبات لعملاء محذوفين. واستخدم <code>validate="many_to_one"</code> لتتأكد أن الجدول الأيمن ليس فيه مفاتيح مكررة.
+            </div>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> الإجابة: كم أنفق كل عميل؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>spend_per_customer.py</span>
+    </div>
+<pre>full = (orders
+        .<span class="fn">merge</span>(products, on=<span class="str">"product_id"</span>, validate=<span class="str">"many_to_one"</span>)
+        .<span class="fn">merge</span>(customers, on=<span class="str">"customer_id"</span>, how=<span class="str">"left"</span>)
+        .<span class="fn">assign</span>(total=<span class="kw">lambda</span> d: d[<span class="str">"qty"</span>] * d[<span class="str">"price"</span>]))
+
+spend = (full.<span class="fn">groupby</span>(<span class="str">"name"</span>, dropna=<span class="kw">False</span>)[<span class="str">"total"</span>].<span class="fn">sum</span>()
+             .<span class="fn">sort_values</span>(ascending=<span class="kw">False</span>))
+<span class="fn">print</span>(spend)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>name
+منى     660
+علي     260
+سارة    255
+NaN      60
+Name: total, dtype: int64</pre>
+</div>
+        <p>
+            لاحظ <code>NaN</code> في الأسماء: هو الطلب 105 لعميل غير موجود. في عمل حقيقي يجب الإبلاغ عن هذا الخلل لا تجاهله.
+        </p>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> concat: لصق الجداول فوق بعضها</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>concat.py</span>
+    </div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+jan = pd.<span class="fn">DataFrame</span>({<span class="str">"product"</span>: [<span class="str">"أ"</span>, <span class="str">"ب"</span>], <span class="str">"sales"</span>: [<span class="num">100</span>, <span class="num">80</span>]})
+feb = pd.<span class="fn">DataFrame</span>({<span class="str">"product"</span>: [<span class="str">"أ"</span>, <span class="str">"ج"</span>], <span class="str">"sales"</span>: [<span class="num">120</span>, <span class="num">40</span>]})
+both = pd.<span class="fn">concat</span>([jan.<span class="fn">assign</span>(month=<span class="str">"يناير"</span>), feb.<span class="fn">assign</span>(month=<span class="str">"فبراير"</span>)], ignore_index=<span class="kw">True</span>)
+<span class="fn">print</span>(both)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>  product  sales   month
+0       أ    100   يناير
+1       ب     80   يناير
+2       أ    120  فبراير
+3       ج     40  فبراير</pre>
+</div>
+</section>
+
+<section class="section-card" id="chaining">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-stream"></i>
+        سلاسل العمليات (Method Chaining)
+    </h2>
+        <p>
+            بدل إنشاء متغيرات وسيطة كثيرة (<code>df2</code>، <code>df3</code>…)، يمكنك ربط العمليات في سلسلة واحدة مقروءة من الأعلى للأسفل.
+            الأدوات الأساسية: <code>assign</code> لإضافة أعمدة، و <code>query</code> للفلترة، و <code>pipe</code> لتمرير دالتك الخاصة.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>chaining.py</span>
+    </div>
+<pre><span class="kw">def</span> <span class="fn">add_month</span>(df):
+    <span class="kw">return</span> df.<span class="fn">assign</span>(month=df[<span class="str">"date"</span>].dt.<span class="fn">strftime</span>(<span class="str">"%Y-%m"</span>))
+
+report = (
+    orders
+    .<span class="fn">merge</span>(products, on=<span class="str">"product_id"</span>)
+    .<span class="fn">assign</span>(total=<span class="kw">lambda</span> d: d[<span class="str">"qty"</span>] * d[<span class="str">"price"</span>])
+    .<span class="fn">query</span>(<span class="str">"total &gt;= 100"</span>)                    <span class="cm"># فلترة بنص مقروء</span>
+    .<span class="fn">pipe</span>(add_month)
+    .<span class="fn">groupby</span>(<span class="str">"month"</span>, as_index=<span class="kw">False</span>)
+    .<span class="fn">agg</span>(orders=(<span class="str">"order_id"</span>, <span class="str">"count"</span>), revenue=(<span class="str">"total"</span>, <span class="str">"sum"</span>))
+    .<span class="fn">sort_values</span>(<span class="str">"revenue"</span>, ascending=<span class="kw">False</span>)
+)
+<span class="fn">print</span>(report)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>     month  orders  revenue
+1  2025-02       1      660
+0  2025-01       2      340
+2  2025-03       1      140</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>لماذا <code>lambda d:</code> داخل assign؟</strong> لأن الدالة تستقبل الجدول <strong>في تلك المرحلة من السلسلة</strong>
+                (بعد الدمج)، وليس الجدول الأصلي <code>orders</code> الذي لا يحتوي عمود السعر.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="strings">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-font"></i>
+        معالجة النصوص بـ .str
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>strings.py</span>
+    </div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+contacts = pd.<span class="fn">DataFrame</span>({
+    <span class="str">"name"</span>: [<span class="str">"  أحمد علي "</span>, <span class="str">"سارة محمد"</span>, <span class="str">"ALI HASSAN"</span>, <span class="str">"منى  خالد"</span>],
+    <span class="str">"email"</span>: [<span class="str">"Ahmed@Mail.com"</span>, <span class="str">"sara@gmail.com"</span>, <span class="str">"ali@company.sa"</span>, <span class="kw">None</span>],
+    <span class="str">"phone"</span>: [<span class="str">"050-123-4567"</span>, <span class="str">"0559876543"</span>, <span class="str">"+966 50 111 2222"</span>, <span class="str">"05x"</span>],
+})
+
+contacts[<span class="str">"name"</span>] = contacts[<span class="str">"name"</span>].str.<span class="fn">strip</span>().str.<span class="fn">replace</span>(<span class="str">r"\s+"</span>, <span class="str">" "</span>, regex=<span class="kw">True</span>).str.<span class="fn">title</span>()
+contacts[<span class="str">"first_name"</span>] = contacts[<span class="str">"name"</span>].str.<span class="fn">split</span>(<span class="str">" "</span>).str[<span class="num">0</span>]
+contacts[<span class="str">"email"</span>] = contacts[<span class="str">"email"</span>].str.<span class="fn">lower</span>()
+contacts[<span class="str">"domain"</span>] = contacts[<span class="str">"email"</span>].str.<span class="fn">split</span>(<span class="str">"@"</span>).str[<span class="num">1</span>]
+digits = contacts[<span class="str">"phone"</span>].str.<span class="fn">replace</span>(<span class="str">r"\D"</span>, <span class="str">""</span>, regex=<span class="kw">True</span>)          <span class="cm"># احذف كل ما ليس رقمًا</span>
+contacts[<span class="str">"phone_ok"</span>] = digits.str.<span class="fn">fullmatch</span>(<span class="str">r"(966)?0?5\d{8}"</span>)
+contacts[<span class="str">"is_gmail"</span>] = contacts[<span class="str">"email"</span>].str.<span class="fn">contains</span>(<span class="str">"gmail"</span>, na=<span class="kw">False</span>)
+<span class="fn">print</span>(contacts[[<span class="str">"name"</span>, <span class="str">"first_name"</span>, <span class="str">"domain"</span>, <span class="str">"phone_ok"</span>, <span class="str">"is_gmail"</span>]])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>         name first_name      domain  phone_ok  is_gmail
+0    أحمد علي       أحمد    mail.com      True     False
+1   سارة محمد       سارة   gmail.com      True      True
+2  Ali Hassan        Ali  company.sa      True     False
+3    منى خالد        منى         NaN     False     False</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الدالة</th><th>الوظيفة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>.str.strip() / lower() / title()</code></td><td>تنظيف المسافات وتوحيد حالة الأحرف</td></tr>
+                    <tr><td><code>.str.replace(pattern, repl, regex=True)</code></td><td>استبدال بنمط</td></tr>
+                    <tr><td><code>.str.split(sep).str[i]</code></td><td>تقسيم وأخذ جزء</td></tr>
+                    <tr><td><code>.str.contains / startswith / fullmatch</code></td><td>فحص يُرجع True/False</td></tr>
+                    <tr><td><code>.str.extract(r"(\d+)")</code></td><td>استخراج جزء بمجموعات Regex</td></tr>
+                    <tr><td><code>.str.len()</code></td><td>طول كل نص</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="dates">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-calendar-alt"></i>
+        التواريخ والسلاسل الزمنية
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>dates.py</span>
+    </div>
+<pre>d = orders[<span class="str">"date"</span>]
+<span class="fn">print</span>(pd.<span class="fn">DataFrame</span>({
+    <span class="str">"date"</span>: d.dt.date,
+    <span class="str">"year"</span>: d.dt.year,
+    <span class="str">"month"</span>: d.dt.month,
+    <span class="str">"day_name"</span>: d.dt.<span class="fn">day_name</span>(),
+    <span class="str">"week"</span>: d.dt.<span class="fn">isocalendar</span>().week.values,
+    <span class="str">"is_weekend"</span>: d.dt.dayofweek.<span class="fn">isin</span>([<span class="num">4</span>, <span class="num">5</span>]),
+}))
+<span class="fn">print</span>(<span class="str">"\nالأيام بين أول وآخر طلب:"</span>, (d.<span class="fn">max</span>() - d.<span class="fn">min</span>()).days)
+<span class="fn">print</span>(<span class="str">"بعد 30 يومًا من أول طلب:"</span>, (d.<span class="fn">min</span>() + pd.<span class="fn">Timedelta</span>(days=<span class="num">30</span>)).<span class="fn">date</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>         date  year  month  day_name  week  is_weekend
+0  2025-01-05  2025      1    Sunday     1       False
+1  2025-01-12  2025      1    Sunday     2       False
+2  2025-02-03  2025      2    Monday     6       False
+3  2025-02-17  2025      2    Monday     8       False
+4  2025-02-20  2025      2  Thursday     8       False
+5  2025-03-08  2025      3  Saturday    10        True
+
+الأيام بين أول وآخر طلب: 62
+بعد 30 يومًا من أول طلب: 2025-02-04</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> إعادة التجميع الزمني (resample) والنوافذ المتحركة (rolling)</p>
+        <p>لدينا مبيعات يومية لمدة شهرين. نريد المجموع الأسبوعي والمتوسط المتحرك لتنعيم التذبذب:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>timeseries.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+rng = np.random.<span class="fn">default_rng</span>(<span class="num">1</span>)
+days = pd.<span class="fn">date_range</span>(<span class="str">"2025-01-01"</span>, <span class="str">"2025-02-28"</span>, freq=<span class="str">"D"</span>)
+trend = np.<span class="fn">linspace</span>(<span class="num">100</span>, <span class="num">160</span>, <span class="fn">len</span>(days))                     <span class="cm"># نمو تدريجي</span>
+weekly = np.<span class="fn">where</span>(days.dayofweek.<span class="fn">isin</span>([<span class="num">4</span>, <span class="num">5</span>]), <span class="num">40</span>, <span class="num">0</span>)        <span class="cm"># ارتفاع في العطلة</span>
+sales = pd.<span class="fn">Series</span>((trend + weekly + rng.<span class="fn">normal</span>(<span class="num">0</span>, <span class="num">12</span>, <span class="fn">len</span>(days))).<span class="fn">round</span>(), index=days, name=<span class="str">"sales"</span>)
+
+<span class="fn">print</span>(sales.<span class="fn">head</span>(<span class="num">3</span>), <span class="str">"\n"</span>)
+<span class="fn">print</span>(<span class="str">"مجموع أسبوعي:"</span>)
+<span class="fn">print</span>(sales.<span class="fn">resample</span>(<span class="str">"W"</span>).<span class="fn">sum</span>().<span class="fn">head</span>(<span class="num">4</span>), <span class="str">"\n"</span>)
+<span class="fn">print</span>(<span class="str">"مجموع شهري:"</span>, sales.<span class="fn">resample</span>(<span class="str">"ME"</span>).<span class="fn">sum</span>().<span class="fn">rename</span>(<span class="kw">lambda</span> d: d.<span class="fn">strftime</span>(<span class="str">"%Y-%m"</span>)).<span class="fn">to_dict</span>())
+
+smooth = sales.<span class="fn">rolling</span>(window=<span class="num">7</span>).<span class="fn">mean</span>()                      <span class="cm"># متوسط آخر 7 أيام</span>
+<span class="fn">print</span>(<span class="str">"\nالمتوسط المتحرك 7 أيام (آخر 3):"</span>, smooth.<span class="fn">tail</span>(<span class="num">3</span>).<span class="fn">round</span>(<span class="num">1</span>).<span class="fn">tolist</span>())
+
+growth = sales.<span class="fn">resample</span>(<span class="str">"ME"</span>).<span class="fn">sum</span>().<span class="fn">pct_change</span>().<span class="fn">mul</span>(<span class="num">100</span>).<span class="fn">round</span>(<span class="num">1</span>)
+<span class="fn">print</span>(<span class="str">"نمو فبراير عن يناير %:"</span>, growth.iloc[-<span class="num">1</span>])
+<span class="fn">print</span>(<span class="str">"مبيعات أمس (shift):"</span>, sales.<span class="fn">shift</span>(<span class="num">1</span>).<span class="fn">tail</span>(<span class="num">2</span>).<span class="fn">tolist</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>2025-01-01    104.0
+2025-01-02    111.0
+2025-01-03    146.0
+Freq: D, Name: sales, dtype: float64 
+
+مجموع أسبوعي:
+2025-01-05    603.0
+2025-01-12    860.0
+2025-01-19    867.0
+2025-01-26    905.0
+Freq: W-SUN, Name: sales, dtype: float64 
+
+مجموع شهري: {'2025-01': 3944.0, '2025-02': 4378.0}
+
+المتوسط المتحرك 7 أيام (آخر 3): [167.1, 167.6, 167.9]
+نمو فبراير عن يناير %: 11.0
+مبيعات أمس (shift): [169.0, 159.0]</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الأداة</th><th>الوظيفة</th><th>مثال</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>resample("W"/"ME"/"QE")</code></td><td>تجميع لفترات أسبوعية/شهرية/ربعية</td><td><code>.resample("ME").sum()</code></td></tr>
+                    <tr><td><code>rolling(n)</code></td><td>نافذة متحركة بآخر n قيم</td><td><code>.rolling(7).mean()</code></td></tr>
+                    <tr><td><code>shift(n)</code></td><td>إزاحة القيم n خطوات (مقارنة بالأمس)</td><td><code>s - s.shift(1)</code></td></tr>
+                    <tr><td><code>pct_change()</code></td><td>نسبة التغير عن القيمة السابقة</td><td>النمو الشهري</td></tr>
+                    <tr><td><code>cumsum()</code></td><td>المجموع التراكمي</td><td>الإيرادات منذ بداية السنة</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="reshape">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-exchange-alt"></i>
+        إعادة تشكيل الجداول: melt و pivot
+    </h2>
+        <p>
+            للبيانات شكلان: <strong>العريض (Wide)</strong> المريح للعرض في Excel، و<strong>الطويل (Long)</strong> المريح للتحليل والرسم.
+            تحتاج كثيرًا للتحويل بينهما:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>melt_pivot.py</span>
+    </div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+wide = pd.<span class="fn">DataFrame</span>({
+    <span class="str">"student"</span>: [<span class="str">"سارة"</span>, <span class="str">"علي"</span>],
+    <span class="str">"math"</span>: [<span class="num">90</span>, <span class="num">75</span>],
+    <span class="str">"science"</span>: [<span class="num">85</span>, <span class="num">80</span>],
+    <span class="str">"english"</span>: [<span class="num">92</span>, <span class="num">70</span>],
+})
+<span class="fn">print</span>(<span class="str">"عريض:\n"</span>, wide, <span class="str">"\n"</span>)
+
+long = wide.<span class="fn">melt</span>(id_vars=<span class="str">"student"</span>, var_name=<span class="str">"subject"</span>, value_name=<span class="str">"score"</span>)
+<span class="fn">print</span>(<span class="str">"طويل:\n"</span>, long, <span class="str">"\n"</span>)
+
+back = long.<span class="fn">pivot</span>(index=<span class="str">"student"</span>, columns=<span class="str">"subject"</span>, values=<span class="str">"score"</span>)
+<span class="fn">print</span>(<span class="str">"عودة إلى العريض:\n"</span>, back, <span class="str">"\n"</span>)
+
+<span class="fn">print</span>(<span class="str">"أفضل مادة لكل طالب:"</span>, long.loc[long.<span class="fn">groupby</span>(<span class="str">"student"</span>)[<span class="str">"score"</span>].<span class="fn">idxmax</span>(), [<span class="str">"student"</span>, <span class="str">"subject"</span>]].values.<span class="fn">tolist</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>عريض:
+   student  math  science  english
+0    سارة    90       85       92
+1     علي    75       80       70 
+
+طويل:
+   student  subject  score
+0    سارة     math     90
+1     علي     math     75
+2    سارة  science     85
+3     علي  science     80
+4    سارة  english     92
+5     علي  english     70 
+
+عودة إلى العريض:
+ subject  english  math  science
+student                        
+سارة          92    90       85
+علي           70    75       80 
+
+أفضل مادة لكل طالب: [['سارة', 'english'], ['علي', 'science']]</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>pivot أم pivot_table؟</strong> <code>pivot</code> فقط يعيد الترتيب ويفشل إذا تكررت التوليفة (طالب + مادة)،
+                أما <code>pivot_table</code> فيجمّع المكرر بدالة مثل <code>sum</code> أو <code>mean</code>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="groupby">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-layer-group"></i>
+        groupby المتقدم: transform و filter
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>groupby_advanced.py</span>
+    </div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+emp = pd.<span class="fn">DataFrame</span>({
+    <span class="str">"name"</span>: [<span class="str">"سارة"</span>, <span class="str">"علي"</span>, <span class="str">"منى"</span>, <span class="str">"خالد"</span>, <span class="str">"ريم"</span>, <span class="str">"يوسف"</span>],
+    <span class="str">"dept"</span>: [<span class="str">"تقنية"</span>, <span class="str">"تقنية"</span>, <span class="str">"مبيعات"</span>, <span class="str">"مبيعات"</span>, <span class="str">"مبيعات"</span>, <span class="str">"موارد"</span>],
+    <span class="str">"salary"</span>: [<span class="num">15000</span>, <span class="num">12000</span>, <span class="num">9000</span>, <span class="num">11000</span>, <span class="num">10000</span>, <span class="num">8000</span>],
+})
+
+<span class="cm"># transform: يُرجع نتيجة بنفس طول الجدول الأصلي — مثالي للمقارنة داخل المجموعة</span>
+emp[<span class="str">"dept_avg"</span>] = emp.<span class="fn">groupby</span>(<span class="str">"dept"</span>)[<span class="str">"salary"</span>].<span class="fn">transform</span>(<span class="str">"mean"</span>)
+emp[<span class="str">"vs_avg_%"</span>] = ((emp[<span class="str">"salary"</span>] / emp[<span class="str">"dept_avg"</span>] - <span class="num">1</span>) * <span class="num">100</span>).<span class="fn">round</span>(<span class="num">1</span>)
+emp[<span class="str">"rank_in_dept"</span>] = emp.<span class="fn">groupby</span>(<span class="str">"dept"</span>)[<span class="str">"salary"</span>].<span class="fn">rank</span>(ascending=<span class="kw">False</span>).<span class="fn">astype</span>(int)
+<span class="fn">print</span>(emp, <span class="str">"\n"</span>)
+
+<span class="cm"># filter: يُبقي المجموعات التي تحقق شرطًا</span>
+big = emp.<span class="fn">groupby</span>(<span class="str">"dept"</span>).<span class="fn">filter</span>(<span class="kw">lambda</span> g: <span class="fn">len</span>(g) &gt;= <span class="num">2</span>)
+<span class="fn">print</span>(<span class="str">"أقسام بها موظفان أو أكثر:"</span>, big[<span class="str">"dept"</span>].<span class="fn">unique</span>().<span class="fn">tolist</span>())
+
+<span class="cm"># أعلى راتب في كل قسم</span>
+<span class="fn">print</span>(emp.loc[emp.<span class="fn">groupby</span>(<span class="str">"dept"</span>)[<span class="str">"salary"</span>].<span class="fn">idxmax</span>(), [<span class="str">"dept"</span>, <span class="str">"name"</span>, <span class="str">"salary"</span>]])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>   name    dept  salary  dept_avg  vs_avg_%  rank_in_dept
+0  سارة   تقنية   15000   13500.0      11.1             1
+1   علي   تقنية   12000   13500.0     -11.1             2
+2   منى  مبيعات    9000   10000.0     -10.0             3
+3  خالد  مبيعات   11000   10000.0      10.0             1
+4   ريم  مبيعات   10000   10000.0       0.0             2
+5  يوسف   موارد    8000    8000.0       0.0             1 
+
+أقسام بها موظفان أو أكثر: ['تقنية', 'مبيعات']
+     dept  name  salary
+0   تقنية  سارة   15000
+3  مبيعات  خالد   11000
+5   موارد  يوسف    8000</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>العملية</th><th>شكل الناتج</th><th>الاستخدام</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>agg</code></td><td>صف واحد لكل مجموعة</td><td>الملخصات</td></tr>
+                    <tr><td><code>transform</code></td><td>نفس عدد صفوف الأصل</td><td>إضافة إحصاء المجموعة لكل صف</td></tr>
+                    <tr><td><code>filter</code></td><td>صفوف المجموعات المقبولة فقط</td><td>استبعاد المجموعات الصغيرة</td></tr>
+                    <tr><td><code>rank / cumcount</code></td><td>نفس عدد صفوف الأصل</td><td>الترتيب والترقيم داخل المجموعة</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="performance">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-tachometer-alt"></i>
+        نصائح الأداء مع البيانات الكبيرة
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>performance.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+n = <span class="num">200</span>_000
+rng = np.random.<span class="fn">default_rng</span>(<span class="num">0</span>)
+df = pd.<span class="fn">DataFrame</span>({
+    <span class="str">"city"</span>: rng.<span class="fn">choice</span>([<span class="str">"الرياض"</span>, <span class="str">"جدة"</span>, <span class="str">"الدمام"</span>, <span class="str">"مكة"</span>], n),
+    <span class="str">"amount"</span>: rng.<span class="fn">integers</span>(<span class="num">10</span>, <span class="num">1000</span>, n),
+})
+before = df.<span class="fn">memory_usage</span>(deep=<span class="kw">True</span>).<span class="fn">sum</span>() / <span class="num">1</span>e6
+df[<span class="str">"city"</span>] = df[<span class="str">"city"</span>].<span class="fn">astype</span>(<span class="str">"category"</span>)          <span class="cm"># النصوص المتكررة ← فئات</span>
+df[<span class="str">"amount"</span>] = pd.<span class="fn">to_numeric</span>(df[<span class="str">"amount"</span>], downcast=<span class="str">"integer"</span>)
+after = df.<span class="fn">memory_usage</span>(deep=<span class="kw">True</span>).<span class="fn">sum</span>() / <span class="num">1</span>e6
+<span class="fn">print</span>(<span class="str">f"الذاكرة: {before:.1f} MB ← {after:.1f} MB"</span>)
+
+<span class="cm"># الأسلوب المتجه أفضل دائمًا من apply مع دوال Python</span>
+df[<span class="str">"tax"</span>] = np.<span class="fn">where</span>(df[<span class="str">"amount"</span>] &gt; <span class="num">500</span>, df[<span class="str">"amount"</span>] * <span class="num">0.15</span>, <span class="num">0</span>)
+<span class="fn">print</span>(df.<span class="fn">head</span>(<span class="num">3</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الذاكرة: 16.6 MB ← 0.6 MB
+     city  amount   tax
+0     مكة     247   0.0
+1  الدمام     610  91.5
+2  الدمام     650  97.5</pre>
+</div>
+        <div class="note-box">
+            <strong>⚡ قواعد الأداء:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> العمليات المتجهة (<code>df["a"] * 2</code>، <code>np.where</code>) أسرع بكثير من <code>apply</code> والحلقات.</li>
+                <li><i class="fas fa-angle-left"></i> حوّل الأعمدة النصية المتكررة إلى <code>category</code>.</li>
+                <li><i class="fas fa-angle-left"></i> اقرأ الأعمدة التي تحتاجها فقط: <code>pd.read_csv(f, usecols=[...])</code>.</li>
+                <li><i class="fas fa-angle-left"></i> للملفات الضخمة جدًا اقرأها على دفعات: <code>pd.read_csv(f, chunksize=100_000)</code>.</li>
+                <li><i class="fas fa-angle-left"></i> احفظ البيانات المعالجة بصيغة <strong>Parquet</strong> (أسرع وأصغر من CSV بكثير).</li>
+            </ul>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! left يُبقي كل صفوف الجدول الأيسر (العملاء)." data-hint="الجدول الذي تريد الإبقاء على كل صفوفه هو الأيسر.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">أنواع الدمج</span>
+    </div>
+    <p class="exercise-question">تريد قائمة <strong>بكل العملاء</strong> حتى الذين لم يطلبوا شيئًا، مع طلباتهم إن وُجدت. أي دمج تستخدم؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>customers.merge(orders, how="inner")</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> <code>customers.merge(orders, how="left")</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> <code>customers.merge(orders, how="right")</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>pd.concat([customers, orders])</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! أدوات Pandas المتقدمة واضحة لديك." data-hint="&lt;code&gt;melt&lt;/code&gt; من العريض إلى الطويل، والعمليات المتجهة هي الأسرع.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>transform</code> يُرجع نتيجة بنفس عدد صفوف الجدول الأصلي.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>melt</code> يحول الجدول من الشكل الطويل إلى العريض.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>resample("ME").sum()</code> يجمع السلسلة الزمنية لكل شهر.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>rolling(7).mean()</code> يحسب متوسط آخر 7 قيم لكل نقطة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>apply</code> مع دالة Python أسرع دائمًا من العمليات المتجهة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="رائع! inner حذف الطلب اليتيم، و left أضاف صفًا لخالد بلا طلبات، والعميل 2 مجموع كمياته 6." data-hint="العميل 1 له طلبان، والعميل 2 له طلبان، والعميل 3 طلب واحد، وخالد لا شيء.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">باستخدام جداول المتجر في الدرس (4 عملاء، 6 طلبات أحدها لعميل غير موجود رقمه 5)، ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="fn">print</span>(<span class="fn">len</span>(orders.<span class="fn">merge</span>(customers, on=<span class="str">"customer_id"</span>)))
+<span class="fn">print</span>(<span class="fn">len</span>(customers.<span class="fn">merge</span>(orders, on=<span class="str">"customer_id"</span>, how=<span class="str">"left"</span>)))
+<span class="fn">print</span>(orders.<span class="fn">groupby</span>(<span class="str">"customer_id"</span>)[<span class="str">"qty"</span>].<span class="fn">sum</span>().<span class="fn">max</span>())</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="5" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="7" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثالث:</span><input type="text" class="blank-input" data-answers="6" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! resample يحتاج فهرسًا زمنيًا، لذلك جعلنا التاريخ فهرسًا أولًا." data-hint="حوّل النص لتاريخ، ثم اجعله الفهرس، ثم أعد التجميع أسبوعيًا واجمع.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">سلسلة عمليات</span>
+    </div>
+    <p class="exercise-question">أكمل السلسلة لحساب الإيراد الأسبوعي من جدول مبيعات فيه عمودا <code>date</code> و <code>amount</code>:</p>
+    <div class="code-fill">
+        <div class="line"><span>weekly = (</span></div>
+        <div class="line"><span>    sales</span></div>
+        <div class="line"><span>    .<span class="fn">assign</span>(date=<span class="kw">lambda</span> d: pd.</span><input type="text" class="blank-input" data-answers="to_datetime" placeholder="..." style="min-width:184px;" autocomplete="off" spellcheck="false"><span>(d[<span class="str">'date'</span>]))</span></div>
+        <div class="line"><span>    .</span><input type="text" class="blank-input" data-answers="set_index" placeholder="..." style="min-width:156px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'date'</span>)</span></div>
+        <div class="line"><span>    .</span><input type="text" class="blank-input" data-answers="resample" placeholder="..." style="min-width:142px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'W'</span>)[<span class="str">'amount'</span>]</span></div>
+        <div class="line"><span>    .</span><input type="text" class="blank-input" data-answers="sum" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>()</span></div>
+        <div class="line"><span>)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب صحيح! لا يمكن حساب الإجمالي قبل جلب السعر بالدمج." data-hint="تحتاج السعر من جدول المنتجات قبل حساب الإجمالي.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب سلسلة العمليات لحساب أعلى 3 عملاء إنفاقًا. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="3" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">.assign(total=lambda d: d[&#x27;qty&#x27;] * d[&#x27;price&#x27;])</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">.nlargest(3)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">orders</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="4" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">.groupby(&#x27;customer_id&#x27;)[&#x27;total&#x27;].sum()</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">.merge(products, on=&#x27;product_id&#x27;)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر الدمج: شاهد أنواع الـ JOIN</div>
+    <p style="color:var(--text-light); font-size:0.95em;">جدول عملاء وجدول طلبات صغيران. اختر نوع الدمج لترى النتيجة. لاحظ الصفوف الملونة: <span style="color:#ef9a9a">حمراء</span> لا يوجد لها مطابق في الجدول الآخر.</p>
+    <div class="lab-row">
+        <label>how =</label>
+        <select class="lab-select" id="joinHow" style="direction:ltr;" onchange="runJoin()">
+            <option>inner</option><option>left</option><option>right</option><option>outer</option>
+        </select>
+        <code style="direction:ltr;">customers.merge(orders, on="customer_id", how=...)</code>
+    </div>
+    <div class="lab-row" style="align-items:flex-start;">
+        <div style="flex:1; min-width:200px;"><div style="color:var(--gold); font-size:0.85em;">customers</div><div class="table-wrap" id="joinL"></div></div>
+        <div style="flex:1; min-width:200px;"><div style="color:var(--gold); font-size:0.85em;">orders</div><div class="table-wrap" id="joinR"></div></div>
+    </div>
+    <div style="color:var(--gold); font-size:0.85em;">النتيجة</div>
+    <div class="table-wrap" id="joinOut"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> دمج الجداول بـ <code>merge</code> بأنواعه الأربعة، و <code>indicator</code> و <code>validate</code>، ولصقها بـ <code>concat</code>.</li>
+                <li><i class="fas fa-check"></i> سلاسل العمليات بـ <code>assign</code> و <code>query</code> و <code>pipe</code>.</li>
+                <li><i class="fas fa-check"></i> معالجة النصوص بـ <code>.str</code> والتعابير النمطية.</li>
+                <li><i class="fas fa-check"></i> التواريخ بـ <code>.dt</code>، والسلاسل الزمنية بـ <code>resample</code> و <code>rolling</code> و <code>shift</code> و <code>pct_change</code>.</li>
+                <li><i class="fas fa-check"></i> إعادة التشكيل بين العريض والطويل بـ <code>melt</code> و <code>pivot</code>.</li>
+                <li><i class="fas fa-check"></i> groupby المتقدم: <code>transform</code> و <code>filter</code> و <code>rank</code>.</li>
+                <li><i class="fas fa-check"></i> تحسين الأداء: الفئات، العمليات المتجهة، Parquet، والقراءة على دفعات.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> افحص عدد الصفوف قبل الدمج وبعده دائمًا؛ التغير المفاجئ يعني مفاتيح مكررة أو مفقودة.</li>
+                <li><i class="fas fa-lightbulb"></i> اكتب تحليلاتك كسلاسل عمليات مرتبة لتكون مقروءة وقابلة للتعديل.</li>
+                <li><i class="fas fa-lightbulb"></i> حوّل التواريخ بـ <code>to_datetime</code> فور قراءة البيانات.</li>
+                <li><i class="fas fa-lightbulb"></i> استخدم الشكل الطويل للتحليل والرسم، والعريض للعرض.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>تنظيف البيانات وتجهيزها</strong> بعمق: القيم المفقودة، والقيم الشاذة، وترميز الفئات، والتطبيع.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson2.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 2: NumPy بعمق</span>
+        </a>
+        <a href="lesson4.html" class="nav-link next">
+            <span>الدرس التالي: تنظيف البيانات وتجهيزها</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · Pandas المتقدم
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '25%';
+            text.textContent = '25% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر الدمج ========== */
+    const J_LEFT = [{ customer_id: 1, name: 'سارة' }, { customer_id: 2, name: 'علي' }, { customer_id: 4, name: 'خالد' }];
+    const J_RIGHT = [{ order_id: 101, customer_id: 1, qty: 1 }, { order_id: 102, customer_id: 2, qty: 2 }, { order_id: 103, customer_id: 1, qty: 1 }, { order_id: 105, customer_id: 5, qty: 1 }];
+
+    function jTable(rows, cols, bad) {
+        return '<table><thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>' +
+            rows.map((r, i) => `<tr style="${bad && bad(r) ? 'background:rgba(244,67,54,0.12);' : ''}">` +
+                cols.map(c => `<td>${r[c] === undefined || r[c] === null ? '<span style="color:#888">NaN</span>' : escapeHtml(r[c])}</td>`).join('') + '</tr>').join('') +
+            '</tbody></table>';
+    }
+
+    function runJoin() {
+        const how = document.getElementById('joinHow').value;
+        const lIds = new Set(J_LEFT.map(r => r.customer_id)), rIds = new Set(J_RIGHT.map(r => r.customer_id));
+        const out = [];
+        J_LEFT.forEach(l => {
+            const m = J_RIGHT.filter(r => r.customer_id === l.customer_id);
+            if (m.length) m.forEach(r => out.push({ ...l, ...r }));
+            else if (how === 'left' || how === 'outer') out.push({ ...l, order_id: null, qty: null, _only: 'left' });
+        });
+        if (how === 'right' || how === 'outer') {
+            J_RIGHT.filter(r => !lIds.has(r.customer_id)).forEach(r => out.push({ customer_id: r.customer_id, name: null, ...r, _only: 'right' }));
+        }
+        if (how === 'right') out.sort((a, b) => J_RIGHT.findIndex(r => r.order_id === a.order_id) - J_RIGHT.findIndex(r => r.order_id === b.order_id));
+        else out.sort((a, b) => a.customer_id - b.customer_id);
+        document.getElementById('joinL').innerHTML = jTable(J_LEFT, ['customer_id', 'name'], r => !rIds.has(r.customer_id));
+        document.getElementById('joinR').innerHTML = jTable(J_RIGHT, ['order_id', 'customer_id', 'qty'], r => !lIds.has(r.customer_id));
+        document.getElementById('joinOut').innerHTML = jTable(out, ['customer_id', 'name', 'order_id', 'qty'], r => r._only) +
+            `<p style="padding:8px 12px; color:var(--text-muted); font-size:0.9em;">${out.length} صفوف</p>`;
+    }
+
+    document.addEventListener('DOMContentLoaded', runJoin);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

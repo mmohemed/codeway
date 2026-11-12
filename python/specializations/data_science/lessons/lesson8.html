@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 8: مقدمة في تعلم الآلة والانحدار | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص تحليل البيانات</a>
+        <span class="sep">/</span>
+        <span>تعلم الآلة والانحدار</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-brain"></i>
+            الدرس 8 · تعلم الآلة
+        </div>
+        <h1 class="lesson-title">مقدمة في تعلم الآلة: التنبؤ بالأرقام (الانحدار)</h1>
+        <p class="lesson-intro">
+            حتى الآن كنت تحلل الماضي. الآن ستبني نماذج <strong>تتنبأ بالمستقبل</strong>! في هذا الدرس ستفهم ما هو <strong>تعلم الآلة</strong> وأنواعه، وتتعلم واجهة <strong>scikit-learn</strong> الموحدة، و<strong>تقسيم البيانات</strong>، و<strong>الانحدار الخطي</strong>، و<strong>مقاييس التقييم</strong>، وخطر <strong>الإفراط في التعلم</strong>، ثم تبني <strong>Pipeline</strong> احترافيًا يتنبأ بأسعار المنازل.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 90 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 أول نموذج تنبؤ حقيقي</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 7</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#what">1. ما هو تعلم الآلة؟</a>
+            <a href="#data">2. البيانات والتقسيم</a>
+            <a href="#simple">3. الانحدار البسيط</a>
+            <a href="#metrics">4. مقاييس التقييم</a>
+            <a href="#pipeline">5. Pipeline</a>
+            <a href="#overfit">6. الإفراط في التعلم</a>
+            <a href="#cv">7. التحقق المتقاطع</a>
+            <a href="#deploy">8. الحفظ والاستخدام</a>
+            <a href="#exercises">9. تمارين تفاعلية</a>
+            <a href="#summary">10. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="what">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        ما هو تعلم الآلة؟
+    </h2>
+        <p>
+            في البرمجة التقليدية تكتب أنت <strong>القواعد</strong>: «إذا كانت المساحة أكبر من 300 فالسعر…». لكن من يعرف كل القواعد التي تحدد سعر منزل؟
+            في <strong>تعلم الآلة</strong> نعطي الحاسوب <strong>أمثلة</strong> (بيانات + إجابات صحيحة)، فيستنتج القواعد بنفسه.
+        </p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-code"></i> البرمجة التقليدية</h4>
+                <p>البيانات + القواعد ← الإجابات</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-brain"></i> تعلم الآلة</h4>
+                <p>البيانات + الإجابات ← القواعد (النموذج)</p>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>النوع</th><th>الفكرة</th><th>أمثلة</th><th>الدرس</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>تعلم موجَّه — انحدار</strong></td><td>التنبؤ <strong>برقم</strong> من أمثلة لها إجابات</td><td>سعر منزل، المبيعات القادمة، زمن التوصيل</td><td>هذا الدرس</td></tr>
+                    <tr><td><strong>تعلم موجَّه — تصنيف</strong></td><td>التنبؤ <strong>بفئة</strong></td><td>رسالة مزعجة أم لا، هل سيغادر العميل؟</td><td>الدرس 9</td></tr>
+                    <tr><td><strong>تعلم غير موجَّه</strong></td><td>اكتشاف أنماط بلا إجابات</td><td>تقسيم العملاء لشرائح</td><td>الدرس 10</td></tr>
+                    <tr><td><strong>تعلم معزز</strong></td><td>التعلم بالتجربة والمكافأة</td><td>الألعاب، الروبوتات</td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المصطلح</th><th>المعنى</th><th>في مثال المنازل</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>الخصائص (Features) <code>X</code></td><td>المدخلات التي نتنبأ منها</td><td>المساحة، الغرف، العمر، الحي</td></tr>
+                    <tr><td>الهدف (Target) <code>y</code></td><td>ما نريد التنبؤ به</td><td>السعر</td></tr>
+                    <tr><td>التدريب (fit)</td><td>تعلّم العلاقة من الأمثلة</td><td>من 480 منزلًا معروف السعر</td></tr>
+                    <tr><td>التنبؤ (predict)</td><td>تطبيق ما تعلمه على بيانات جديدة</td><td>منزل جديد لا نعرف سعره</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+                <span>التثبيت</span>
+            </div>
+<pre>pip install scikit-learn</pre>
+        </div>
+</section>
+
+<section class="section-card" id="data">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-home"></i>
+        بيانات المنازل والتقسيم
+    </h2>
+        <p>لدينا 600 منزل بخصائصها وأسعارها (بالريال). هذا كود توليدها، انسخه في بداية النوتبوك:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>housing_data.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+rng = np.random.<span class="fn">default_rng</span>(<span class="num">2024</span>)
+n = <span class="num">600</span>
+district = rng.<span class="fn">choice</span>([<span class="str">"north"</span>, <span class="str">"center"</span>, <span class="str">"east"</span>, <span class="str">"south"</span>], n, p=[<span class="num">0.3</span>, <span class="num">0.25</span>, <span class="num">0.25</span>, <span class="num">0.2</span>])
+area = rng.<span class="fn">normal</span>(<span class="num">260</span>, <span class="num">70</span>, n).<span class="fn">clip</span>(<span class="num">90</span>, <span class="num">520</span>).<span class="fn">round</span>()
+rooms = np.<span class="fn">clip</span>((area / <span class="num">55</span> + rng.<span class="fn">normal</span>(<span class="num">0</span>, <span class="num">0.8</span>, n)).<span class="fn">round</span>(), <span class="num">2</span>, <span class="num">9</span>).<span class="fn">astype</span>(int)
+age = rng.<span class="fn">integers</span>(<span class="num">0</span>, <span class="num">35</span>, n)
+distance = (rng.<span class="fn">gamma</span>(<span class="num">2.5</span>, <span class="num">4</span>, n) + np.<span class="fn">where</span>(district == <span class="str">"center"</span>, -<span class="num">4</span>, <span class="num">0</span>)).<span class="fn">clip</span>(<span class="num">0.5</span>, <span class="num">40</span>).<span class="fn">round</span>(<span class="num">1</span>)
+garden = rng.<span class="fn">random</span>(n) &lt; <span class="num">0.35</span>
+base = {<span class="str">"north"</span>: <span class="num">4200</span>, <span class="str">"center"</span>: <span class="num">5200</span>, <span class="str">"east"</span>: <span class="num">3300</span>, <span class="str">"south"</span>: <span class="num">2900</span>}
+price = (area * np.<span class="fn">vectorize</span>(base.get)(district)
+         + rooms * <span class="num">25</span>_000
+         - age * <span class="num">6</span>_000
+         - distance * <span class="num">9</span>_000
+         + garden * <span class="num">60</span>_000
+         + rng.<span class="fn">normal</span>(<span class="num">0</span>, <span class="num">90</span>_000, n))
+houses = pd.<span class="fn">DataFrame</span>({
+    <span class="str">"area"</span>: area, <span class="str">"rooms"</span>: rooms, <span class="str">"age"</span>: age, <span class="str">"distance_km"</span>: distance,
+    <span class="str">"district"</span>: district, <span class="str">"garden"</span>: garden.<span class="fn">astype</span>(int),
+    <span class="str">"price"</span>: (price.<span class="fn">clip</span>(<span class="num">250</span>_000) / <span class="num">1000</span>).<span class="fn">round</span>() * <span class="num">1000</span>,
+})</pre>
+</div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>look.py</span>
+    </div>
+<pre><span class="fn">print</span>(houses.<span class="fn">head</span>())
+<span class="fn">print</span>(<span class="str">"\nالشكل:"</span>, houses.shape)
+<span class="fn">print</span>(<span class="str">"\nالارتباط مع السعر:"</span>)
+<span class="fn">print</span>(houses.<span class="fn">corr</span>(numeric_only=<span class="kw">True</span>)[<span class="str">"price"</span>].<span class="fn">drop</span>(<span class="str">"price"</span>).<span class="fn">sort_values</span>(ascending=<span class="kw">False</span>).<span class="fn">round</span>(<span class="num">2</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>    area  rooms  age  distance_km district  garden      price
+0  345.0      5   13         18.4     east       1   927000.0
+1  234.0      5   15          1.5    north       0  1209000.0
+2  303.0      6    7          0.5   center       1  1839000.0
+3  296.0      5   34         20.1     east       1   892000.0
+4  300.0      5    1         11.9    south       0   902000.0
+
+الشكل: (600, 7)
+
+الارتباط مع السعر:
+area           0.76
+rooms          0.65
+garden        -0.00
+age           -0.11
+distance_km   -0.27
+Name: price, dtype: float64</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> القاعدة الأهم: تقسيم البيانات</p>
+        <p>
+            لو اختبرت نموذجك على نفس البيانات التي تدرّب عليها، فكأنك تعطي الطالب أسئلة الامتحان قبله! لذلك نقسم البيانات:
+            <strong>بيانات تدريب</strong> يتعلم منها النموذج، و<strong>بيانات اختبار</strong> نخفيها عنه ونقيس بها أداءه الحقيقي.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>split.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+X = houses.<span class="fn">drop</span>(columns=<span class="str">"price"</span>)
+y = houses[<span class="str">"price"</span>]
+
+X_train, X_test, y_train, y_test = <span class="fn">train_test_split</span>(X, y, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>)
+<span class="fn">print</span>(<span class="str">"تدريب:"</span>, X_train.shape, <span class="str">"| اختبار:"</span>, X_test.shape)
+<span class="fn">print</span>(<span class="str">"متوسط السعر في التدريب:"</span>, <span class="fn">round</span>(y_train.<span class="fn">mean</span>()), <span class="str">"| في الاختبار:"</span>, <span class="fn">round</span>(y_test.<span class="fn">mean</span>()))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>تدريب: (480, 6) | اختبار: (120, 6)
+متوسط السعر في التدريب: 995956 | في الاختبار: 953008</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>تسرّب البيانات (Data Leakage):</strong> لا تدع أي معلومة من بيانات الاختبار تصل للتدريب — ولا حتى متوسطها عند تعويض القيم المفقودة
+                أو التطبيع! وإلا ستبدو نتائجك ممتازة على الورق وسيئة في الواقع. الحل الآمن: <strong>Pipeline</strong> الذي ستتعلمه بعد قليل.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="simple">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-chart-line"></i>
+        الانحدار الخطي البسيط
+    </h2>
+        <p>لنبدأ بأبسط نموذج: التنبؤ بالسعر من <strong>المساحة فقط</strong>، أي إيجاد أفضل خط مستقيم: <code>السعر = a × المساحة + b</code>.</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>simple_regression.py</span>
+    </div>
+<pre><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+X_train, X_test, y_train, y_test = <span class="fn">train_test_split</span>(houses[[<span class="str">"area"</span>]], houses[<span class="str">"price"</span>], test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>)
+
+model = <span class="fn">LinearRegression</span>()          <span class="cm"># 1) أنشئ النموذج</span>
+model.<span class="fn">fit</span>(X_train, y_train)         <span class="cm"># 2) درّبه</span>
+pred = model.<span class="fn">predict</span>(X_test)        <span class="cm"># 3) تنبأ</span>
+
+<span class="fn">print</span>(<span class="str">f"الميل a = {model.coef_[0]:,.0f} ريال لكل متر مربع"</span>)
+<span class="fn">print</span>(<span class="str">f"التقاطع b = {model.intercept_:,.0f}"</span>)
+<span class="fn">print</span>(<span class="str">f"منزل 300 م² ← {model.predict(pd.DataFrame({'area': [300]}))[0]:,.0f} ريال"</span>)
+<span class="fn">print</span>(<span class="str">f"R² على الاختبار = {model.score(X_test, y_test):.3f}"</span>)
+
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="num">8</span>, <span class="num">4.5</span>))
+ax.<span class="fn">scatter</span>(X_train[<span class="str">"area"</span>], y_train / <span class="num">1</span>e6, alpha=<span class="num">0.35</span>, label=<span class="str">"training data"</span>)
+xs = pd.<span class="fn">DataFrame</span>({<span class="str">"area"</span>: np.<span class="fn">linspace</span>(<span class="num">90</span>, <span class="num">520</span>, <span class="num">50</span>)})
+ax.<span class="fn">plot</span>(xs[<span class="str">"area"</span>], model.<span class="fn">predict</span>(xs) / <span class="num">1</span>e6, color=<span class="str">"#d4a017"</span>, linewidth=<span class="num">3</span>, label=<span class="str">"fitted line"</span>)
+ax.<span class="fn">set_xlabel</span>(<span class="str">"Area (m²)"</span>)
+ax.<span class="fn">set_ylabel</span>(<span class="str">"Price (M SAR)"</span>)
+ax.<span class="fn">set_title</span>(<span class="str">"Simple linear regression: price vs area"</span>)
+ax.<span class="fn">legend</span>()
+plt.<span class="fn">show</span>()</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الميل a = 4,440 ريال لكل متر مربع
+التقاطع b = -159,334
+منزل 300 م² ← 1,172,605 ريال
+R² على الاختبار = 0.548</pre>
+</div>
+<div class="figure-block">
+    <div class="output-header"><i class="fas fa-chart-bar"></i> الرسم الناتج</div>
+    <img src="data:image/webp;base64,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" alt="رسم بياني ناتج عن simple_regression.py" loading="lazy">
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>واجهة scikit-learn الموحدة:</strong> كل النماذج تعمل بنفس الأسلوب: <code>model = ...()</code> ثم <code>fit(X, y)</code> ثم
+                <code>predict(X)</code> و <code>score(X, y)</code>. إذا تعلمت نموذجًا واحدًا تستطيع استخدام العشرات بنفس الطريقة!
+                ولاحظ أن <code>X</code> يجب أن يكون <strong>جدولًا</strong> (لذلك <code>houses[["area"]]</code> بقوسين مزدوجين).
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="metrics">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-ruler-combined"></i>
+        تقييم نماذج الانحدار
+    </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المقياس</th><th>المعنى</th><th>الأفضل</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>MAE</strong> متوسط الخطأ المطلق</td><td>كم نخطئ في المتوسط (بنفس وحدة السعر) — سهل الشرح</td><td>الأقل</td></tr>
+                    <tr><td><strong>RMSE</strong> جذر متوسط مربع الخطأ</td><td>مثل MAE لكنه يعاقب الأخطاء الكبيرة أكثر</td><td>الأقل</td></tr>
+                    <tr><td><strong>R²</strong> معامل التحديد</td><td>نسبة التباين في السعر التي يفسرها النموذج (1 = مثالي، 0 = لا أفضل من المتوسط)</td><td>الأعلى</td></tr>
+                    <tr><td><strong>MAPE</strong></td><td>متوسط الخطأ كنسبة مئوية من القيمة الحقيقية</td><td>الأقل</td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>metrics.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.dummy <span class="kw">import</span> DummyRegressor
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_absolute_error, mean_absolute_percentage_error, r2_score, root_mean_squared_error
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+X = houses[[<span class="str">"area"</span>, <span class="str">"rooms"</span>, <span class="str">"age"</span>, <span class="str">"distance_km"</span>, <span class="str">"garden"</span>]]
+X_train, X_test, y_train, y_test = <span class="fn">train_test_split</span>(X, houses[<span class="str">"price"</span>], test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>)
+
+
+<span class="kw">def</span> <span class="fn">report</span>(name, model):
+    model.<span class="fn">fit</span>(X_train, y_train)
+    p = model.<span class="fn">predict</span>(X_test)
+    <span class="fn">print</span>(<span class="str">f"{name:&lt;22} MAE={mean_absolute_error(y_test, p):&gt;9,.0f}  RMSE={root_mean_squared_error(y_test, p):&gt;9,.0f}"</span>
+          <span class="str">f"  MAPE={mean_absolute_percentage_error(y_test, p):5.1%}  R²={r2_score(y_test, p):.3f}"</span>)
+
+
+<span class="fn">report</span>(<span class="str">"Baseline (mean)"</span>, <span class="fn">DummyRegressor</span>(strategy=<span class="str">"mean"</span>))
+<span class="fn">report</span>(<span class="str">"Linear (numeric only)"</span>, <span class="fn">LinearRegression</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>Baseline (mean)        MAE=  328,050  RMSE=  417,659  MAPE=47.9%  R²=-0.011
+Linear (numeric only)  MAE=  189,190  RMSE=  239,270  MAPE=23.3%  R²=0.668</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>ابدأ دائمًا بخط أساس (Baseline):</strong> نموذج غبي يتنبأ دائمًا بالمتوسط. إذا لم يتفوق نموذجك عليه بوضوح، فهناك مشكلة.
+                هنا قلّل النموذج الخطي متوسط الخطأ بنحو 40%.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="pipeline">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-cogs"></i>
+        Pipeline: المعالجة والنموذج معًا
+    </h2>
+        <p>
+            لم نستخدم بعد عمود <code>district</code> النصي، وهو من أهم العوامل! نحتاج ترميزه (One-Hot) وتطبيع الأرقام.
+            <strong>ColumnTransformer</strong> يطبق معالجة مختلفة لكل نوع عمود، و<strong>Pipeline</strong> يربط المعالجة بالنموذج في كائن واحد:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>pipeline.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.compose <span class="kw">import</span> ColumnTransformer
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_absolute_error, r2_score
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> OneHotEncoder, StandardScaler
+
+numeric = [<span class="str">"area"</span>, <span class="str">"rooms"</span>, <span class="str">"age"</span>, <span class="str">"distance_km"</span>, <span class="str">"garden"</span>]
+categorical = [<span class="str">"district"</span>]
+
+preprocess = <span class="fn">ColumnTransformer</span>([
+    (<span class="str">"num"</span>, <span class="fn">StandardScaler</span>(), numeric),
+    (<span class="str">"cat"</span>, <span class="fn">OneHotEncoder</span>(handle_unknown=<span class="str">"ignore"</span>), categorical),
+])
+model = <span class="fn">Pipeline</span>([(<span class="str">"prep"</span>, preprocess), (<span class="str">"reg"</span>, <span class="fn">LinearRegression</span>())])
+
+X_train, X_test, y_train, y_test = <span class="fn">train_test_split</span>(houses.<span class="fn">drop</span>(columns=<span class="str">"price"</span>), houses[<span class="str">"price"</span>],
+                                                    test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>)
+model.<span class="fn">fit</span>(X_train, y_train)            <span class="cm"># المعالجة تتعلم من بيانات التدريب فقط ← لا تسرّب</span>
+pred = model.<span class="fn">predict</span>(X_test)
+<span class="fn">print</span>(<span class="str">f"MAE = {mean_absolute_error(y_test, pred):,.0f} | R² = {r2_score(y_test, pred):.3f}"</span>)
+
+names = model.named_steps[<span class="str">"prep"</span>].<span class="fn">get_feature_names_out</span>()
+coefs = pd.<span class="fn">Series</span>(model.named_steps[<span class="str">"reg"</span>].coef_, index=names).<span class="fn">sort_values</span>()
+<span class="fn">print</span>(<span class="str">"\nأثر كل خاصية (بعد التطبيع، بالريال):"</span>)
+<span class="fn">print</span>(coefs.<span class="fn">round</span>(-<span class="num">3</span>).<span class="fn">astype</span>(int).<span class="fn">to_string</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>MAE = 98,580 | R² = 0.909
+
+أثر كل خاصية (بعد التطبيع، بالريال):
+cat__district_south    -255000
+cat__district_east     -155000
+num__distance_km        -54000
+num__age                -50000
+num__rooms               23000
+num__garden              29000
+cat__district_north      79000
+num__area               295000
+cat__district_center    331000</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>قفزة كبيرة:</strong> إضافة الحي رفعت R² بشكل واضح. والمعاملات تخبرنا بالقصة: المساحة أقوى عامل إيجابي،
+                والحي الجنوبي والشرقي أرخص، والبُعد عن المركز والعمر يخفضان السعر. هذه <strong>قابلية التفسير</strong> ميزة كبيرة للنماذج الخطية.
+            </div>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>pred_vs_actual.py</span>
+    </div>
+<pre><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> sklearn.compose <span class="kw">import</span> make_column_transformer
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> make_pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> OneHotEncoder, StandardScaler
+
+prep = <span class="fn">make_column_transformer</span>((<span class="fn">StandardScaler</span>(), [<span class="str">"area"</span>, <span class="str">"rooms"</span>, <span class="str">"age"</span>, <span class="str">"distance_km"</span>, <span class="str">"garden"</span>]),
+                               (<span class="fn">OneHotEncoder</span>(), [<span class="str">"district"</span>]))
+model = <span class="fn">make_pipeline</span>(prep, <span class="fn">LinearRegression</span>())
+X_train, X_test, y_train, y_test = <span class="fn">train_test_split</span>(houses.<span class="fn">drop</span>(columns=<span class="str">"price"</span>), houses[<span class="str">"price"</span>], test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>)
+pred = model.<span class="fn">fit</span>(X_train, y_train).<span class="fn">predict</span>(X_test)
+
+fig, (ax1, ax2) = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">12</span>, <span class="num">4.5</span>))
+ax1.<span class="fn">scatter</span>(y_test / <span class="num">1</span>e6, pred / <span class="num">1</span>e6, alpha=<span class="num">0.6</span>)
+lims = [<span class="num">0.2</span>, <span class="num">2.6</span>]
+ax1.<span class="fn">plot</span>(lims, lims, <span class="str">"--"</span>, color=<span class="str">"red"</span>, label=<span class="str">"perfect prediction"</span>)
+ax1.<span class="fn">set_xlabel</span>(<span class="str">"Actual price (M)"</span>)
+ax1.<span class="fn">set_ylabel</span>(<span class="str">"Predicted price (M)"</span>)
+ax1.<span class="fn">set_title</span>(<span class="str">"Predicted vs actual"</span>)
+ax1.<span class="fn">legend</span>()
+
+residuals = (y_test - pred) / <span class="num">1</span>e3
+ax2.<span class="fn">hist</span>(residuals, bins=<span class="num">25</span>, color=<span class="str">"#d4a017"</span>)
+ax2.<span class="fn">axvline</span>(<span class="num">0</span>, color=<span class="str">"black"</span>)
+ax2.<span class="fn">set_title</span>(<span class="str">"Residuals (actual − predicted, K SAR)"</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+</div>
+<div class="figure-block">
+    <div class="output-header"><i class="fas fa-chart-bar"></i> الرسم الناتج</div>
+    <img src="data:image/webp;base64,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" alt="رسم بياني ناتج عن pred_vs_actual.py" loading="lazy">
+</div>
+</section>
+
+<section class="section-card" id="overfit">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-balance-scale-right"></i>
+        الإفراط وقلة التعلم (Overfitting)
+    </h2>
+        <p>
+            النموذج البسيط جدًا لا يلتقط النمط (<strong>Underfitting</strong>)، والمعقد جدًا «يحفظ» بيانات التدريب بضجيجها فيفشل مع الجديد
+            (<strong>Overfitting</strong>) — كالطالب الذي يحفظ الإجابات دون فهم:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>overfitting.py</span>
+    </div>
+<pre><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_squared_error
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> make_pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> PolynomialFeatures
+
+rng = np.random.<span class="fn">default_rng</span>(<span class="num">3</span>)
+x = np.<span class="fn">sort</span>(rng.<span class="fn">uniform</span>(<span class="num">0</span>, <span class="num">1</span>, <span class="num">15</span>))                         <span class="cm"># 15 نقطة تدريب فقط</span>
+y = np.<span class="fn">sin</span>(<span class="num">2</span> * np.pi * x) + rng.<span class="fn">normal</span>(<span class="num">0</span>, <span class="num">0.3</span>, <span class="num">15</span>)
+x_new = rng.<span class="fn">uniform</span>(x.<span class="fn">min</span>(), x.<span class="fn">max</span>(), <span class="num">200</span>)                 <span class="cm"># بيانات جديدة من نفس المدى</span>
+y_new = np.<span class="fn">sin</span>(<span class="num">2</span> * np.pi * x_new) + rng.<span class="fn">normal</span>(<span class="num">0</span>, <span class="num">0.3</span>, <span class="num">200</span>)
+grid = np.<span class="fn">linspace</span>(x.<span class="fn">min</span>(), x.<span class="fn">max</span>(), <span class="num">300</span>)
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">3</span>, figsize=(<span class="num">14</span>, <span class="num">3.8</span>), sharey=<span class="kw">True</span>)
+<span class="kw">for</span> ax, degree, title <span class="kw">in</span> <span class="fn">zip</span>(axes, [<span class="num">1</span>, <span class="num">4</span>, <span class="num">14</span>], [<span class="str">"Underfit"</span>, <span class="str">"Good fit"</span>, <span class="str">"Overfit"</span>]):
+    model = <span class="fn">make_pipeline</span>(<span class="fn">PolynomialFeatures</span>(degree), <span class="fn">LinearRegression</span>()).<span class="fn">fit</span>(x[:, <span class="kw">None</span>], y)
+    train_err = <span class="fn">mean_squared_error</span>(y, model.<span class="fn">predict</span>(x[:, <span class="kw">None</span>]))
+    test_err = <span class="fn">mean_squared_error</span>(y_new, model.<span class="fn">predict</span>(x_new[:, <span class="kw">None</span>]))
+    ax.<span class="fn">scatter</span>(x, y, color=<span class="str">"black"</span>, s=<span class="num">18</span>, zorder=<span class="num">3</span>)
+    ax.<span class="fn">plot</span>(grid, model.<span class="fn">predict</span>(grid[:, <span class="kw">None</span>]), color=<span class="str">"#d4a017"</span>, linewidth=<span class="num">2.5</span>)
+    ax.<span class="fn">set_ylim</span>(-<span class="num">2</span>, <span class="num">2</span>)
+    ax.<span class="fn">set_title</span>(<span class="str">f"{title} (degree {degree})\ntrain MSE={train_err:.3f} | test MSE={test_err:.3f}"</span>)
+    <span class="fn">print</span>(<span class="str">f"degree {degree:&gt;2}: train={train_err:.3f}  test={test_err:.3f}"</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>degree  1: train=0.147  test=0.194
+degree  4: train=0.042  test=0.094
+degree 14: train=0.019  test=1.028</pre>
+</div>
+<div class="figure-block">
+    <div class="output-header"><i class="fas fa-chart-bar"></i> الرسم الناتج</div>
+    <img src="data:image/webp;base64,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" alt="رسم بياني ناتج عن overfitting.py" loading="lazy">
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الحالة</th><th>خطأ التدريب</th><th>خطأ الاختبار</th><th>العلاج</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Underfitting</td><td>مرتفع</td><td>مرتفع</td><td>نموذج أقوى، خصائص أكثر</td></tr>
+                    <tr><td>مناسب ✅</td><td>منخفض</td><td>منخفض وقريب منه</td><td>—</td></tr>
+                    <tr><td>Overfitting</td><td>منخفض جدًا</td><td>مرتفع</td><td>نموذج أبسط، بيانات أكثر، Regularization</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="cv">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-random"></i>
+        التحقق المتقاطع ومقارنة النماذج
+    </h2>
+        <p>
+            تقسيم واحد للبيانات قد يكون «محظوظًا». <strong>التحقق المتقاطع (Cross-Validation)</strong> يقسم بيانات التدريب إلى k أجزاء،
+            ويدرّب k مرات كل مرة يختبر على جزء مختلف، ثم يأخذ المتوسط — تقدير أكثر موثوقية:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>cross_validation.py</span>
+    </div>
+<pre><span class="kw">from</span> sklearn.compose <span class="kw">import</span> make_column_transformer
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestRegressor
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression, Ridge
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> cross_val_score
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> make_pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> OneHotEncoder, StandardScaler
+<span class="kw">from</span> sklearn.tree <span class="kw">import</span> DecisionTreeRegressor
+
+X, y = houses.<span class="fn">drop</span>(columns=<span class="str">"price"</span>), houses[<span class="str">"price"</span>]
+prep = <span class="fn">make_column_transformer</span>((<span class="fn">StandardScaler</span>(), [<span class="str">"area"</span>, <span class="str">"rooms"</span>, <span class="str">"age"</span>, <span class="str">"distance_km"</span>, <span class="str">"garden"</span>]),
+                               (<span class="fn">OneHotEncoder</span>(), [<span class="str">"district"</span>]))
+candidates = {
+    <span class="str">"Linear Regression"</span>: <span class="fn">LinearRegression</span>(),
+    <span class="str">"Ridge (alpha=10)"</span>: <span class="fn">Ridge</span>(alpha=<span class="num">10</span>),
+    <span class="str">"Decision Tree"</span>: <span class="fn">DecisionTreeRegressor</span>(random_state=<span class="num">0</span>),
+    <span class="str">"Decision Tree (leaf&gt;=5)"</span>: <span class="fn">DecisionTreeRegressor</span>(min_samples_leaf=<span class="num">5</span>, random_state=<span class="num">0</span>),
+    <span class="str">"Random Forest"</span>: <span class="fn">RandomForestRegressor</span>(n_estimators=<span class="num">200</span>, random_state=<span class="num">0</span>),
+}
+<span class="kw">for</span> name, reg <span class="kw">in</span> candidates.<span class="fn">items</span>():
+    scores = <span class="fn">cross_val_score</span>(<span class="fn">make_pipeline</span>(prep, reg), X, y, cv=<span class="num">5</span>, scoring=<span class="str">"neg_mean_absolute_error"</span>)
+    <span class="fn">print</span>(<span class="str">f"{name:&lt;25} MAE = {-scores.mean():&gt;8,.0f} ± {scores.std():&gt;6,.0f}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>Linear Regression         MAE =   92,056 ± 10,437
+Ridge (alpha=10)          MAE =   93,620 ±  9,382
+Decision Tree             MAE =  131,203 ±  6,714
+Decision Tree (leaf&gt;=5)   MAE =  117,623 ±  8,996
+Random Forest             MAE =   92,858 ±  4,857</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>قراءة النتائج:</strong> شجرة القرار بلا قيود تفرط في التعلم، واشتراط 5 منازل على الأقل في كل ورقة (<code>min_samples_leaf=5</code>) يحسنها بوضوح. والانحدار الخطي ممتاز هنا لأن العلاقة
+                في بياناتنا خطية تقريبًا — النموذج الأعقد ليس دائمًا الأفضل! ستتعرف على الأشجار والغابات العشوائية بعمق في الدرس القادم.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="deploy">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-save"></i>
+        حفظ النموذج واستخدامه
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>save_model.py</span>
+    </div>
+<pre><span class="kw">import</span> joblib
+<span class="kw">from</span> sklearn.compose <span class="kw">import</span> make_column_transformer
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> make_pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> OneHotEncoder, StandardScaler
+
+prep = <span class="fn">make_column_transformer</span>((<span class="fn">StandardScaler</span>(), [<span class="str">"area"</span>, <span class="str">"rooms"</span>, <span class="str">"age"</span>, <span class="str">"distance_km"</span>, <span class="str">"garden"</span>]),
+                               (<span class="fn">OneHotEncoder</span>(handle_unknown=<span class="str">"ignore"</span>), [<span class="str">"district"</span>]))
+model = <span class="fn">make_pipeline</span>(prep, <span class="fn">LinearRegression</span>()).<span class="fn">fit</span>(houses.<span class="fn">drop</span>(columns=<span class="str">"price"</span>), houses[<span class="str">"price"</span>])
+
+joblib.<span class="fn">dump</span>(model, <span class="str">"house_price_model.joblib"</span>)          <span class="cm"># حفظ النموذج كاملًا (مع المعالجة)</span>
+
+loaded = joblib.<span class="fn">load</span>(<span class="str">"house_price_model.joblib"</span>)          <span class="cm"># لاحقًا: في تطبيق ويب أو API</span>
+new_houses = pd.<span class="fn">DataFrame</span>([
+    {<span class="str">"area"</span>: <span class="num">300</span>, <span class="str">"rooms"</span>: <span class="num">5</span>, <span class="str">"age"</span>: <span class="num">3</span>, <span class="str">"distance_km"</span>: <span class="num">4.0</span>, <span class="str">"district"</span>: <span class="str">"center"</span>, <span class="str">"garden"</span>: <span class="num">1</span>},
+    {<span class="str">"area"</span>: <span class="num">300</span>, <span class="str">"rooms"</span>: <span class="num">5</span>, <span class="str">"age"</span>: <span class="num">3</span>, <span class="str">"distance_km"</span>: <span class="num">4.0</span>, <span class="str">"district"</span>: <span class="str">"south"</span>, <span class="str">"garden"</span>: <span class="num">1</span>},
+])
+<span class="kw">for</span> (_, h), price <span class="kw">in</span> <span class="fn">zip</span>(new_houses.<span class="fn">iterrows</span>(), loaded.<span class="fn">predict</span>(new_houses)):
+    <span class="fn">print</span>(<span class="str">f"منزل {h['area']:.0f} م² في {h['district']:&lt;6} ← سعر متوقع {price:,.0f} ريال"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>منزل 300 م² في center ← سعر متوقع 1,640,152 ريال
+منزل 300 م² في south  ← سعر متوقع 1,052,314 ريال</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>لاحظ:</strong> نفس المنزل تمامًا في حي مختلف يختلف سعره كثيرًا — النموذج تعلّم أثر الموقع.
+                ويمكنك الآن تحميل هذا الملف داخل API بـ FastAPI (مثل مشروع 2 في المستوى المتقدم) لتقديم خدمة تقدير الأسعار!
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! الناتج رقم متصل، إذن انحدار." data-hint="هل الناتج رقم أم فئة؟">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">نوع المشكلة</span>
+    </div>
+    <p class="exercise-question">تريد التنبؤ <strong>بعدد الدقائق</strong> التي سيستغرقها توصيل طلب. ما نوع هذه المشكلة؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> تصنيف</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> انحدار</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> تجميع</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> تعلم معزز</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تفهم أساسيات تعلم الآلة جيدًا." data-hint="R² = 1 مثالي، والتعقيد الزائد يسبب الإفراط في التعلم.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">يجب تقييم النموذج على بيانات لم يرها أثناء التدريب.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">R² يساوي 1 يعني أن النموذج لا يفسر شيئًا.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">Overfitting يعني أداء ممتاز على التدريب وضعيف على البيانات الجديدة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">Pipeline يمنع تسرّب معلومات بيانات الاختبار أثناء المعالجة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">النموذج الأعقد يعطي دائمًا نتائج أفضل.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! y = 2x + 3، وعند x = 10 تكون 23." data-hint="كل زيادة 1 في X تزيد y بمقدار 2، وعند X = 0 تكون y = 3.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">انحدار خطي</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟ (البيانات على خط مستقيم تمامًا)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+
+X = np.<span class="fn">array</span>([[<span class="num">1</span>], [<span class="num">2</span>], [<span class="num">3</span>], [<span class="num">4</span>]])
+y = np.<span class="fn">array</span>([<span class="num">5</span>, <span class="num">7</span>, <span class="num">9</span>, <span class="num">11</span>])
+m = <span class="fn">LinearRegression</span>().<span class="fn">fit</span>(X, y)
+<span class="fn">print</span>(<span class="fn">round</span>(m.coef_[<span class="num">0</span>]))
+<span class="fn">print</span>(<span class="fn">round</span>(m.intercept_))
+<span class="fn">print</span>(<span class="fn">round</span>(m.<span class="fn">predict</span>([[<span class="num">10</span>]])[<span class="num">0</span>]))</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">الميل:</span><input type="text" class="blank-input" data-answers="2" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">التقاطع:</span><input type="text" class="blank-input" data-answers="3" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">التنبؤ عند 10:</span><input type="text" class="blank-input" data-answers="23" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذا هو النمط الذي ستكرره مع كل نموذج." data-hint="قسّم ← درّب بـ fit ← تنبأ بـ predict ← قارن بالإجابات الحقيقية y_test.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">سير العمل</span>
+    </div>
+    <p class="exercise-question">أكمل سير عمل scikit-learn الأساسي:</p>
+    <div class="code-fill">
+        <div class="line"><span>X_train, X_test, y_train, y_test = </span><input type="text" class="blank-input" data-answers="train_test_split" placeholder="..." style="min-width:254px;" autocomplete="off" spellcheck="false"><span>(X, y, test_size=<span class="num">0.2</span>)</span></div>
+        <div class="line"><span>model = <span class="fn">LinearRegression</span>()</span></div>
+        <div class="line"><span>model.</span><input type="text" class="blank-input" data-answers="fit" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>(X_train, y_train)</span></div>
+        <div class="line"><span>pred = model.</span><input type="text" class="blank-input" data-answers="predict" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"><span>(X_test)</span></div>
+        <div class="line"><span><span class="fn">print</span>(<span class="fn">r2_score</span>(</span><input type="text" class="blank-input" data-answers="y_test" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"><span>, pred))</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! بيانات الاختبار تُستخدم مرة واحدة في النهاية فقط." data-hint="لا تلمس بيانات الاختبار إلا في التقييم النهائي.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب خطوات بناء نموذج تنبؤ بشكل صحيح. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) مقارنة النماذج بالتحقق المتقاطع على التدريب</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="6" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">6) حفظ النموذج واستخدامه</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">1) تحديد الهدف y والخصائص X</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">5) التقييم النهائي مرة واحدة على الاختبار</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">3) بناء Pipeline (معالجة + نموذج)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="6">
+            <span class="order-num">6</span>
+            <span style="flex:1; white-space:pre;">2) تقسيم البيانات إلى تدريب واختبار</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر: كن أنت خوارزمية الانحدار</div>
+    <p style="color:var(--text-light); font-size:0.95em;">حرّك المؤشرين لتغيير ميل الخط وتقاطعه، وحاول تقليل الخطأ (MSE) لأقل قيمة ممكنة. ثم اضغط «الحل الأمثل» لترى ما يجده <code>LinearRegression</code> رياضيًا.</p>
+    <div class="lab-row">
+        <label>الميل a:</label><input type="range" id="lrA" min="-1" max="4" step="0.05" value="0.5" oninput="drawLR()" style="flex:1;"><code id="lrAv" style="min-width:50px;"></code>
+    </div>
+    <div class="lab-row">
+        <label>التقاطع b:</label><input type="range" id="lrB" min="-10" max="20" step="0.25" value="8" oninput="drawLR()" style="flex:1;"><code id="lrBv" style="min-width:50px;"></code>
+        <button class="btn btn-primary" onclick="bestLR()"><i class="fas fa-magic"></i> الحل الأمثل</button>
+    </div>
+    <div id="lrBox" style="background:#fff; border-radius:10px; padding:8px; margin-top:8px;"></div>
+    <div class="lab-console" id="lrNote" style="min-height:0;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">10</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> مفهوم تعلم الآلة وأنواعه: الانحدار، والتصنيف، والتعلم غير الموجه.</li>
+                <li><i class="fas fa-check"></i> المصطلحات: الخصائص X، والهدف y، والتدريب، والتنبؤ.</li>
+                <li><i class="fas fa-check"></i> تقسيم البيانات بـ <code>train_test_split</code> وخطر تسرّب البيانات.</li>
+                <li><i class="fas fa-check"></i> واجهة scikit-learn الموحدة <code>fit / predict / score</code> والانحدار الخطي وتفسير معاملاته.</li>
+                <li><i class="fas fa-check"></i> مقاييس الانحدار MAE و RMSE و MAPE و R²، وأهمية خط الأساس.</li>
+                <li><i class="fas fa-check"></i> <code>ColumnTransformer</code> و <code>Pipeline</code> للمعالجة الآمنة.</li>
+                <li><i class="fas fa-check"></i> الإفراط وقلة التعلم، والتحقق المتقاطع لمقارنة النماذج.</li>
+                <li><i class="fas fa-check"></i> حفظ النموذج بـ <code>joblib</code> واستخدامه للتنبؤ.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> ابدأ بخط أساس ونموذج بسيط قبل أي نموذج معقد.</li>
+                <li><i class="fas fa-lightbulb"></i> ضع كل المعالجة داخل Pipeline دائمًا.</li>
+                <li><i class="fas fa-lightbulb"></i> قارن خطأ التدريب بخطأ الاختبار لاكتشاف الإفراط في التعلم.</li>
+                <li><i class="fas fa-lightbulb"></i> اشرح النتيجة بوحدة يفهمها الناس: «نخطئ بمتوسط 70 ألف ريال».</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>نماذج التصنيف</strong>: الانحدار اللوجستي وأشجار القرار والغابات العشوائية، ومصفوفة الالتباس.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson7.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 7: الإحصاء</span>
+        </a>
+        <a href="lesson9.html" class="nav-link next">
+            <span>الدرس التالي: نماذج التصنيف</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · تعلم الآلة والانحدار
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '67%';
+            text.textContent = '67% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر الانحدار ========== */
+    const LR_X = [1, 2, 3, 3.5, 4, 5, 5.5, 6, 7, 8, 8.5, 9];
+    const LR_Y = [4.1, 5.9, 6.2, 8.4, 7.6, 10.3, 9.8, 12.1, 13.0, 15.2, 14.1, 17.3];
+
+    function lrFit() {
+        const n = LR_X.length, mx = LR_X.reduce((a, b) => a + b) / n, my = LR_Y.reduce((a, b) => a + b) / n;
+        let sxy = 0, sxx = 0;
+        LR_X.forEach((x, i) => { sxy += (x - mx) * (LR_Y[i] - my); sxx += (x - mx) ** 2; });
+        const a = sxy / sxx;
+        return [a, my - a * mx];
+    }
+    const mse = (a, b) => LR_X.reduce((s, x, i) => s + (LR_Y[i] - (a * x + b)) ** 2, 0) / LR_X.length;
+
+    function bestLR() {
+        const [a, b] = lrFit();
+        document.getElementById('lrA').value = a;
+        document.getElementById('lrB').value = b;
+        drawLR(true, a, b);
+    }
+
+    function drawLR(exact, ea, eb) {
+        const a = exact ? ea : parseFloat(document.getElementById('lrA').value), b = exact ? eb : parseFloat(document.getElementById('lrB').value);
+        document.getElementById('lrAv').textContent = a.toFixed(2);
+        document.getElementById('lrBv').textContent = b.toFixed(2);
+        const W = 520, H = 280, P = 30;
+        const sx = x => P + x / 10 * (W - 2 * P), sy = y => H - P - y / 20 * (H - 2 * P);
+        let svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:auto;"><rect x="${P}" y="${P}" width="${W - 2 * P}" height="${H - 2 * P}" fill="none" stroke="#ddd"/>`;
+        LR_X.forEach((x, i) => {
+            svg += `<line x1="${sx(x)}" y1="${sy(LR_Y[i])}" x2="${sx(x)}" y2="${sy(a * x + b)}" stroke="#f44336" stroke-dasharray="3,3"/>`;
+            svg += `<circle cx="${sx(x)}" cy="${sy(LR_Y[i])}" r="5" fill="#4C72B0"/>`;
+        });
+        svg += `<line x1="${sx(0)}" y1="${sy(b)}" x2="${sx(10)}" y2="${sy(a * 10 + b)}" stroke="#d4a017" stroke-width="3"/></svg>`;
+        document.getElementById('lrBox').innerHTML = svg;
+        const [ba, bb] = lrFit();
+        const m = mse(a, b), best = mse(ba, bb);
+        document.getElementById('lrNote').innerHTML = `y = ${a.toFixed(2)}x + ${b.toFixed(2)}   |   MSE = ${m.toFixed(3)}   |   أفضل MSE ممكن = ${best.toFixed(3)}` +
+            (exact || m - best < 0.01 ? '\n<span style="color:#a5d6a7">✅ هذا هو الخط الأمثل: ما يجده LinearRegression بطريقة المربعات الصغرى.</span>'
+                : '\nالخطوط الحمراء المتقطعة هي الأخطاء (residuals). حاول تقصيرها!');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => drawLR());
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 7: الجمل الشرطية في Python | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list {
+            list-style: none;
+            padding: 0;
+            margin: 14px 0;
+        }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows {
+            display: flex;
+            gap: 6px;
+        }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .sort-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span class="sep">/</span>
+        <span>الجمل الشرطية</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-code-branch"></i>
+            الدرس 7 · الجمل الشرطية
+        </div>
+        <h1 class="lesson-title">الجمل الشرطية في Python</h1>
+        <p class="lesson-intro">
+            الجمل الشرطية هي التي تمنح برنامجك القدرة على <strong>اتخاذ القرارات</strong>.
+            بها يمكن للبرنامج أن يتصرف بشكل مختلف حسب البيانات والمعطيات.
+            في هذا الدرس ستتعلم <code>if</code>، <code>elif</code>، <code>else</code>،
+            والجمل المتداخلة، والتعبير الشرطي.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 30 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 اتخاذ القرارات في البرمجة</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 مبتدئ</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 6</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#intro">1. مقدمة</a>
+            <a href="#if">2. جملة if</a>
+            <a href="#ifelse">3. جملة if...else</a>
+            <a href="#elif">4. جملة if...elif...else</a>
+            <a href="#nested">5. الجمل المتداخلة</a>
+            <a href="#ternary">6. التعبير الشرطي</a>
+            <a href="#operators">7. عوامل المقارنة</a>
+            <a href="#exercises">8. تمارين تفاعلية</a>
+            <a href="#summary">9. الخلاصة</a>
+        </div>
+    </div>
+
+    <!-- 1. مقدمة -->
+    <section class="section-card" id="intro">
+        <h2 class="section-title">
+            <span class="num">1</span>
+            <i class="fas fa-lightbulb"></i>
+            مقدمة إلى الجمل الشرطية
+        </h2>
+        <p>
+            تخيّل أنك تكتب برنامجًا لموقع تسجيل دخول. كيف يعرف البرنامج إن كان المستخدم
+            مسجّلًا أم لا؟ الجواب: <strong>بالجمل الشرطية</strong>.
+        </p>
+        <p>
+            الجمل الشرطية تسمح للبرنامج بتنفيذ كود معيّن <strong>فقط إذا تحقق شرط معيّن</strong>،
+            وتعتمد أساسًا على القيم المنطقية (<code>True</code> أو <code>False</code>).
+        </p>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>الفكرة الأساسية:</strong> إذا كان الشرط صحيحًا → نفّذ الكود.
+                إذا لم يكن صحيحًا → تجاهله أو نفّذ كودًا بديلًا.
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. if -->
+    <section class="section-card" id="if">
+        <h2 class="section-title">
+            <span class="num">2</span>
+            <i class="fas fa-code"></i>
+            جملة if البسيطة
+        </h2>
+        <p>
+            أبسط صورة للجملة الشرطية: تُنفّذ الكود فقط إذا كان الشرط صحيحًا،
+            وإن كان خاطئًا يتجاهل الكود تمامًا.
+        </p>
+
+        <p><strong>التركيب الأساسي:</strong></p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>الصيغة</span>
+            </div>
+<pre><span class="kw">if</span> condition:
+    <span class="cm"># الكود الذي سيُنفَّذ إذا كان الشرط صحيحًا</span></pre>
+        </div>
+
+        <p><strong>مثال عملي:</strong></p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>if_example.py</span>
+            </div>
+<pre>age = <span class="num">20</span>
+
+<span class="kw">if</span> age >= <span class="num">18</span>:
+    <span class="fn">print</span>(<span class="str">"أنت بالغ يمكنك التصويت"</span>)</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>أنت بالغ يمكنك التصويت</pre>
+        </div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>مهم جدًا:</strong> يجب وضع <strong>نقطتين <code>:</code></strong>
+                بعد الشرط، و<strong>إزاحة (Indentation)</strong> متسقة للكود الذي ينتمي للجملة الشرطية (المتعارف عليه 4 مسافات).
+                بدون الإزاحة سيُظهر Python خطأ <code>IndentationError</code>.
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. if...else -->
+    <section class="section-card" id="ifelse">
+        <h2 class="section-title">
+            <span class="num">3</span>
+            <i class="fas fa-code-branch"></i>
+            جملة if...else
+        </h2>
+        <p>
+            عندما نريد تنفيذ كود بديل في حالة عدم تحقق الشرط، نستخدم <code>else</code>.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>الصيغة</span>
+            </div>
+<pre><span class="kw">if</span> condition:
+    <span class="cm"># يُنفَّذ إذا كان الشرط صحيحًا</span>
+<span class="kw">else</span>:
+    <span class="cm"># يُنفَّذ إذا كان الشرط خاطئًا</span></pre>
+        </div>
+
+        <p><strong>مثال: التحقق من نتيجة طالب</strong></p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>if_else.py</span>
+            </div>
+<pre>score = <span class="num">75</span>
+
+<span class="kw">if</span> score >= <span class="num">50</span>:
+    <span class="fn">print</span>(<span class="str">"مبروك! لقد نجحت في الامتحان"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"للأسف، لم تنجح في الامتحان"</span>)</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>مبروك! لقد نجحت في الامتحان</pre>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>نصيحة:</strong> <code>else</code> لا تحتاج شرطًا لأنها تُنفَّذ
+                عندما تفشل جميع الشروط السابقة.
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. if...elif...else -->
+    <section class="section-card" id="elif">
+        <h2 class="section-title">
+            <span class="num">4</span>
+            <i class="fas fa-sitemap"></i>
+            جملة if...elif...else
+        </h2>
+        <p>
+            عندما يكون لدينا أكثر من شرط، نستخدم <code>elif</code> (اختصار else if).
+            يمكن تكرارها لعدد غير محدود من الشروط المتوسطة.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>الصيغة</span>
+            </div>
+<pre><span class="kw">if</span> condition1:
+    <span class="cm"># الشرط الأول</span>
+<span class="kw">elif</span> condition2:
+    <span class="cm"># الشرط الثاني</span>
+<span class="kw">elif</span> condition3:
+    <span class="cm"># الشرط الثالث</span>
+<span class="kw">else</span>:
+    <span class="cm"># إذا فشلت كل الشروط السابقة</span></pre>
+        </div>
+
+        <p><strong>مثال: تحديد التقدير بناءً على الدرجة</strong></p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>grades.py</span>
+            </div>
+<pre>score = <span class="num">85</span>
+
+<span class="kw">if</span> score >= <span class="num">90</span>:
+    <span class="fn">print</span>(<span class="str">"التقدير: ممتاز"</span>)
+<span class="kw">elif</span> score >= <span class="num">80</span>:
+    <span class="fn">print</span>(<span class="str">"التقدير: جيد جداً"</span>)
+<span class="kw">elif</span> score >= <span class="num">70</span>:
+    <span class="fn">print</span>(<span class="str">"التقدير: جيد"</span>)
+<span class="kw">elif</span> score >= <span class="num">60</span>:
+    <span class="fn">print</span>(<span class="str">"التقدير: مقبول"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"التقدير: راسب"</span>)</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>التقدير: جيد جداً</pre>
+        </div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>ترتيب مهم:</strong> ضع الشروط من الأصعب (الأعلى) إلى الأسهل (الأدنى).
+                لو بدأنا بـ <code>score >= 60</code> أولًا، فكل النتائج ≥ 60 ستُطبع فيها "مقبول" فقط.
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. nested -->
+    <section class="section-card" id="nested">
+        <h2 class="section-title">
+            <span class="num">5</span>
+            <i class="fas fa-project-diagram"></i>
+            الجمل الشرطية المتداخلة
+        </h2>
+        <p>
+            يمكننا وضع جملة شرطية داخل جملة شرطية أخرى، وهذا ما يسمى
+            <strong>الجمل المتداخلة (Nested)</strong>. مفيدة عند الحاجة لاختبار شرطين
+            متسلسلين.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>nested.py</span>
+            </div>
+<pre>age = <span class="num">25</span>
+has_license = <span class="kw">True</span>
+
+<span class="kw">if</span> age >= <span class="num">18</span>:
+    <span class="kw">if</span> has_license:
+        <span class="fn">print</span>(<span class="str">"يمكنك قيادة السيارة"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="str">"لا يمكنك القيادة قبل الحصول على رخصة"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"لا يمكنك قيادة السيارة"</span>)</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>يمكنك قيادة السيارة</pre>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>متى نستخدم المتداخلة؟</strong> عندما نحتاج لاختبار شرط فقط بعد التأكد من شرط آخر.
+                في المثال: لا معنى لفحص الرخصة إن كان الشخص قاصرًا أصلًا.
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. ternary -->
+    <section class="section-card" id="ternary">
+        <h2 class="section-title">
+            <span class="num">6</span>
+            <i class="fas fa-bolt"></i>
+            التعبير الشرطي (Ternary Operator)
+        </h2>
+        <p>
+            صيغة مختصرة لكتابة <code>if...else</code> في سطر واحد،
+            مفيدة عندما تكون الجملتان بسيطتين.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>الصيغة</span>
+            </div>
+<pre>value_if_true <span class="kw">if</span> condition <span class="kw">else</span> value_if_false</pre>
+        </div>
+
+        <p><strong>مقارنة بين الطريقتين:</strong></p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-python"></i> Python</span>
+                <span>مثال</span>
+            </div>
+<pre><span class="cm"># الطريقة التقليدية</span>
+age = <span class="num">20</span>
+<span class="kw">if</span> age >= <span class="num">18</span>:
+    status = <span class="str">"بالغ"</span>
+<span class="kw">else</span>:
+    status = <span class="str">"قاصر"</span>
+
+<span class="cm"># نفس المثال بالتعبير الشرطي</span>
+status = <span class="str">"بالغ"</span> <span class="kw">if</span> age >= <span class="num">18</span> <span class="kw">else</span> <span class="str">"قاصر"</span>
+
+<span class="fn">print</span>(status)</pre>
+        </div>
+
+        <div class="output-block">
+            <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+            <pre>بالغ</pre>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>متى تستخدمها؟</strong> عندما تكون القيمة المطلوبة بسيطة (كلمة أو رقم)،
+                وليس فيها عمليات معقّدة. لا تستخدمها للشروط المتعددة (elif) لأنها ستُربك الكود.
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. operators -->
+    <section class="section-card" id="operators">
+        <h2 class="section-title">
+            <span class="num">7</span>
+            <i class="fas fa-calculator"></i>
+            عوامل المقارنة والمنطقية
+        </h2>
+        <p>تحتاج الجمل الشرطية لعوامل لبناء الشروط. هذه أشهرها:</p>
+
+        <p><strong>عوامل المقارنة:</strong></p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>العامل</th><th>المعنى</th><th>مثال</th><th>الناتج</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>==</code></td><td>يساوي</td><td><code>5 == 5</code></td><td><code>True</code></td></tr>
+                    <tr><td><code>!=</code></td><td>لا يساوي</td><td><code>5 != 3</code></td><td><code>True</code></td></tr>
+                    <tr><td><code>&gt;</code></td><td>أكبر من</td><td><code>10 &gt; 5</code></td><td><code>True</code></td></tr>
+                    <tr><td><code>&lt;</code></td><td>أصغر من</td><td><code>3 &lt; 1</code></td><td><code>False</code></td></tr>
+                    <tr><td><code>&gt;=</code></td><td>أكبر أو يساوي</td><td><code>5 &gt;= 5</code></td><td><code>True</code></td></tr>
+                    <tr><td><code>&lt;=</code></td><td>أصغر أو يساوي</td><td><code>4 &lt;= 3</code></td><td><code>False</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p><strong>العوامل المنطقية:</strong></p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>العامل</th><th>المعنى</th><th>مثال</th><th>الناتج</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>and</code></td><td>و (كلا الشرطين)</td><td><code>5 &gt; 3 and 2 &lt; 4</code></td><td><code>True</code></td></tr>
+                    <tr><td><code>or</code></td><td>أو (أحدهما)</td><td><code>5 &gt; 10 or 2 &lt; 4</code></td><td><code>True</code></td></tr>
+                    <tr><td><code>not</code></td><td>النفي</td><td><code>not (5 &gt; 3)</code></td><td><code>False</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>فرق مهم:</strong> <code>=</code> للإسناد (تعيين قيمة)،
+                و <code>==</code> للمقارنة. من أكثر الأخطاء شيوعًا عند المبتدئين الخلط بينهما.
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. التمارين -->
+    <section class="section-card" id="exercises">
+        <h2 class="section-title">
+            <span class="num">8</span>
+            <i class="fas fa-pencil-alt"></i>
+            التمارين التفاعلية
+        </h2>
+        <p>اختبر فهمك للدرس من خلال أربعة تمارين متنوعة:</p>
+
+        <!-- تمرين 1: اختيار متعدد -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">1</span>
+                <h4>اختيار من متعدد</h4>
+                <span class="exercise-tag">الصيغة الصحيحة</span>
+            </div>
+            <p class="exercise-question">
+                أي من الأسطر التالية <strong>صحيح</strong> لبدء جملة شرطية في Python؟
+                <em>(اختر كل الإجابات الصحيحة)</em>
+            </p>
+            <div class="options-list" id="q1-options">
+                <label class="option"><input type="checkbox" name="q1" value="1"> <code>if age &gt;= 18:</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="2"> <code>if age &gt;= 18</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="3"> <code>If age &gt;= 18:</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="4"> <code>if (age &gt;= 18):</code></label>
+                <label class="option"><input type="checkbox" name="q1" value="5"> <code>if age = 18:</code></label>
+            </div>
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ1()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ1()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q1-result"></div>
+        </div>
+
+        <!-- تمرين 2: صح/خطأ -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">2</span>
+                <h4>صح أم خطأ</h4>
+                <span class="exercise-tag">اختر لكل عبارة</span>
+            </div>
+            <p class="exercise-question">
+                اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:
+            </p>
+            <div class="tf-list" id="q2-list">
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">يجب وضع نقطتين <code>:</code> بعد شرط <code>if</code>.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">الكود داخل جملة <code>if</code> يجب أن يكون مُزاحًا (Indented).</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="false">
+                    <span class="tf-statement">يمكن استخدام <code>elif</code> بدون <code>if</code>.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="false">
+                    <span class="tf-statement">العامل <code>=</code> يُستخدم للمقارنة بين قيمتين.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+                <div class="tf-item" data-answer="true">
+                    <span class="tf-statement">التعبير الشرطي يسمح بكتابة <code>if...else</code> في سطر واحد.</span>
+                    <div class="tf-actions">
+                        <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                        <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ2()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ2()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q2-result"></div>
+        </div>
+
+        <!-- تمرين 3: توقّع الناتج -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">3</span>
+                <h4>توقّع الناتج</h4>
+                <span class="exercise-tag">ماذا سيطبع؟</span>
+            </div>
+            <p class="exercise-question">
+                بالنظر للكود التالي، ما الذي سيطبعه البرنامج؟ <em>(اكتب النص كما هو بالضبط)</em>
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="lang"><i class="fab fa-python"></i> Python</span>
+                    <span>predict.py</span>
+                </div>
+<pre>score = <span class="num">72</span>
+
+<span class="kw">if</span> score >= <span class="num">90</span>:
+    <span class="fn">print</span>(<span class="str">"ممتاز"</span>)
+<span class="kw">elif</span> score >= <span class="num">80</span>:
+    <span class="fn">print</span>(<span class="str">"جيد جداً"</span>)
+<span class="kw">elif</span> score >= <span class="num">70</span>:
+    <span class="fn">print</span>(<span class="str">"جيد"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"راسب"</span>)</pre>
+            </div>
+
+            <div class="code-fill">
+                <div class="line">
+                    <span class="cm">الناتج:</span>
+                    <input type="text" class="blank-input" id="b3" placeholder="اكتب الناتج..." style="min-width:140px;">
+                </div>
+            </div>
+
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ3()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ3()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q3-result"></div>
+        </div>
+
+        <!-- تمرين 4: ترتيب الكود -->
+        <div class="exercise-block">
+            <div class="exercise-head">
+                <span class="exercise-num">4</span>
+                <h4>رتّب الكود</h4>
+                <span class="exercise-tag">استخدم الأسهم</span>
+            </div>
+            <p class="exercise-question">
+                رتّب الأسطر التالية لتكوين برنامج يتحقق إن كان الرقم موجبًا أو سالبًا أو صفرًا.
+                <em>(من الأعلى إلى الأسفل)</em>
+            </p>
+
+            <div class="sortable-list" id="q4-list">
+                <div class="sortable-item" data-correct="4">
+                    <span class="order-num">1</span>
+                    <span>else:</span>
+                    <span style="flex:1; margin-left:8px; color:#f1fa8c;">print("الرقم صفر")</span>
+                    <div class="sort-arrows">
+                        <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                        <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                </div>
+                <div class="sortable-item" data-correct="1">
+                    <span class="order-num">2</span>
+                    <span>num = int(input("أدخل رقمًا: "))</span>
+                    <div class="sort-arrows">
+                        <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                        <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                </div>
+                <div class="sortable-item" data-correct="3">
+                    <span class="order-num">3</span>
+                    <span>elif num &lt; 0:</span>
+                    <span style="flex:1; margin-left:8px; color:#f1fa8c;">print("الرقم سالب")</span>
+                    <div class="sort-arrows">
+                        <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                        <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                </div>
+                <div class="sortable-item" data-correct="2">
+                    <span class="order-num">4</span>
+                    <span>if num &gt; 0:</span>
+                    <span style="flex:1; margin-left:8px; color:#f1fa8c;">print("الرقم موجب")</span>
+                    <div class="sort-arrows">
+                        <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                        <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="checkQ4()">
+                    <i class="fas fa-check"></i> تحقق
+                </button>
+                <button class="btn btn-secondary" onclick="resetQ4()">
+                    <i class="fas fa-redo"></i> إعادة
+                </button>
+            </div>
+            <div class="result-msg" id="q4-result"></div>
+        </div>
+
+    </section>
+
+    <!-- 9. الخلاصة -->
+    <section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> مفهوم الجمل الشرطية وأهميتها في اتخاذ القرار.</li>
+                <li><i class="fas fa-check"></i> كتابة <code>if</code> البسيطة وكيفية استخدام الإزاحة.</li>
+                <li><i class="fas fa-check"></i> استخدام <code>else</code> لتنفيذ كود بديل.</li>
+                <li><i class="fas fa-check"></i> استخدام <code>elif</code> للشروط المتعددة وترتيبها الصحيح.</li>
+                <li><i class="fas fa-check"></i> الجمل المتداخلة (Nested).</li>
+                <li><i class="fas fa-check"></i> التعبير الشرطي (Ternary) لاختصار الكود.</li>
+                <li><i class="fas fa-check"></i> عوامل المقارنة (<code>==, !=, &gt;, &lt;, &gt;=, &lt;=</code>).</li>
+                <li><i class="fas fa-check"></i> العوامل المنطقية (<code>and, or, not</code>).</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> اكتب برامج صغيرة تقرأ من المستخدم وتقرر بناءً على مدخلاته.</li>
+                <li><i class="fas fa-lightbulb"></i> تدرّب على ترتيب الشروط من الأصعب إلى الأسهل.</li>
+                <li><i class="fas fa-lightbulb"></i> استخدم التعبير الشرطي فقط في الحالات البسيطة.</li>
+                <li><i class="fas fa-lightbulb"></i> انتبه للإزاحة، فهي سبب معظم أخطاء المبتدئين.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس القادم ستتعلم <strong>الحلقات التكرارية
+                (Loops)</strong> — كيف نكرّر الأوامر دون كتابتها عدة مرات.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson6.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 6: العمليات الحسابية والمنطقية</span>
+        </a>
+        <a href="lesson8.html" class="nav-link next">
+            <span>الدرس التالي: الحلقات التكرارية</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · الجمل الشرطية
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '47%';
+            text.textContent = '47% مكتمل';
+        }, 400);
+    });
+
+    /* ========== تمرين 1 ========== */
+    function checkQ1() {
+        const correct = ['1', '4']; // if age >= 18:  و  if (age >= 18):
+        const boxes = document.querySelectorAll('input[name="q1"]');
+        let right = 0, wrong = 0, pickedWrong = 0;
+
+        boxes.forEach(b => {
+            const label = b.closest('.option');
+            label.classList.remove('correct', 'wrong');
+            if (b.checked) {
+                if (correct.includes(b.value)) {
+                    label.classList.add('correct');
+                    right++;
+                } else {
+                    label.classList.add('wrong');
+                    wrong++;
+                    pickedWrong++;
+                }
+            } else if (correct.includes(b.value)) {
+                wrong++;
+            }
+        });
+
+        const msg = document.getElementById('q1-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (![...boxes].some(b => b.checked)) {
+            msg.classList.add('mid');
+            msg.innerHTML = '<i class="fas fa-info-circle"></i> اختر إجابة واحدة على الأقل ثم اضغط «تحقق».';
+            return;
+        }
+
+        if (right === correct.length && wrong === 0) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> ممتاز! الإجابتان الصحيحتان هما: <code>if age &gt;= 18:</code> و <code>if (age &gt;= 18):</code> — كلاهما مقبول 🎉';
+        } else if (right > 0) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${correct.length}${pickedWrong ? `، لكنك اخترت ${pickedWrong === 1 ? 'خيارًا خاطئًا' : pickedWrong === 2 ? 'خيارين خاطئين' : pickedWrong + ' خيارات خاطئة'} (باللون الأحمر)` : ''}. تذكّر: يجب أن تكون <code>if</code> بحروف صغيرة، ونقطتان في النهاية.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة صحيحة. الصيغة الصحيحة: <code>if age &gt;= 18:</code>.';
+        }
+    }
+
+    function resetQ1() {
+        document.querySelectorAll('input[name="q1"]').forEach(b => b.checked = false);
+        document.querySelectorAll('#q1-options .option').forEach(l => l.classList.remove('correct', 'wrong'));
+        const msg = document.getElementById('q1-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== تمرين 2 ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkQ2() {
+        const items = document.querySelectorAll('#q2-list .tf-item');
+        let right = 0, answered = 0;
+
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+
+            if (selected === undefined) return;
+            answered++;
+
+            if ((selected === 'true') === correct) {
+                item.classList.add('correct');
+                right++;
+            } else {
+                item.classList.add('wrong');
+            }
+        });
+
+        const msg = document.getElementById('q2-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (answered < items.length) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`;
+        } else if (right === items.length) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> رائع! جميع إجاباتك صحيحة 🎉';
+        } else if (right > 0) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${items.length}. العبارات الخاطئة باللون الأحمر.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> لم تصب أي عبارة. راجع الدرس ثم أعد المحاولة.';
+        }
+    }
+
+    function resetQ2() {
+        document.querySelectorAll('#q2-list .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        const msg = document.getElementById('q2-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== تمرين 3 ========== */
+    function checkQ3() {
+        const b3 = document.getElementById('b3');
+        const v = b3.value.trim();
+
+        b3.classList.remove('correct', 'wrong');
+
+        // الناتج الصحيح: "جيد" (لأن score = 72، والشرط 70 <= 72 < 80)
+        const correct = (v === 'جيد');
+
+        if (correct) {
+            b3.classList.add('correct');
+        } else {
+            b3.classList.add('wrong');
+        }
+
+        const msg = document.getElementById('q3-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (correct) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> إجابة صحيحة! لأن 72 يقع في النطاق من 70 إلى 79 → "جيد" 🎉';
+        } else if (v === '') {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> لم تكتب أي ناتج. راجع شروط الكود.';
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> الناتج غير صحيح. تلميح: 72 ≥ 70 لكن أقل من 80.';
+        }
+    }
+
+    function resetQ3() {
+        const b3 = document.getElementById('b3');
+        b3.value = '';
+        b3.classList.remove('correct', 'wrong');
+        const msg = document.getElementById('q3-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== تمرين 4: ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const list = document.getElementById('q4-list');
+        const item = btn.closest('.sortable-item');
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+
+        if (direction === -1 && index > 0) {
+            list.insertBefore(item, items[index - 1]);
+        } else if (direction === 1 && index < items.length - 1) {
+            list.insertBefore(items[index + 1], item);
+        }
+        updateOrderNumbers();
+    }
+
+    function updateOrderNumbers() {
+        const items = document.querySelectorAll('#q4-list .sortable-item');
+        items.forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+        });
+    }
+
+    function checkQ4() {
+        const items = document.querySelectorAll('#q4-list .sortable-item');
+        let right = 0;
+
+        items.forEach((item, index) => {
+            const correct = parseInt(item.dataset.correct);
+            item.classList.remove('correct', 'wrong');
+            if (correct === index + 1) {
+                item.classList.add('correct');
+                right++;
+            } else {
+                item.classList.add('wrong');
+            }
+        });
+
+        const msg = document.getElementById('q4-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show');
+
+        if (right === items.length) {
+            msg.classList.add('ok');
+            msg.innerHTML = '<i class="fas fa-check-circle"></i> ترتيب صحيح تمامًا! 🎉 الترتيب: إدخال ← if موجب ← elif سالب ← else صفر.';
+        } else if (right >= 2) {
+            msg.classList.add('mid');
+            msg.innerHTML = `<i class="fas fa-info-circle"></i> ${right} من 4 أسطر في مكانها الصحيح. تذكّر: أولًا الإدخال، ثم <code>if</code>، ثم <code>elif</code>، ثم <code>else</code>.`;
+        } else {
+            msg.classList.add('bad');
+            msg.innerHTML = '<i class="fas fa-times-circle"></i> الترتيب غير صحيح. الترتيب الصحيح: إدخال ← if ← elif ← else.';
+        }
+    }
+
+    // نحفظ الترتيب المخلوط الأصلي عند تحميل الصفحة، لنستعيده عند «إعادة» دون كشف الحل
+    const q4Initial = Array.from(document.getElementById('q4-list').children);
+
+    function resetQ4() {
+        const list = document.getElementById('q4-list');
+        q4Initial.forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            list.appendChild(item);
+        });
+        updateOrderNumbers();
+        const msg = document.getElementById('q4-result');
+        msg.classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

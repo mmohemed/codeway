@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 2: تثبيت Python و VS Code | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --text: #fff;
+            --text-light: #dcdcdc;
+            --info: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 800;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .breadcrumb {
+            font-size: 0.82em;
+            color: #ccc;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+
+        .breadcrumb span { margin: 0 6px; color: #777; }
+
+        /* ===== الهيدر ===== */
+        .page-hero {
+            padding: 140px 30px 70px;
+            background: radial-gradient(circle at top, #1a1a1a 0%, #000 70%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .page-hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 16px;
+        }
+
+        .lesson-title {
+            font-size: 2.6em;
+            color: var(--gold);
+            margin-bottom: 14px;
+            text-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
+            line-height: 1.4;
+        }
+
+        .lesson-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            font-size: 0.85em;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lesson-meta-item i { color: var(--gold); }
+
+        /* ===== المحتوى (كامل العرض) ===== */
+        .content-wrapper {
+            width: 100%;
+            padding: 50px 40px 80px;
+            background: linear-gradient(180deg, #000 0%, #050505 100%);
+        }
+
+        .content-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .main-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 50px 55px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+        }
+
+        .main-card h2 {
+            font-size: 1.6em;
+            color: var(--gold);
+            margin: 40px 0 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+        }
+
+        .main-card h2:first-child { margin-top: 0; }
+
+        .main-card h2 i { font-size: 1.05rem; color: var(--gold-soft); }
+
+        .main-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 14px 0 18px;
+        }
+
+        .main-card ul.plain,
+        .main-card ol.plain {
+            padding-right: 24px;
+            margin: 14px 0;
+        }
+
+        .main-card ul.plain li,
+        .main-card ol.plain li {
+            margin-bottom: 10px;
+            color: var(--text-light);
+            font-size: 0.98em;
+        }
+
+        /* ===== صندوق مميز ===== */
+        .highlight-box {
+            margin: 25px 0;
+            background: #121212;
+            border-radius: 14px;
+            padding: 24px 28px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+        }
+
+        .highlight-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 14px;
+            font-size: 1.1em;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .highlight-box ul li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 9px 0;
+            color: var(--text-light);
+            font-size: 0.97em;
+        }
+
+        .highlight-box ul li i {
+            color: var(--gold);
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        /* ===== كتلة الكود ===== */
+        .code-block {
+            margin: 22px 0;
+            background: #050505;
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+        }
+
+        .code-label {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            font-size: 0.74em;
+            color: var(--gold-soft);
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        pre {
+            margin: 0;
+            padding-top: 26px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.95em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.75;
+        }
+
+        code.inline {
+            background: #1a1a1a;
+            color: var(--gold);
+            padding: 2px 9px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.9em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== ملاحظات ===== */
+        .note, .tip, .warning {
+            margin: 22px 0;
+            padding: 18px 22px;
+            border-radius: 12px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            line-height: 1.85;
+        }
+
+        .note {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+
+        .tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+
+        .warning {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+
+        .note i, .tip i, .warning i { font-size: 1.2em; margin-top: 5px; flex-shrink: 0; }
+        .note i { color: var(--info); }
+        .tip i { color: var(--success); }
+        .warning i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        table thead {
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        table th {
+            padding: 16px 18px;
+            color: var(--gold);
+            text-align: right;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        table td {
+            padding: 16px 18px;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table tr:last-child td { border-bottom: none; }
+        table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        /* ===== خطوات مرقمة ===== */
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            counter-reset: step;
+        }
+
+        .steps-list li {
+            position: relative;
+            padding: 14px 60px 14px 20px;
+            margin-bottom: 12px;
+            background: #0d0d0d;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
+            font-size: 0.97em;
+            line-height: 1.8;
+            transition: all 0.3s;
+        }
+
+        .steps-list li:hover {
+            border-color: rgba(255, 215, 0, 0.4);
+            background: #121212;
+            transform: translateX(-4px);
+        }
+
+        .steps-list li::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+            color: #000;
+            font-weight: 800;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== التمارين التفاعلية ===== */
+        .exercise-section {
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(15, 15, 15, 0.9));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+        }
+
+        .exercise-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+            color: #000;
+            font-weight: 800;
+            font-size: 1.05em;
+            flex-shrink: 0;
+        }
+
+        .exercise-title {
+            color: var(--gold);
+            font-size: 1.15em;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .exercise-question {
+            font-size: 1em;
+            color: var(--text-light);
+            margin-bottom: 18px;
+            line-height: 1.8;
+        }
+
+        /* --- خيارات --- */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option-item:hover {
+            border-color: rgba(255, 215, 0, 0.4);
+            background: #101010;
+            transform: translateX(-4px);
+        }
+
+        .option-item input[type="radio"],
+        .option-item input[type="checkbox"] {
+            accent-color: var(--gold);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* --- إدخال نصي --- */
+        .text-input-wrap {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .text-input {
+            flex: 1;
+            min-width: 220px;
+            padding: 13px 18px;
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        /* --- أزرار التمرين --- */
+        .exercise-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 22px;
+            border-radius: 9px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 700;
+            font-size: 0.94em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        /* --- نتيجة التمرين --- */
+        .exercise-result {
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            display: none;
+            line-height: 1.8;
+        }
+
+        .exercise-result.success {
+            display: block;
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+
+        .exercise-result.partial {
+            display: block;
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+
+        .exercise-result.error {
+            display: block;
+            background: rgba(244, 67, 54, 0.15);
+            border-right: 4px solid var(--danger);
+            color: #ffcdd2;
+        }
+
+        /* ===== شريط التقدم ===== */
+        .progress-footer {
+            margin: 40px 0 0;
+            padding: 26px 28px;
+            background: #0a0a0a;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .progress-footer h3 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.85em;
+            color: #aaa;
+            text-align: center;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            margin-top: 45px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 260px;
+            font-size: 0.95em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.5);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        footer {
+            text-align: center;
+            padding: 28px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: #aaa;
+        }
+
+        /* ===== استجابة ===== */
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 8px; padding: 10px 15px; }
+            .page-hero { padding: 160px 15px 50px; }
+            .lesson-title { font-size: 1.75em; }
+            .content-wrapper { padding: 30px 15px 50px; }
+            .main-card { padding: 26px 20px; }
+            .exercise-section { padding: 22px 18px; }
+            .lesson-meta { flex-direction: column; align-items: center; }
+            .nav-links { flex-direction: column; }
+            .nav-link { min-width: 100%; justify-content: center !important; }
+            .steps-list li { padding: 12px 55px 12px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- شريط التنقل -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span>/</span>
+        <a href="../index.html">مستوى المبتدئين</a>
+        <span>/</span>
+        <span>الدرس 2</span>
+    </div>
+</nav>
+
+<!-- الهيدر -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-tools"></i>
+            الدرس 2 · تجهيز بيئة العمل
+        </div>
+        <h1 class="lesson-title">تثبيت Python و VS Code على جهازك</h1>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> المدة: 15 دقيقة تطبيق</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> الهدف: تجهيز بيئة العمل</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> المستوى: لا يتطلب معرفة سابقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-list-ol"></i> الدرس 2 من 15</div>
+        </div>
+    </div>
+</section>
+
+<!-- المحتوى (كامل العرض) -->
+<div class="content-wrapper">
+    <div class="content-inner">
+        <article class="main-card">
+
+            <!-- ===== مقدمة ===== -->
+            <h2><i class="fas fa-tools"></i> لماذا نحتاج لتثبيت Python و VS Code؟</h2>
+            <p>
+                قبل أن نكتب أول برنامج حقيقي بلغة بايثون، نحتاج لشيئين رئيسيين على جهازك:
+            </p>
+            <ol class="plain">
+                <li><strong style="color:var(--gold)">مفسّر Python (Interpreter):</strong> وهو البرنامج الذي ينفّذ شيفرة بايثون على جهازك ويحوّلها إلى أوامر يفهمها الحاسوب.</li>
+                <li><strong style="color:var(--gold)">محرر أكواد (Code Editor):</strong> وهو البرنامج الذي تكتب فيه كودك بشكل مريح ومنظّم، مع تلوين للكود واكتشاف الأخطاء.</li>
+            </ol>
+            <p>
+                يمكنك استخدام أي محرر تفضله، لكن في هذا المسار سنعتمد على
+                <strong>Visual Studio Code</strong> (VS Code) لأنه مجاني، قوي، خفيف، ويدعم بايثون بشكل ممتاز.
+            </p>
+
+            <div class="highlight-box">
+                <strong><i class="fas fa-info-circle"></i> ماذا سنفعل في هذا الدرس؟</strong>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> تثبيت مترجم Python على جهازك.</li>
+                    <li><i class="fas fa-check-circle"></i> التأكد من نجاح التثبيت عبر سطر الأوامر.</li>
+                    <li><i class="fas fa-check-circle"></i> تثبيت VS Code وإعداد إضافة Python.</li>
+                    <li><i class="fas fa-check-circle"></i> تجربة أول ملف Python وتشغيله.</li>
+                </ul>
+            </div>
+
+            <!-- ===== الخطوة 1 ===== -->
+            <h2><i class="fas fa-download"></i> الخطوة 1: تحميل وتثبيت Python</h2>
+            <p>اتبع الخطوات التالية بالترتيب:</p>
+
+            <ol class="steps-list">
+                <li>افتح المتصفح واذهب إلى الموقع الرسمي: <strong>python.org</strong></li>
+                <li>من القائمة العلوية اختر: <strong>Downloads</strong>.</li>
+                <li>سيقترح عليك الموقع تلقائيًا النسخة المناسبة لنظامك. اضغط عليها لتنزيل ملف التثبيت.</li>
+                <li>بعد انتهاء التنزيل، شغّل ملف التثبيت. <strong>الخطوات التالية لنظام Windows</strong> (لـ macOS و Linux انظر الملاحظة بعد الخطوات).</li>
+                <li>
+                    <strong style="color:var(--gold)">مهم جدًا:</strong> قبل الضغط على زر Install، تأكد من تفعيل الخيار
+                    <br><strong>"Add python.exe to PATH"</strong> (أو <strong>"Add Python to PATH"</strong> في الإصدارات الأقدم) أسفل نافذة التثبيت.
+                </li>
+                <li>اضغط <strong>Install Now</strong> وانتظر حتى تكتمل عملية التثبيت.</li>
+                <li>عند الانتهاء اضغط <strong>Close</strong>.</li>
+            </ol>
+
+            <div class="warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>ملاحظة مهمّة جدًا:</strong> تفعيل خيار <strong>Add Python to PATH</strong> ضروري
+                    ليعمل الأمر <code class="inline">python</code> من أي مكان في جهازك. إذا نسيت تفعيله، يمكن إصلاح ذلك لاحقًا،
+                    لكن يفضل الانتباه من البداية.
+                </div>
+            </div>
+
+            <div class="note">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>على macOS:</strong> شغّل ملف التثبيت (<code class="inline">.pkg</code>) واتبع الخطوات بالضغط على Continue ثم Install؛ لا يوجد خيار PATH لأن المثبّت يضيف الأمر <code class="inline">python3</code> تلقائيًا.
+                    <br><strong>على Linux:</strong> غالبًا Python مثبّت مسبقًا. تحقق بالأمر <code class="inline">python3 --version</code>، وإن لم يكن مثبتًا فثبّته من مدير الحزم، مثل <code class="inline">sudo apt install python3</code> في Ubuntu.
+                </div>
+            </div>
+
+            <!-- ===== الخطوة 2 ===== -->
+            <h2><i class="fas fa-check-double"></i> الخطوة 2: التأكد من نجاح تثبيت Python</h2>
+            <p>بعد انتهاء التثبيت، سنتحقق من أن Python يعمل بشكل صحيح:</p>
+
+            <ol class="steps-list">
+                <li>في <strong>Windows</strong>: افتح قائمة ابدأ واكتب <strong>CMD</strong> أو <strong>PowerShell</strong>، ثم اضغط Enter.</li>
+                <li>في <strong>macOS / Linux</strong>: افتح تطبيق <strong>Terminal</strong>.</li>
+                <li>اكتب الأمر التالي ثم اضغط Enter:</li>
+            </ol>
+
+            <div class="code-block">
+                <div class="code-label">أمر للتحقق من نسخة Python</div>
+<pre>
+python --version
+</pre>
+            </div>
+
+            <p style="font-size:0.95em;color:#ddd;">
+                إذا ظهرت لك نسخة مثل: <code class="inline">Python 3.13.1</code> (أي رقم يبدأ بـ 3) فهذا يعني أن التثبيت تم بنجاح.
+                أما إذا ظهرت رسالة خطأ، فراجع الخطوة السابقة وتأكد من تفعيل خيار <strong>Add Python to PATH</strong>.
+            </p>
+
+            <div class="note">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>معلومة:</strong> على بعض أنظمة macOS و Linux، قد تحتاج لاستخدام الأمر
+                    <code class="inline">python3 --version</code> بدلًا من <code class="inline">python --version</code>.
+                </div>
+            </div>
+
+            <!-- ===== الخطوة 3 ===== -->
+            <h2><i class="fas fa-laptop-code"></i> الخطوة 3: تحميل وتثبيت VS Code</h2>
+            <p>الآن سنقوم بتثبيت محرر الأكواد:</p>
+
+            <ol class="steps-list">
+                <li>اذهب إلى الموقع الرسمي: <strong>code.visualstudio.com</strong></li>
+                <li>اضغط على زر <strong>Download</strong> الكبير في الصفحة الرئيسية.</li>
+                <li>سيتم تنزيل النسخة المناسبة لنظامك تلقائيًا.</li>
+                <li>شغّل ملف التثبيت واتبع الخطوات الافتراضية (Next → Next → Install).</li>
+                <li>بعد انتهاء التثبيت، افتح VS Code لأول مرة.</li>
+            </ol>
+
+            <div class="tip">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>نصيحة:</strong> أثناء التثبيت على Windows، يُفضّل تفعيل الخيار
+                    <strong>"Add to PATH"</strong> وأيضًا الخيار
+                    <strong>"Open with Code"</strong> لقائمة النقر بزر الفأرة الأيمن على الملفات والمجلدات.
+                </div>
+            </div>
+
+            <!-- ===== الخطوة 4 ===== -->
+            <h2><i class="fas fa-puzzle-piece"></i> الخطوة 4: إعداد VS Code للعمل مع Python</h2>
+            <p>حتى يستطيع VS Code فهم كود Python، نحتاج لتثبيت إضافة رسمية من Microsoft:</p>
+
+            <ol class="steps-list">
+                <li>افتح VS Code.</li>
+                <li>من الشريط الجانبي الأيسر اضغط على أيقونة <strong>Extensions</strong> (أو اضغط <code class="inline">Ctrl+Shift+X</code>، أو <code class="inline">Cmd+Shift+X</code> في macOS).</li>
+                <li>في مربع البحث اكتب: <strong>Python</strong>.</li>
+                <li>اختر إضافة <strong>Python</strong> الرسمية من <strong>Microsoft</strong> (ستجد عدد التنزيلات بالملايين).</li>
+                <li>اضغط <strong>Install</strong> وانتظر حتى تكتمل.</li>
+            </ol>
+
+            <p>هذه أهم الإضافات المفيدة لبايثون في VS Code:</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الإضافة</th>
+                            <th>الفائدة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Python (Microsoft)</strong></td>
+                            <td>الأساسية — توفّر تلوين الكود، وإكمال تلقائي، وكشف الأخطاء، وتشغيل الملفات.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code Runner</strong></td>
+                            <td>تضيف زر تشغيل سريع لتشغيل أي ملف كود بضغطة واحدة.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pylance</strong></td>
+                            <td>يُحسّن الإكمال التلقائي وتنبيهات الأخطاء في Python (يأتي غالبًا مع إضافة Python).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ===== الخطوة 5 ===== -->
+            <h2><i class="fas fa-play"></i> الخطوة 5: تجربة أول ملف Python من VS Code</h2>
+            <p>حان وقت التجربة العملية. اتبع هذه الخطوات:</p>
+
+            <ol class="steps-list">
+                <li>أنشئ مجلدًا جديدًا على سطح المكتب، وسمّه: <strong>python_learning</strong>.</li>
+                <li>افتح VS Code.</li>
+                <li>من القائمة العلوية اختر <strong>File → Open Folder</strong>، واختر مجلد <strong>python_learning</strong>.</li>
+                <li>من الشريط الجانبي اضغط على أيقونة <strong>New File</strong>، وسمّ الملف: <strong>test.py</strong>.</li>
+                <li>اكتب داخله الكود التالي:</li>
+            </ol>
+
+            <div class="code-block">
+                <div class="code-label">ملف test.py</div>
+<pre>
+print("بايثون تعمل بنجاح من VS Code!")
+</pre>
+            </div>
+
+            <p>لتشغيل الملف، أمامك طريقتان:</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الطريقة</th>
+                            <th>الخطوات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>الطريقة الأولى — Terminal</strong></td>
+                            <td>افتح Terminal من <code class="inline">Terminal → New Terminal</code>، ثم اكتب:<br><code class="inline">python test.py</code> واضغط Enter.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>الطريقة الثانية — Code Runner</strong></td>
+                            <td>إذا ثبّت إضافة Code Runner، اضغط بزر الفأرة الأيمن على الملف واختر <strong>Run Code</strong>، أو اضغط <code class="inline">Ctrl+Alt+N</code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tip">
+                <i class="fas fa-check-circle"></i>
+                <div>
+                    إذا ظهرت لك الجملة <strong>«بايثون تعمل بنجاح من VS Code!»</strong> في نافذة Terminal أو Output،
+                    فقد نجحت في تجهيز بيئة العمل بالكامل! 🎉
+                </div>
+            </div>
+
+            <!-- ===== أخطاء شائعة ===== -->
+            <h2><i class="fas fa-exclamation-circle"></i> أخطاء شائعة وحلولها</h2>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المشكلة</th>
+                            <th>الحل</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ظهور رسالة: <code class="inline">'python' is not recognized</code></td>
+                            <td>لم يتم تفعيل خيار <strong>Add Python to PATH</strong>. أعد تثبيت Python مع تفعيل الخيار.</td>
+                        </tr>
+                        <tr>
+                            <td>الأمر <code class="inline">python</code> لا يعمل لكن <code class="inline">python3</code> يعمل</td>
+                            <td>استخدم <code class="inline">python3</code> بدلًا من <code class="inline">python</code> (شائع في macOS/Linux).</td>
+                        </tr>
+                        <tr>
+                            <td>VS Code لا يلوّن الكود ولا يقترح إكمالًا</td>
+                            <td>تأكد من تثبيت إضافة <strong>Python</strong> من Microsoft بشكل صحيح.</td>
+                        </tr>
+                        <tr>
+                            <td>لا يعمل زر التشغيل (Run)</td>
+                            <td>تأكد من أن الملف ينتهي بـ <code class="inline">.py</code>، وأنك اخترت مترجم Python من الزاوية السفلية.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ===== التمارين التفاعلية ===== -->
+            <h2><i class="fas fa-pencil-alt"></i> تمارين تفاعلية</h2>
+            <p>اختبر ما تعلمته في هذا الدرس من خلال التمارين التالية:</p>
+
+            <!-- تمرين 1 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">1</div>
+                    <h3 class="exercise-title">تمرين الاختيار الفردي — الخيار الحاسم</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما هو الخيار المهم الذي يجب تفعيله أثناء تثبيت Python
+                    لكي يعمل الأمر <code class="inline">python</code> من أي مكان في الجهاز؟
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex1" value="a"> Install for all users</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="b"> Add Python to PATH</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="c"> Install pip</label>
+                    <label class="option-item"><input type="radio" name="ex1" value="d"> Create shortcuts</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise1()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex1','result1')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result1"></div>
+            </div>
+
+            <!-- تمرين 2 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">2</div>
+                    <h3 class="exercise-title">تمرين إكمال الفراغ — الأمر الصحيح</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> اكتب الأمر الذي نستخدمه للتحقق من نسخة Python المثبتة على الجهاز
+                    (اكتب الأمر كاملًا بدون علامات اقتباس):
+                </p>
+                <div class="text-input-wrap">
+                    <input type="text" class="text-input" id="ex2-input" placeholder="اكتب الأمر هنا..." autocomplete="off">
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise2()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex2','result2')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result2"></div>
+            </div>
+
+            <!-- تمرين 3 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">3</div>
+                    <h3 class="exercise-title">تمرين صح أو خطأ</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> إضافة <strong>Code Runner</strong> ضرورية لكي يعمل VS Code مع Python.
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="ex3" value="true"> ✔️ صح</label>
+                    <label class="option-item"><input type="radio" name="ex3" value="false"> ✖️ خطأ</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise3()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex3','result3')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result3"></div>
+            </div>
+
+            <!-- تمرين 4 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">4</div>
+                    <h3 class="exercise-title">تمرين اختيار متعدد — الأدوات والإضافات</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> اختر الإضافات/الأدوات التي نحتاجها فعليًا في هذا الدرس
+                    (يمكنك اختيار أكثر من إجابة):
+                </p>
+                <div class="options-list">
+                    <label class="option-item"><input type="checkbox" name="ex4" value="python"> إضافة Python من Microsoft</label>
+                    <label class="option-item"><input type="checkbox" name="ex4" value="vscode"> محرر VS Code</label>
+                    <label class="option-item"><input type="checkbox" name="ex4" value="interpreter"> مترجم Python</label>
+                    <label class="option-item"><input type="checkbox" name="ex4" value="photoshop"> برنامج Photoshop</label>
+                    <label class="option-item"><input type="checkbox" name="ex4" value="browser"> متصفح للوصول للمواقع الرسمية</label>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise4()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex4','result4')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result4"></div>
+            </div>
+
+            <!-- تمرين 5 -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-number">5</div>
+                    <h3 class="exercise-title">تمرين إكمال الفراغ — امتداد الملف</h3>
+                </div>
+                <p class="exercise-question">
+                    <strong>السؤال:</strong> ما هو الامتداد (Extension) الذي يجب أن ينتهي به ملف Python؟
+                    (اكتبه بدون نقطة، كما نكتب امتداد ملفات النصوص: txt)
+                </p>
+                <div class="text-input-wrap">
+                    <input type="text" class="text-input" id="ex5-input" placeholder="اكتب الامتداد هنا..." autocomplete="off">
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="checkExercise5()">
+                        <i class="fas fa-check"></i> تحقق من الإجابة
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetExercise('ex5','result5')">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+                <div class="exercise-result" id="result5"></div>
+            </div>
+
+            <!-- ===== خلاصة الدرس ===== -->
+            <h2><i class="fas fa-tasks"></i> خلاصة الدرس</h2>
+            <ul class="plain">
+                <li>✔️ قمنا بتثبيت مترجم <strong>Python</strong> من الموقع الرسمي مع تفعيل خيار <code class="inline">Add Python to PATH</code>.</li>
+                <li>✔️ تحققنا من نجاح التثبيت باستخدام الأمر <code class="inline">python --version</code>.</li>
+                <li>✔️ قمنا بتثبيت محرر الأكواد <strong>VS Code</strong> مع إضافة <strong>Python</strong> الرسمية.</li>
+                <li>✔️ أنشأنا أول ملف <code class="inline">test.py</code> وشغّلناه بنجاح.</li>
+                <li>✔️ تعرفنا على أشهر الأخطاء الشائعة وكيفية حلها.</li>
+            </ul>
+
+            <!-- ===== شريط التقدم ===== -->
+            <div class="progress-footer">
+                <h3><i class="fas fa-chart-line"></i> تقدمك في المسار</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0% مكتمل</div>
+            </div>
+
+            <!-- ===== التنقل ===== -->
+            <div class="nav-links">
+                <a href="lesson1.html" class="nav-link prev">
+                    <i class="fas fa-arrow-right"></i>
+                    الدرس السابق: ما هي Python؟
+                </a>
+                <a href="lesson3.html" class="nav-link next">
+                    الدرس التالي: كتابة أول برنامج و print()
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+
+        </article>
+    </div>
+</div>
+
+<footer>
+    © 2025 CodeWay — مسار Python · الدرس 2 من مستوى المبتدئين.
+</footer>
+
+<script>
+    /* شريط التقدم */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '13%';
+            text.textContent = '13% مكتمل';
+        }, 400);
+    });
+
+    /* ===== تمرين 1 ===== */
+    function checkExercise1() {
+        const selected = document.querySelector('input[name="ex1"]:checked');
+        const result = document.getElementById('result1');
+        result.className = 'exercise-result';
+
+        if (!selected) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.';
+            return;
+        }
+
+        if (selected.value === 'b') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> تفعيل <code class="inline">Add Python to PATH</code> ضروري ليعمل الأمر <code class="inline">python</code> من أي مكان في الجهاز.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة خاطئة.</strong> الإجابة الصحيحة هي <strong>Add Python to PATH</strong>.';
+        }
+    }
+
+    /* ===== تمرين 2 ===== */
+    function checkExercise2() {
+        // بدون toLowerCase: الخيار -V (حرف كبير) يعرض الإصدار، أما -v (صغير) فيفعل شيئًا آخر
+        const input = document.getElementById('ex2-input').value.trim().replace(/\s+/g, ' ');
+        const result = document.getElementById('result2');
+        result.className = 'exercise-result';
+
+        if (!input) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تكتب أي إجابة.';
+            return;
+        }
+
+        const validAnswers = ['python --version', 'python -V', 'python3 --version', 'python3 -V', 'py --version', 'py -V'];
+        if (/^(python3?|py) -v$/.test(input)) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>قريب!</strong> الخيار المختصر هو <code class="inline">-V</code> بحرف كبير؛ أما <code class="inline">-v</code> الصغير فيشغّل بايثون في وضع يطبع تفاصيل داخلية كثيرة.';
+        } else if (validAnswers.includes(input)) {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> الأمر <code class="inline">python --version</code> هو الطريقة الصحيحة للتحقق من نسخة Python.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة غير صحيحة.</strong> الإجابة الصحيحة هي <code class="inline">python --version</code>.';
+        }
+    }
+
+    /* ===== تمرين 3 ===== */
+    function checkExercise3() {
+        const selected = document.querySelector('input[name="ex3"]:checked');
+        const result = document.getElementById('result3');
+        result.className = 'exercise-result';
+
+        if (!selected) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.';
+            return;
+        }
+
+        if (selected.value === 'false') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>صحيح تمامًا!</strong> إضافة Python الرسمية كافية، و Code Runner مجرد إضافة اختيارية تسهّل التشغيل.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>للأسف خطأ.</strong> Code Runner اختيارية — إضافة <strong>Python</strong> الرسمية هي الأساسية.';
+        }
+    }
+
+    /* ===== تمرين 4 ===== */
+    function checkExercise4() {
+        const correct = ['python', 'vscode', 'interpreter', 'browser'];
+        const wrong   = ['photoshop'];
+
+        const checked = [...document.querySelectorAll('input[name="ex4"]:checked')].map(cb => cb.value);
+        const correctSelected = checked.filter(v => correct.includes(v)).length;
+        const wrongSelected   = checked.filter(v => wrong.includes(v)).length;
+
+        const result = document.getElementById('result4');
+        result.className = 'exercise-result';
+
+        if (checked.length === 0) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تختر أي إجابة.';
+            return;
+        }
+
+        if (correctSelected === correct.length && wrongSelected === 0) {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>ممتاز!</strong> اخترت كل الأدوات الصحيحة وتجنبت الخاطئة.';
+        } else if (wrongSelected > 0) {
+            result.classList.add('partial');
+            result.innerHTML = `<i class="fas fa-exclamation-triangle"></i> لديك <strong>${wrongSelected}</strong> إجابة خاطئة. "Photoshop" ليس له علاقة ببيئة بايثون.`;
+        } else {
+            result.classList.add('partial');
+            result.innerHTML = `<i class="fas fa-info-circle"></i> اخترت <strong>${correctSelected}</strong> من <strong>${correct.length}</strong> إجابات صحيحة. حاول اكتشاف الباقي!`;
+        }
+    }
+
+    /* ===== تمرين 5 ===== */
+    function checkExercise5() {
+        const input = document.getElementById('ex5-input').value.trim().toLowerCase().replace(/^\./, '');
+        const result = document.getElementById('result5');
+        result.className = 'exercise-result';
+
+        if (!input) {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> لم تكتب أي إجابة.';
+            return;
+        }
+
+        if (input === 'py') {
+            result.classList.add('success');
+            result.innerHTML = '<i class="fas fa-check-circle"></i> <strong>إجابة صحيحة!</strong> ملفات Python تنتهي دائمًا بالامتداد <code class="inline">.py</code>.';
+        } else {
+            result.classList.add('error');
+            result.innerHTML = '<i class="fas fa-times-circle"></i> <strong>إجابة غير صحيحة.</strong> الامتداد الصحيح هو <code class="inline">py</code>.';
+        }
+    }
+
+    /* ===== إعادة تعيين ===== */
+    function resetExercise(name, resultId) {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(el => el.checked = false);
+        const input = document.getElementById(name + '-input');
+        if (input) input.value = '';
+        const result = document.getElementById(resultId);
+        if (result) {
+            result.className = 'exercise-result';
+            result.innerHTML = '';
+        }
+    }
+</script>
+
+</body>
+</html>

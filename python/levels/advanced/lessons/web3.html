@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 15: مشروع صغير REST API | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">المستوى المتقدم</a>
+        <span class="sep">/</span>
+        <span>مشروع REST API</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-network-wired"></i>
+            الدرس 15 · مشروع REST
+        </div>
+        <h1 class="lesson-title">مشروع: REST API كاملة لتطبيق الملاحظات</h1>
+        <p class="lesson-intro">
+            حان وقت بناء مشروع حقيقي! ستصمم وتبني <strong>REST API كاملة</strong> لتطبيق ملاحظات: عمليات <strong>CRUD</strong> الأربع، التحقق من البيانات، البحث والفلترة والتقسيم لصفحات، <strong>حفظ البيانات في ملف JSON</strong>، و<strong>اختبارات آلية</strong> تضمن أن كل شيء يعمل.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 90 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 API كاملة بعمليات CRUD</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 متقدم</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 14</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#intro">1. مقدمة إلى REST</a>
+            <a href="#design">2. تصميم المشروع</a>
+            <a href="#code">3. الكود الكامل</a>
+            <a href="#crud">4. تجربة CRUD</a>
+            <a href="#filtering">5. البحث والصفحات</a>
+            <a href="#tests">6. الاختبارات الآلية</a>
+            <a href="#run">7. التشغيل والتطوير</a>
+            <a href="#exercises">8. تمارين تفاعلية</a>
+            <a href="#summary">9. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="intro">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        ما هي REST؟
+    </h2>
+        <p>
+            <strong>REST</strong> (Representational State Transfer) ليست مكتبة ولا لغة، بل <strong>أسلوب لتصميم الـ APIs</strong>
+            يجعلها منظمة ومتوقعة. معظم الـ APIs العامة التي ستتعامل معها (GitHub، Twitter، خرائط Google…) مبنية بهذا الأسلوب.
+        </p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-cube"></i> كل شيء «مورد» (Resource)</h4>
+                <p>الملاحظات، المستخدمون، الطلبات… كل مورد له رابط: <code>/api/notes</code>.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-exchange-alt"></i> الفعل في طريقة HTTP</h4>
+                <p>الرابط اسم (noun) والطريقة فعل (verb). لا نكتب <code>/getNotes</code> بل <code>GET /notes</code>.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-history"></i> بدون حالة (Stateless)</h4>
+                <p>كل طلب مستقل ويحمل كل ما يحتاجه الخادم لفهمه، فلا يتذكر الخادم الطلبات السابقة.</p>
+            </div>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> عمليات CRUD وما يقابلها في REST</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>العملية</th><th>الطريقة</th><th>المسار</th><th>الرد الناجح</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>عرض كل الملاحظات (Read)</td><td><code>GET</code></td><td><code>/api/notes</code></td><td><code>200</code> + قائمة</td></tr>
+                    <tr><td>عرض ملاحظة واحدة (Read)</td><td><code>GET</code></td><td><code>/api/notes/7</code></td><td><code>200</code> + الملاحظة</td></tr>
+                    <tr><td>إنشاء ملاحظة (Create)</td><td><code>POST</code></td><td><code>/api/notes</code></td><td><code>201</code> + الملاحظة الجديدة</td></tr>
+                    <tr><td>تعديل جزئي (Update)</td><td><code>PATCH</code></td><td><code>/api/notes/7</code></td><td><code>200</code> + بعد التعديل</td></tr>
+                    <tr><td>حذف (Delete)</td><td><code>DELETE</code></td><td><code>/api/notes/7</code></td><td><code>204</code> بدون محتوى</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>PUT أم PATCH؟</strong> <code>PUT</code> يستبدل المورد <strong>بالكامل</strong> (يجب إرسال كل الحقول)،
+                أما <code>PATCH</code> فيعدّل <strong>الحقول المرسلة فقط</strong>. في مشروعنا سنستخدم PATCH لأنه أكثر مرونة.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="design">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-drafting-compass"></i>
+        تصميم المشروع قبل كتابة الكود
+    </h2>
+        <p>المحترفون يصممون قبل أن يكتبوا. هذا هو «عقد» الـ API الذي سنلتزم به:</p>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> شكل الملاحظة (Note)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>note_shape.json</span>
+    </div>
+<pre>{
+    <span class="str">"id"</span>: <span class="num">2</span>,
+    <span class="str">"title"</span>: <span class="str">"أفكار مشروع بايثون"</span>,
+    <span class="str">"content"</span>: <span class="str">"API للملاحظات + واجهة ويب"</span>,
+    <span class="str">"tags"</span>: [<span class="str">"عمل"</span>, <span class="str">"برمجة"</span>],
+    <span class="str">"pinned"</span>: true,
+    <span class="str">"created_at"</span>: <span class="str">"2025-06-15T10:30:00"</span>,
+    <span class="str">"updated_at"</span>: <span class="str">"2025-06-15T10:30:00"</span>
+}</pre>
+</div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الحقل</th><th>النوع</th><th>القواعد</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>title</code></td><td>نص</td><td>مطلوب عند الإنشاء، حتى 100 حرف.</td></tr>
+                    <tr><td><code>content</code></td><td>نص</td><td>اختياري، الافتراضي فارغ.</td></tr>
+                    <tr><td><code>tags</code></td><td>قائمة نصوص</td><td>اختياري، للتصنيف والفلترة.</td></tr>
+                    <tr><td><code>pinned</code></td><td>منطقي</td><td>الملاحظات المثبتة تظهر أولًا.</td></tr>
+                    <tr><td><code>id, created_at, updated_at</code></td><td>—</td><td>يولّدها الخادم، ولا يرسلها العميل.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> هيكل المجلد</p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-folder"></i> Project</span>
+                <span>notes-api/</span>
+            </div>
+<pre>notes-api/
+├── notes_api.py        <span class="cm"># التطبيق (المسارات + التخزين + التحقق)</span>
+├── test_notes_api.py   <span class="cm"># الاختبارات الآلية</span>
+├── notes.json          <span class="cm"># البيانات (يُنشأ تلقائيًا)</span>
+├── requirements.txt    <span class="cm"># flask</span>
+└── README.md           <span class="cm"># شرح المشروع وطريقة التشغيل</span></pre>
+        </div>
+</section>
+
+<section class="section-card" id="code">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-code"></i>
+        الكود الكامل للتطبيق
+    </h2>
+        <p>
+            هذا هو الملف <code>notes_api.py</code> كاملًا. اقرأه بتمعن، وسنشرح أهم الأفكار فيه بعده:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>notes_api.py</span>
+    </div>
+<pre><span class="str">"""Notes REST API — مشروع الدرس 15"""</span>
+<span class="kw">import</span> json
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">from</span> flask <span class="kw">import</span> Flask, request
+
+ALLOWED_FIELDS = {<span class="str">"title"</span>, <span class="str">"content"</span>, <span class="str">"tags"</span>, <span class="str">"pinned"</span>}
+
+
+<span class="kw">def</span> <span class="fn">create_app</span>(data_file=<span class="str">"notes.json"</span>):
+    app = <span class="fn">Flask</span>(__name__)
+    app.json.ensure_ascii = <span class="kw">False</span>
+    store = <span class="fn">Path</span>(data_file)
+
+    <span class="cm"># ---------- التخزين ----------</span>
+    <span class="kw">def</span> <span class="fn">load</span>():
+        <span class="kw">if</span> store.<span class="fn">exists</span>():
+            <span class="kw">return</span> json.<span class="fn">loads</span>(store.<span class="fn">read_text</span>(encoding=<span class="str">"utf-8"</span>))
+        <span class="kw">return</span> []
+
+    <span class="kw">def</span> <span class="fn">save</span>(notes):
+        store.<span class="fn">write_text</span>(json.<span class="fn">dumps</span>(notes, ensure_ascii=<span class="kw">False</span>, indent=<span class="num">2</span>), encoding=<span class="str">"utf-8"</span>)
+
+    <span class="kw">def</span> <span class="fn">find</span>(notes, note_id):
+        <span class="kw">return</span> <span class="fn">next</span>((n <span class="kw">for</span> n <span class="kw">in</span> notes <span class="kw">if</span> n[<span class="str">"id"</span>] == note_id), <span class="kw">None</span>)
+
+    <span class="cm"># ---------- التحقق من البيانات ----------</span>
+    <span class="kw">def</span> <span class="fn">validate</span>(data, partial=<span class="kw">False</span>):
+        <span class="kw">if</span> <span class="kw">not</span> <span class="fn">isinstance</span>(data, dict):
+            <span class="kw">return</span> <span class="str">"يجب إرسال كائن JSON"</span>
+        unknown = <span class="fn">set</span>(data) - ALLOWED_FIELDS
+        <span class="kw">if</span> unknown:
+            <span class="kw">return</span> <span class="str">f"حقول غير معروفة: {', '.join(sorted(unknown))}"</span>
+        <span class="kw">if</span> <span class="kw">not</span> partial <span class="kw">and</span> <span class="kw">not</span> data.<span class="fn">get</span>(<span class="str">"title"</span>):
+            <span class="kw">return</span> <span class="str">"الحقل title مطلوب"</span>
+        <span class="kw">if</span> <span class="str">"title"</span> <span class="kw">in</span> data <span class="kw">and</span> (<span class="kw">not</span> <span class="fn">isinstance</span>(data[<span class="str">"title"</span>], str) <span class="kw">or</span> <span class="fn">len</span>(data[<span class="str">"title"</span>]) &gt; <span class="num">100</span>):
+            <span class="kw">return</span> <span class="str">"title يجب أن يكون نصًا حتى 100 حرف"</span>
+        <span class="kw">if</span> <span class="str">"tags"</span> <span class="kw">in</span> data <span class="kw">and</span> <span class="kw">not</span> <span class="fn">isinstance</span>(data[<span class="str">"tags"</span>], list):
+            <span class="kw">return</span> <span class="str">"tags يجب أن تكون قائمة"</span>
+        <span class="kw">return</span> <span class="kw">None</span>
+
+    <span class="kw">def</span> <span class="fn">now</span>():
+        <span class="kw">return</span> datetime.<span class="fn">now</span>().<span class="fn">isoformat</span>(timespec=<span class="str">"seconds"</span>)
+
+    <span class="cm"># ---------- المسارات ----------</span>
+    @app.<span class="fn">get</span>(<span class="str">"/api/notes"</span>)
+    <span class="kw">def</span> <span class="fn">list_notes</span>():
+        notes = <span class="fn">load</span>()
+        q = request.args.<span class="fn">get</span>(<span class="str">"q"</span>, <span class="str">""</span>).<span class="fn">strip</span>()
+        tag = request.args.<span class="fn">get</span>(<span class="str">"tag"</span>)
+        <span class="kw">if</span> q:
+            notes = [n <span class="kw">for</span> n <span class="kw">in</span> notes <span class="kw">if</span> q <span class="kw">in</span> n[<span class="str">"title"</span>] <span class="kw">or</span> q <span class="kw">in</span> n[<span class="str">"content"</span>]]
+        <span class="kw">if</span> tag:
+            notes = [n <span class="kw">for</span> n <span class="kw">in</span> notes <span class="kw">if</span> tag <span class="kw">in</span> n[<span class="str">"tags"</span>]]
+        notes.<span class="fn">sort</span>(key=<span class="kw">lambda</span> n: (<span class="kw">not</span> n[<span class="str">"pinned"</span>], n[<span class="str">"id"</span>]))
+        page = request.args.<span class="fn">get</span>(<span class="str">"page"</span>, <span class="num">1</span>, type=int)
+        per_page = <span class="fn">min</span>(request.args.<span class="fn">get</span>(<span class="str">"per_page"</span>, <span class="num">10</span>, type=int), <span class="num">50</span>)
+        start = (page - <span class="num">1</span>) * per_page
+        <span class="kw">return</span> {<span class="str">"total"</span>: <span class="fn">len</span>(notes), <span class="str">"page"</span>: page, <span class="str">"per_page"</span>: per_page,
+                <span class="str">"items"</span>: notes[start:start + per_page]}
+
+    @app.<span class="fn">get</span>(<span class="str">"/api/notes/&lt;int:note_id&gt;"</span>)
+    <span class="kw">def</span> <span class="fn">get_note</span>(note_id):
+        note = <span class="fn">find</span>(<span class="fn">load</span>(), note_id)
+        <span class="kw">if</span> note <span class="kw">is</span> <span class="kw">None</span>:
+            <span class="kw">return</span> {<span class="str">"error"</span>: <span class="str">"الملاحظة غير موجودة"</span>}, <span class="num">404</span>
+        <span class="kw">return</span> note
+
+    @app.<span class="fn">post</span>(<span class="str">"/api/notes"</span>)
+    <span class="kw">def</span> <span class="fn">create_note</span>():
+        data = request.<span class="fn">get_json</span>(silent=<span class="kw">True</span>)
+        error = <span class="fn">validate</span>(data)
+        <span class="kw">if</span> error:
+            <span class="kw">return</span> {<span class="str">"error"</span>: error}, <span class="num">400</span>
+        notes = <span class="fn">load</span>()
+        note = {
+            <span class="str">"id"</span>: <span class="fn">max</span>((n[<span class="str">"id"</span>] <span class="kw">for</span> n <span class="kw">in</span> notes), default=<span class="num">0</span>) + <span class="num">1</span>,
+            <span class="str">"title"</span>: data[<span class="str">"title"</span>].<span class="fn">strip</span>(),
+            <span class="str">"content"</span>: data.<span class="fn">get</span>(<span class="str">"content"</span>, <span class="str">""</span>),
+            <span class="str">"tags"</span>: data.<span class="fn">get</span>(<span class="str">"tags"</span>, []),
+            <span class="str">"pinned"</span>: <span class="fn">bool</span>(data.<span class="fn">get</span>(<span class="str">"pinned"</span>, <span class="kw">False</span>)),
+            <span class="str">"created_at"</span>: <span class="fn">now</span>(),
+            <span class="str">"updated_at"</span>: <span class="fn">now</span>(),
+        }
+        notes.<span class="fn">append</span>(note)
+        <span class="fn">save</span>(notes)
+        <span class="kw">return</span> note, <span class="num">201</span>, {<span class="str">"Location"</span>: <span class="str">f"/api/notes/{note['id']}"</span>}
+
+    @app.<span class="fn">patch</span>(<span class="str">"/api/notes/&lt;int:note_id&gt;"</span>)
+    <span class="kw">def</span> <span class="fn">update_note</span>(note_id):
+        data = request.<span class="fn">get_json</span>(silent=<span class="kw">True</span>)
+        error = <span class="fn">validate</span>(data, partial=<span class="kw">True</span>)
+        <span class="kw">if</span> error:
+            <span class="kw">return</span> {<span class="str">"error"</span>: error}, <span class="num">400</span>
+        notes = <span class="fn">load</span>()
+        note = <span class="fn">find</span>(notes, note_id)
+        <span class="kw">if</span> note <span class="kw">is</span> <span class="kw">None</span>:
+            <span class="kw">return</span> {<span class="str">"error"</span>: <span class="str">"الملاحظة غير موجودة"</span>}, <span class="num">404</span>
+        note.<span class="fn">update</span>(data)
+        note[<span class="str">"updated_at"</span>] = <span class="fn">now</span>()
+        <span class="fn">save</span>(notes)
+        <span class="kw">return</span> note
+
+    @app.<span class="fn">delete</span>(<span class="str">"/api/notes/&lt;int:note_id&gt;"</span>)
+    <span class="kw">def</span> <span class="fn">delete_note</span>(note_id):
+        notes = <span class="fn">load</span>()
+        note = <span class="fn">find</span>(notes, note_id)
+        <span class="kw">if</span> note <span class="kw">is</span> <span class="kw">None</span>:
+            <span class="kw">return</span> {<span class="str">"error"</span>: <span class="str">"الملاحظة غير موجودة"</span>}, <span class="num">404</span>
+        notes.<span class="fn">remove</span>(note)
+        <span class="fn">save</span>(notes)
+        <span class="kw">return</span> <span class="str">""</span>, <span class="num">204</span>
+
+    @app.<span class="fn">errorhandler</span>(<span class="num">404</span>)
+    <span class="kw">def</span> <span class="fn">not_found</span>(e):
+        <span class="kw">return</span> {<span class="str">"error"</span>: <span class="str">"المسار غير موجود"</span>}, <span class="num">404</span>
+
+    @app.<span class="fn">errorhandler</span>(<span class="num">405</span>)
+    <span class="kw">def</span> <span class="fn">not_allowed</span>(e):
+        <span class="kw">return</span> {<span class="str">"error"</span>: <span class="str">"طريقة الطلب غير مسموحة"</span>}, <span class="num">405</span>
+
+    <span class="kw">return</span> app
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    <span class="fn">create_app</span>().<span class="fn">run</span>(debug=<span class="kw">True</span>)</pre>
+</div>
+
+        <div class="note-box">
+            <strong>🔍 أهم الأفكار في الكود:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> <strong>مصنع التطبيق</strong> <code>create_app(data_file)</code>: دالة تُنشئ التطبيق وتستقبل اسم ملف البيانات،
+                    فنستطيع في الاختبارات استخدام ملف منفصل دون إفساد البيانات الحقيقية.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>فصل المسؤوليات</strong>: دوال للتخزين (<code>load/save</code>)، ودالة للتحقق (<code>validate</code>)، والمسارات تستخدمها.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>قائمة الحقول المسموحة</strong> <code>ALLOWED_FIELDS</code>: تمنع العميل من تعديل <code>id</code> أو حقول غير متوقعة.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>الإرجاع بثلاثة عناصر</strong> <code>return note, 201, {"Location": ...}</code>: البيانات، رمز الحالة، والترويسات.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>ردود أخطاء موحدة</strong> بصيغة JSON لكل الحالات.</li>
+            </ul>
+        </div>
+</section>
+
+<section class="section-card" id="crud">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-tasks"></i>
+        تجربة عمليات CRUD
+    </h2>
+        <p>لنشغّل سيناريو كاملًا على الـ API باستخدام عميل الاختبار:</p>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> إنشاء (Create)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>crud_create.py</span>
+    </div>
+<pre><span class="kw">from</span> notes_api <span class="kw">import</span> create_app
+
+client = <span class="fn">create_app</span>(<span class="str">"demo.json"</span>).<span class="fn">test_client</span>()
+
+r = client.<span class="fn">post</span>(<span class="str">"/api/notes"</span>, json={
+    <span class="str">"title"</span>: <span class="str">"أفكار مشروع بايثون"</span>,
+    <span class="str">"content"</span>: <span class="str">"API للملاحظات + واجهة ويب"</span>,
+    <span class="str">"tags"</span>: [<span class="str">"عمل"</span>, <span class="str">"برمجة"</span>],
+    <span class="str">"pinned"</span>: <span class="kw">True</span>,
+})
+note = r.<span class="fn">get_json</span>()
+<span class="fn">print</span>(r.status_code, <span class="str">"| Location:"</span>, r.headers[<span class="str">"Location"</span>])
+<span class="fn">print</span>({k: note[k] <span class="kw">for</span> k <span class="kw">in</span> (<span class="str">"id"</span>, <span class="str">"title"</span>, <span class="str">"tags"</span>, <span class="str">"pinned"</span>)})
+
+r = client.<span class="fn">post</span>(<span class="str">"/api/notes"</span>, json={<span class="str">"content"</span>: <span class="str">"بدون عنوان"</span>})
+<span class="fn">print</span>(r.status_code, r.<span class="fn">get_json</span>())
+
+r = client.<span class="fn">post</span>(<span class="str">"/api/notes"</span>, json={<span class="str">"title"</span>: <span class="str">"x"</span>, <span class="str">"id"</span>: <span class="num">500</span>})
+<span class="fn">print</span>(r.status_code, r.<span class="fn">get_json</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>201 | Location: /api/notes/1
+{'id': 1, 'title': 'أفكار مشروع بايثون', 'tags': ['عمل', 'برمجة'], 'pinned': True}
+400 {'error': 'الحقل title مطلوب'}
+400 {'error': 'حقول غير معروفة: id'}</pre>
+</div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> قراءة (Read)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>crud_read.py</span>
+    </div>
+<pre>r = client.<span class="fn">get</span>(<span class="str">"/api/notes"</span>)
+data = r.<span class="fn">get_json</span>()
+<span class="fn">print</span>(<span class="str">"المجموع:"</span>, data[<span class="str">"total"</span>])
+<span class="kw">for</span> n <span class="kw">in</span> data[<span class="str">"items"</span>]:
+    <span class="fn">print</span>((<span class="str">"📌 "</span> <span class="kw">if</span> n[<span class="str">"pinned"</span>] <span class="kw">else</span> <span class="str">"   "</span>) + <span class="str">f'{n["id"]}. {n["title"]} {n["tags"]}'</span>)
+
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/api/notes/3"</span>).<span class="fn">get_json</span>()[<span class="str">"title"</span>])
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/api/notes/42"</span>).status_code)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>المجموع: 3
+📌 2. أفكار مشروع بايثون ['عمل', 'برمجة']
+   1. قائمة التسوق ['منزل']
+   3. كتب للقراءة ['قراءة']
+كتب للقراءة
+404</pre>
+</div>
+        <p>لاحظ أن الملاحظة المثبتة (رقم 2) ظهرت أولًا بفضل الترتيب في <code>list_notes</code>.</p>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> تعديل (Update) وحذف (Delete)</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>crud_update_delete.py</span>
+    </div>
+<pre>r = client.<span class="fn">patch</span>(<span class="str">"/api/notes/1"</span>, json={<span class="str">"title"</span>: <span class="str">"قائمة التسوق الأسبوعية"</span>, <span class="str">"pinned"</span>: <span class="kw">True</span>})
+<span class="fn">print</span>(r.status_code, r.<span class="fn">get_json</span>()[<span class="str">"title"</span>], <span class="str">"| مثبتة:"</span>, r.<span class="fn">get_json</span>()[<span class="str">"pinned"</span>])
+
+r = client.<span class="fn">patch</span>(<span class="str">"/api/notes/1"</span>, json={<span class="str">"tags"</span>: <span class="str">"منزل"</span>})      <span class="cm"># نوع خاطئ</span>
+<span class="fn">print</span>(r.status_code, r.<span class="fn">get_json</span>())
+
+r = client.<span class="fn">delete</span>(<span class="str">"/api/notes/3"</span>)
+<span class="fn">print</span>(<span class="str">"الحذف:"</span>, r.status_code, <span class="str">"| الجسم فارغ؟"</span>, r.<span class="fn">get_data</span>() == <span class="str">b""</span>)
+
+<span class="fn">print</span>(<span class="str">"الحذف مرة أخرى:"</span>, client.<span class="fn">delete</span>(<span class="str">"/api/notes/3"</span>).status_code)
+<span class="fn">print</span>(<span class="str">"المتبقي:"</span>, client.<span class="fn">get</span>(<span class="str">"/api/notes"</span>).<span class="fn">get_json</span>()[<span class="str">"total"</span>])</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>200 قائمة التسوق الأسبوعية | مثبتة: True
+400 {'error': 'tags يجب أن تكون قائمة'}
+الحذف: 204 | الجسم فارغ؟ True
+الحذف مرة أخرى: 404
+المتبقي: 2</pre>
+</div>
+</section>
+
+<section class="section-card" id="filtering">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-filter"></i>
+        البحث والفلترة والتقسيم لصفحات
+    </h2>
+        <p>
+            عندما يصبح لديك آلاف الملاحظات، لا يصح إرجاعها كلها في رد واحد. لذلك تدعم الـ API:
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المعامل</th><th>الوظيفة</th><th>مثال</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>q</code></td><td>البحث في العنوان والمحتوى</td><td><code>/api/notes?q=بايثون</code></td></tr>
+                    <tr><td><code>tag</code></td><td>الفلترة حسب الوسم</td><td><code>/api/notes?tag=عمل</code></td></tr>
+                    <tr><td><code>page</code> / <code>per_page</code></td><td>رقم الصفحة وعدد العناصر فيها (حد أقصى 50)</td><td><code>/api/notes?page=2&amp;per_page=1</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>filtering.py</span>
+    </div>
+<pre><span class="kw">def</span> <span class="fn">titles</span>(url):
+    data = client.<span class="fn">get</span>(url).<span class="fn">get_json</span>()
+    <span class="kw">return</span> data[<span class="str">"total"</span>], [n[<span class="str">"title"</span>] <span class="kw">for</span> n <span class="kw">in</span> data[<span class="str">"items"</span>]]
+
+<span class="fn">print</span>(<span class="fn">titles</span>(<span class="str">"/api/notes?q=بايثون"</span>))
+<span class="fn">print</span>(<span class="fn">titles</span>(<span class="str">"/api/notes?tag=قراءة"</span>))
+<span class="fn">print</span>(<span class="fn">titles</span>(<span class="str">"/api/notes?page=1&amp;per_page=2"</span>))
+<span class="fn">print</span>(<span class="fn">titles</span>(<span class="str">"/api/notes?page=2&amp;per_page=2"</span>))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>(1, ['أفكار مشروع بايثون'])
+(1, ['كتب للقراءة'])
+(3, ['أفكار مشروع بايثون', 'قائمة التسوق'])
+(3, ['كتب للقراءة'])</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>لماذا نرجع total؟</strong> حتى يعرف العميل (مثلًا واجهة الموقع) عدد الصفحات الكلي ويعرض أزرار
+                «التالي» و«السابق» بشكل صحيح: <code>pages = ceil(total / per_page)</code>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="tests">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-vial"></i>
+        الاختبارات الآلية
+    </h2>
+        <p>
+            كيف تتأكد أن تعديلًا جديدًا لم يكسر شيئًا يعمل؟ بـ <strong>الاختبارات الآلية</strong>: كود يختبر كودك.
+            هذا ملف <code>test_notes_api.py</code> باستخدام وحدة <code>unittest</code> المدمجة:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>test_notes_api.py</span>
+    </div>
+<pre><span class="kw">import</span> os
+<span class="kw">import</span> tempfile
+<span class="kw">import</span> unittest
+
+<span class="kw">from</span> notes_api <span class="kw">import</span> create_app
+
+
+<span class="kw">class</span> <span class="fn">NotesApiTest</span>(unittest.TestCase):
+    <span class="kw">def</span> <span class="fn">setUp</span>(self):
+        <span class="cm"># ملف بيانات مؤقت جديد لكل اختبار</span>
+        fd, self.path = tempfile.<span class="fn">mkstemp</span>(suffix=<span class="str">".json"</span>)
+        os.<span class="fn">close</span>(fd)
+        os.<span class="fn">remove</span>(self.path)
+        self.client = <span class="fn">create_app</span>(self.path).<span class="fn">test_client</span>()
+
+    <span class="kw">def</span> <span class="fn">tearDown</span>(self):
+        <span class="kw">if</span> os.path.<span class="fn">exists</span>(self.path):
+            os.<span class="fn">remove</span>(self.path)
+
+    <span class="kw">def</span> <span class="fn">test_create_and_get</span>(self):
+        r = self.client.<span class="fn">post</span>(<span class="str">"/api/notes"</span>, json={<span class="str">"title"</span>: <span class="str">"اختبار"</span>})
+        self.<span class="fn">assertEqual</span>(r.status_code, <span class="num">201</span>)
+        note_id = r.<span class="fn">get_json</span>()[<span class="str">"id"</span>]
+        self.<span class="fn">assertEqual</span>(self.client.<span class="fn">get</span>(<span class="str">f"/api/notes/{note_id}"</span>).<span class="fn">get_json</span>()[<span class="str">"title"</span>], <span class="str">"اختبار"</span>)
+
+    <span class="kw">def</span> <span class="fn">test_title_required</span>(self):
+        r = self.client.<span class="fn">post</span>(<span class="str">"/api/notes"</span>, json={<span class="str">"content"</span>: <span class="str">"..."</span>})
+        self.<span class="fn">assertEqual</span>(r.status_code, <span class="num">400</span>)
+
+    <span class="kw">def</span> <span class="fn">test_update</span>(self):
+        self.client.<span class="fn">post</span>(<span class="str">"/api/notes"</span>, json={<span class="str">"title"</span>: <span class="str">"قديم"</span>})
+        r = self.client.<span class="fn">patch</span>(<span class="str">"/api/notes/1"</span>, json={<span class="str">"title"</span>: <span class="str">"جديد"</span>})
+        self.<span class="fn">assertEqual</span>(r.<span class="fn">get_json</span>()[<span class="str">"title"</span>], <span class="str">"جديد"</span>)
+
+    <span class="kw">def</span> <span class="fn">test_delete</span>(self):
+        self.client.<span class="fn">post</span>(<span class="str">"/api/notes"</span>, json={<span class="str">"title"</span>: <span class="str">"للحذف"</span>})
+        self.<span class="fn">assertEqual</span>(self.client.<span class="fn">delete</span>(<span class="str">"/api/notes/1"</span>).status_code, <span class="num">204</span>)
+        self.<span class="fn">assertEqual</span>(self.client.<span class="fn">get</span>(<span class="str">"/api/notes/1"</span>).status_code, <span class="num">404</span>)
+
+    <span class="kw">def</span> <span class="fn">test_data_persists_in_file</span>(self):
+        self.client.<span class="fn">post</span>(<span class="str">"/api/notes"</span>, json={<span class="str">"title"</span>: <span class="str">"باقية"</span>})
+        new_client = <span class="fn">create_app</span>(self.path).<span class="fn">test_client</span>()     <span class="cm"># كأننا أعدنا تشغيل الخادم</span>
+        self.<span class="fn">assertEqual</span>(new_client.<span class="fn">get</span>(<span class="str">"/api/notes"</span>).<span class="fn">get_json</span>()[<span class="str">"total"</span>], <span class="num">1</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    unittest.<span class="fn">main</span>(verbosity=<span class="num">2</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>test_create_and_get (__main__.NotesApiTest.test_create_and_get) ... ok
+test_data_persists_in_file (__main__.NotesApiTest.test_data_persists_in_file) ... ok
+test_delete (__main__.NotesApiTest.test_delete) ... ok
+test_title_required (__main__.NotesApiTest.test_title_required) ... ok
+test_update (__main__.NotesApiTest.test_update) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.034s
+
+OK</pre>
+</div>
+        <p>شغّل الاختبارات من الطرفية بالأمر <code>python -m unittest -v</code>. ✅ كل الاختبارات الخمسة نجحت!</p>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>كيف تقرأ النتيجة؟</strong> كل سطر ينتهي بـ <code>ok</code> يعني اختبارًا ناجحًا، وكلمة <code>OK</code> في النهاية
+                تعني أن كل الاختبارات نجحت. لو فشل اختبار ستظهر <code>FAIL</code> مع تفاصيل القيمة المتوقعة والقيمة الفعلية.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="run">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-rocket"></i>
+        التشغيل والخطوات التالية
+    </h2>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+                <span>تشغيل المشروع</span>
+            </div>
+<pre>pip install flask
+python notes_api.py
+<span class="cm"># الآن في طرفية أخرى:</span>
+curl http://127.0.0.1:5000/api/notes
+curl -X POST http://127.0.0.1:5000/api/notes -H "Content-Type: application/json" -d "{\"title\": \"أول ملاحظة\"}"
+curl -X DELETE http://127.0.0.1:5000/api/notes/1</pre>
+        </div>
+
+        <div class="note-box">
+            <strong>🚀 أفكار لتطوير المشروع (تحديات لك):</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> أضف مسار <code>GET /api/tags</code> يُرجع كل الوسوم المستخدمة وعدد ملاحظات كل وسم.</li>
+                <li><i class="fas fa-angle-left"></i> أضف معامل <code>sort</code> للترتيب حسب <code>created_at</code> أو <code>title</code>.</li>
+                <li><i class="fas fa-angle-left"></i> احمِ الـ API بمفتاح سري يُرسل في الترويسة <code>X-API-Key</code> وأرجع <code>401</code> بدونه.</li>
+                <li><i class="fas fa-angle-left"></i> استبدل ملف JSON بقاعدة بيانات <code>sqlite3</code> (مدمجة في Python).</li>
+                <li><i class="fas fa-angle-left"></i> ابنِ صفحة HTML بسيطة تستخدم <code>fetch()</code> لعرض الملاحظات من الـ API.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>حدود ملف JSON:</strong> التخزين في ملف ممتاز للتعلم والمشاريع الصغيرة، لكنه لا يتحمل طلبات متزامنة كثيرة
+                (قد يكتب طلبان في نفس اللحظة فتضيع بيانات). في المشاريع الحقيقية تُستخدم قواعد البيانات مثل SQLite و PostgreSQL.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! المسار يحدد المورد، والطريقة DELETE تحدد الفعل." data-hint="في REST: الرابط اسم المورد، والفعل يأتي من طريقة HTTP.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">تصميم REST</span>
+    </div>
+    <p class="exercise-question">أي طلب هو الأنسب في أسلوب REST <strong>لحذف</strong> الملاحظة رقم 5؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>GET /api/deleteNote?id=5</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="2"> <code>POST /api/notes/5/delete</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="3"> <code>DELETE /api/notes/5</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>DELETE /api/notes?action=remove&amp;id=5</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! فهمت مبادئ تصميم REST API." data-hint="الخادم هو من يولّد &lt;code&gt;id&lt;/code&gt;، وقواعد البيانات أفضل من ملفات JSON للتطبيقات الكبيرة.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>PATCH</code> يعدّل الحقول المرسلة فقط دون الحاجة لإرسال المورد كاملًا.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">بعد إنشاء مورد بنجاح يُفضّل الرد بالرمز <code>201</code>.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يجب أن يرسل العميل قيمة <code>id</code> عند إنشاء ملاحظة جديدة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">التقسيم لصفحات (Pagination) يقلل حجم الردود عند وجود بيانات كثيرة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">ملف JSON هو أفضل طريقة لتخزين بيانات تطبيق يستخدمه آلاف الأشخاص في نفس الوقت.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="رائع! لاحظ أن PUT غير معرّفة في مشروعنا (استخدمنا PATCH) لذلك الرد 405." data-hint="الحذف الناجح 204، والعنصر المحذوف لم يعد موجودًا، و PUT ليست من المسارات المعرّفة.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">باستخدام API الملاحظات (فيها 3 ملاحظات بالأرقام 1، 2، 3)، ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="fn">print</span>(client.<span class="fn">delete</span>(<span class="str">"/api/notes/2"</span>).status_code)
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/api/notes/2"</span>).status_code)
+<span class="fn">print</span>(client.<span class="fn">get</span>(<span class="str">"/api/notes"</span>).<span class="fn">get_json</span>()[<span class="str">"total"</span>])
+<span class="fn">print</span>(client.<span class="fn">put</span>(<span class="str">"/api/notes/1"</span>, json={<span class="str">"title"</span>: <span class="str">"x"</span>}).status_code)</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="204" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="404" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثالث:</span><input type="text" class="blank-input" data-answers="2" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الرابع:</span><input type="text" class="blank-input" data-answers="405" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذا مسار حذف REST مكتمل." data-hint="الطريقة &lt;code&gt;delete&lt;/code&gt;، والحذف من القائمة بـ &lt;code&gt;remove&lt;/code&gt;، والرد بدون محتوى رمزه 204.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">مسار الحذف</span>
+    </div>
+    <p class="exercise-question">أكمل مسار الحذف ليُرجع 404 إن لم توجد الملاحظة، و 204 بعد الحذف:</p>
+    <div class="code-fill">
+        <div class="line"><span>@app.</span><input type="text" class="blank-input" data-answers="delete" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'/api/notes/&lt;int:note_id&gt;'</span>)</span></div>
+        <div class="line"><span><span class="kw">def</span> <span class="fn">delete_note</span>(note_id):</span></div>
+        <div class="line"><span>    notes = <span class="fn">load</span>()</span></div>
+        <div class="line"><span>    note = <span class="fn">find</span>(notes, note_id)</span></div>
+        <div class="line"><span>    <span class="kw">if</span> note <span class="kw">is</span> </span><input type="text" class="blank-input" data-answers="None" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"><span>:</span></div>
+        <div class="line"><span>        <span class="kw">return</span> {<span class="str">'error'</span>: <span class="str">'غير موجودة'</span>}, <span class="num">404</span></span></div>
+        <div class="line"><span>    notes.</span><input type="text" class="blank-input" data-answers="remove" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"><span>(note)</span></div>
+        <div class="line"><span>    <span class="fn">save</span>(notes)</span></div>
+        <div class="line"><span>    <span class="kw">return</span> <span class="str">''</span>, </span><input type="text" class="blank-input" data-answers="204" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! قراءة ← تحقق ← تحميل ← إنشاء ← حفظ ← رد." data-hint="لا تحمّل أو تحفظ أي شيء قبل التأكد من صحة البيانات.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب خطوات معالجة طلب <code>POST</code> لإنشاء ملاحظة داخل الخادم. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="3" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">3) تحميل الملاحظات الحالية من الملف</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="6" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">6) إرجاع الملاحظة مع الرمز 201</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">1) قراءة JSON من جسم الطلب</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">5) حفظ القائمة في الملف</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) التحقق من البيانات وإرجاع 400 عند الخطأ</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="4" data-orig="6">
+            <span class="order-num">6</span>
+            <span style="flex:1; white-space:pre;">4) إنشاء الملاحظة الجديدة برقم جديد</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر تصميم REST</div>
+    <p style="color:var(--text-light); font-size:0.95em;">لكل عملية مطلوبة، اختر <strong>طريقة HTTP</strong> و<strong>المسار</strong> الصحيحين ورمز الحالة المتوقع عند النجاح، ثم اضغط «افحص».</p>
+    <div id="restQuiz"></div>
+    <div class="lab-row">
+        <button class="btn btn-primary" onclick="checkRest()"><i class="fas fa-search"></i> افحص</button>
+        <button class="btn btn-secondary" onclick="renderRest()"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="lab-console" id="restConsole" style="direction:rtl; text-align:right; font-family:Cairo, sans-serif;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> مبادئ REST: الموارد، الأفعال عبر طرق HTTP، وعدم الاحتفاظ بالحالة.</li>
+                <li><i class="fas fa-check"></i> ربط عمليات CRUD بالطرق والمسارات ورموز الحالة الصحيحة، والفرق بين PUT و PATCH.</li>
+                <li><i class="fas fa-check"></i> تصميم «عقد» الـ API وهيكل المشروع قبل كتابة الكود.</li>
+                <li><i class="fas fa-check"></i> مصنع التطبيق <code>create_app()</code> وفصل التخزين عن التحقق عن المسارات.</li>
+                <li><i class="fas fa-check"></i> التحقق من البيانات وقائمة الحقول المسموحة ورسائل خطأ موحدة.</li>
+                <li><i class="fas fa-check"></i> حفظ البيانات في ملف JSON واستمرارها بعد إعادة التشغيل.</li>
+                <li><i class="fas fa-check"></i> البحث والفلترة والتقسيم لصفحات عبر معاملات الاستعلام.</li>
+                <li><i class="fas fa-check"></i> كتابة اختبارات آلية بـ <code>unittest</code> و <code>test_client</code>.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> صمّم المسارات ورموز الحالة على الورق قبل كتابة أول سطر.</li>
+                <li><i class="fas fa-lightbulb"></i> اكتب اختبارًا لكل مسار، وشغّل الاختبارات قبل أي تعديل كبير.</li>
+                <li><i class="fas fa-lightbulb"></i> اكتب ملف README يشرح كل مسار وأمثلة على استخدامه.</li>
+                <li><i class="fas fa-lightbulb"></i> جرّب أحد تحديات التطوير المقترحة لتثبيت ما تعلمته.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في الدرس الإضافي القادم ستدخل عالم <strong>تحليل البيانات</strong> مع مكتبتي <strong>NumPy</strong> و <strong>Pandas</strong>.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="web2.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 14: بناء API بسيطة</span>
+        </a>
+        <a href="data1.html" class="nav-link next">
+            <span>الدرس الإضافي: مقدمة في NumPy و Pandas</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · مشروع REST API
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '71%';
+            text.textContent = '71% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر تصميم REST ========== */
+    const REST_TASKS = [
+        { task: 'عرض كل المستخدمين', m: 'GET', p: '/users', s: '200' },
+        { task: 'إنشاء طلب شراء جديد', m: 'POST', p: '/orders', s: '201' },
+        { task: 'عرض المنتج رقم 12', m: 'GET', p: '/products/12', s: '200' },
+        { task: 'تعديل سعر المنتج رقم 12 فقط', m: 'PATCH', p: '/products/12', s: '200' },
+        { task: 'حذف المستخدم رقم 3', m: 'DELETE', p: '/users/3', s: '204' },
+    ];
+    const REST_PATHS = ['/users', '/users/3', '/orders', '/products/12', '/getUsers', '/deleteUser?id=3'];
+
+    function renderRest() {
+        const sel = (id, opts) => `<select class="lab-select" id="${id}" style="direction:ltr; min-width:90px;"><option value="">—</option>${opts.map(o => `<option>${o}</option>`).join('')}</select>`;
+        document.getElementById('restQuiz').innerHTML = REST_TASKS.map((t, i) => `
+            <div class="lab-row" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:9px; padding:8px 12px;">
+                <span style="flex:1; min-width:180px; color:var(--text-light);">${i + 1}. ${t.task}</span>
+                ${sel('rm' + i, ['GET', 'POST', 'PATCH', 'DELETE'])}
+                ${sel('rp' + i, REST_PATHS)}
+                ${sel('rs' + i, ['200', '201', '204', '404'])}
+            </div>`).join('');
+        document.getElementById('restConsole').innerHTML = '';
+    }
+
+    function checkRest() {
+        let score = 0;
+        document.getElementById('restConsole').innerHTML = REST_TASKS.map((t, i) => {
+            const ok = ['m', 'p', 's'].map(k => document.getElementById('r' + k + i).value === t[k]);
+            const all = ok.every(Boolean);
+            if (all) score++;
+            return (all ? '✅ ' : '<span class="err">❌ </span>') + `${t.task}: <code>${t.m} ${t.p}</code> ← ${t.s}`;
+        }).join('<br>') + `<br><br>🎯 النتيجة: ${score} من ${REST_TASKS.length}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', renderRest);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

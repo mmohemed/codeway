@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مشروع 1: نظام إدارة مهام متقدم مع حفظ للبيانات | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">المستوى المتقدم</a>
+        <span class="sep">/</span>
+        <span>مشروع إدارة المهام</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-tasks"></i>
+            مشروع 1 · تطبيق سطر أوامر
+        </div>
+        <h1 class="lesson-title">مشروع 1: نظام إدارة مهام متقدم</h1>
+        <p class="lesson-intro">
+            في هذا المشروع ستبني <strong>تطبيق إدارة مهام احترافيًا</strong> يعمل من سطر الأوامر، ويجمع أهم ما تعلمته في المستوى المتقدم: <strong>dataclasses</strong> و <strong>Enum</strong>، تقسيم المشروع إلى <strong>وحدات</strong>، الحفظ الآمن في <strong>JSON</strong>، واجهة أوامر بـ <strong>argparse</strong>، و<strong>اختبارات آلية</strong>.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 2–3 ساعات</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 مشروع متعدد الملفات</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 متقدم</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد دروس OOP والملفات</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#idea">1. فكرة المشروع</a>
+            <a href="#models">2. النماذج</a>
+            <a href="#storage">3. التخزين</a>
+            <a href="#manager">4. منطق التطبيق</a>
+            <a href="#cli">5. واجهة الأوامر</a>
+            <a href="#tests">6. الاختبارات</a>
+            <a href="#next">7. التشغيل والتطوير</a>
+            <a href="#exercises">8. تمارين تفاعلية</a>
+            <a href="#summary">9. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="idea">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-lightbulb"></i>
+        فكرة المشروع ومتطلباته
+    </h2>
+        <p>
+            ستبني أداة <code>tasks</code> تُستخدم من الطرفية هكذا:
+        </p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+                <span>طريقة الاستخدام</span>
+            </div>
+<pre>python cli.py add "تسليم تقرير المشروع" -p high -d 2025-06-20 -t عمل
+python cli.py list
+python cli.py done 1
+python cli.py stats</pre>
+        </div>
+
+        <div class="note-box">
+            <strong>📋 المتطلبات:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> لكل مهمة: رقم، عنوان، أولوية (منخفضة/متوسطة/عالية)، موعد نهائي اختياري، وسوم، وحالة الإنجاز.</li>
+                <li><i class="fas fa-angle-left"></i> العمليات: إضافة، عرض مرتب حسب الأولوية والموعد، إنهاء، حذف، بحث وفلترة بالوسم.</li>
+                <li><i class="fas fa-angle-left"></i> تنبيه على المهام المتأخرة وإحصائيات للتقدم.</li>
+                <li><i class="fas fa-angle-left"></i> الحفظ التلقائي في JSON بطريقة آمنة لا تفقد البيانات.</li>
+                <li><i class="fas fa-angle-left"></i> رسائل خطأ واضحة بدل توقف البرنامج، واختبارات آلية.</li>
+            </ul>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> المعمارية: كل ملف له مسؤولية واحدة</p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-cube"></i> models.py</h4>
+                <p>شكل البيانات: الكلاس <code>Task</code> والأولويات <code>Priority</code>، والتحويل من/إلى قاموس.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-database"></i> storage.py</h4>
+                <p>الحفظ والتحميل فقط. لو أردت لاحقًا قاعدة بيانات، تغيّر هذا الملف وحده.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-brain"></i> manager.py</h4>
+                <p>منطق العمل: الإضافة والإنهاء والفلترة والإحصائيات. لا يعرف شيئًا عن الطرفية.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-terminal"></i> cli.py</h4>
+                <p>الواجهة: قراءة الأوامر وطباعة النتائج. يمكن استبدالها لاحقًا بواجهة ويب دون لمس الباقي.</p>
+            </div>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>مبدأ فصل المسؤوليات (Separation of Concerns):</strong> عندما يكون لكل جزء مهمة واحدة، يصبح الكود أسهل في الفهم
+                والاختبار والتطوير. هذا ما يميز المشاريع الاحترافية عن ملف واحد طويل من 500 سطر.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="models">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-cube"></i>
+        الخطوة 1: نماذج البيانات (models.py)
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>models.py</span>
+    </div>
+<pre><span class="str">"""models.py — نماذج البيانات"""</span>
+<span class="kw">from</span> dataclasses <span class="kw">import</span> asdict, dataclass, field
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+<span class="kw">from</span> enum <span class="kw">import</span> Enum
+
+
+<span class="kw">class</span> <span class="fn">Priority</span>(Enum):
+    LOW = <span class="num">1</span>
+    MEDIUM = <span class="num">2</span>
+    HIGH = <span class="num">3</span>
+
+    @property
+    <span class="kw">def</span> <span class="fn">label</span>(self):
+        <span class="kw">return</span> {<span class="num">1</span>: <span class="str">"🟢 منخفضة"</span>, <span class="num">2</span>: <span class="str">"🟡 متوسطة"</span>, <span class="num">3</span>: <span class="str">"🔴 عالية"</span>}[self.value]
+
+
+@dataclass
+<span class="kw">class</span> <span class="fn">Task</span>:
+    id: int
+    title: str
+    priority: Priority = Priority.MEDIUM
+    due: date | <span class="kw">None</span> = <span class="kw">None</span>
+    tags: list[str] = <span class="fn">field</span>(default_factory=list)
+    done: bool = <span class="kw">False</span>
+
+    <span class="kw">def</span> <span class="fn">is_overdue</span>(self, today=<span class="kw">None</span>):
+        today = today <span class="kw">or</span> date.<span class="fn">today</span>()
+        <span class="kw">return</span> <span class="kw">not</span> self.done <span class="kw">and</span> self.due <span class="kw">is</span> <span class="kw">not</span> <span class="kw">None</span> <span class="kw">and</span> self.due &lt; today
+
+    <span class="kw">def</span> <span class="fn">to_dict</span>(self):
+        data = <span class="fn">asdict</span>(self)
+        data[<span class="str">"priority"</span>] = self.priority.name
+        data[<span class="str">"due"</span>] = self.due.<span class="fn">isoformat</span>() <span class="kw">if</span> self.due <span class="kw">else</span> <span class="kw">None</span>
+        <span class="kw">return</span> data
+
+    @classmethod
+    <span class="kw">def</span> <span class="fn">from_dict</span>(cls, data):
+        <span class="kw">return</span> <span class="fn">cls</span>(
+            id=data[<span class="str">"id"</span>],
+            title=data[<span class="str">"title"</span>],
+            priority=Priority[data[<span class="str">"priority"</span>]],
+            due=date.<span class="fn">fromisoformat</span>(data[<span class="str">"due"</span>]) <span class="kw">if</span> data[<span class="str">"due"</span>] <span class="kw">else</span> <span class="kw">None</span>,
+            tags=data.<span class="fn">get</span>(<span class="str">"tags"</span>, []),
+            done=data.<span class="fn">get</span>(<span class="str">"done"</span>, <span class="kw">False</span>),
+        )</pre>
+</div>
+        <div class="note-box">
+            <strong>🔍 ماذا استخدمنا؟</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> <code>@dataclass</code> يولّد تلقائيًا <code>__init__</code> و <code>__repr__</code> و <code>__eq__</code> من تعريف الحقول.</li>
+                <li><i class="fas fa-angle-left"></i> <code>field(default_factory=list)</code> لأن القيمة الافتراضية القابلة للتعديل (<code>[]</code>) تُشارك بين كل الكائنات إن كُتبت مباشرة!</li>
+                <li><i class="fas fa-angle-left"></i> <code>Enum</code> يمنع القيم الخاطئة: لا يمكن أن تكون الأولوية «عاجلة جدًا» إلا إن عرّفناها.</li>
+                <li><i class="fas fa-angle-left"></i> <code>to_dict</code> و <code>from_dict</code> (classmethod) لأن JSON لا يعرف التواريخ ولا Enum.</li>
+                <li><i class="fas fa-angle-left"></i> <code>date | None</code> تلميح نوع (Type Hint) يعني «تاريخ أو لا شيء».</li>
+            </ul>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>try_models.py</span>
+    </div>
+<pre><span class="kw">from</span> datetime <span class="kw">import</span> date
+<span class="kw">from</span> models <span class="kw">import</span> Priority, Task
+
+task = <span class="fn">Task</span>(<span class="num">1</span>, <span class="str">"مراجعة الكود"</span>, Priority.HIGH, <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">6</span>, <span class="num">1</span>), [<span class="str">"عمل"</span>])
+<span class="fn">print</span>(task)
+<span class="fn">print</span>(task.priority.label, <span class="str">"| متأخرة؟"</span>, task.<span class="fn">is_overdue</span>(today=<span class="fn">date</span>(<span class="num">2025</span>, <span class="num">6</span>, <span class="num">10</span>)))
+
+data = task.<span class="fn">to_dict</span>()
+<span class="fn">print</span>(data)
+<span class="fn">print</span>(Task.<span class="fn">from_dict</span>(data) == task)     <span class="cm"># dataclass تقارن الحقول تلقائيًا</span></pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>Task(id=1, title='مراجعة الكود', priority=&lt;Priority.HIGH: 3&gt;, due=datetime.date(2025, 6, 1), tags=['عمل'], done=False)
+🔴 عالية | متأخرة؟ True
+{'id': 1, 'title': 'مراجعة الكود', 'priority': 'HIGH', 'due': '2025-06-01', 'tags': ['عمل'], 'done': False}
+True</pre>
+</div>
+</section>
+
+<section class="section-card" id="storage">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-database"></i>
+        الخطوة 2: التخزين الآمن (storage.py)
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>storage.py</span>
+    </div>
+<pre><span class="str">"""storage.py — الحفظ والتحميل الآمن"""</span>
+<span class="kw">import</span> json
+<span class="kw">import</span> os
+<span class="kw">import</span> tempfile
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">from</span> models <span class="kw">import</span> Task
+
+
+<span class="kw">class</span> <span class="fn">JsonStorage</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, path=<span class="str">"tasks.json"</span>):
+        self.path = <span class="fn">Path</span>(path)
+
+    <span class="kw">def</span> <span class="fn">load</span>(self):
+        <span class="kw">if</span> <span class="kw">not</span> self.path.<span class="fn">exists</span>():
+            <span class="kw">return</span> []
+        <span class="kw">try</span>:
+            raw = json.<span class="fn">loads</span>(self.path.<span class="fn">read_text</span>(encoding=<span class="str">"utf-8"</span>))
+        <span class="kw">except</span> json.JSONDecodeError:
+            backup = self.path.<span class="fn">with_suffix</span>(<span class="str">".broken.json"</span>)
+            self.path.<span class="fn">replace</span>(backup)          <span class="cm"># لا نحذف بيانات المستخدم أبدًا</span>
+            <span class="fn">print</span>(<span class="str">f"⚠️ الملف تالف، نُقل إلى {backup.name} وبدأنا قائمة جديدة"</span>)
+            <span class="kw">return</span> []
+        <span class="kw">return</span> [Task.<span class="fn">from_dict</span>(item) <span class="kw">for</span> item <span class="kw">in</span> raw]
+
+    <span class="kw">def</span> <span class="fn">save</span>(self, tasks):
+        data = json.<span class="fn">dumps</span>([t.<span class="fn">to_dict</span>() <span class="kw">for</span> t <span class="kw">in</span> tasks], ensure_ascii=<span class="kw">False</span>, indent=<span class="num">2</span>)
+        <span class="cm"># كتابة ذرية: نكتب في ملف مؤقت ثم نستبدل الأصلي دفعة واحدة</span>
+        fd, tmp = tempfile.<span class="fn">mkstemp</span>(dir=self.path.parent <span class="kw">or</span> <span class="str">"."</span>, suffix=<span class="str">".tmp"</span>)
+        <span class="kw">with</span> os.<span class="fn">fdopen</span>(fd, <span class="str">"w"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+            f.<span class="fn">write</span>(data)
+        os.<span class="fn">replace</span>(tmp, self.path)</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>لماذا «الكتابة الذرية»؟</strong> لو كتبنا مباشرة في <code>tasks.json</code> وانقطعت الكهرباء في منتصف الكتابة،
+                سيصبح الملف نصف مكتوب وتضيع كل المهام! الحل: نكتب في ملف مؤقت، ثم <code>os.replace</code> تستبدل الملف القديم
+                بالجديد في خطوة واحدة لا يمكن أن تتوقف في المنتصف.
+            </div>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>try_storage.py</span>
+    </div>
+<pre><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">from</span> models <span class="kw">import</span> Task
+<span class="kw">from</span> storage <span class="kw">import</span> JsonStorage
+
+store = <span class="fn">JsonStorage</span>(<span class="str">"demo.json"</span>)
+store.<span class="fn">save</span>([<span class="fn">Task</span>(<span class="num">1</span>, <span class="str">"مهمة أولى"</span>), <span class="fn">Task</span>(<span class="num">2</span>, <span class="str">"مهمة ثانية"</span>, tags=[<span class="str">"بيت"</span>])])
+<span class="fn">print</span>([t.title <span class="kw">for</span> t <span class="kw">in</span> store.<span class="fn">load</span>()])
+
+<span class="fn">Path</span>(<span class="str">"demo.json"</span>).<span class="fn">write_text</span>(<span class="str">"{ هذا ليس JSON"</span>, encoding=<span class="str">"utf-8"</span>)   <span class="cm"># محاكاة ملف تالف</span>
+<span class="fn">print</span>(store.<span class="fn">load</span>())
+<span class="fn">print</span>(<span class="fn">sorted</span>(p.name <span class="kw">for</span> p <span class="kw">in</span> <span class="fn">Path</span>(<span class="str">"."</span>).<span class="fn">glob</span>(<span class="str">"demo*"</span>)))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>['مهمة أولى', 'مهمة ثانية']
+⚠️ الملف تالف، نُقل إلى demo.broken.json وبدأنا قائمة جديدة
+[]
+['demo.broken.json']</pre>
+</div>
+</section>
+
+<section class="section-card" id="manager">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-brain"></i>
+        الخطوة 3: منطق التطبيق (manager.py)
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>manager.py</span>
+    </div>
+<pre><span class="str">"""manager.py — منطق التطبيق"""</span>
+<span class="kw">from</span> collections <span class="kw">import</span> Counter
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+
+<span class="kw">from</span> models <span class="kw">import</span> Priority, Task
+
+
+<span class="kw">class</span> <span class="fn">TaskNotFound</span>(Exception):
+    <span class="kw">pass</span>
+
+
+<span class="kw">class</span> <span class="fn">TaskManager</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, storage):
+        self.storage = storage
+        self.tasks = storage.<span class="fn">load</span>()
+
+    <span class="kw">def</span> <span class="fn">_next_id</span>(self):
+        <span class="kw">return</span> <span class="fn">max</span>((t.id <span class="kw">for</span> t <span class="kw">in</span> self.tasks), default=<span class="num">0</span>) + <span class="num">1</span>
+
+    <span class="kw">def</span> <span class="fn">_get</span>(self, task_id):
+        <span class="kw">for</span> task <span class="kw">in</span> self.tasks:
+            <span class="kw">if</span> task.id == task_id:
+                <span class="kw">return</span> task
+        <span class="kw">raise</span> <span class="fn">TaskNotFound</span>(<span class="str">f"لا توجد مهمة برقم {task_id}"</span>)
+
+    <span class="kw">def</span> <span class="fn">add</span>(self, title, priority=<span class="str">"MEDIUM"</span>, due=<span class="kw">None</span>, tags=<span class="kw">None</span>):
+        title = title.<span class="fn">strip</span>()
+        <span class="kw">if</span> <span class="kw">not</span> title:
+            <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="str">"عنوان المهمة لا يمكن أن يكون فارغًا"</span>)
+        task = <span class="fn">Task</span>(
+            id=self.<span class="fn">_next_id</span>(),
+            title=title,
+            priority=Priority[priority.<span class="fn">upper</span>()],
+            due=date.<span class="fn">fromisoformat</span>(due) <span class="kw">if</span> due <span class="kw">else</span> <span class="kw">None</span>,
+            tags=tags <span class="kw">or</span> [],
+        )
+        self.tasks.<span class="fn">append</span>(task)
+        self.storage.<span class="fn">save</span>(self.tasks)
+        <span class="kw">return</span> task
+
+    <span class="kw">def</span> <span class="fn">complete</span>(self, task_id):
+        task = self.<span class="fn">_get</span>(task_id)
+        task.done = <span class="kw">True</span>
+        self.storage.<span class="fn">save</span>(self.tasks)
+        <span class="kw">return</span> task
+
+    <span class="kw">def</span> <span class="fn">delete</span>(self, task_id):
+        task = self.<span class="fn">_get</span>(task_id)
+        self.tasks.<span class="fn">remove</span>(task)
+        self.storage.<span class="fn">save</span>(self.tasks)
+        <span class="kw">return</span> task
+
+    <span class="kw">def</span> <span class="fn">list</span>(self, show_done=<span class="kw">False</span>, tag=<span class="kw">None</span>, search=<span class="kw">None</span>):
+        result = [t <span class="kw">for</span> t <span class="kw">in</span> self.tasks <span class="kw">if</span> show_done <span class="kw">or</span> <span class="kw">not</span> t.done]
+        <span class="kw">if</span> tag:
+            result = [t <span class="kw">for</span> t <span class="kw">in</span> result <span class="kw">if</span> tag <span class="kw">in</span> t.tags]
+        <span class="kw">if</span> search:
+            result = [t <span class="kw">for</span> t <span class="kw">in</span> result <span class="kw">if</span> search.<span class="fn">lower</span>() <span class="kw">in</span> t.title.<span class="fn">lower</span>()]
+        <span class="cm"># الأعلى أولوية أولًا، ثم الأقرب موعدًا</span>
+        <span class="kw">return</span> <span class="fn">sorted</span>(result, key=<span class="kw">lambda</span> t: (-t.priority.value, t.due <span class="kw">or</span> date.max))
+
+    <span class="kw">def</span> <span class="fn">overdue</span>(self, today=<span class="kw">None</span>):
+        <span class="kw">return</span> [t <span class="kw">for</span> t <span class="kw">in</span> self.tasks <span class="kw">if</span> t.<span class="fn">is_overdue</span>(today)]
+
+    <span class="kw">def</span> <span class="fn">stats</span>(self, today=<span class="kw">None</span>):
+        done = <span class="fn">sum</span>(t.done <span class="kw">for</span> t <span class="kw">in</span> self.tasks)
+        <span class="kw">return</span> {
+            <span class="str">"total"</span>: <span class="fn">len</span>(self.tasks),
+            <span class="str">"done"</span>: done,
+            <span class="str">"pending"</span>: <span class="fn">len</span>(self.tasks) - done,
+            <span class="str">"overdue"</span>: <span class="fn">len</span>(self.<span class="fn">overdue</span>(today)),
+            <span class="str">"progress"</span>: <span class="fn">round</span>(done / <span class="fn">len</span>(self.tasks) * <span class="num">100</span>) <span class="kw">if</span> self.tasks <span class="kw">else</span> <span class="num">0</span>,
+            <span class="str">"by_tag"</span>: <span class="fn">dict</span>(<span class="fn">Counter</span>(tag <span class="kw">for</span> t <span class="kw">in</span> self.tasks <span class="kw">for</span> tag <span class="kw">in</span> t.tags)),
+        }</pre>
+</div>
+        <div class="note-box">
+            <strong>🔍 قرارات تصميم مهمة:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> <strong>استثناء مخصص</strong> <code>TaskNotFound</code> بدل طباعة رسالة: المدير لا يقرر كيف يُعرض الخطأ، الواجهة هي من تقرر.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>حقن التبعية</strong>: المدير يستقبل <code>storage</code> من الخارج، فيمكن في الاختبارات تمرير تخزين وهمي.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>مفتاح ترتيب مركب</strong> <code>(-priority, due)</code>: الأعلى أولوية أولًا، وعند التساوي الأقرب موعدًا.</li>
+                <li><i class="fas fa-angle-left"></i> المعامل <code>today</code> الاختياري يجعل نتائج «المتأخرة» قابلة للاختبار في أي يوم.</li>
+            </ul>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>try_manager.py</span>
+    </div>
+<pre><span class="kw">from</span> datetime <span class="kw">import</span> date
+<span class="kw">from</span> manager <span class="kw">import</span> TaskManager, TaskNotFound
+<span class="kw">from</span> storage <span class="kw">import</span> JsonStorage
+
+m = <span class="fn">TaskManager</span>(<span class="fn">JsonStorage</span>(<span class="str">"tasks.json"</span>))
+m.<span class="fn">add</span>(<span class="str">"شراء هدية"</span>, <span class="str">"low"</span>, <span class="str">"2025-06-30"</span>, [<span class="str">"بيت"</span>])
+m.<span class="fn">add</span>(<span class="str">"تسليم التقرير"</span>, <span class="str">"high"</span>, <span class="str">"2025-06-05"</span>, [<span class="str">"عمل"</span>])
+m.<span class="fn">add</span>(<span class="str">"حجز موعد الطبيب"</span>, <span class="str">"high"</span>, <span class="str">"2025-06-12"</span>)
+m.<span class="fn">add</span>(<span class="str">"قراءة كتاب"</span>, tags=[<span class="str">"تطوير"</span>])
+m.<span class="fn">complete</span>(<span class="num">4</span>)
+
+<span class="kw">for</span> t <span class="kw">in</span> m.<span class="fn">list</span>():
+    <span class="fn">print</span>(t.id, t.title, t.priority.name, t.due)
+
+<span class="fn">print</span>(<span class="str">"المتأخرة في 10 يونيو:"</span>, [t.title <span class="kw">for</span> t <span class="kw">in</span> m.<span class="fn">overdue</span>(<span class="fn">date</span>(<span class="num">2025</span>, <span class="num">6</span>, <span class="num">10</span>))])
+<span class="fn">print</span>(m.<span class="fn">stats</span>(<span class="fn">date</span>(<span class="num">2025</span>, <span class="num">6</span>, <span class="num">10</span>)))
+
+<span class="kw">try</span>:
+    m.<span class="fn">complete</span>(<span class="num">99</span>)
+<span class="kw">except</span> TaskNotFound <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="str">"خطأ متوقع:"</span>, e)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>2 تسليم التقرير HIGH 2025-06-05
+3 حجز موعد الطبيب HIGH 2025-06-12
+1 شراء هدية LOW 2025-06-30
+المتأخرة في 10 يونيو: ['تسليم التقرير']
+{'total': 4, 'done': 1, 'pending': 3, 'overdue': 1, 'progress': 25, 'by_tag': {'بيت': 1, 'عمل': 1, 'تطوير': 1}}
+خطأ متوقع: لا توجد مهمة برقم 99</pre>
+</div>
+</section>
+
+<section class="section-card" id="cli">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-terminal"></i>
+        الخطوة 4: واجهة الأوامر (cli.py)
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>cli.py</span>
+    </div>
+<pre><span class="str">"""cli.py — واجهة سطر الأوامر"""</span>
+<span class="kw">import</span> argparse
+<span class="kw">import</span> sys
+
+<span class="kw">from</span> manager <span class="kw">import</span> TaskManager, TaskNotFound
+<span class="kw">from</span> storage <span class="kw">import</span> JsonStorage
+
+
+<span class="kw">def</span> <span class="fn">build_parser</span>():
+    parser = argparse.<span class="fn">ArgumentParser</span>(prog=<span class="str">"tasks"</span>, description=<span class="str">"مدير المهام"</span>)
+    parser.<span class="fn">add_argument</span>(<span class="str">"--file"</span>, default=<span class="str">"tasks.json"</span>, help=<span class="str">"ملف البيانات"</span>)
+    sub = parser.<span class="fn">add_subparsers</span>(dest=<span class="str">"command"</span>, required=<span class="kw">True</span>)
+
+    add = sub.<span class="fn">add_parser</span>(<span class="str">"add"</span>, help=<span class="str">"إضافة مهمة"</span>)
+    add.<span class="fn">add_argument</span>(<span class="str">"title"</span>)
+    add.<span class="fn">add_argument</span>(<span class="str">"-p"</span>, <span class="str">"--priority"</span>, default=<span class="str">"medium"</span>, choices=[<span class="str">"low"</span>, <span class="str">"medium"</span>, <span class="str">"high"</span>])
+    add.<span class="fn">add_argument</span>(<span class="str">"-d"</span>, <span class="str">"--due"</span>, help=<span class="str">"الموعد YYYY-MM-DD"</span>)
+    add.<span class="fn">add_argument</span>(<span class="str">"-t"</span>, <span class="str">"--tag"</span>, action=<span class="str">"append"</span>, dest=<span class="str">"tags"</span>, help=<span class="str">"وسم (يمكن تكراره)"</span>)
+
+    ls = sub.<span class="fn">add_parser</span>(<span class="str">"list"</span>, help=<span class="str">"عرض المهام"</span>)
+    ls.<span class="fn">add_argument</span>(<span class="str">"--all"</span>, action=<span class="str">"store_true"</span>, help=<span class="str">"تضمين المكتملة"</span>)
+    ls.<span class="fn">add_argument</span>(<span class="str">"--tag"</span>)
+    ls.<span class="fn">add_argument</span>(<span class="str">"--search"</span>)
+
+    sub.<span class="fn">add_parser</span>(<span class="str">"done"</span>, help=<span class="str">"إنهاء مهمة"</span>).<span class="fn">add_argument</span>(<span class="str">"id"</span>, type=int)
+    sub.<span class="fn">add_parser</span>(<span class="str">"delete"</span>, help=<span class="str">"حذف مهمة"</span>).<span class="fn">add_argument</span>(<span class="str">"id"</span>, type=int)
+    sub.<span class="fn">add_parser</span>(<span class="str">"stats"</span>, help=<span class="str">"إحصائيات"</span>)
+    <span class="kw">return</span> parser
+
+
+<span class="kw">def</span> <span class="fn">print_task</span>(t):
+    mark = <span class="str">"✅"</span> <span class="kw">if</span> t.done <span class="kw">else</span> (<span class="str">"⏰"</span> <span class="kw">if</span> t.<span class="fn">is_overdue</span>() <span class="kw">else</span> <span class="str">"⬜"</span>)
+    due = <span class="str">f" | 📅 {t.due}"</span> <span class="kw">if</span> t.due <span class="kw">else</span> <span class="str">""</span>
+    tags = <span class="str">f" | #{' #'.join(t.tags)}"</span> <span class="kw">if</span> t.tags <span class="kw">else</span> <span class="str">""</span>
+    <span class="fn">print</span>(<span class="str">f"{mark} [{t.id}] {t.title} | {t.priority.label}{due}{tags}"</span>)
+
+
+<span class="kw">def</span> <span class="fn">main</span>(argv=<span class="kw">None</span>):
+    args = <span class="fn">build_parser</span>().<span class="fn">parse_args</span>(argv)
+    manager = <span class="fn">TaskManager</span>(<span class="fn">JsonStorage</span>(args.file))
+    <span class="kw">try</span>:
+        <span class="kw">if</span> args.command == <span class="str">"add"</span>:
+            task = manager.<span class="fn">add</span>(args.title, args.priority, args.due, args.tags)
+            <span class="fn">print</span>(<span class="str">f"➕ أُضيفت المهمة رقم {task.id}"</span>)
+        <span class="kw">elif</span> args.command == <span class="str">"list"</span>:
+            tasks = manager.<span class="fn">list</span>(args.all, args.tag, args.search)
+            <span class="kw">if</span> <span class="kw">not</span> tasks:
+                <span class="fn">print</span>(<span class="str">"لا توجد مهام 🎉"</span>)
+            <span class="kw">for</span> t <span class="kw">in</span> tasks:
+                <span class="fn">print_task</span>(t)
+        <span class="kw">elif</span> args.command == <span class="str">"done"</span>:
+            <span class="fn">print</span>(<span class="str">f"✅ أُنجزت: {manager.complete(args.id).title}"</span>)
+        <span class="kw">elif</span> args.command == <span class="str">"delete"</span>:
+            <span class="fn">print</span>(<span class="str">f"🗑️ حُذفت: {manager.delete(args.id).title}"</span>)
+        <span class="kw">elif</span> args.command == <span class="str">"stats"</span>:
+            s = manager.<span class="fn">stats</span>()
+            <span class="fn">print</span>(<span class="str">f"المجموع {s['total']} | المنجز {s['done']} | المتبقي {s['pending']} | المتأخر {s['overdue']}"</span>)
+            <span class="fn">print</span>(<span class="str">f"التقدم: {'█' * (s['progress'] // 10)}{'░' * (10 - s['progress'] // 10)} {s['progress']}%"</span>)
+    <span class="kw">except</span> (TaskNotFound, ValueError, KeyError) <span class="kw">as</span> error:
+        <span class="fn">print</span>(<span class="str">f"❌ خطأ: {error}"</span>)
+        <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">return</span> <span class="num">0</span>
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    sys.<span class="fn">exit</span>(<span class="fn">main</span>())</pre>
+</div>
+        <p>
+            لاحظ أن <code>main(argv=None)</code> تستقبل قائمة الأوامر اختياريًا؛ هذا يسمح لنا بتجربتها من داخل Python
+            كأننا نكتبها في الطرفية:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>cli_session.py</span>
+    </div>
+<pre><span class="kw">from</span> cli <span class="kw">import</span> main
+
+commands = [
+    <span class="str">'add "تسليم تقرير المشروع" -p high -d 2030-06-20 -t عمل'</span>,
+    <span class="str">'add "شراء مستلزمات" -p low -t بيت -t تسوق'</span>,
+    <span class="str">'add "تعلم FastAPI" -t تطوير'</span>,
+    <span class="str">"list"</span>,
+    <span class="str">"done 1"</span>,
+    <span class="str">"list --all"</span>,
+    <span class="str">"delete 7"</span>,
+    <span class="str">"stats"</span>,
+]
+<span class="kw">import</span> shlex
+<span class="kw">for</span> cmd <span class="kw">in</span> commands:
+    <span class="fn">print</span>(<span class="str">f"$ python cli.py {cmd}"</span>)
+    <span class="fn">main</span>(shlex.<span class="fn">split</span>(cmd))
+    <span class="fn">print</span>()</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>$ python cli.py add "تسليم تقرير المشروع" -p high -d 2030-06-20 -t عمل
+➕ أُضيفت المهمة رقم 1
+
+$ python cli.py add "شراء مستلزمات" -p low -t بيت -t تسوق
+➕ أُضيفت المهمة رقم 2
+
+$ python cli.py add "تعلم FastAPI" -t تطوير
+➕ أُضيفت المهمة رقم 3
+
+$ python cli.py list
+⬜ [1] تسليم تقرير المشروع | 🔴 عالية | 📅 2030-06-20 | #عمل
+⬜ [3] تعلم FastAPI | 🟡 متوسطة | #تطوير
+⬜ [2] شراء مستلزمات | 🟢 منخفضة | #بيت #تسوق
+
+$ python cli.py done 1
+✅ أُنجزت: تسليم تقرير المشروع
+
+$ python cli.py list --all
+✅ [1] تسليم تقرير المشروع | 🔴 عالية | 📅 2030-06-20 | #عمل
+⬜ [3] تعلم FastAPI | 🟡 متوسطة | #تطوير
+⬜ [2] شراء مستلزمات | 🟢 منخفضة | #بيت #تسوق
+
+$ python cli.py delete 7
+❌ خطأ: لا توجد مهمة برقم 7
+
+$ python cli.py stats
+المجموع 3 | المنجز 1 | المتبقي 2 | المتأخر 0
+التقدم: ███░░░░░░░ 33%</pre>
+</div>
+
+        <p>ومن الطرفية، تحصل على المساعدة تلقائيًا بفضل argparse:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>cli_help.py</span>
+    </div>
+<pre><span class="kw">from</span> cli <span class="kw">import</span> build_parser
+<span class="fn">build_parser</span>().<span class="fn">print_help</span>()</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>usage: tasks [-h] [--file FILE] {add,list,done,delete,stats} ...
+
+مدير المهام
+
+positional arguments:
+  {add,list,done,delete,stats}
+    add                 إضافة مهمة
+    list                عرض المهام
+    done                إنهاء مهمة
+    delete              حذف مهمة
+    stats               إحصائيات
+
+options:
+  -h, --help            show this help message and exit
+  --file FILE           ملف البيانات</pre>
+</div>
+</section>
+
+<section class="section-card" id="tests">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-vial"></i>
+        الخطوة 5: الاختبارات الآلية
+    </h2>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>test_manager.py</span>
+    </div>
+<pre><span class="kw">import</span> unittest
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+
+<span class="kw">from</span> manager <span class="kw">import</span> TaskManager, TaskNotFound
+
+
+<span class="kw">class</span> <span class="fn">MemoryStorage</span>:
+    <span class="str">"""تخزين وهمي في الذاكرة — لا يلمس الملفات أثناء الاختبار"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.saved = []
+
+    <span class="kw">def</span> <span class="fn">load</span>(self):
+        <span class="kw">return</span> []
+
+    <span class="kw">def</span> <span class="fn">save</span>(self, tasks):
+        self.saved = <span class="fn">list</span>(tasks)
+
+
+<span class="kw">class</span> <span class="fn">TaskManagerTest</span>(unittest.TestCase):
+    <span class="kw">def</span> <span class="fn">setUp</span>(self):
+        self.storage = <span class="fn">MemoryStorage</span>()
+        self.m = <span class="fn">TaskManager</span>(self.storage)
+
+    <span class="kw">def</span> <span class="fn">test_add_saves</span>(self):
+        self.m.<span class="fn">add</span>(<span class="str">"مهمة"</span>)
+        self.<span class="fn">assertEqual</span>(<span class="fn">len</span>(self.storage.saved), <span class="num">1</span>)
+
+    <span class="kw">def</span> <span class="fn">test_empty_title_rejected</span>(self):
+        <span class="kw">with</span> self.<span class="fn">assertRaises</span>(ValueError):
+            self.m.<span class="fn">add</span>(<span class="str">"   "</span>)
+
+    <span class="kw">def</span> <span class="fn">test_sorted_by_priority_then_due</span>(self):
+        self.m.<span class="fn">add</span>(<span class="str">"ب"</span>, <span class="str">"low"</span>)
+        self.m.<span class="fn">add</span>(<span class="str">"أ"</span>, <span class="str">"high"</span>, <span class="str">"2025-02-01"</span>)
+        self.m.<span class="fn">add</span>(<span class="str">"ج"</span>, <span class="str">"high"</span>, <span class="str">"2025-01-01"</span>)
+        self.<span class="fn">assertEqual</span>([t.title <span class="kw">for</span> t <span class="kw">in</span> self.m.<span class="fn">list</span>()], [<span class="str">"ج"</span>, <span class="str">"أ"</span>, <span class="str">"ب"</span>])
+
+    <span class="kw">def</span> <span class="fn">test_overdue</span>(self):
+        self.m.<span class="fn">add</span>(<span class="str">"قديمة"</span>, due=<span class="str">"2025-01-01"</span>)
+        self.<span class="fn">assertEqual</span>(<span class="fn">len</span>(self.m.<span class="fn">overdue</span>(<span class="fn">date</span>(<span class="num">2025</span>, <span class="num">2</span>, <span class="num">1</span>))), <span class="num">1</span>)
+        self.m.<span class="fn">complete</span>(<span class="num">1</span>)
+        self.<span class="fn">assertEqual</span>(self.m.<span class="fn">overdue</span>(<span class="fn">date</span>(<span class="num">2025</span>, <span class="num">2</span>, <span class="num">1</span>)), [])
+
+    <span class="kw">def</span> <span class="fn">test_missing_task</span>(self):
+        <span class="kw">with</span> self.<span class="fn">assertRaises</span>(TaskNotFound):
+            self.m.<span class="fn">delete</span>(<span class="num">42</span>)
+
+
+unittest.<span class="fn">main</span>(verbosity=<span class="num">2</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>test_add_saves (__main__.TaskManagerTest.test_add_saves) ... ok
+test_empty_title_rejected (__main__.TaskManagerTest.test_empty_title_rejected) ... ok
+test_missing_task (__main__.TaskManagerTest.test_missing_task) ... ok
+test_overdue (__main__.TaskManagerTest.test_overdue) ... ok
+test_sorted_by_priority_then_due (__main__.TaskManagerTest.test_sorted_by_priority_then_due) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+OK</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>لاحظ <code>MemoryStorage</code>:</strong> لأن المدير يستقبل التخزين من الخارج (حقن التبعية)، استبدلناه في الاختبارات
+                بكلاس بسيط لا يكتب ملفات. هذا يجعل الاختبارات سريعة ومستقلة. وهذه فائدة مباشرة لفصل المسؤوليات!
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="next">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-rocket"></i>
+        تشغيل المشروع وتطويره
+    </h2>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-folder"></i> Project</span>
+                <span>task-manager/</span>
+            </div>
+<pre>task-manager/
+├── models.py
+├── storage.py
+├── manager.py
+├── cli.py
+├── test_manager.py
+└── README.md
+
+<span class="cm"># التشغيل (Python 3.10 أو أحدث)</span>
+python cli.py --help
+python -m unittest -v</pre>
+        </div>
+        <div class="note-box">
+            <strong>🚀 تحديات لتطوير المشروع:</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> أضف أمر <code>edit</code> لتعديل عنوان المهمة أو أولويتها.</li>
+                <li><i class="fas fa-angle-left"></i> أضف مهامًا فرعية (Subtasks) داخل كل مهمة.</li>
+                <li><i class="fas fa-angle-left"></i> أضف أمر <code>export</code> يصدّر المهام إلى CSV.</li>
+                <li><i class="fas fa-angle-left"></i> اكتب <code>SqliteStorage</code> بنفس الدالتين <code>load/save</code> واستبدل بها JSON دون تغيير باقي الملفات.</li>
+                <li><i class="fas fa-angle-left"></i> استخدم مكتبة <code>rich</code> لعرض المهام في جدول ملون جميل.</li>
+            </ul>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! القيم الافتراضية القابلة للتعديل تُشارك بين الكائنات، و dataclass ترفضها أصلًا لحمايتك." data-hint="فكّر: ماذا يحدث لو شاركت كل المهام نفس كائن القائمة؟">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">dataclasses</span>
+    </div>
+    <p class="exercise-question">لماذا كتبنا <code>tags: list[str] = field(default_factory=list)</code> بدل <code>tags: list[str] = []</code>؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> لأن <code>field</code> أسرع في التنفيذ</label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> حتى تحصل كل مهمة على قائمة جديدة خاصة بها بدل مشاركة نفس القائمة</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> لأن dataclass لا تقبل القوائم إطلاقًا</label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> لتحويل الوسوم إلى نصوص تلقائيًا</label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تفهم قرارات التصميم في المشروع." data-hint="JSON يعرف النصوص والأرقام والقوائم والقواميس فقط، والاختبارات يجب أن تكون معزولة.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">فصل التخزين عن منطق التطبيق يسمح بتغيير طريقة الحفظ دون تعديل <code>manager.py</code>.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">الكتابة الذرية تحمي الملف من التلف إذا توقف البرنامج أثناء الحفظ.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">JSON يدعم حفظ كائنات <code>date</code> و <code>Enum</code> مباشرة.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>argparse</code> يولّد رسالة المساعدة <code>--help</code> تلقائيًا.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يجب أن تكتب الاختبارات في ملف البيانات الحقيقي <code>tasks.json</code>.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! «ب» أُنجزت فاختفت من القائمة، والتقدم 1 من 3 ≈ 33%." data-hint="&lt;code&gt;list()&lt;/code&gt; تخفي المنجزة افتراضيًا وترتب حسب الأولوية، والتقدم يُقرّب لأقرب عدد صحيح.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">الترتيب</span>
+    </div>
+    <p class="exercise-question">باستخدام <code>TaskManager</code> من المشروع، ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">from</span> manager <span class="kw">import</span> TaskManager
+<span class="kw">from</span> storage <span class="kw">import</span> JsonStorage
+
+m = <span class="fn">TaskManager</span>(<span class="fn">JsonStorage</span>(<span class="str">"x.json"</span>))
+m.<span class="fn">add</span>(<span class="str">"أ"</span>, <span class="str">"low"</span>)
+m.<span class="fn">add</span>(<span class="str">"ب"</span>, <span class="str">"high"</span>)
+m.<span class="fn">add</span>(<span class="str">"ج"</span>, <span class="str">"medium"</span>)
+m.<span class="fn">complete</span>(<span class="num">2</span>)
+<span class="fn">print</span>([t.title <span class="kw">for</span> t <span class="kw">in</span> m.<span class="fn">list</span>()])
+<span class="fn">print</span>(m.<span class="fn">stats</span>()[<span class="str">"progress"</span>])</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="[&#x27;ج&#x27;, &#x27;أ&#x27;]" placeholder="..." style="min-width:170px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="33" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذا هو النمط نفسه المستخدم في &lt;code&gt;models.py&lt;/code&gt;." data-hint="استورد &lt;code&gt;dataclass&lt;/code&gt; و &lt;code&gt;Enum&lt;/code&gt;، وضع الديكوريتر فوق الكلاس، والحالة الافتراضية المفتوحة.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">Enum و dataclass</span>
+    </div>
+    <p class="exercise-question">أكمل تعريف النماذج:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">from</span> dataclasses <span class="kw">import</span> </span><input type="text" class="blank-input" data-answers="dataclass" placeholder="..." style="min-width:156px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span><span class="kw">from</span> enum <span class="kw">import</span> </span><input type="text" class="blank-input" data-answers="Enum" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span><span class="kw">class</span> <span class="fn">Status</span>(Enum):</span></div>
+        <div class="line"><span>    OPEN = <span class="num">1</span></span></div>
+        <div class="line"><span>    CLOSED = <span class="num">2</span></span></div>
+        <div class="line"><input type="text" class="blank-input" data-answers="@dataclass" placeholder="..." style="min-width:170px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span><span class="kw">class</span> <span class="fn">Ticket</span>:</span></div>
+        <div class="line"><span>    id: int</span></div>
+        <div class="line"><span>    status: Status = Status.</span><input type="text" class="blank-input" data-answers="OPEN" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب صحيح! هكذا تتعاون الطبقات الأربع." data-hint="الواجهة تبدأ وتنتهي، والتخزين يحدث بعد التعديل.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب ما يحدث عند تنفيذ الأمر <code>python cli.py done 3</code>. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) storage.save يكتب الملف بطريقة ذرية</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">2) إنشاء TaskManager الذي يحمّل المهام من JsonStorage</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">5) cli يطبع رسالة النجاح</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">1) argparse يحلل الأمر ويستخرج id = 3</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">3) manager.complete(3) يبحث عن المهمة ويجعل done = True</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> جرّب مدير المهام في المتصفح</div>
+    <p style="color:var(--text-light); font-size:0.95em;">نسخة تفاعلية من المشروع: أضف مهامًا، وأنهِها، واحذفها. تحت كل عملية ترى <strong>الأمر المكافئ في الطرفية</strong> ومحتوى <code>tasks.json</code> بعد الحفظ.</p>
+    <div class="lab-row">
+        <input type="text" class="lab-input" id="tmTitle" placeholder="عنوان المهمة" style="flex:1;">
+        <select class="lab-select" id="tmPrio"><option value="low">منخفضة</option><option value="medium" selected>متوسطة</option><option value="high">عالية</option></select>
+        <input type="date" class="lab-input" id="tmDue" style="max-width:170px;">
+        <input type="text" class="lab-input" id="tmTag" placeholder="وسم" style="max-width:110px;">
+        <button class="btn btn-primary" onclick="tmAdd()"><i class="fas fa-plus"></i> add</button>
+    </div>
+    <div class="lab-row">
+        <label><input type="checkbox" id="tmAll" onchange="tmRender()"> عرض المنجزة (--all)</label>
+    </div>
+    <div id="tmList"></div>
+    <div class="lab-console" id="tmConsole"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> تقسيم مشروع إلى طبقات: النماذج، التخزين، المنطق، والواجهة.</li>
+                <li><i class="fas fa-check"></i> <code>@dataclass</code> و <code>field(default_factory=...)</code> و <code>Enum</code> وتلميحات الأنواع.</li>
+                <li><i class="fas fa-check"></i> التحويل من/إلى JSON عبر <code>to_dict</code> و <code>from_dict</code> (classmethod).</li>
+                <li><i class="fas fa-check"></i> الحفظ الذري بملف مؤقت و <code>os.replace</code>، والتعامل مع الملف التالف.</li>
+                <li><i class="fas fa-check"></i> الاستثناءات المخصصة وحقن التبعية لتسهيل الاختبار.</li>
+                <li><i class="fas fa-check"></i> واجهة أوامر كاملة بـ <code>argparse</code> مع أوامر فرعية.</li>
+                <li><i class="fas fa-check"></i> اختبارات آلية باستخدام تخزين وهمي في الذاكرة.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> اكتب الملفات بالترتيب: النماذج ← التخزين ← المنطق ← الواجهة، واختبر كل طبقة قبل التالية.</li>
+                <li><i class="fas fa-lightbulb"></i> اجعل كل دالة تقوم بمهمة واحدة واضحة.</li>
+                <li><i class="fas fa-lightbulb"></i> ارفع المشروع على GitHub مع README يشرح الأوامر — إنه إضافة ممتازة لسيرتك الذاتية.</li>
+                <li><i class="fas fa-lightbulb"></i> اختر تحديًا واحدًا على الأقل من قائمة التطوير ونفّذه.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> في المشروع التالي ستبني <strong>API كاملة باستخدام FastAPI</strong> مع التحقق التلقائي من البيانات وتوثيق تفاعلي.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="data2.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى: تحليل ملف CSV حقيقي</span>
+        </a>
+        <a href="project2.html" class="nav-link next">
+            <span>التالي: مشروع 2 — API كاملة باستخدام FastAPI</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · مشروع إدارة المهام
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '86%';
+            text.textContent = '86% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مدير المهام التفاعلي ========== */
+    const TM = { tasks: [
+        { id: 1, title: 'تسليم تقرير المشروع', priority: 'HIGH', due: '2025-06-20', tags: ['عمل'], done: false },
+        { id: 2, title: 'شراء مستلزمات', priority: 'LOW', due: null, tags: ['بيت'], done: false },
+    ] };
+    const PRIO = { LOW: [1, '🟢 منخفضة'], MEDIUM: [2, '🟡 متوسطة'], HIGH: [3, '🔴 عالية'] };
+
+    function tmLog(cmd, msg) {
+        const out = document.getElementById('tmConsole');
+        out.innerHTML = '<span class="prompt">$ </span>python cli.py ' + escapeHtml(cmd) + '\n' + escapeHtml(msg) +
+            '\n\n<span style="color:#888"># tasks.json</span>\n' + escapeHtml(JSON.stringify(TM.tasks, null, 2));
+    }
+
+    function tmRender() {
+        const all = document.getElementById('tmAll').checked;
+        const list = TM.tasks.filter(t => all || !t.done)
+            .sort((a, b) => PRIO[b.priority][0] - PRIO[a.priority][0] || (a.due || '9999').localeCompare(b.due || '9999'));
+        document.getElementById('tmList').innerHTML = list.length ? list.map(t => `
+            <div class="lab-row" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:9px; padding:8px 12px; ${t.done ? 'opacity:0.6;' : ''}">
+                <span style="flex:1; color:var(--text-light);">${t.done ? '✅' : '⬜'} [${t.id}] ${escapeHtml(t.title)} | ${PRIO[t.priority][1]}${t.due ? ' | 📅 ' + t.due : ''}${t.tags.length ? ' | #' + t.tags.map(escapeHtml).join(' #') : ''}</span>
+                ${t.done ? '' : `<button class="btn btn-secondary" onclick="tmDone(${t.id})">done</button>`}
+                <button class="btn btn-secondary" onclick="tmDelete(${t.id})">delete</button>
+            </div>`).join('') : '<p style="color:var(--text-muted);">لا توجد مهام 🎉</p>';
+    }
+
+    function tmAdd() {
+        const title = document.getElementById('tmTitle').value.trim();
+        const prio = document.getElementById('tmPrio').value;
+        const due = document.getElementById('tmDue').value;
+        const tag = document.getElementById('tmTag').value.trim();
+        let cmd = `add "${title}" -p ${prio}` + (due ? ` -d ${due}` : '') + (tag ? ` -t ${tag}` : '');
+        if (!title) { tmLog(cmd, '❌ خطأ: عنوان المهمة لا يمكن أن يكون فارغًا'); return; }
+        const id = Math.max(0, ...TM.tasks.map(t => t.id)) + 1;
+        TM.tasks.push({ id, title, priority: prio.toUpperCase(), due: due || null, tags: tag ? [tag] : [], done: false });
+        document.getElementById('tmTitle').value = '';
+        tmRender();
+        tmLog(cmd, `➕ أُضيفت المهمة رقم ${id}`);
+    }
+
+    function tmDone(id) {
+        const t = TM.tasks.find(x => x.id === id);
+        t.done = true;
+        tmRender();
+        tmLog('done ' + id, '✅ أُنجزت: ' + t.title);
+    }
+
+    function tmDelete(id) {
+        const i = TM.tasks.findIndex(x => x.id === id);
+        const [t] = TM.tasks.splice(i, 1);
+        tmRender();
+        tmLog('delete ' + id, '🗑️ حُذفت: ' + t.title);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { tmRender(); tmLog('list', 'عرض المهام الحالية'); });
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

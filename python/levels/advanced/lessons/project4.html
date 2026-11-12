@@ -1,0 +1,2180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مشروع 4: مشروع تتخرّج به من مسار Python | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">المستوى المتقدم</a>
+        <span class="sep">/</span>
+        <span>مشروع التخرج</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-graduation-cap"></i>
+            مشروع 4 · التخرج
+        </div>
+        <h1 class="lesson-title">مشروع التخرّج من مسار Python 🎓</h1>
+        <p class="lesson-intro">
+            وصلت إلى المحطة الأخيرة! مشروع التخرج هو فرصتك لتثبت أنك تستطيع بناء <strong>تطبيق متكامل من الصفر</strong> بمعايير احترافية: تخطيط، هيكلة، قاعدة بيانات، اختبارات، توثيق، ونشر على GitHub. في هذه الصفحة ستجد <strong>أفكار المشاريع</strong>، و<strong>المتطلبات ومعايير التقييم</strong>، و<strong>مثالًا كاملًا محلولًا</strong> تسترشد به.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 3–4 أسابيع</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 تطبيق متكامل في ملف أعمالك</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 متقدم</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد إنهاء المسار</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#goals">1. الهدف</a>
+            <a href="#ideas">2. أفكار المشاريع</a>
+            <a href="#requirements">3. المتطلبات</a>
+            <a href="#setup">4. تجهيز المشروع</a>
+            <a href="#example">5. مثال محلول</a>
+            <a href="#tests">6. الاختبارات</a>
+            <a href="#quality">7. جودة الكود</a>
+            <a href="#plan">8. الخطة والتقييم</a>
+            <a href="#after">9. ماذا بعد؟</a>
+            <a href="#exercises">10. تمارين تفاعلية</a>
+            <a href="#summary">11. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="goals">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-flag"></i>
+        ما المطلوب في مشروع التخرج؟
+    </h2>
+        <p>
+            مشروع التخرج ليس تمرينًا آخر، بل <strong>منتج حقيقي</strong> تعرضه في ملف أعمالك (Portfolio) وفي مقابلات العمل.
+            المهم ليس حجم المشروع، بل أن يكون <strong>مكتملًا ومنظمًا ومختبرًا وموثقًا</strong>.
+        </p>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-puzzle-piece"></i> يجمع مهاراتك</h4>
+                <p>OOP، التعامل مع البيانات، معالجة الأخطاء، الوحدات، والاختبارات في مشروع واحد.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-users"></i> يحل مشكلة حقيقية</h4>
+                <p>اختر مشكلة تواجهك أنت أو من حولك؛ ستكون أكثر حماسًا وسيكون المشروع أكثر إقناعًا.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fab fa-github"></i> منشور ومتاح</h4>
+                <p>على GitHub مع README واضح، بحيث يستطيع أي شخص تشغيله في دقائق.</p>
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="ideas">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-lightbulb"></i>
+        اختر فكرة مشروعك
+    </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المشروع</th><th>الوصف</th><th>المهارات الأساسية</th><th>الصعوبة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>💰 مدير المصروفات</td><td>تسجيل المصروفات، ميزانيات شهرية، تنبيهات وتقارير.</td><td>OOP، SQLite، تقارير، CLI</td><td>⭐⭐</td></tr>
+                    <tr><td>📚 نظام مكتبة</td><td>كتب وأعضاء وإعارة وإرجاع وغرامات تأخير.</td><td>تصميم كائنات، قاعدة بيانات، API</td><td>⭐⭐⭐</td></tr>
+                    <tr><td>🌦️ لوحة الطقس</td><td>جلب الطقس لمدن متعددة من API خارجية، حفظ السجل، وتحليل الاتجاهات.</td><td>requests، JSON، Pandas</td><td>⭐⭐</td></tr>
+                    <tr><td>🛒 متتبع الأسعار</td><td>مراقبة أسعار منتجات من مواقع، وتنبيه عند انخفاض السعر.</td><td>Web Scraping، جدولة، بريد</td><td>⭐⭐⭐</td></tr>
+                    <tr><td>🧠 منصة اختبارات</td><td>بنك أسئلة، اختبارات بمؤقت، نتائج ولوحة متصدرين.</td><td>FastAPI أو Flask، قاعدة بيانات</td><td>⭐⭐⭐</td></tr>
+                    <tr><td>🏥 حجز المواعيد</td><td>عيادة: أطباء، مواعيد متاحة، حجز وإلغاء، منع التعارض.</td><td>REST API، التحقق، التواريخ</td><td>⭐⭐⭐⭐</td></tr>
+                    <tr><td>📊 محلل البيانات المفتوحة</td><td>تحليل بيانات حكومية مفتوحة وإنتاج تقرير ورسوم.</td><td>Pandas، matplotlib، Excel</td><td>⭐⭐</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>نصيحة الاختيار:</strong> ابدأ بنسخة صغيرة تعمل (MVP — أقل منتج قابل للاستخدام) خلال الأسبوع الأول،
+                ثم أضف الميزات تدريجيًا. المشروع الصغير المكتمل أفضل بكثير من مشروع ضخم لم يكتمل.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="requirements">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-clipboard-check"></i>
+        المتطلبات الإلزامية
+    </h2>
+        <div class="note-box">
+            <strong>✅ يجب أن يحتوي مشروعك على:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> <strong>تصميم كائني:</strong> كلاسات لها مسؤوليات واضحة (يُفضل dataclasses).</li>
+                <li><i class="fas fa-check"></i> <strong>تخزين دائم:</strong> ملفات JSON/CSV أو قاعدة بيانات SQLite.</li>
+                <li><i class="fas fa-check"></i> <strong>واجهة:</strong> سطر أوامر (argparse) أو API (Flask/FastAPI) أو واجهة ويب.</li>
+                <li><i class="fas fa-check"></i> <strong>تحقق ومعالجة أخطاء:</strong> لا يتوقف البرنامج بسبب إدخال خاطئ.</li>
+                <li><i class="fas fa-check"></i> <strong>اختبارات آلية:</strong> 5 اختبارات على الأقل للمنطق الأساسي.</li>
+                <li><i class="fas fa-check"></i> <strong>تقسيم لوحدات:</strong> عدة ملفات منظمة وليس ملفًا واحدًا ضخمًا.</li>
+                <li><i class="fas fa-check"></i> <strong>توثيق:</strong> README فيه الوصف وطريقة التثبيت والتشغيل وأمثلة.</li>
+                <li><i class="fas fa-check"></i> <strong>Git و GitHub:</strong> سجل commits واضح يوضح تطور المشروع.</li>
+            </ul>
+        </div>
+</section>
+
+<section class="section-card" id="setup">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-folder-plus"></i>
+        تجهيز المشروع باحترافية
+    </h2>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-terminal"></i> Terminal</span>
+                <span>البداية</span>
+            </div>
+<pre>mkdir expense-tracker &amp;&amp; cd expense-tracker
+python -m venv venv
+venv\Scripts\activate                 <span class="cm"># Windows   (Linux/macOS: source venv/bin/activate)</span>
+pip install pytest
+pip freeze &gt; requirements.txt
+git init
+git add . &amp;&amp; git commit -m "Initial project structure"</pre>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fas fa-folder"></i> Project</span>
+                <span>هيكل مقترح</span>
+            </div>
+<pre>expense-tracker/
+├── expenses/
+│   ├── __init__.py
+│   ├── models.py          <span class="cm"># الكلاسات</span>
+│   ├── repository.py      <span class="cm"># قاعدة البيانات</span>
+│   ├── reports.py         <span class="cm"># التقارير</span>
+│   └── cli.py             <span class="cm"># الواجهة</span>
+├── tests/
+│   └── test_reports.py
+├── .gitignore             <span class="cm"># venv/  __pycache__/  *.db  .env</span>
+├── requirements.txt
+└── README.md</pre>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> قالب README</p>
+        <div class="code-block">
+            <div class="code-header">
+                <span class="lang"><i class="fab fa-markdown"></i> Markdown</span>
+                <span>README.md</span>
+            </div>
+<pre># 💰 مدير المصروفات الشخصي
+
+أداة سطر أوامر لتسجيل المصروفات اليومية ومتابعة الميزانية الشهرية.
+
+## الميزات
+- إضافة المصروفات وتصنيفها
+- تقرير شهري مع رسم نصي
+- تنبيهات عند الاقتراب من الميزانية
+
+## التثبيت
+```bash
+git clone https://github.com/USERNAME/expense-tracker.git
+cd expense-tracker
+pip install -r requirements.txt
+```
+
+## الاستخدام
+```bash
+python -m expenses.cli add 120 مواصلات --note "وقود"
+python -m expenses.cli report 2025-05
+```
+
+## الاختبارات
+```bash
+pytest
+```</pre>
+        </div>
+</section>
+
+<section class="section-card" id="example">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-laptop-code"></i>
+        مثال محلول: مدير المصروفات
+    </h2>
+        <p>
+            إليك النواة الكاملة لمشروع «مدير المصروفات» كمثال على المستوى المطلوب. لاحظ الطبقات الثلاث:
+            <strong>النموذج</strong> <code>Expense</code>، و<strong>المستودع</strong> <code>ExpenseRepository</code> (SQLite)،
+            و<strong>التقارير</strong> <code>BudgetReport</code>.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>expenses.py</span>
+    </div>
+<pre><span class="str">"""expenses.py — مدير المصروفات الشخصي (مثال مشروع تخرج)"""</span>
+<span class="kw">import</span> sqlite3
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+
+CATEGORIES = (<span class="str">"طعام"</span>, <span class="str">"مواصلات"</span>, <span class="str">"فواتير"</span>, <span class="str">"تسوق"</span>, <span class="str">"ترفيه"</span>, <span class="str">"أخرى"</span>)
+
+
+@<span class="fn">dataclass</span>(frozen=<span class="kw">True</span>)
+<span class="kw">class</span> <span class="fn">Expense</span>:
+    amount: float
+    category: str
+    spent_on: date
+    note: str = <span class="str">""</span>
+    id: int | <span class="kw">None</span> = <span class="kw">None</span>
+
+    <span class="kw">def</span> <span class="fn">__post_init__</span>(self):
+        <span class="kw">if</span> self.amount &lt;= <span class="num">0</span>:
+            <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="str">"المبلغ يجب أن يكون أكبر من صفر"</span>)
+        <span class="kw">if</span> self.category <span class="kw">not</span> <span class="kw">in</span> CATEGORIES:
+            <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="str">f"تصنيف غير معروف: {self.category}"</span>)
+
+
+<span class="kw">class</span> <span class="fn">ExpenseRepository</span>:
+    <span class="str">"""طبقة الوصول للبيانات — SQLite المدمجة في Python"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, path=<span class="str">":memory:"</span>):
+        self.conn = sqlite3.<span class="fn">connect</span>(path)
+        self.conn.<span class="fn">execute</span>(<span class="str">"""
+            CREATE TABLE IF NOT EXISTS expenses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                amount REAL NOT NULL CHECK (amount &gt; 0),
+                category TEXT NOT NULL,
+                spent_on TEXT NOT NULL,
+                note TEXT DEFAULT ''
+            )"""</span>)
+
+    <span class="kw">def</span> <span class="fn">add</span>(self, e: Expense) -&gt; int:
+        <span class="kw">with</span> self.conn:      <span class="cm"># يحفظ (commit) تلقائيًا أو يتراجع عند الخطأ</span>
+            cur = self.conn.<span class="fn">execute</span>(
+                <span class="str">"INSERT INTO expenses (amount, category, spent_on, note) VALUES (?, ?, ?, ?)"</span>,
+                (e.amount, e.category, e.spent_on.<span class="fn">isoformat</span>(), e.note),
+            )
+        <span class="kw">return</span> cur.lastrowid
+
+    <span class="kw">def</span> <span class="fn">by_month</span>(self, year: int, month: int) -&gt; list[Expense]:
+        rows = self.conn.<span class="fn">execute</span>(
+            <span class="str">"SELECT amount, category, spent_on, note, id FROM expenses "</span>
+            <span class="str">"WHERE strftime('%Y-%m', spent_on) = ? ORDER BY spent_on"</span>,
+            (<span class="str">f"{year}-{month:02d}"</span>,),
+        ).<span class="fn">fetchall</span>()
+        <span class="kw">return</span> [<span class="fn">Expense</span>(a, c, date.<span class="fn">fromisoformat</span>(d), n, i) <span class="kw">for</span> a, c, d, n, i <span class="kw">in</span> rows]
+
+    <span class="kw">def</span> <span class="fn">delete</span>(self, expense_id: int) -&gt; bool:
+        <span class="kw">with</span> self.conn:
+            cur = self.conn.<span class="fn">execute</span>(<span class="str">"DELETE FROM expenses WHERE id = ?"</span>, (expense_id,))
+        <span class="kw">return</span> cur.rowcount == <span class="num">1</span>
+
+
+<span class="kw">class</span> <span class="fn">BudgetReport</span>:
+    <span class="str">"""منطق التقارير — لا يعرف شيئًا عن قاعدة البيانات"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, expenses: list[Expense], budgets: dict[str, float]):
+        self.expenses = expenses
+        self.budgets = budgets
+
+    <span class="kw">def</span> <span class="fn">totals</span>(self) -&gt; dict[str, float]:
+        result: dict[str, float] = {}
+        <span class="kw">for</span> e <span class="kw">in</span> self.expenses:
+            result[e.category] = result.<span class="fn">get</span>(e.category, <span class="num">0</span>) + e.amount
+        <span class="kw">return</span> <span class="fn">dict</span>(<span class="fn">sorted</span>(result.<span class="fn">items</span>(), key=<span class="kw">lambda</span> kv: -kv[<span class="num">1</span>]))
+
+    <span class="kw">def</span> <span class="fn">alerts</span>(self) -&gt; list[str]:
+        messages = []
+        <span class="kw">for</span> category, spent <span class="kw">in</span> self.<span class="fn">totals</span>().<span class="fn">items</span>():
+            limit = self.budgets.<span class="fn">get</span>(category)
+            <span class="kw">if</span> limit <span class="kw">is</span> <span class="kw">None</span>:
+                <span class="kw">continue</span>
+            ratio = spent / limit
+            <span class="kw">if</span> ratio &gt; <span class="num">1</span>:
+                messages.<span class="fn">append</span>(<span class="str">f"🔴 تجاوزت ميزانية {category} بـ {spent - limit:.0f} ريال"</span>)
+            <span class="kw">elif</span> ratio &gt;= <span class="num">0.8</span>:
+                messages.<span class="fn">append</span>(<span class="str">f"🟡 استهلكت {ratio:.0%} من ميزانية {category}"</span>)
+        <span class="kw">return</span> messages
+
+    <span class="kw">def</span> <span class="fn">render</span>(self) -&gt; str:
+        totals = self.<span class="fn">totals</span>()
+        grand = <span class="fn">sum</span>(totals.<span class="fn">values</span>())
+        lines = [<span class="str">f"إجمالي المصروفات: {grand:,.0f} ريال"</span>, <span class="str">""</span>]
+        <span class="kw">for</span> category, spent <span class="kw">in</span> totals.<span class="fn">items</span>():
+            bar = <span class="str">"█"</span> * <span class="fn">round</span>(spent / grand * <span class="num">20</span>)
+            lines.<span class="fn">append</span>(<span class="str">f"{category:&lt;8} {bar:&lt;20} {spent:&gt;7,.0f} ({spent / grand:.0%})"</span>)
+        <span class="kw">return</span> <span class="str">"\n"</span>.<span class="fn">join</span>(lines)</pre>
+</div>
+
+        <div class="note-box">
+            <strong>🔍 ما الجديد هنا؟</strong>
+            <ul>
+                <li><i class="fas fa-angle-left"></i> <strong>sqlite3</strong>: قاعدة بيانات حقيقية مدمجة في Python دون تثبيت شيء، تُحفظ في ملف واحد.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>علامات <code>?</code> في SQL</strong>: تمرير القيم بأمان. لا تستخدم f-string لبناء استعلامات SQL أبدًا (ثغرة SQL Injection).</li>
+                <li><i class="fas fa-angle-left"></i> <strong><code>with self.conn:</code></strong> معاملة (Transaction): تُحفظ التغييرات عند النجاح وتُلغى كلها عند الخطأ.</li>
+                <li><i class="fas fa-angle-left"></i> <strong><code>frozen=True</code> و <code>__post_init__</code></strong>: كائن غير قابل للتعديل يتحقق من صحة نفسه عند الإنشاء.</li>
+                <li><i class="fas fa-angle-left"></i> <strong>الفصل:</strong> <code>BudgetReport</code> يستقبل قائمة مصروفات، فيمكن اختباره دون قاعدة بيانات إطلاقًا.</li>
+            </ul>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> تجربة المشروع</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>demo.py</span>
+    </div>
+<pre>may = repo.<span class="fn">by_month</span>(<span class="num">2025</span>, <span class="num">5</span>)
+<span class="fn">print</span>(<span class="str">f"مصروفات مايو: {len(may)} عمليات\n"</span>)
+
+report = <span class="fn">BudgetReport</span>(may, budgets={<span class="str">"طعام"</span>: <span class="num">1200</span>, <span class="str">"مواصلات"</span>: <span class="num">300</span>, <span class="str">"ترفيه"</span>: <span class="num">150</span>, <span class="str">"تسوق"</span>: <span class="num">200</span>})
+<span class="fn">print</span>(report.<span class="fn">render</span>())
+
+<span class="fn">print</span>(<span class="str">"\nالتنبيهات:"</span>)
+<span class="kw">for</span> alert <span class="kw">in</span> report.<span class="fn">alerts</span>():
+    <span class="fn">print</span>(alert)
+
+<span class="fn">print</span>(<span class="str">"\nحذف العملية 4:"</span>, repo.<span class="fn">delete</span>(<span class="num">4</span>), <span class="str">"| مرة أخرى:"</span>, repo.<span class="fn">delete</span>(<span class="num">4</span>))
+
+<span class="kw">try</span>:
+    <span class="fn">Expense</span>(-<span class="num">50</span>, <span class="str">"طعام"</span>, date.<span class="fn">today</span>())
+<span class="kw">except</span> ValueError <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="str">"❌"</span>, e)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>مصروفات مايو: 9 عمليات
+
+إجمالي المصروفات: 2,350 ريال
+
+طعام     ███████████            1,280 (54%)
+فواتير   ███                      380 (16%)
+مواصلات  ██                       260 (11%)
+تسوق     ██                       260 (11%)
+ترفيه    █                        170 (7%)
+
+التنبيهات:
+🔴 تجاوزت ميزانية طعام بـ 80 ريال
+🟡 استهلكت 87% من ميزانية مواصلات
+🔴 تجاوزت ميزانية تسوق بـ 60 ريال
+🔴 تجاوزت ميزانية ترفيه بـ 20 ريال
+
+حذف العملية 4: True | مرة أخرى: False
+❌ المبلغ يجب أن يكون أكبر من صفر</pre>
+</div>
+</section>
+
+<section class="section-card" id="tests">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-vial"></i>
+        الاختبارات بأسلوب pytest
+    </h2>
+        <p>
+            في المشاريع الحديثة تُكتب الاختبارات غالبًا بمكتبة <strong>pytest</strong> لأنها أبسط: دوال عادية تبدأ بـ <code>test_</code>
+            و <code>assert</code> فقط:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>tests/test_reports.py</span>
+    </div>
+<pre><span class="kw">from</span> datetime <span class="kw">import</span> date
+
+<span class="kw">import</span> pytest
+
+<span class="kw">from</span> expenses <span class="kw">import</span> BudgetReport, Expense
+
+
+<span class="kw">def</span> <span class="fn">make</span>(amount, category):
+    <span class="kw">return</span> <span class="fn">Expense</span>(amount, category, <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">5</span>, <span class="num">1</span>))
+
+
+<span class="kw">def</span> <span class="fn">test_totals_sorted_descending</span>():
+    report = <span class="fn">BudgetReport</span>([<span class="fn">make</span>(<span class="num">50</span>, <span class="str">"ترفيه"</span>), <span class="fn">make</span>(<span class="num">200</span>, <span class="str">"طعام"</span>), <span class="fn">make</span>(<span class="num">30</span>, <span class="str">"طعام"</span>)], {})
+    <span class="kw">assert</span> <span class="fn">list</span>(report.<span class="fn">totals</span>().<span class="fn">items</span>()) == [(<span class="str">"طعام"</span>, <span class="num">230</span>), (<span class="str">"ترفيه"</span>, <span class="num">50</span>)]
+
+
+<span class="kw">def</span> <span class="fn">test_over_budget_alert</span>():
+    report = <span class="fn">BudgetReport</span>([<span class="fn">make</span>(<span class="num">350</span>, <span class="str">"مواصلات"</span>)], {<span class="str">"مواصلات"</span>: <span class="num">300</span>})
+    <span class="kw">assert</span> report.<span class="fn">alerts</span>() == [<span class="str">"🔴 تجاوزت ميزانية مواصلات بـ 50 ريال"</span>]
+
+
+<span class="kw">def</span> <span class="fn">test_negative_amount_rejected</span>():
+    <span class="kw">with</span> pytest.<span class="fn">raises</span>(ValueError):
+        <span class="fn">make</span>(-<span class="num">1</span>, <span class="str">"طعام"</span>)
+
+
+@pytest.mark.<span class="fn">parametrize</span>(<span class="str">"category"</span>, [<span class="str">"طعام"</span>, <span class="str">"فواتير"</span>, <span class="str">"أخرى"</span>], ids=[<span class="str">"food"</span>, <span class="str">"bills"</span>, <span class="str">"other"</span>])
+<span class="kw">def</span> <span class="fn">test_valid_categories</span>(category):
+    <span class="kw">assert</span> <span class="fn">make</span>(<span class="num">10</span>, category).category == category</pre>
+</div>
+        <p>والنتيجة عند تشغيل الأمر <code>pytest -v</code>:</p>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>tests/test_reports.py::test_totals_sorted_descending PASSED              [ 16%]
+tests/test_reports.py::test_over_budget_alert PASSED                     [ 33%]
+tests/test_reports.py::test_negative_amount_rejected PASSED              [ 50%]
+tests/test_reports.py::test_valid_categories[food] PASSED                [ 66%]
+tests/test_reports.py::test_valid_categories[bills] PASSED               [ 83%]
+tests/test_reports.py::test_valid_categories[other] PASSED               [100%]
+
+============================== 6 passed in 0.04s ===============================</pre>
+</div>
+        <p>ولمن لا يريد تثبيت pytest، هذه نفس الاختبارات مكتوبة بوحدة <code>unittest</code> المدمجة، ومخرجاتها الفعلية:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>verify_tests.py</span>
+    </div>
+<pre><span class="kw">import</span> unittest
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+<span class="kw">from</span> expenses <span class="kw">import</span> BudgetReport, Expense
+
+
+<span class="kw">def</span> <span class="fn">make</span>(amount, category):
+    <span class="kw">return</span> <span class="fn">Expense</span>(amount, category, <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">5</span>, <span class="num">1</span>))
+
+
+<span class="kw">class</span> <span class="fn">ReportTests</span>(unittest.TestCase):
+    <span class="kw">def</span> <span class="fn">test_totals_sorted_descending</span>(self):
+        report = <span class="fn">BudgetReport</span>([<span class="fn">make</span>(<span class="num">50</span>, <span class="str">"ترفيه"</span>), <span class="fn">make</span>(<span class="num">200</span>, <span class="str">"طعام"</span>), <span class="fn">make</span>(<span class="num">30</span>, <span class="str">"طعام"</span>)], {})
+        self.<span class="fn">assertEqual</span>(<span class="fn">list</span>(report.<span class="fn">totals</span>().<span class="fn">items</span>()), [(<span class="str">"طعام"</span>, <span class="num">230</span>), (<span class="str">"ترفيه"</span>, <span class="num">50</span>)])
+
+    <span class="kw">def</span> <span class="fn">test_over_budget_alert</span>(self):
+        report = <span class="fn">BudgetReport</span>([<span class="fn">make</span>(<span class="num">350</span>, <span class="str">"مواصلات"</span>)], {<span class="str">"مواصلات"</span>: <span class="num">300</span>})
+        self.<span class="fn">assertEqual</span>(report.<span class="fn">alerts</span>(), [<span class="str">"🔴 تجاوزت ميزانية مواصلات بـ 50 ريال"</span>])
+
+    <span class="kw">def</span> <span class="fn">test_negative_amount_rejected</span>(self):
+        <span class="kw">with</span> self.<span class="fn">assertRaises</span>(ValueError):
+            <span class="fn">make</span>(-<span class="num">1</span>, <span class="str">"طعام"</span>)
+
+    <span class="kw">def</span> <span class="fn">test_valid_categories</span>(self):
+        <span class="kw">for</span> category <span class="kw">in</span> [<span class="str">"طعام"</span>, <span class="str">"فواتير"</span>, <span class="str">"أخرى"</span>]:
+            <span class="kw">with</span> self.<span class="fn">subTest</span>(category=category):
+                self.<span class="fn">assertEqual</span>(<span class="fn">make</span>(<span class="num">10</span>, category).category, category)
+
+
+unittest.<span class="fn">main</span>(verbosity=<span class="num">2</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>test_negative_amount_rejected (__main__.ReportTests.test_negative_amount_rejected) ... ok
+test_over_budget_alert (__main__.ReportTests.test_over_budget_alert) ... ok
+test_totals_sorted_descending (__main__.ReportTests.test_totals_sorted_descending) ... ok
+test_valid_categories (__main__.ReportTests.test_valid_categories) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+OK</pre>
+</div>
+</section>
+
+<section class="section-card" id="quality">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-gem"></i>
+        جودة الكود
+    </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الممارسة</th><th>الأداة / الطريقة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>تنسيق موحد للكود (PEP 8)</td><td><code>pip install ruff</code> ثم <code>ruff format .</code> و <code>ruff check .</code></td></tr>
+                    <tr><td>تلميحات الأنواع</td><td><code>def add(e: Expense) -&gt; int:</code> مع <code>mypy</code> للفحص</td></tr>
+                    <tr><td>توثيق الدوال</td><td>Docstrings بين <code>"""..."""</code> لكل كلاس ودالة عامة</td></tr>
+                    <tr><td>السجلات بدل print</td><td>وحدة <code>logging</code> لتتبع ما يحدث في الإنتاج</td></tr>
+                    <tr><td>الأسرار</td><td>متغيرات البيئة وملف <code>.env</code> في <code>.gitignore</code></td></tr>
+                    <tr><td>رسائل Commit واضحة</td><td><code>Add monthly budget alerts</code> بدل <code>update</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>logging_demo.py</span>
+    </div>
+<pre><span class="kw">import</span> logging
+<span class="kw">import</span> sys
+
+logging.<span class="fn">basicConfig</span>(level=logging.INFO, stream=sys.stdout,
+                    format=<span class="str">"%(levelname)s | %(name)s | %(message)s"</span>)
+log = logging.<span class="fn">getLogger</span>(<span class="str">"expenses"</span>)
+
+log.<span class="fn">info</span>(<span class="str">"تمت إضافة مصروف بقيمة %s ريال"</span>, <span class="num">120</span>)
+log.<span class="fn">warning</span>(<span class="str">"استهلكت %d%% من ميزانية الطعام"</span>, <span class="num">85</span>)
+log.<span class="fn">debug</span>(<span class="str">"هذه الرسالة لن تظهر لأن المستوى INFO"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>INFO | expenses | تمت إضافة مصروف بقيمة 120 ريال
+WARNING | expenses | استهلكت 85% من ميزانية الطعام</pre>
+</div>
+</section>
+
+<section class="section-card" id="plan">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-calendar-alt"></i>
+        خطة العمل ومعايير التقييم
+    </h2>
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> خطة مقترحة لأربعة أسابيع</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>الأسبوع</th><th>المهام</th><th>المخرج</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>اختيار الفكرة، كتابة المتطلبات، تصميم الكلاسات، تجهيز المستودع</td><td>هيكل المشروع + نماذج البيانات</td></tr>
+                    <tr><td>2</td><td>التخزين والمنطق الأساسي واختباراته</td><td>نسخة MVP تعمل</td></tr>
+                    <tr><td>3</td><td>الواجهة (CLI أو API)، معالجة الأخطاء، الميزات الإضافية</td><td>تطبيق مكتمل</td></tr>
+                    <tr><td>4</td><td>التحسين، التوثيق، README، فيديو عرض قصير، النشر</td><td>مشروع منشور على GitHub</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="sub-title"><i class="fas fa-circle" style="font-size:0.5em;"></i> معايير التقييم (100 درجة)</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المعيار</th><th>الدرجة</th><th>ماذا نبحث عنه؟</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>الوظائف تعمل كما هو مطلوب</td><td>25</td><td>كل الميزات المذكورة تعمل دون أخطاء</td></tr>
+                    <tr><td>التصميم والهيكلة</td><td>20</td><td>فصل المسؤوليات، كلاسات واضحة، وحدات منظمة</td></tr>
+                    <tr><td>جودة الكود</td><td>15</td><td>أسماء واضحة، بدون تكرار، تنسيق موحد، تلميحات أنواع</td></tr>
+                    <tr><td>معالجة الأخطاء والتحقق</td><td>10</td><td>لا يتوقف البرنامج بسبب إدخال خاطئ</td></tr>
+                    <tr><td>الاختبارات</td><td>15</td><td>اختبارات ذات معنى تغطي المنطق الأساسي</td></tr>
+                    <tr><td>التوثيق و README</td><td>10</td><td>يستطيع شخص آخر تشغيل المشروع بسهولة</td></tr>
+                    <tr><td>Git والعرض</td><td>5</td><td>سجل commits منتظم وعرض واضح للمشروع</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="after">
+    <h2 class="section-title">
+        <span class="num">9</span>
+        <i class="fas fa-road"></i>
+        ماذا بعد مسار Python؟
+    </h2>
+        <div class="function-types">
+            <div class="function-card">
+                <h4><i class="fas fa-globe"></i> تطوير الويب</h4>
+                <p>تعمّق في Django أو FastAPI مع قواعد البيانات والنشر، من خلال تخصص الويب في المنصة.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-chart-bar"></i> تحليل البيانات و AI</h4>
+                <p>Pandas، الرسوم البيانية، الإحصاء، ثم تعلم الآلة بـ scikit-learn.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-robot"></i> الأتمتة</h4>
+                <p>أتمتة الملفات والبريد والمتصفح والتقارير لتوفير ساعات من العمل.</p>
+            </div>
+            <div class="function-card">
+                <h4><i class="fas fa-shield-alt"></i> الأمن السيبراني</h4>
+                <p>كتابة أدوات فحص وتحليل شبكات وسكربتات أمنية تعليمية.</p>
+            </div>
+        </div>
+        <div class="alert alert-tip">
+            <i class="fas fa-trophy"></i>
+            <div>
+                <strong>🎉 مبروك!</strong> إذا وصلت إلى هنا وأنجزت مشروعك، فأنت لم تعد مبتدئًا. استمر في البناء، وشارك مشاريعك،
+                وساهم في مشاريع مفتوحة المصدر. أفضل طريقة لتعلم البرمجة هي <strong>أن تبرمج كل يوم</strong>.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">10</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! علامة &lt;code&gt;?&lt;/code&gt; تجعل المكتبة تمرر القيمة بأمان وتمنع SQL Injection." data-hint="لا تبنِ استعلام SQL بدمج النصوص أبدًا.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">أمان SQL</span>
+    </div>
+    <p class="exercise-question">أي طريقة هي <strong>الآمنة</strong> لتمرير اسم المستخدم إلى استعلام SQL؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>conn.execute(f"SELECT * FROM users WHERE name = '{name}'")</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="2"> <code>conn.execute("SELECT * FROM users WHERE name = ?", (name,))</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="3"> <code>conn.execute("SELECT * FROM users WHERE name = " + name)</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>conn.execute("SELECT * FROM users WHERE name = %s" % name)</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! أنت جاهز لبناء مشروع تخرج احترافي." data-hint="&lt;code&gt;venv&lt;/code&gt; والأسرار تُستثنى عبر &lt;code&gt;.gitignore&lt;/code&gt;، و README واجهة مشروعك للعالم.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">المشروع الصغير المكتمل أفضل من مشروع ضخم غير مكتمل.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">يجب رفع مجلد <code>venv</code> وملف <code>.env</code> إلى GitHub.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>sqlite3</code> مدمجة في Python ولا تحتاج تثبيتًا.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>@dataclass(frozen=True)</code> تمنع تعديل الكائن بعد إنشائه.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement">ملف README غير مهم ما دام الكود يعمل.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="رائع! الترفيه تجاوز الميزانية (120 من 100)، والفواتير وصلت 83% فظهر تنبيهان." data-hint="التنبيه يظهر عند تجاوز الميزانية أو عند الوصول إلى 80% منها، والترتيب تنازلي حسب المبلغ.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">ماذا سيطبع؟</span>
+    </div>
+    <p class="exercise-question">باستخدام <code>BudgetReport</code> من المثال المحلول، ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre>r = <span class="fn">BudgetReport</span>([<span class="fn">Expense</span>(<span class="num">80</span>, <span class="str">"ترفيه"</span>, <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">5</span>, <span class="num">1</span>)),
+                  <span class="fn">Expense</span>(<span class="num">40</span>, <span class="str">"ترفيه"</span>, <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">5</span>, <span class="num">9</span>)),
+                  <span class="fn">Expense</span>(<span class="num">500</span>, <span class="str">"فواتير"</span>, <span class="fn">date</span>(<span class="num">2025</span>, <span class="num">5</span>, <span class="num">3</span>))],
+                 {<span class="str">"ترفيه"</span>: <span class="num">100</span>, <span class="str">"فواتير"</span>: <span class="num">600</span>})
+<span class="fn">print</span>(r.<span class="fn">totals</span>()[<span class="str">"ترفيه"</span>])
+<span class="fn">print</span>(<span class="fn">len</span>(r.<span class="fn">alerts</span>()))
+<span class="fn">print</span>(<span class="fn">list</span>(r.<span class="fn">totals</span>())[<span class="num">0</span>])</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر الأول:</span><input type="text" class="blank-input" data-answers="120||120.0" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثاني:</span><input type="text" class="blank-input" data-answers="2" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر الثالث:</span><input type="text" class="blank-input" data-answers="فواتير" placeholder="..." style="min-width:114px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذه أساسيات SQLite التي تحتاجها في مشروعك." data-hint="الاتصال بـ &lt;code&gt;connect&lt;/code&gt;، والقيم بعلامة &lt;code&gt;?&lt;/code&gt;، وجلب كل النتائج بـ &lt;code&gt;fetchall&lt;/code&gt;.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">SQLite</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لإنشاء قاعدة بيانات وإضافة صف بأمان:</p>
+    <div class="code-fill">
+        <div class="line"><span><span class="kw">import</span> </span><input type="text" class="blank-input" data-answers="sqlite3" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span>conn = sqlite3.</span><input type="text" class="blank-input" data-answers="connect" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"><span>(<span class="str">'app.db'</span>)</span></div>
+        <div class="line"><span>conn.<span class="fn">execute</span>(<span class="str">'CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, text TEXT)'</span>)</span></div>
+        <div class="line"><span><span class="kw">with</span> conn:</span></div>
+        <div class="line"><span>    conn.<span class="fn">execute</span>('INSERT INTO <span class="fn">notes</span> (text) <span class="fn">VALUES</span> (</span><input type="text" class="blank-input" data-answers="?" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"><span>)<span class="str">', ('</span>مرحبًا',))</span></div>
+        <div class="line"><span>rows = conn.<span class="fn">execute</span>(<span class="str">'SELECT * FROM notes'</span>).</span><input type="text" class="blank-input" data-answers="fetchall" placeholder="..." style="min-width:142px;" autocomplete="off" spellcheck="false"><span>()</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب ممتاز! اتبع هذه الخطة وستنجز مشروعك بثقة." data-hint="خطط أولًا، ثم ابنِ النواة، ثم وسّع، ثم انشر.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب مراحل تنفيذ مشروع التخرج. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">4) إضافة الواجهة والميزات ومعالجة الأخطاء</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">1) اختيار الفكرة وكتابة المتطلبات</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">5) التوثيق والنشر على GitHub</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">3) بناء MVP مع اختباراته</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">2) تصميم الكلاسات وتجهيز المستودع و venv</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> قائمة تحقق مشروع التخرج</div>
+    <p style="color:var(--text-light); font-size:0.95em;">استخدم هذه القائمة أثناء عملك على المشروع. علّم ما أنجزته لترى تقدمك وتقديرك المتوقع حسب معايير التقييم (تُحفظ اختياراتك في متصفحك إن أمكن).</p>
+    <div id="capList"></div>
+    <div class="progress-bar" style="margin-top:14px;"><div class="progress-fill" id="capFill"></div></div>
+    <div class="lab-console" id="capConsole" style="direction:rtl; text-align:right; font-family:Cairo, sans-serif; min-height:0;"></div>
+    <div class="lab-row"><button class="btn btn-secondary" onclick="capReset()"><i class="fas fa-redo"></i> مسح الاختيارات</button></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">11</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> ما يميز مشروع التخرج: مكتمل، منظم، مختبر، موثق، ومنشور.</li>
+                <li><i class="fas fa-check"></i> أفكار مشاريع متنوعة بمستويات صعوبة مختلفة، وفكرة MVP.</li>
+                <li><i class="fas fa-check"></i> المتطلبات الإلزامية ومعايير التقييم بالدرجات.</li>
+                <li><i class="fas fa-check"></i> تجهيز المشروع: venv، هيكل المجلدات، .gitignore، requirements، README، و Git.</li>
+                <li><i class="fas fa-check"></i> مثال محلول بقاعدة بيانات SQLite وطبقات واضحة وتحقق ذاتي للبيانات.</li>
+                <li><i class="fas fa-check"></i> كتابة الاختبارات بـ pytest، وأدوات جودة الكود و logging.</li>
+                <li><i class="fas fa-check"></i> خطة عمل لأربعة أسابيع، والمسارات التالية بعد Python.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> ابدأ اليوم بنسخة صغيرة تعمل، ثم حسّنها كل يوم.</li>
+                <li><i class="fas fa-lightbulb"></i> اعمل commit بعد كل ميزة صغيرة برسالة واضحة.</li>
+                <li><i class="fas fa-lightbulb"></i> اطلب من صديق تشغيل مشروعك من README فقط؛ إن نجح فالتوثيق ممتاز.</li>
+                <li><i class="fas fa-lightbulb"></i> سجّل فيديو قصيرًا (دقيقتان) يعرض المشروع وأضفه إلى README.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> 🎓 <strong>تهانينا على إنهاء مسار Python!</strong> اختر الآن أحد <strong>التخصصات</strong> لتتعمق فيه، وابدأ مشروع تخرجك.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="project3.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى: مشروع 3 — أداة التقارير</span>
+        </a>
+        <a href="../index.html" class="nav-link next">
+            <span>العودة إلى صفحة المستوى المتقدم</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · مشروع التخرج
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '100%';
+            text.textContent = '100% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== قائمة تحقق التخرج ========== */
+    const CAP_ITEMS = [
+        ['اخترت الفكرة وكتبت قائمة الميزات', 'الوظائف', 5],
+        ['كل الميزات الأساسية تعمل', 'الوظائف', 20],
+        ['قسّمت المشروع إلى وحدات بمسؤوليات واضحة', 'التصميم', 10],
+        ['استخدمت كلاسات / dataclasses', 'التصميم', 10],
+        ['أسماء واضحة وتنسيق موحد (ruff)', 'الجودة', 8],
+        ['تلميحات أنواع و docstrings', 'الجودة', 7],
+        ['التحقق من المدخلات ومعالجة الأخطاء', 'الأخطاء', 10],
+        ['5 اختبارات آلية أو أكثر تنجح', 'الاختبارات', 15],
+        ['README بالتثبيت والاستخدام والأمثلة', 'التوثيق', 10],
+        ['منشور على GitHub بسجل commits منتظم', 'Git', 5],
+    ];
+    const CAP_KEY = 'codeway-capstone-checklist';
+
+    function capLoad() {
+        try { return JSON.parse(localStorage.getItem(CAP_KEY) || '[]'); } catch (e) { return []; }
+    }
+
+    function capSave(done) {
+        try { localStorage.setItem(CAP_KEY, JSON.stringify(done)); } catch (e) { /* التخزين غير متاح */ }
+    }
+
+    function capRender() {
+        const done = capLoad();
+        document.getElementById('capList').innerHTML = CAP_ITEMS.map(([text, cat, pts], i) => `
+            <label class="option" style="margin-bottom:8px;">
+                <input type="checkbox" ${done.includes(i) ? 'checked' : ''} onchange="capToggle(${i}, this.checked)">
+                <span style="flex:1;">${text}</span>
+                <span class="exercise-tag">${cat} · ${pts}</span>
+            </label>`).join('');
+        capUpdate();
+    }
+
+    function capToggle(i, on) {
+        let done = capLoad().filter(x => x !== i);
+        if (on) done.push(i);
+        capSave(done);
+        capUpdate();
+    }
+
+    function capUpdate() {
+        const done = Array.from(document.querySelectorAll('#capList input')).map((c, i) => c.checked ? i : -1).filter(i => i >= 0);
+        const score = done.reduce((a, i) => a + CAP_ITEMS[i][2], 0);
+        document.getElementById('capFill').style.width = score + '%';
+        const level = score >= 90 ? '🏆 ممتاز — مشروعك جاهز للعرض!' : score >= 75 ? '🌟 جيد جدًا — بقيت لمسات أخيرة' : score >= 50 ? '💪 في منتصف الطريق' : '🚀 بداية موفقة، استمر!';
+        document.getElementById('capConsole').innerHTML = `أنجزت ${done.length} من ${CAP_ITEMS.length} بنود — التقدير المتوقع: <strong>${score} / 100</strong><br>${level}`;
+    }
+
+    function capReset() {
+        capSave([]);
+        capRender();
+    }
+
+    document.addEventListener('DOMContentLoaded', capRender);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -40,7 +40,7 @@
           ${steps.map((c, i) => {
             const cp = CW.progress.percent(c.id);
             return `<div class="t-item${cp === 100 ? " done" : ""}" data-n="${i + 1}">
-              <a class="card tinted" style="--c:${c.color}" href="course.html?id=${c.id}">
+              <a class="card tinted" style="--c:${c.color}" href="${CW.courseHref(c.id)}">
                 <div class="card-top"><span class="lang-badge" style="background:${c.color}">${CW.esc(c.short)}</span>
                   <div><span class="muted" style="font-size:13px">الخطوة ${i + 1} · ${c.kind || "لغة برمجة"}</span><h3>${CW.esc(c.name)}</h3></div></div>
                 <p>${CW.esc(c.desc)}</p>
@@ -62,7 +62,7 @@
         <h3>تقدّمك في المسار</h3>
         <div class="progress"><i style="width:${pct}%"></i></div>
         <span class="muted">أنجزت ${done} من ${lessons} درساً (${pct}%)</span>
-        <a class="btn btn-primary" href="course.html?id=${(steps.find(c => CW.progress.percent(c.id) < 100) || steps[0]).id}">${done ? "تابع المسار" : "ابدأ المسار"}</a>
+        <a class="btn btn-primary" href="${CW.courseHref((steps.find(c => CW.progress.percent(c.id) < 100) || steps[0]).id)}">${done ? "تابع المسار" : "ابدأ المسار"}</a>
         <h4 style="margin:10px 0 0">🛠️ مشاريع المسار</h4>
         <ul class="check-list" style="margin:0">${p.projects.map(x => `<li>${x}</li>`).join("")}</ul>
         <h4 style="margin:6px 0 0">🎓 مشروع التخرج</h4>

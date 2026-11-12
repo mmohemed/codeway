@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الدرس 8: نظام التشغيل والعمليات | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-soft: #d4af37;
+            --bg: #000;
+            --card: #101010;
+            --card-soft: #161616;
+            --text: #fff;
+            --text-light: #d8d8d8;
+            --text-muted: #a0a0a0;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05em;
+        }
+
+        .logo i { font-size: 1.2rem; }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb span.sep { margin: 0 6px; color: #666; }
+
+        /* ===== هيدر الدرس ===== */
+        .page-hero {
+            padding: 130px 30px 55px;
+            background: radial-gradient(circle at top, #1f1f1f 0%, #000 70%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,215,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,215,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+
+        .page-hero-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            font-size: 0.8em;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .lesson-title {
+            margin: 0 0 14px;
+            font-size: 2.3em;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+            line-height: 1.4;
+        }
+
+        .lesson-intro {
+            font-size: 1.02em;
+            color: var(--text-light);
+            max-width: 780px;
+            margin: 0 auto 22px;
+        }
+
+        .lesson-meta {
+            font-size: 0.9em;
+            color: #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lesson-meta-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 30px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ===== فهرس ===== */
+        .toc-bar {
+            background: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+
+        .toc-bar h3 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .toc-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.86em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s;
+        }
+
+        .toc-links a:hover {
+            color: var(--gold);
+            background: rgba(255,215,0,0.08);
+            border-color: rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ===== بطاقات الأقسام ===== */
+        .section-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px 40px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+            opacity: 0.7;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+        }
+
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            font-size: 0.85em;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .section-title i { font-size: 1.1rem; color: var(--gold); }
+
+        .section-card p {
+            font-size: 1em;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        .section-card strong { color: var(--gold); }
+
+        .sub-title {
+            color: var(--gold-soft);
+            font-size: 1.15em;
+            margin: 22px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title i { color: var(--gold); font-size: 0.95em; }
+
+        /* ===== قوائم ===== */
+        .list { list-style: none; padding: 0; margin: 14px 0; }
+
+        .list li {
+            position: relative;
+            padding: 10px 34px 10px 16px;
+            margin-bottom: 8px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.96em;
+            color: var(--text-light);
+        }
+
+        .list li::before {
+            content: "\f0da";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 0.75em;
+        }
+
+        /* ===== كتل الكود ===== */
+        .code-block {
+            margin: 16px 0;
+            background: #050505;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d0d0d;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .code-header .lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.94em;
+            direction: ltr;
+            text-align: left;
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+
+        pre .kw { color: #ff79c6; }
+        pre .fn { color: #8be9fd; }
+        pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; }
+        pre .num { color: #bd93f9; }
+
+        /* ===== مخرجات ===== */
+        .output-block {
+            margin: 12px 0 16px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.08);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 0.8em;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .output-block pre {
+            padding: 16px 20px;
+            color: #c8e6c9;
+            font-size: 0.92em;
+        }
+
+        /* ===== تنبيهات ===== */
+        .alert {
+            margin: 16px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.94em;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.85;
+        }
+
+        .alert i { margin-top: 6px; font-size: 1.1em; flex-shrink: 0; }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.08);
+            border-right: 4px solid var(--info);
+            color: #bbdefb;
+        }
+        .alert-info i { color: var(--info); }
+
+        .alert-tip {
+            background: rgba(76, 175, 80, 0.08);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .alert-tip i { color: var(--success); }
+
+        .alert-warn {
+            background: rgba(255, 152, 0, 0.08);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .alert-warn i { color: var(--warning); }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        th {
+            background: #141414;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.97em;
+        }
+
+        td { color: var(--text-light); }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+        code {
+            background: rgba(255,215,0,0.08);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* ===== بطاقات أنواع الدوال ===== */
+        .function-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .function-card {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 4px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--gold-soft);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.1);
+        }
+
+        .function-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .function-card h4 i { font-size: 1.15em; }
+
+        .function-card p {
+            font-size: 0.93em;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== صناديق ملاحظة ===== */
+        .note-box {
+            background: var(--card-soft);
+            border-radius: 12px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            margin: 16px 0;
+        }
+
+        .note-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.02em;
+        }
+
+        .note-box ul { list-style: none; padding: 0; margin: 0; }
+
+        .note-box li {
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-light);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .note-box li:last-child { border-bottom: none; }
+
+        .note-box li i { color: var(--gold); margin-top: 7px; flex-shrink: 0; }
+
+        /* ===== التمارين ===== */
+        .exercise-block {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            position: relative;
+        }
+
+        .exercise-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: 24px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .exercise-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .exercise-head h4 {
+            color: var(--gold);
+            font-size: 1.1em;
+            margin: 0;
+            flex: 1;
+        }
+
+        .exercise-tag {
+            font-size: 0.72em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+        }
+
+        .exercise-question {
+            color: var(--text-light);
+            font-size: 0.98em;
+            margin-bottom: 14px;
+            line-height: 1.85;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .option input {
+            accent-color: var(--gold);
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.12);
+            border-color: var(--success);
+        }
+
+        .option.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* صح/خطأ */
+        .tf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            flex-wrap: wrap;
+        }
+
+        .tf-statement {
+            font-size: 0.95em;
+            color: var(--text-light);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .tf-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .tf-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .tf-btn.selected {
+            background: rgba(255,215,0,0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tf-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .tf-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* أكمل الكود */
+        .code-fill {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #050505;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            font-family: Consolas, monospace;
+            direction: ltr;
+            font-size: 0.95em;
+            margin-bottom: 14px;
+            color: #f5f5f5;
+            line-height: 2.3;
+        }
+
+        .code-fill .line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-fill .cm { color: #6272a4; font-style: italic; }
+        .code-fill .str { color: #f1fa8c; }
+        .code-fill .fn { color: #8be9fd; }
+        .code-fill .kw { color: #ff79c6; }
+
+        .blank-input {
+            background: rgba(255,215,0,0.08);
+            border: 2px dashed var(--gold);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--gold);
+            font-family: Consolas, monospace;
+            font-size: 0.95em;
+            min-width: 100px;
+            width: auto;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .blank-input:focus {
+            background: rgba(255,215,0,0.15);
+            border-style: solid;
+        }
+
+        .blank-input.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: var(--success);
+            color: #a5d6a7;
+        }
+
+        .blank-input.wrong {
+            background: rgba(244, 67, 54, 0.12);
+            border-color: var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ترتيب الكود */
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px;
+            font-family: Consolas, monospace;
+            font-size: 0.92em;
+            direction: ltr;
+            text-align: left;
+            cursor: default;
+        }
+
+        .sortable-item .order-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: "Cairo", sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sortable-item.correct {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--success);
+        }
+
+        .sortable-item.wrong {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--danger);
+        }
+
+        .sort-arrows { display: flex; gap: 6px; }
+
+        .sort-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* أزرار التمرين */
+        .exercise-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Cairo", sans-serif;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .result-msg {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 0.93em;
+            display: none;
+        }
+
+        .result-msg.show { display: block; }
+        .result-msg.ok {
+            background: rgba(76, 175, 80, 0.15);
+            border-right: 4px solid var(--success);
+            color: #c8e6c9;
+        }
+        .result-msg.mid {
+            background: rgba(255, 152, 0, 0.15);
+            border-right: 4px solid var(--warning);
+            color: #ffe0b2;
+        }
+        .result-msg.bad {
+            background: rgba(244, 67, 54, 0.12);
+            border-right: 4px solid var(--danger);
+            color: #ef9a9a;
+        }
+
+        /* ===== التنقل ===== */
+        .nav-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            text-decoration: none;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.3s;
+            font-size: 0.94em;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .nav-link.next { justify-content: flex-end; text-align: left; }
+
+        /* ===== شريط التقدم ===== */
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,215,0,0.2);
+        }
+
+        .progress-section h4 {
+            color: var(--gold);
+            font-size: 1.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.87em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.87em;
+            color: var(--text-muted);
+        }
+
+        /* ===== تجاوب ===== */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .page-hero { padding: 150px 20px 40px; }
+            .lesson-title { font-size: 1.7em; }
+            .container { padding: 25px 18px 55px; }
+            .section-card { padding: 24px 20px; }
+            .section-title { font-size: 1.2em; }
+            .nav-links { grid-template-columns: 1fr; }
+            .tf-item { flex-direction: column; align-items: stretch; }
+            .tf-actions { justify-content: flex-end; }
+            .function-types { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .lesson-title { font-size: 1.4em; }
+        }
+
+        /* ===== المختبر التفاعلي ===== */
+        .lab {
+            margin-top: 18px;
+            background: linear-gradient(135deg, #101820 0%, #0a0a0a 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid rgba(33, 150, 243, 0.35);
+        }
+        .lab-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #90caf9;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lab-row label { color: var(--text-light); font-size: 0.92em; }
+        .lab-input, .lab-select {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: Consolas, "Cairo", monospace;
+            font-size: 0.95em;
+            min-width: 120px;
+            outline: none;
+        }
+        .lab-input:focus, .lab-select:focus { border-color: var(--gold); }
+        .lab-console {
+            margin-top: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            min-height: 60px;
+            padding: 14px 18px;
+            font-family: Consolas, monospace;
+            direction: ltr;
+            text-align: left;
+            color: #c8e6c9;
+            white-space: pre-wrap;
+            font-size: 0.92em;
+            line-height: 1.8;
+        }
+        .lab-console .err { color: #ef9a9a; }
+        .lab-console .prompt { color: var(--gold); }
+        .output-block pre.err-out { color: #ef9a9a; }
+        .figure-block {
+            margin: 12px 0 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            overflow: hidden;
+            background: #0d1117;
+        }
+        .figure-block .output-header { border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
+        .figure-block img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== شريط التنقل ===== -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-code"></i>
+        <span>CodeWay · Python</span>
+    </div>
+    <div class="breadcrumb">
+        <a href="../../../index.html">مسار بايثون</a>
+        <span class="sep">/</span>
+        <a href="../index.html">تخصص الأتمتة</a>
+        <span class="sep">/</span>
+        <span>نظام التشغيل</span>
+    </div>
+</nav>
+
+<!-- ===== هيدر الدرس ===== -->
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <div class="lesson-badge">
+            <i class="fas fa-microchip"></i>
+            الدرس 8 · النظام
+        </div>
+        <h1 class="lesson-title">نظام التشغيل والعمليات</h1>
+        <p class="lesson-intro">
+            بايثون يستطيع أن يكون «قائد الأوركسترا» الذي يشغّل البرامج الأخرى: Git، وأدوات الضغط، وتحويل الفيديو، وأوامر النظام. في هذا الدرس ستتعلم <strong>متغيرات البيئة</strong> و<strong>المسارات التي تعمل على كل الأنظمة</strong>، وتشغيل البرامج بـ <strong>subprocess</strong> وقراءة نتائجها وأخطائها، و<strong>تشغيل عدة عمليات بالتوازي</strong>، و<strong>مراقبة النظام</strong>، وأهم درس أمني في الأتمتة: <strong>حقن الأوامر</strong> وكيف تتجنبه.
+        </p>
+        <div class="lesson-meta">
+            <div class="lesson-meta-item"><i class="fas fa-clock"></i> ⏱ 70 دقيقة</div>
+            <div class="lesson-meta-item"><i class="fas fa-bullseye"></i> 🎯 بايثون يشغّل البرامج الأخرى</div>
+            <div class="lesson-meta-item"><i class="fas fa-layer-group"></i> 🧱 تخصص</div>
+            <div class="lesson-meta-item"><i class="fas fa-check-circle"></i> بعد الدرس 7</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== المحتوى ===== -->
+<main class="container">
+
+    <!-- فهرس -->
+    <div class="toc-bar">
+        <h3><i class="fas fa-list"></i> محتويات الدرس</h3>
+        <div class="toc-links">
+            <a href="#env">1. متغيرات البيئة</a>
+            <a href="#paths">2. المسارات والأنظمة</a>
+            <a href="#subprocess">3. subprocess</a>
+            <a href="#git">4. أتمتة Git</a>
+            <a href="#parallel">5. التوازي</a>
+            <a href="#monitor">6. مراقبة النظام</a>
+            <a href="#security">7. حقن الأوامر</a>
+            <a href="#exercises">8. تمارين تفاعلية</a>
+            <a href="#summary">9. الخلاصة</a>
+        </div>
+    </div>
+
+<section class="section-card" id="env">
+    <h2 class="section-title">
+        <span class="num">1</span>
+        <i class="fas fa-sliders-h"></i>
+        متغيرات البيئة والإعدادات
+    </h2>
+        <p>
+            <strong>متغيرات البيئة</strong> قيم يحملها نظام التشغيل لكل عملية: <code>PATH</code> (أين يبحث عن البرامج)، و <code>HOME</code>، وأي إعداد تضيفه أنت.
+            هي الطريقة القياسية لتمرير الإعدادات والأسرار لسكربت دون تعديل كوده — بين جهازك والخادم مثلًا.
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>env_config.py</span>
+    </div>
+<pre><span class="kw">import</span> os
+
+os.environ[<span class="str">"REPORT_DAYS"</span>] = <span class="str">"7"</span>            <span class="cm"># في الواقع: تُضبط في الطرفية أو ملف .env أو المجدول</span>
+os.environ[<span class="str">"DRY_RUN"</span>] = <span class="str">"yes"</span>
+
+<span class="cm"># القيم دائمًا نصوص — حوّلها بنفسك وضع قيمًا افتراضية</span>
+days = <span class="fn">int</span>(os.environ.<span class="fn">get</span>(<span class="str">"REPORT_DAYS"</span>, <span class="str">"1"</span>))
+dry_run = os.environ.<span class="fn">get</span>(<span class="str">"DRY_RUN"</span>, <span class="str">"no"</span>).<span class="fn">lower</span>() <span class="kw">in</span> {<span class="str">"1"</span>, <span class="str">"true"</span>, <span class="str">"yes"</span>}
+mode = os.environ.<span class="fn">get</span>(<span class="str">"APP_MODE"</span>, <span class="str">"development"</span>)
+<span class="fn">print</span>(<span class="str">f"الأيام={days} ({type(days).__name__}) | تجربة={dry_run} | الوضع={mode}"</span>)
+
+<span class="kw">try</span>:
+    token = os.environ[<span class="str">"API_TOKEN"</span>]          <span class="cm"># إعداد إلزامي: الأفضل أن يفشل بوضوح</span>
+<span class="kw">except</span> KeyError:
+    <span class="fn">print</span>(<span class="str">"❌ المتغير API_TOKEN غير مضبوط. أضفه إلى ملف .env"</span>)
+
+<span class="fn">print</span>(<span class="str">"فاصل مجلدات PATH على هذا النظام:"</span>, <span class="fn">repr</span>(os.pathsep))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>الأيام=7 (int) | تجربة=True | الوضع=development
+❌ المتغير API_TOKEN غير مضبوط. أضفه إلى ملف .env
+فاصل مجلدات PATH على هذا النظام: ':'</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المهمة</th><th>Windows (cmd)</th><th>Linux / macOS</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>ضبط متغير للجلسة الحالية</td><td><code>set REPORT_DAYS=7</code></td><td><code>export REPORT_DAYS=7</code></td></tr>
+                    <tr><td>ضبطه دائمًا</td><td><code>setx REPORT_DAYS 7</code></td><td>أضف سطر export إلى <code>~/.bashrc</code></td></tr>
+                    <tr><td>عرضه</td><td><code>echo %REPORT_DAYS%</code></td><td><code>echo $REPORT_DAYS</code></td></tr>
+                    <tr><td>فاصل PATH (<code>os.pathsep</code>)</td><td><code>;</code></td><td><code>:</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="paths">
+    <h2 class="section-title">
+        <span class="num">2</span>
+        <i class="fas fa-route"></i>
+        سكربت واحد لكل الأنظمة
+    </h2>
+        <p>
+            زميلك يستخدم Windows، والخادم Linux، وأنت macOS. لا تكتب المسارات كنصوص بشرطة مائلة معينة؛ استخدم <code>pathlib</code> وستتولى الفرق:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>cross_platform.py</span>
+    </div>
+<pre><span class="kw">import</span> platform
+<span class="kw">import</span> shutil
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path, PurePosixPath, PureWindowsPath
+
+parts = (<span class="str">"reports"</span>, <span class="str">"2025"</span>, <span class="str">"march.xlsx"</span>)
+<span class="fn">print</span>(<span class="str">"Windows:"</span>, <span class="fn">PureWindowsPath</span>(<span class="str">"C:/Users/sara"</span>, *parts))
+<span class="fn">print</span>(<span class="str">"Linux  :"</span>, <span class="fn">PurePosixPath</span>(<span class="str">"/home/sara"</span>, *parts))
+<span class="fn">print</span>(<span class="str">"هنا    :"</span>, <span class="fn">type</span>(Path.<span class="fn">home</span>()).__name__)                  <span class="cm"># WindowsPath أو PosixPath تلقائيًا</span>
+
+<span class="fn">print</span>(<span class="str">"النظام معروف؟"</span>, platform.<span class="fn">system</span>() <span class="kw">in</span> {<span class="str">"Windows"</span>, <span class="str">"Linux"</span>, <span class="str">"Darwin"</span>})
+
+<span class="cm"># هل البرنامج مثبت؟ shutil.which تبحث في PATH كما تفعل الطرفية</span>
+<span class="kw">for</span> program <span class="kw">in</span> [<span class="str">"git"</span>, <span class="str">"program-that-does-not-exist"</span>]:
+    <span class="fn">print</span>(<span class="str">f"{program}: {'✅ موجود' if shutil.which(program) else '❌ غير مثبت'}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>Windows: C:\Users\sara\reports\2025\march.xlsx
+Linux  : /home/sara/reports/2025/march.xlsx
+هنا    : PosixPath
+النظام معروف؟ True
+git: ✅ موجود
+program-that-does-not-exist: ❌ غير مثبت</pre>
+</div>
+        <p>وعندما تحتاج سلوكًا مختلفًا لكل نظام، افحص <code>platform.system()</code> أو <code>sys.platform</code>:</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>open_file.py</span>
+    </div>
+<pre><span class="kw">import</span> os
+<span class="kw">import</span> platform
+<span class="kw">import</span> subprocess
+
+
+<span class="kw">def</span> <span class="fn">open_with_default_app</span>(path):
+    <span class="str">"""يفتح الملف بالبرنامج الافتراضي (Excel للتقرير، المتصفح لـ HTML...)."""</span>
+    system = platform.<span class="fn">system</span>()
+    <span class="kw">if</span> system == <span class="str">"Windows"</span>:
+        os.<span class="fn">startfile</span>(path)                          <span class="cm"># موجودة في Windows فقط</span>
+    <span class="kw">elif</span> system == <span class="str">"Darwin"</span>:                        <span class="cm"># macOS</span>
+        subprocess.<span class="fn">run</span>([<span class="str">"open"</span>, path], check=<span class="kw">True</span>)
+    <span class="kw">else</span>:                                           <span class="cm"># Linux</span>
+        subprocess.<span class="fn">run</span>([<span class="str">"xdg-open"</span>, path], check=<span class="kw">True</span>)
+
+
+<span class="fn">open_with_default_app</span>(<span class="str">"report.xlsx"</span>)</pre>
+</div>
+        <div class="alert alert-tip">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>قواعد التوافق:</strong> اكتب الملفات دائمًا بـ <code>encoding="utf-8"</code> (ترميز Windows الافتراضي قد يختلف)، واستخدم
+                <code>newline=""</code> مع ملفات CSV، ولا تفترض حساسية أسماء الملفات لحالة الأحرف (Windows لا يفرّق بين <code>Report.txt</code> و <code>report.txt</code>).
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="subprocess">
+    <h2 class="section-title">
+        <span class="num">3</span>
+        <i class="fas fa-terminal"></i>
+        تشغيل البرامج بـ subprocess
+    </h2>
+        <p>
+            <code>subprocess.run</code> تشغّل برنامجًا آخر، وتنتظره، وتعيد لك نتيجته. القاعدة الذهبية: <strong>مرّر الأمر كقائمة</strong> — كل جزء عنصر مستقل.
+            في الأمثلة نشغّل بايثون نفسه (<code>sys.executable</code>) لأنه موجود على كل جهاز، لكن الطريقة واحدة لأي برنامج:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>run_basics.py</span>
+    </div>
+<pre><span class="kw">import</span> subprocess
+<span class="kw">import</span> sys
+
+<span class="cm"># 1) تشغيل والتقاط المخرجات</span>
+r = subprocess.<span class="fn">run</span>([sys.executable, <span class="str">"-c"</span>, <span class="str">"print('مرحبًا من عملية أخرى'); print(2 ** 10)"</span>],
+                   capture_output=<span class="kw">True</span>, text=<span class="kw">True</span>, encoding=<span class="str">"utf-8"</span>)
+<span class="fn">print</span>(<span class="str">"رمز الخروج:"</span>, r.returncode)
+<span class="fn">print</span>(<span class="str">"المخرجات:"</span>, r.stdout.<span class="fn">splitlines</span>())
+
+<span class="cm"># 2) برنامج فشل: check=True تحوّل الفشل إلى استثناء</span>
+<span class="kw">try</span>:
+    subprocess.<span class="fn">run</span>([sys.executable, <span class="str">"-c"</span>, <span class="str">"import sys; sys.exit('ملف الإدخال غير موجود')"</span>],
+                   capture_output=<span class="kw">True</span>, text=<span class="kw">True</span>, encoding=<span class="str">"utf-8"</span>, check=<span class="kw">True</span>)
+<span class="kw">except</span> subprocess.CalledProcessError <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="str">f"❌ فشل برمز {e.returncode}: {e.stderr.strip()}"</span>)
+
+<span class="cm"># 3) برنامج علق: timeout يقتله بعد المهلة</span>
+<span class="kw">try</span>:
+    subprocess.<span class="fn">run</span>([sys.executable, <span class="str">"-c"</span>, <span class="str">"import time; time.sleep(10)"</span>], timeout=<span class="num">0.5</span>)
+<span class="kw">except</span> subprocess.TimeoutExpired <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="str">f"⏱ تجاوز المهلة ({e.timeout} ث) وأُوقف"</span>)
+
+<span class="cm"># 4) برنامج غير مثبت أصلًا</span>
+<span class="kw">try</span>:
+    subprocess.<span class="fn">run</span>([<span class="str">"program-that-does-not-exist"</span>, <span class="str">"--version"</span>])
+<span class="kw">except</span> FileNotFoundError:
+    <span class="fn">print</span>(<span class="str">"❌ البرنامج غير موجود في PATH"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>رمز الخروج: 0
+المخرجات: ['مرحبًا من عملية أخرى', '1024']
+❌ فشل برمز 1: ملف الإدخال غير موجود
+⏱ تجاوز المهلة (0.5 ث) وأُوقف
+❌ البرنامج غير موجود في PATH</pre>
+</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>المعامل</th><th>الفائدة</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>capture_output=True</code></td><td>التقاط stdout و stderr بدل طباعتهما على الشاشة</td></tr>
+                    <tr><td><code>text=True, encoding="utf-8"</code></td><td>النتيجة نصوص لا بايتات، بترميز يدعم العربية</td></tr>
+                    <tr><td><code>check=True</code></td><td>يرفع <code>CalledProcessError</code> إذا كان رمز الخروج غير صفري</td></tr>
+                    <tr><td><code>timeout=60</code></td><td>يوقف البرنامج ويرفع <code>TimeoutExpired</code> بعد المهلة</td></tr>
+                    <tr><td><code>cwd="..."</code></td><td>مجلد العمل الذي يُشغَّل فيه البرنامج</td></tr>
+                    <tr><td><code>env={...}</code></td><td>متغيرات بيئة خاصة بالعملية (انسخ <code>os.environ</code> وعدّل عليها)</td></tr>
+                </tbody>
+            </table>
+        </div>
+</section>
+
+<section class="section-card" id="git">
+    <h2 class="section-title">
+        <span class="num">4</span>
+        <i class="fas fa-code-branch"></i>
+        مثال حقيقي: أتمتة Git
+    </h2>
+        <p>
+            لنشغّل أداة حقيقية: سكربت ينشئ مستودع Git، ويحفظ نسخة من ملفات التقارير كل يوم، ثم يقرأ السجل ويحلله. هذا أسلوب بسيط لحفظ
+            <strong>تاريخ كامل لتغيّرات ملفات الإعدادات أو التقارير</strong>:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>git_snapshot.py</span>
+    </div>
+<pre><span class="kw">import</span> subprocess
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+repo = <span class="fn">Path</span>(<span class="str">"reports_repo"</span>)
+repo.<span class="fn">mkdir</span>(exist_ok=<span class="kw">True</span>)
+
+
+<span class="kw">def</span> <span class="fn">git</span>(*args):
+    <span class="str">"""تشغيل أمر git داخل المستودع وإعادة مخرجاته كنص."""</span>
+    result = subprocess.<span class="fn">run</span>(
+        [<span class="str">"git"</span>, <span class="str">"-c"</span>, <span class="str">"user.name=Report Bot"</span>, <span class="str">"-c"</span>, <span class="str">"user.email=bot@company.com"</span>, *args],
+        cwd=repo, capture_output=<span class="kw">True</span>, text=<span class="kw">True</span>, encoding=<span class="str">"utf-8"</span>, check=<span class="kw">True</span>, timeout=<span class="num">30</span>)
+    <span class="kw">return</span> result.stdout.<span class="fn">strip</span>()
+
+
+<span class="fn">git</span>(<span class="str">"init"</span>, <span class="str">"--quiet"</span>)
+<span class="kw">for</span> day, sales <span class="kw">in</span> [(<span class="str">"2025-03-12"</span>, <span class="num">48200</span>), (<span class="str">"2025-03-13"</span>, <span class="num">51000</span>), (<span class="str">"2025-03-14"</span>, <span class="num">47300</span>)]:
+    (repo / <span class="str">"sales.csv"</span>).<span class="fn">write_text</span>(<span class="str">f"date,sales\n{day},{sales}\n"</span>, encoding=<span class="str">"utf-8"</span>)
+    (repo / <span class="str">"notes.txt"</span>).<span class="fn">write_text</span>(<span class="str">f"آخر تحديث {day}\n"</span>, encoding=<span class="str">"utf-8"</span>)
+    <span class="kw">if</span> <span class="fn">git</span>(<span class="str">"status"</span>, <span class="str">"--porcelain"</span>):                  <span class="cm"># هل هناك تغييرات؟</span>
+        <span class="fn">git</span>(<span class="str">"add"</span>, <span class="str">"-A"</span>)
+        <span class="fn">git</span>(<span class="str">"commit"</span>, <span class="str">"--quiet"</span>, <span class="str">"-m"</span>, <span class="str">f"snapshot {day}"</span>)
+
+log = <span class="fn">git</span>(<span class="str">"log"</span>, <span class="str">"--pretty=format:%an|%s"</span>)
+<span class="fn">print</span>(<span class="str">"📜 السجل:"</span>)
+<span class="kw">for</span> line <span class="kw">in</span> log.<span class="fn">splitlines</span>():
+    author, subject = line.<span class="fn">split</span>(<span class="str">"|"</span>)
+    <span class="fn">print</span>(<span class="str">f"   {subject}  (بواسطة {author})"</span>)
+<span class="fn">print</span>(<span class="str">"عدد النسخ:"</span>, <span class="fn">git</span>(<span class="str">"rev-list"</span>, <span class="str">"--count"</span>, <span class="str">"HEAD"</span>))
+<span class="fn">print</span>(<span class="str">"التغيير الأخير:"</span>, <span class="fn">git</span>(<span class="str">"diff"</span>, <span class="str">"HEAD~1"</span>, <span class="str">"--stat"</span>).<span class="fn">splitlines</span>()[-<span class="num">1</span>].<span class="fn">strip</span>())</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>📜 السجل:
+   snapshot 2025-03-14  (بواسطة Report Bot)
+   snapshot 2025-03-13  (بواسطة Report Bot)
+   snapshot 2025-03-12  (بواسطة Report Bot)
+عدد النسخ: 3
+التغيير الأخير: 2 files changed, 2 insertions(+), 2 deletions(-)</pre>
+</div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                لاحظ الدالة المساعدة <code>git(*args)</code>: كل تفاصيل التشغيل (المجلد، والترميز، والمهلة، والتحقق) في مكان واحد. اصنع دالة كهذه
+                لأي برنامج خارجي يستخدمه سكربتك كثيرًا (<code>ffmpeg</code>، <code>7z</code>، <code>pg_dump</code>...).
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="parallel">
+    <h2 class="section-title">
+        <span class="num">5</span>
+        <i class="fas fa-stream"></i>
+        المتابعة الحية والتشغيل المتوازي
+    </h2>
+        <p>
+            <code>run</code> تنتظر حتى ينتهي البرنامج. لكن ماذا لو أردت عرض تقدّم عملية طويلة <strong>أثناء</strong> عملها؟ استخدم <code>Popen</code> واقرأ سطرًا سطرًا:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>live_output.py</span>
+    </div>
+<pre><span class="kw">import</span> subprocess
+<span class="kw">import</span> sys
+
+child_code = <span class="str">"""
+import time
+for step in ["تنزيل البيانات", "تنظيفها", "إنشاء التقرير"]:
+    print("...", step, flush=True)
+    time.sleep(0.2)
+"""</span>
+<span class="kw">with</span> subprocess.<span class="fn">Popen</span>([sys.executable, <span class="str">"-c"</span>, child_code], stdout=subprocess.PIPE,
+                      text=<span class="kw">True</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> proc:
+    <span class="kw">for</span> line <span class="kw">in</span> proc.stdout:                 <span class="cm"># يصل كل سطر لحظة طباعته</span>
+        <span class="fn">print</span>(<span class="str">"📡 تقدّم:"</span>, line.<span class="fn">strip</span>())
+<span class="fn">print</span>(<span class="str">"انتهت برمز"</span>, proc.returncode)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>📡 تقدّم: ... تنزيل البيانات
+📡 تقدّم: ... تنظيفها
+📡 تقدّم: ... إنشاء التقرير
+انتهت برمز 0</pre>
+</div>
+        <p>
+            وعندما تكون لديك مهام مستقلة (ضغط 4 مجلدات، تحويل 10 فيديوهات)، شغّلها <strong>معًا</strong> بدل انتظار كل واحدة. الخيوط (Threads) مناسبة هنا لأن العمل
+            الحقيقي يجري في العمليات الخارجية:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>parallel_jobs.py</span>
+    </div>
+<pre><span class="kw">import</span> subprocess
+<span class="kw">import</span> sys
+<span class="kw">import</span> time
+<span class="kw">from</span> concurrent.futures <span class="kw">import</span> ThreadPoolExecutor
+
+
+<span class="kw">def</span> <span class="fn">job</span>(name):
+    subprocess.<span class="fn">run</span>([sys.executable, <span class="str">"-c"</span>, <span class="str">"import time; time.sleep(0.5)"</span>], check=<span class="kw">True</span>)
+    <span class="kw">return</span> name
+
+
+names = [<span class="str">"ضغط الصور"</span>, <span class="str">"ضغط المستندات"</span>, <span class="str">"ضغط الفيديو"</span>, <span class="str">"ضغط الأرشيف"</span>]
+
+t = time.<span class="fn">perf_counter</span>()
+<span class="kw">for</span> name <span class="kw">in</span> names:
+    <span class="fn">job</span>(name)
+sequential = time.<span class="fn">perf_counter</span>() - t
+
+t = time.<span class="fn">perf_counter</span>()
+<span class="kw">with</span> <span class="fn">ThreadPoolExecutor</span>(max_workers=<span class="num">4</span>) <span class="kw">as</span> pool:
+    done = <span class="fn">list</span>(pool.<span class="fn">map</span>(job, names))          <span class="cm"># النتائج بنفس ترتيب المدخلات</span>
+parallel = time.<span class="fn">perf_counter</span>() - t
+
+<span class="fn">print</span>(<span class="str">"أُنجز:"</span>, done)
+<span class="fn">print</span>(<span class="str">f"بالتتابع ≈ {sequential:.0f} ث | بالتوازي ≈ {parallel:.1f} ث | أسرع بنحو {sequential / parallel:.0f} مرات"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>أُنجز: ['ضغط الصور', 'ضغط المستندات', 'ضغط الفيديو', 'ضغط الأرشيف']
+بالتتابع ≈ 2 ث | بالتوازي ≈ 0.5 ث | أسرع بنحو 4 مرات</pre>
+</div>
+        <div class="alert alert-warn">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                التوازي ليس مجانيًا: 50 عملية ضغط معًا ستخنق المعالج والقرص. حدد <code>max_workers</code> بعدد معقول (مثل عدد أنوية المعالج <code>os.cpu_count()</code>)،
+                ولا تطلق مئات الطلبات المتوازية على موقع ويب واحد.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="monitor">
+    <h2 class="section-title">
+        <span class="num">6</span>
+        <i class="fas fa-tachometer-alt"></i>
+        مراقبة موارد النظام
+    </h2>
+        <p>
+            مساحة القرص متاحة في المكتبة القياسية بـ <code>shutil.disk_usage</code>. ولمعلومات أكثر (المعالج، والذاكرة، والعمليات) ثبّت <code>pip install psutil</code>:
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>system_report.py</span>
+    </div>
+<pre><span class="kw">import</span> shutil
+
+<span class="kw">import</span> psutil
+
+disk = shutil.<span class="fn">disk_usage</span>(<span class="str">"/"</span>)                       <span class="cm"># في Windows: "C:\\"</span>
+<span class="fn">print</span>(<span class="str">f"القرص: {disk.used / disk.total:.0%} مستخدم، المتاح {disk.free / 1e9:.1f} GB"</span>)
+<span class="fn">print</span>(<span class="str">f"المعالج: {psutil.cpu_percent(interval=1)}%"</span>)
+<span class="fn">print</span>(<span class="str">f"الذاكرة: {psutil.virtual_memory().percent}%"</span>)
+
+<span class="cm"># أكثر 3 عمليات استهلاكًا للذاكرة</span>
+procs = <span class="fn">sorted</span>(psutil.<span class="fn">process_iter</span>([<span class="str">"name"</span>, <span class="str">"memory_info"</span>]),
+               key=<span class="kw">lambda</span> p: p.info[<span class="str">"memory_info"</span>].rss <span class="kw">if</span> p.info[<span class="str">"memory_info"</span>] <span class="kw">else</span> <span class="num">0</span>, reverse=<span class="kw">True</span>)
+<span class="kw">for</span> p <span class="kw">in</span> procs[:<span class="num">3</span>]:
+    <span class="fn">print</span>(<span class="str">f"   {p.info['name']:&lt;20} {p.info['memory_info'].rss / 1e6:,.0f} MB"</span>)</pre>
+</div>
+        <p>
+            القيم تختلف من جهاز لآخر، لذلك نفصل <strong>القرار</strong> عن <strong>القراءة</strong>: دالة تقيّم القراءات وتعيد التنبيهات، فنختبرها بقيم ثابتة،
+            ثم نوصلها بالقراءات الحقيقية ونظام التنبيه الذكي (الدرس 5) ونجدولها كل 10 دقائق (الدرس 7):
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>health_rules.py</span>
+    </div>
+<pre><span class="kw">from</span> collections <span class="kw">import</span> namedtuple
+
+Usage = <span class="fn">namedtuple</span>(<span class="str">"Usage"</span>, <span class="str">"total used free"</span>)       <span class="cm"># نفس شكل نتيجة shutil.disk_usage</span>
+RULES = {<span class="str">"disk"</span>: (<span class="num">80</span>, <span class="num">90</span>), <span class="str">"cpu"</span>: (<span class="num">85</span>, <span class="num">95</span>), <span class="str">"memory"</span>: (<span class="num">80</span>, <span class="num">92</span>)}   <span class="cm"># (تحذير، حرج)</span>
+
+
+<span class="kw">def</span> <span class="fn">evaluate</span>(readings):
+    alerts = []
+    <span class="kw">for</span> name, value <span class="kw">in</span> readings.<span class="fn">items</span>():
+        warn, critical = RULES[name]
+        <span class="kw">if</span> value &gt;= critical:
+            alerts.<span class="fn">append</span>(<span class="str">f"🚨 {name}: {value:.0f}% (حرج ≥ {critical})"</span>)
+        <span class="kw">elif</span> value &gt;= warn:
+            alerts.<span class="fn">append</span>(<span class="str">f"⚠️ {name}: {value:.0f}% (تحذير ≥ {warn})"</span>)
+    <span class="kw">return</span> alerts <span class="kw">or</span> [<span class="str">"✅ كل الموارد ضمن الحدود"</span>]
+
+
+disk = <span class="fn">Usage</span>(total=<span class="num">500</span>e9, used=<span class="num">455</span>e9, free=<span class="num">45</span>e9)
+readings = {<span class="str">"disk"</span>: disk.used / disk.total * <span class="num">100</span>, <span class="str">"cpu"</span>: <span class="num">37.5</span>, <span class="str">"memory"</span>: <span class="num">83.0</span>}
+<span class="fn">print</span>(<span class="str">"\n"</span>.<span class="fn">join</span>(<span class="fn">evaluate</span>(readings)))
+<span class="fn">print</span>(<span class="str">"\n"</span>.<span class="fn">join</span>(<span class="fn">evaluate</span>({<span class="str">"disk"</span>: <span class="num">41</span>, <span class="str">"cpu"</span>: <span class="num">12</span>, <span class="str">"memory"</span>: <span class="num">55</span>})))</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>🚨 disk: 91% (حرج ≥ 90)
+⚠️ memory: 83% (تحذير ≥ 80)
+✅ كل الموارد ضمن الحدود</pre>
+</div>
+</section>
+
+<section class="section-card" id="security">
+    <h2 class="section-title">
+        <span class="num">7</span>
+        <i class="fas fa-user-shield"></i>
+        الأمان: حقن الأوامر
+    </h2>
+        <p>
+            ربما رأيت أمثلة تكتب الأمر كنص واحد مع <code>shell=True</code>. هذا يعني أن <strong>الطرفية (Shell)</strong> ستفسر النص، بما فيه الرموز الخاصة مثل
+            <code>;</code> و <code>&amp;&amp;</code> و <code>$( )</code>. فإذا جاء جزء من الأمر من مستخدم أو من اسم ملف، يمكنه تنفيذ أي أمر يريد!
+            لنرَ ذلك بأمر <code>echo</code> غير المؤذي (المثال مكتوب لـ Linux و macOS):
+        </p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>injection_demo.py</span>
+    </div>
+<pre><span class="kw">import</span> shlex
+<span class="kw">import</span> subprocess
+
+filename = <span class="str">"report.pdf; echo 💥 تم تنفيذ أمر دخيل!"</span>     <span class="cm"># اسم «ملف» خبيث من مستخدم</span>
+
+<span class="fn">print</span>(<span class="str">"1) shell=True مع نص مركّب (خطر):"</span>)
+subprocess.<span class="fn">run</span>(<span class="str">f"echo معالجة {filename}"</span>, shell=<span class="kw">True</span>)
+
+<span class="fn">print</span>(<span class="str">"\n2) قائمة بدون shell (آمن):"</span>)
+subprocess.<span class="fn">run</span>([<span class="str">"echo"</span>, <span class="str">"معالجة"</span>, filename])
+
+<span class="fn">print</span>(<span class="str">"\n3) إذا اضطررت لنص shell، احمِ القيمة بـ shlex.quote:"</span>)
+<span class="fn">print</span>(<span class="str">"  "</span>, <span class="str">f"echo معالجة {shlex.quote(filename)}"</span>)</pre>
+</div>
+<div class="output-block">
+    <div class="output-header"><i class="fas fa-terminal"></i> المخرجات</div>
+    <pre>1) shell=True مع نص مركّب (خطر):
+معالجة report.pdf
+💥 تم تنفيذ أمر دخيل!
+
+2) قائمة بدون shell (آمن):
+معالجة report.pdf; echo 💥 تم تنفيذ أمر دخيل!
+
+3) إذا اضطررت لنص shell، احمِ القيمة بـ shlex.quote:
+   echo معالجة 'report.pdf; echo 💥 تم تنفيذ أمر دخيل!'</pre>
+</div>
+        <p>
+            في الحالة الأولى رأت الطرفية الفاصلة المنقوطة فنفّذت أمرًا ثانيًا! تخيل لو كان <code>rm -rf ~</code> بدل <code>echo</code>.
+            في الحالة الثانية وصل الاسم كاملًا كقيمة واحدة لـ echo، ولم يُفسَّر أي شيء.
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>افعل</th><th>لا تفعل</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>subprocess.run(["ffmpeg", "-i", name, out])</code></td><td><code>subprocess.run(f"ffmpeg -i {name} {out}", shell=True)</code></td></tr>
+                    <tr><td><code>shutil.copy</code>، <code>Path.unlink</code>، <code>shutil.make_archive</code></td><td><code>os.system("cp ...")</code> لمهام لها دوال بايثون</td></tr>
+                    <tr><td>تحقق من المدخلات بقائمة مسموحة (<code>fullmatch</code>)</td><td>الثقة بأسماء الملفات القادمة من البريد أو الويب</td></tr>
+                    <tr><td>شغّل السكربت بأقل صلاحيات ممكنة</td><td>تشغيل سكربتات الأتمتة كمسؤول (Administrator/root) بلا داعٍ</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                في Windows تستخدم <code>shell=True</code> موجه الأوامر <code>cmd</code> الذي يفصل الأوامر بـ <code>&amp;</code> بدل <code>;</code>، والخطر نفسه موجود.
+                وبعض أوامر Windows المدمجة (مثل <code>dir</code> و <code>copy</code>) لا تعمل إلا داخل cmd — لكن لكل منها بديل في بايثون، فلا تحتاجها.
+            </div>
+        </div>
+</section>
+
+<section class="section-card" id="exercises">
+    <h2 class="section-title">
+        <span class="num">8</span>
+        <i class="fas fa-pencil-alt"></i>
+        التمارين التفاعلية
+    </h2>
+    <p>اختبر فهمك للدرس من خلال 5 تمارين متنوعة، ثم جرّب المختبر التفاعلي في الأسفل:</p>
+<div class="exercise-block" id="q1" data-ok="صحيح! القائمة تمنع حقن الأوامر، و check و timeout يجعلان الفشل واضحًا." data-hint="تجنب أي طريقة تجعل الطرفية تفسر نص المستخدم.">
+    <div class="exercise-head">
+        <span class="exercise-num">1</span>
+        <h4>اختيار من متعدد</h4>
+        <span class="exercise-tag">subprocess</span>
+    </div>
+    <p class="exercise-question">المتغير <code>name</code> يحتوي اسم ملف فيديو أرسله مستخدم. ما الطريقة الصحيحة لتحويله إلى MP3؟</p>
+    <div class="options-list">
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="1"> <code>os.system("ffmpeg -i " + name + " out.mp3")</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="2"> <code>subprocess.run(f"ffmpeg -i {name} out.mp3", shell=True)</code></label>
+        <label class="option" data-correct="1"><input type="radio" name="q1" value="3"> <code>subprocess.run(["ffmpeg", "-i", name, "out.mp3"], check=True, timeout=600)</code></label>
+        <label class="option" data-correct="0"><input type="radio" name="q1" value="4"> <code>eval("ffmpeg -i " + name)</code></label>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkMC('q1')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetMC('q1')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q1-result"></div>
+</div>
+<div class="exercise-block" id="q2" data-ok="ممتاز! تتعامل مع النظام بوعي وأمان." data-hint="Windows يفصل مجلدات PATH بفاصلة منقوطة.">
+    <div class="exercise-head">
+        <span class="exercise-num">2</span>
+        <h4>صح أم خطأ</h4>
+        <span class="exercise-tag">اختر لكل عبارة</span>
+    </div>
+    <p class="exercise-question">اقرأ كل عبارة وحدد إن كانت <strong>صحيحة</strong> أم <strong>خاطئة</strong>:</p>
+    <div class="tf-list">
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement"><code>check=True</code> ترفع <code>CalledProcessError</code> عندما يكون رمز الخروج غير صفري.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>shell=True</code> آمنة مع أي اسم ملف ما دام ينتهي بـ .pdf.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">مع <code>text=True</code> يكون <code>stdout</code> نصًا (str) لا بايتات.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="true">
+            <span class="tf-statement">قيم متغيرات البيئة تُقرأ دائمًا كنصوص ويجب تحويلها.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+        <div class="tf-item" data-answer="false">
+            <span class="tf-statement"><code>os.pathsep</code> هو <code>:</code> في كل أنظمة التشغيل.</span>
+            <div class="tf-actions">
+                <button class="tf-btn" onclick="pickTF(this, true)">صح</button>
+                <button class="tf-btn" onclick="pickTF(this, false)">خطأ</button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkTF('q2')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetTF('q2')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q2-result"></div>
+</div>
+<div class="exercise-block" id="q3" data-ok="صحيح! نجاح برمز 0، والمخرجات نص لأننا طلبنا &lt;code&gt;text=True&lt;/code&gt;." data-hint="رمز الخروج 0 يعني النجاح.">
+    <div class="exercise-head">
+        <span class="exercise-num">3</span>
+        <h4>توقّع الناتج</h4>
+        <span class="exercise-tag">subprocess.run</span>
+    </div>
+    <p class="exercise-question">ما الذي سيطبعه الكود؟</p>
+<div class="code-block">
+    <div class="code-header">
+        <span class="lang"><i class="fab fa-python"></i> Python</span>
+        <span>predict.py</span>
+    </div>
+<pre><span class="kw">import</span> subprocess, sys
+r = subprocess.<span class="fn">run</span>([sys.executable, <span class="str">"-c"</span>, <span class="str">"print(6 * 7)"</span>], capture_output=<span class="kw">True</span>, text=<span class="kw">True</span>)
+<span class="fn">print</span>(r.returncode)
+<span class="fn">print</span>(r.stdout.<span class="fn">strip</span>())
+<span class="fn">print</span>(<span class="fn">type</span>(r.stdout).__name__)</pre>
+</div>
+    <div class="code-fill">
+        <div class="line"><span class="cm">السطر 1:</span><input type="text" class="blank-input" data-answers="0" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 2:</span><input type="text" class="blank-input" data-answers="42" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+        <div class="line"><span class="cm">السطر 3:</span><input type="text" class="blank-input" data-answers="str" placeholder="..." style="min-width:80px;" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q3')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q3')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q3-result"></div>
+</div>
+<div class="exercise-block" id="q4" data-ok="أحسنت! هذه المعاملات الأربعة هي الوضع الافتراضي الآمن لأي أمر في الأتمتة." data-hint="التقاط ← capture_output، نص ← text، فشل ← check، مهلة ← timeout.">
+    <div class="exercise-head">
+        <span class="exercise-num">4</span>
+        <h4>أكمل الكود</h4>
+        <span class="exercise-tag">معاملات run</span>
+    </div>
+    <p class="exercise-question">أكمل الكود لتشغيل الأمر، والتقاط مخرجاته كنص، ورفع استثناء عند الفشل، وإيقافه بعد 30 ثانية:</p>
+    <div class="code-fill">
+        <div class="line"><span>result = subprocess.<span class="fn">run</span>(</span></div>
+        <div class="line"><span>    cmd, </span><input type="text" class="blank-input" data-answers="capture_output" placeholder="..." style="min-width:226px;" autocomplete="off" spellcheck="false"><span>=<span class="kw">True</span>, </span><input type="text" class="blank-input" data-answers="text" placeholder="..." style="min-width:86px;" autocomplete="off" spellcheck="false"><span>=<span class="kw">True</span>,</span></div>
+        <div class="line"><span>    </span><input type="text" class="blank-input" data-answers="check" placeholder="..." style="min-width:100px;" autocomplete="off" spellcheck="false"><span>=<span class="kw">True</span>, </span><input type="text" class="blank-input" data-answers="timeout" placeholder="..." style="min-width:128px;" autocomplete="off" spellcheck="false"><span>=<span class="num">30</span>)</span></div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkFill('q4')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetFill('q4')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q4-result"></div>
+</div>
+<div class="exercise-block" id="q5" data-ok="ترتيب صحيح! الاستيراد، ثم الأمر كقائمة، ثم التشغيل، ثم فحص النتيجة." data-hint="لا يمكن فحص النتيجة قبل تشغيل الأمر.">
+    <div class="exercise-head">
+        <span class="exercise-num">5</span>
+        <h4>رتّب الكود</h4>
+        <span class="exercise-tag">استخدم الأسهم</span>
+    </div>
+    <p class="exercise-question">رتّب الأسطر لتشغيل أمر وطباعة مخرجاته إذا نجح. <em>(من الأعلى إلى الأسفل)</em></p>
+    <div class="sortable-list">
+        <div class="sortable-item" data-correct="4" data-orig="1">
+            <span class="order-num">1</span>
+            <span style="flex:1; white-space:pre;">if result.returncode == 0:</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="1" data-orig="2">
+            <span class="order-num">2</span>
+            <span style="flex:1; white-space:pre;">import subprocess, sys</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="5" data-orig="3">
+            <span class="order-num">3</span>
+            <span style="flex:1; white-space:pre;">    print(result.stdout.strip())</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="3" data-orig="4">
+            <span class="order-num">4</span>
+            <span style="flex:1; white-space:pre;">result = subprocess.run(cmd, capture_output=True, text=True)</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+        <div class="sortable-item" data-correct="2" data-orig="5">
+            <span class="order-num">5</span>
+            <span style="flex:1; white-space:pre;">cmd = [sys.executable, &#x27;-c&#x27;, &quot;print(&#x27;done&#x27;)&quot;]</span>
+            <div class="sort-arrows">
+                <button class="sort-btn" onclick="moveItem(this, -1)"><i class="fas fa-arrow-up"></i></button>
+                <button class="sort-btn" onclick="moveItem(this, 1)"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="exercise-actions">
+        <button class="btn btn-primary" onclick="checkSort('q5')"><i class="fas fa-check"></i> تحقق</button>
+        <button class="btn btn-secondary" onclick="resetSort('q5')"><i class="fas fa-redo"></i> إعادة</button>
+    </div>
+    <div class="result-msg" id="q5-result"></div>
+</div>
+<div class="lab">
+    <div class="lab-head"><i class="fas fa-flask"></i> مختبر الأمر الآمن</div>
+    <p style="color:var(--text-light); font-size:0.95em;">اكتب اسم ملف كما قد يصل من مستخدم، وشاهد كيف ستفهمه الطرفية مع <code>shell=True</code>، ولماذا القائمة أو <code>shlex.quote</code> آمنتان. المختبر لا ينفّذ أي شيء — إنه يحلل النص فقط.</p>
+    <div class="lab-row">
+        <label>مثال جاهز:</label>
+        <select class="lab-select" id="cmdPreset" onchange="document.getElementById('cmdName').value=this.value; runCmd()">
+            <option value="report 2025.pdf">اسم عادي بمسافة</option>
+            <option value="x.pdf; rm -rf ~">فاصلة منقوطة</option>
+            <option value="$(whoami).pdf">استبدال أمر $( )</option>
+            <option value="a.pdf &amp;&amp; shutdown -h now">&amp;&amp; أمر ثانٍ</option>
+            <option value="it's.pdf">علامة تنصيص</option>
+        </select>
+    </div>
+    <div class="lab-row">
+        <label>اسم الملف:</label>
+        <input class="lab-input" id="cmdName" value="report 2025.pdf" style="flex:1; min-width:200px; direction:ltr; font-family:monospace;" oninput="runCmd()" spellcheck="false">
+    </div>
+    <div class="lab-console" id="cmdOut" style="direction:ltr; text-align:left;"></div>
+</div>
+</section>
+
+<section class="section-card" id="summary">
+        <h2 class="section-title">
+            <span class="num">9</span>
+            <i class="fas fa-flag-checkered"></i>
+            خلاصة الدرس
+        </h2>
+        <p>في هذا الدرس قمت بـ:</p>
+
+        <div class="note-box">
+            <strong>✅ ما تعلمته:</strong>
+            <ul>
+                <li><i class="fas fa-check"></i> قراءة متغيرات البيئة وتحويلها وجعل الإعدادات الإلزامية تفشل بوضوح.</li>
+                <li><i class="fas fa-check"></i> مسارات تعمل على Windows و Linux و macOS بـ pathlib، و shutil.which.</li>
+                <li><i class="fas fa-check"></i> تشغيل البرامج بـ subprocess.run مع capture_output و check و timeout.</li>
+                <li><i class="fas fa-check"></i> التعامل مع CalledProcessError و TimeoutExpired و FileNotFoundError.</li>
+                <li><i class="fas fa-check"></i> أتمتة أداة حقيقية (Git) عبر دالة مساعدة.</li>
+                <li><i class="fas fa-check"></i> متابعة المخرجات الحية بـ Popen، وتشغيل العمليات بالتوازي.</li>
+                <li><i class="fas fa-check"></i> قواعد مراقبة الموارد، وحقن الأوامر وكيف تتجنبه.</li>
+            </ul>
+        </div>
+
+        <div class="note-box">
+            <strong>💡 نصائح للممارسة:</strong>
+            <ul>
+                <li><i class="fas fa-lightbulb"></i> مرّر الأوامر كقوائم دائمًا، وتجنب shell=True.</li>
+                <li><i class="fas fa-lightbulb"></i> استخدم دالة بايثون إن وُجدت بدل أمر خارجي.</li>
+                <li><i class="fas fa-lightbulb"></i> ضع timeout لكل أمر خارجي.</li>
+                <li><i class="fas fa-lightbulb"></i> افصل منطق القرار عن القراءات لتختبره بسهولة.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-tip">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>الخطوة التالية:</strong> أنهيت دروس التخصص! في <strong>المشروع الأول</strong> ستجمع كل ما تعلمته في <strong>مساعد المكتب اليومي</strong>: ترتيب الملفات، وتقرير Excel، والبريد، والجدولة.
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h4><i class="fas fa-chart-line"></i> تقدمك في المسار</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+    </section>
+
+    <!-- التنقل -->
+    <div class="nav-links">
+        <a href="lesson7.html" class="nav-link prev">
+            <i class="fas fa-arrow-right"></i>
+            <span>الرجوع إلى الدرس 7: الجدولة والسكربتات الموثوقة</span>
+        </a>
+        <a href="project1.html" class="nav-link next">
+            <span>المشروع التالي: مساعد المكتب اليومي</span>
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 CodeWay — مسار Python · نظام التشغيل
+</footer>
+
+<script>
+    /* ========== شريط التقدم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        setTimeout(() => {
+            fill.style.width = '80%';
+            text.textContent = '80% مكتمل';
+        }, 400);
+    });
+
+    /* ========== أدوات مشتركة للتمارين ========== */
+    function showResult(qid, cls, html) {
+        const msg = document.getElementById(qid + '-result');
+        msg.classList.remove('ok', 'mid', 'bad');
+        msg.classList.add('show', cls);
+        msg.innerHTML = html;
+    }
+
+    function clearResult(qid) {
+        document.getElementById(qid + '-result').classList.remove('show', 'ok', 'mid', 'bad');
+    }
+
+    function grade(qid, right, total, extra) {
+        const box = document.getElementById(qid);
+        if (right === total && !extra) {
+            showResult(qid, 'ok', '<i class="fas fa-check-circle"></i> ' + box.dataset.ok + ' 🎉');
+        } else if (right > 0) {
+            showResult(qid, 'mid', `<i class="fas fa-info-circle"></i> أصبت في ${right} من ${total}. ` + box.dataset.hint);
+        } else {
+            showResult(qid, 'bad', '<i class="fas fa-times-circle"></i> ليست صحيحة. ' + box.dataset.hint);
+        }
+    }
+
+    /* ========== اختيار من متعدد ========== */
+    function checkMC(qid) {
+        const options = document.querySelectorAll('#' + qid + ' .option');
+        let right = 0, wrong = 0, total = 0, picked = 0;
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            const isCorrect = opt.dataset.correct === '1';
+            if (isCorrect) total++;
+            opt.classList.remove('correct', 'wrong');
+            if (input.checked) {
+                picked++;
+                if (isCorrect) { opt.classList.add('correct'); right++; }
+                else { opt.classList.add('wrong'); wrong++; }
+            }
+        });
+        if (picked === 0) {
+            showResult(qid, 'mid', '<i class="fas fa-exclamation-circle"></i> اختر إجابة أولًا.');
+            return;
+        }
+        grade(qid, right, total, wrong > 0);
+    }
+
+    function resetMC(qid) {
+        document.querySelectorAll('#' + qid + ' .option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong');
+            opt.querySelector('input').checked = false;
+        });
+        clearResult(qid);
+    }
+
+    /* ========== صح أم خطأ ========== */
+    function pickTF(btn, value) {
+        const item = btn.closest('.tf-item');
+        item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.selected = value;
+    }
+
+    function checkTF(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .tf-item');
+        let right = 0, answered = 0;
+        items.forEach(item => {
+            const correct = item.dataset.answer === 'true';
+            const selected = item.dataset.selected;
+            item.classList.remove('correct', 'wrong');
+            if (selected === undefined) return;
+            answered++;
+            if ((selected === 'true') === correct) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        if (answered < items.length) {
+            showResult(qid, 'mid', `<i class="fas fa-exclamation-circle"></i> لم تجب على جميع العبارات (${answered}/${items.length}).`);
+            return;
+        }
+        grade(qid, right, items.length, false);
+    }
+
+    function resetTF(qid) {
+        document.querySelectorAll('#' + qid + ' .tf-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+            delete item.dataset.selected;
+            item.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+        });
+        clearResult(qid);
+    }
+
+    /* ========== أكمل الفراغ / توقّع الناتج ========== */
+    function normalize(v) {
+        return v.trim().replace(/\s+/g, '').replace(/[“”"‘’]/g, "'");
+    }
+
+    function checkFill(qid) {
+        const inputs = document.querySelectorAll('#' + qid + ' .blank-input');
+        let right = 0;
+        inputs.forEach(inp => {
+            const answers = inp.dataset.answers.split('||').map(normalize);
+            inp.classList.remove('correct', 'wrong');
+            if (answers.includes(normalize(inp.value))) { inp.classList.add('correct'); right++; }
+            else { inp.classList.add('wrong'); }
+        });
+        grade(qid, right, inputs.length, false);
+    }
+
+    function resetFill(qid) {
+        document.querySelectorAll('#' + qid + ' .blank-input').forEach(inp => {
+            inp.value = '';
+            inp.classList.remove('correct', 'wrong');
+        });
+        clearResult(qid);
+    }
+
+    /* ========== ترتيب الكود ========== */
+    function moveItem(btn, direction) {
+        const item = btn.closest('.sortable-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const index = items.indexOf(item);
+        if (direction === -1 && index > 0) list.insertBefore(item, items[index - 1]);
+        else if (direction === 1 && index < items.length - 1) list.insertBefore(items[index + 1], item);
+        renumber(list);
+    }
+
+    function renumber(list) {
+        Array.from(list.children).forEach((item, i) => {
+            item.querySelector('.order-num').textContent = i + 1;
+            item.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkSort(qid) {
+        const items = document.querySelectorAll('#' + qid + ' .sortable-item');
+        let right = 0;
+        items.forEach((item, index) => {
+            item.classList.remove('correct', 'wrong');
+            if (parseInt(item.dataset.correct) === index + 1) { item.classList.add('correct'); right++; }
+            else { item.classList.add('wrong'); }
+        });
+        grade(qid, right, items.length, false);
+    }
+
+    function resetSort(qid) {
+        const list = document.querySelector('#' + qid + ' .sortable-list');
+        Array.from(list.children)
+            .sort((a, b) => parseInt(a.dataset.orig) - parseInt(b.dataset.orig))
+            .forEach(item => list.appendChild(item));
+        renumber(list);
+        clearResult(qid);
+    }
+
+    /* ========== أدوات المختبر: تمثيل القيم بأسلوب Python ========== */
+    function pyRepr(v) {
+        if (v === null || v === undefined) return 'None';
+        if (v === true) return 'True';
+        if (v === false) return 'False';
+        if (typeof v === 'string') return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        if (typeof v === 'number') return Number.isInteger(v) && v.__float ? v + '.0' : String(v);
+        if (v instanceof PyFloat) return Number.isInteger(v.value) ? v.value + '.0' : String(v.value);
+        if (v instanceof PyTuple) return v.items.length === 1 ? '(' + pyRepr(v.items[0]) + ',)' : '(' + v.items.map(pyRepr).join(', ') + ')';
+        if (v instanceof PySet) return v.items.length ? '{' + v.items.map(pyRepr).join(', ') + '}' : 'set()';
+        if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']';
+        if (v instanceof Map) return '{' + Array.from(v.entries()).map(([k, val]) => pyRepr(k) + ': ' + pyRepr(val)).join(', ') + '}';
+        return String(v);
+    }
+    function PyTuple(items) { this.items = items; }
+    function PySet(items) { this.items = items; }
+    function PyFloat(value) { this.value = value; }
+
+    /* يحوّل نصًا كتبه المستخدم إلى قيمة: رقم أو نص أو True/False/None */
+    function parseLiteral(raw) {
+        const s = raw.trim();
+        if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+        if (/^-?\d*\.\d+$/.test(s)) return new PyFloat(parseFloat(s));
+        if (s === 'True') return true;
+        if (s === 'False') return false;
+        if (s === 'None') return null;
+        const q = s.match(/^(['"])(.*)\1$/);
+        return q ? q[2] : s;
+    }
+
+    function keyOf(v) { return v instanceof PyFloat ? 'f' + v.value : typeof v + ':' + String(v); }
+
+    function consoleLine(el, code, result, isErr) {
+        const line = document.createElement('div');
+        line.innerHTML = '<span class="prompt">&gt;&gt;&gt; </span>' + escapeHtml(code) +
+            (result === undefined ? '' : '\n' + (isErr ? '<span class="err">' + escapeHtml(result) + '</span>' : escapeHtml(result)));
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    /* ========== مختبر الأمر الآمن ========== */
+    function shQuote(s) {
+        if (s === '') return "''";
+        if (/^[\w@%+=:,./-]+$/.test(s)) return s;
+        return "'" + s.replace(/'/g, "'\"'\"'") + "'";
+    }
+
+    function runCmd() {
+        const name = document.getElementById('cmdName').value;
+        const out = document.getElementById('cmdOut');
+        const danger = [[/;/, 'الفاصلة المنقوطة ; تنهي الأمر وتبدأ أمرًا جديدًا'],
+                        [/&&|\|\|/, '&& أو || تشغّل أمرًا ثانيًا'],
+                        [/\|/, '| تمرر المخرجات لبرنامج آخر'],
+                        [/\$\(|`/, '$( ) أو ` ` تنفّذ أمرًا وتضع نتيجته مكانه'],
+                        [/[<>]/, '< أو > تعيد توجيه الملفات (قد تمسح ملفًا)'],
+                        [/\$\w/, '$VAR تُستبدل بقيمة متغير'],
+                        [/['"]/, 'علامات التنصيص تغيّر طريقة تقسيم النص'],
+                        [/\s/, 'المسافة تقسم الاسم إلى أكثر من معامل']];
+        const found = danger.filter(([re]) => re.test(name)).map(([, msg]) => msg);
+        const shellCmd = `convert ${name} out.txt`;
+        const lines = [
+            '<span style="color:#888"># ❌ subprocess.run(f"convert {name} out.txt", shell=True)</span>',
+            'الطرفية ترى: ' + escapeHtml(shellCmd),
+            found.length ? `<span class="err">⚠️ رموز ستفسرها الطرفية:\n   - ${found.map(escapeHtml).join('\n   - ')}</span>`
+                         : '<span style="color:#888">لا رموز خاصة هنا… لكن الاسم القادم قد يحملها، فلا تعتمد على ذلك.</span>',
+            '',
+            '<span style="color:#888"># ✅ subprocess.run(["convert", name, "out.txt"])</span>',
+            'البرنامج يستلم: ' + escapeHtml(JSON.stringify(['convert', name, 'out.txt'])),
+            '<span style="color:var(--gold)">الاسم معامل واحد كما هو، ولا توجد طرفية تفسره.</span>',
+            '',
+            '<span style="color:#888"># ✅ shlex.quote إذا اضطررت لنص shell</span>',
+            escapeHtml(`convert ${shQuote(name)} out.txt`),
+        ];
+        out.innerHTML = lines.join('\n');
+    }
+
+    document.addEventListener('DOMContentLoaded', runCmd);
+
+    /* ========== ظهور ناعم ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.section-card, .toc-bar').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            obs.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>

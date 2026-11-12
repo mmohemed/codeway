@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>محرر بايثون | CodeWay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-dark: #d4af37;
+            --dark: #000;
+            --dark-light: #111;
+            --text: #fff;
+            --text-light: #ddd;
+            --card-bg: rgba(30, 30, 30, 0.7);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        /* الهيدر الرئيسي */
+        header {
+            padding: 140px 20px 80px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.9), rgba(30, 30, 30, 0.8)), 
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%230a0a0a"/><path d="M0 0L100 100M100 0L0 100" stroke="%23ffd700" stroke-width="0.5"/></svg>');
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 215, 0, 0.1), transparent 70%);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 3.2rem;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            position: relative;
+            animation: fadeInUp 1s ease;
+        }
+
+        header p {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto 50px;
+            padding: 0 20px;
+        }
+
+        /* الأقسام */
+        .section-box {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+        }
+
+        .section-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .section-box h2 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-box h2 i {
+            font-size: 1.5rem;
+        }
+
+        .section-box p {
+            margin: 10px 0 15px;
+            line-height: 1.8;
+            color: var(--text-light);
+        }
+
+        .btn-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 14px 28px;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            color: #000;
+            font-weight: 700;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 1.05em;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-main::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: var(--transition);
+        }
+
+        .btn-main:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-main:hover::before {
+            left: 100%;
+        }
+
+        /* كروت المستويات */
+        .levels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .level-card {
+            flex: 1 1 300px;
+            background: linear-gradient(145deg, #1a1a1a, #151515);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,215,0,0.3);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 40px 40px;
+            border-color: transparent transparent var(--primary) transparent;
+            opacity: 0.1;
+        }
+
+        .level-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255,215,0,0.6);
+        }
+
+        .level-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .level-card h3 i {
+            font-size: 1.2rem;
+        }
+
+        .level-card p {
+            font-size: 0.95em;
+            color: var(--text-light);
+            margin: 10px 0 15px;
+        }
+
+        .level-card a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 0.95em;
+            text-decoration: none;
+            color: #000;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .level-card a:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.4);
+        }
+
+        /* كروت التخصصات */
+        .specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .spec-card {
+            flex: 1 1 250px;
+            background: linear-gradient(145deg, #1a1a1a, #151515);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,215,0,0.25);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spec-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
+        }
+
+        .spec-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .spec-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .spec-card h4 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spec-card h4 i {
+            font-size: 1rem;
+        }
+
+        .spec-card p {
+            font-size: 0.9em;
+            margin: 8px 0 12px;
+            color: var(--text-light);
+        }
+
+        .spec-card a {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: var(--transition);
+        }
+
+        .spec-card a:hover {
+            color: #fff;
+            transform: translateX(3px);
+        }
+
+        /* قسم المشاريع والمراجع */
+        .links-list {
+            margin: 0;
+            padding-right: 20px;
+            list-style: none;
+        }
+
+        .links-list li {
+            margin-bottom: 12px;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: var(--transition);
+            border-right: 3px solid transparent;
+        }
+
+        .links-list li:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-right-color: var(--primary);
+            transform: translateX(-5px);
+        }
+
+        .links-list a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .links-list a:hover {
+            color: var(--primary);
+        }
+
+        .links-list i {
+            color: var(--primary);
+            font-size: 1.1rem;
+            width: 25px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: var(--dark-light);
+            border-top: 2px solid var(--primary);
+            font-size: 0.9em;
+            color: var(--text-light);
+            margin-top: 50px;
+        }
+
+        /* تأثيرات الحركة */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* شريط التقدم */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1001;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* زر العودة للأعلى */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: var(--primary);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+            z-index: 999;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6);
+        }
+
+        /* التجاوب مع الشاشات المختلفة */
+        @media (max-width: 992px) {
+            header h1 {
+                font-size: 2.6rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 120px 20px 60px;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .section-box {
+                padding: 20px;
+            }
+            
+            .level-card, .spec-card {
+                flex: 1 1 100%;
+            }
+            
+            .back-to-top {
+                bottom: 20px;
+                left: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+            
+            .btn-main {
+                padding: 12px 20px;
+                font-size: 0.95em;
+            }
+        }
+    
+
+        .hub-hero { padding: 120px 20px 50px; text-align: center; }
+        .hub-hero .crumb { color: #aaa; font-size: 0.9rem; margin-bottom: 10px; }
+        .hub-hero .crumb a { color: var(--primary); text-decoration: none; }
+        .hub-hero h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); color: var(--primary); margin-bottom: 10px; text-wrap: balance; }
+        .hub-hero p { color: var(--text-light); max-width: 720px; margin: 0 auto; }
+        .hub-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px; }
+        .hub-stats span { border: 1px solid rgba(255,215,0,0.25); border-radius: 999px; padding: 4px 14px; color: #ccc; font-size: 0.9rem; }
+        .hub-stats b { color: var(--primary); }
+        .nav-links a.active { color: var(--primary); }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 18px; }
+        .toolbar input[type=search] {
+            flex: 1 1 240px; min-width: 0; background: #111; color: #fff; border: 1px solid rgba(255,215,0,0.25);
+            border-radius: 10px; padding: 10px 14px; font-family: inherit; font-size: 0.95rem;
+        }
+        .toolbar input[type=search]:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip {
+            background: #151515; color: #ccc; border: 1px solid rgba(255,255,255,0.12); border-radius: 999px;
+            padding: 6px 14px; font-family: inherit; font-size: 0.88rem; cursor: pointer; transition: var(--transition);
+        }
+        .chip:hover { border-color: var(--primary-dark); color: #fff; }
+        .chip.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: 700; }
+        .chip:focus-visible, .copy-btn:focus-visible, .hub-card a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+        .hub-card {
+            background: linear-gradient(145deg, #1a1a1a, #121212); border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 10px; min-width: 0;
+            transition: var(--transition);
+        }
+        .hub-card:hover { border-color: rgba(255,215,0,0.5); transform: translateY(-3px); }
+        .hub-card h3 { color: var(--primary); font-size: 1.12rem; line-height: 1.5; }
+        .hub-card p { color: var(--text-light); font-size: 0.93rem; margin: 0; }
+        .badges { display: flex; flex-wrap: wrap; gap: 6px; }
+        .badge { font-size: 0.75rem; padding: 2px 10px; border-radius: 999px; background: rgba(255,215,0,0.1); color: var(--primary); }
+        .badge.lvl-1 { background: rgba(46,204,113,0.12); color: #6fdc9b; }
+        .badge.lvl-2 { background: rgba(52,152,219,0.14); color: #7cc0f0; }
+        .badge.lvl-3 { background: rgba(231,76,60,0.14); color: #f39a8f; }
+        .badge.muted { background: rgba(255,255,255,0.06); color: #bbb; }
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tags span { font-size: 0.78rem; color: #aaa; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 1px 8px; }
+        .card-link {
+            margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px;
+            color: #000; background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            padding: 8px 16px; border-radius: 9px; font-weight: 700; text-decoration: none; font-size: 0.9rem;
+        }
+        .card-link.ext { background: transparent; color: var(--primary); border: 1px solid var(--primary-dark); }
+        .empty-msg { color: #aaa; text-align: center; padding: 30px; display: none; }
+        .group-title { color: var(--primary); font-size: 1.35rem; margin: 34px 0 14px; display: flex; align-items: center; gap: 10px; }
+        .group-title:first-child { margin-top: 0; }
+        .route { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; counter-reset: step; }
+        .route div { background: #121212; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; }
+        .route b { color: var(--primary); display: block; margin-bottom: 4px; }
+        .route small { color: #bbb; }
+        /* code */
+        .code-block { margin: 6px 0 0; background: #050505; border-radius: 10px; border: 1px solid rgba(255,215,0,0.15); overflow: hidden; min-width: 0; }
+        .code-head { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: #0d0d0d; font-size: 0.8rem; color: #888; }
+        .code-block pre { margin: 0; padding: 12px 14px; overflow-x: auto; direction: ltr; text-align: left; font-family: Consolas, "Courier New", monospace; font-size: 0.86rem; line-height: 1.6; color: #f8f8f2; }
+        pre .kw { color: #ff79c6; } pre .fn { color: #8be9fd; } pre .str { color: #f1fa8c; }
+        pre .cm { color: #6272a4; font-style: italic; } pre .num { color: #bd93f9; }
+        .code-out { border-top: 1px dashed rgba(255,255,255,0.12); background: #0d1117; }
+        .code-out pre { color: #c8e6c9; }
+        .code-out .lbl { font-size: 0.72rem; color: #6fdc9b; padding: 6px 14px 0; }
+        .copy-btn {
+            background: transparent; color: var(--primary); border: 1px solid rgba(255,215,0,0.35); border-radius: 6px;
+            padding: 2px 10px; font-family: inherit; font-size: 0.78rem; cursor: pointer;
+        }
+        .copy-btn.done { background: var(--primary); color: #000; }
+        .cheat-card { gap: 8px; }
+        .cheat-card .note { color: #bbb; font-size: 0.86rem; }
+        .toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+        .toc a { color: #ddd; text-decoration: none; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 4px 12px; font-size: 0.86rem; }
+        .toc a:hover { border-color: var(--primary); color: var(--primary); }
+        @media (max-width: 600px) { .hub-hero { padding-top: 100px; } .hub-grid { grid-template-columns: 1fr; } }
+        @media (prefers-reduced-motion: reduce) { .hub-card, .chip { transition: none; } .hub-card:hover { transform: none; } }
+
+        .py-status { display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #bbb; }
+        .py-status .dot { width: 9px; height: 9px; border-radius: 50%; background: #777; }
+        .py-status[data-s=loading] .dot, .py-status[data-s=running] .dot { background: #f1c40f; animation: pulse 1s infinite; }
+        .py-status[data-s=ready] .dot { background: #2ecc71; }
+        .py-status[data-s=error] .dot, .py-status[data-s=stopped] .dot { background: #e74c3c; }
+        @keyframes pulse { 50% { opacity: 0.3; } }
+        @media (prefers-reduced-motion: reduce) { .py-status .dot { animation: none !important; } }
+        .ed-wrap { display: flex; border: 1px solid rgba(255,215,0,0.25); border-radius: 12px; overflow: hidden; background: #050505; direction: ltr; }
+        .ed-gutter { padding: 12px 8px; color: #555; text-align: right; user-select: none; font-family: Consolas, "Courier New", monospace;
+                     font-size: 0.92rem; line-height: 1.6; white-space: pre; overflow: hidden; background: #0b0b0b; min-width: 2.8em; }
+        .ed-area { flex: 1; min-width: 0; resize: vertical; border: 0; outline: none; background: transparent; color: #f8f8f2; padding: 12px 14px;
+                   font-family: Consolas, "Courier New", monospace; font-size: 0.92rem; line-height: 1.6; tab-size: 4; white-space: pre;
+                   overflow: auto; min-height: 300px; direction: ltr; text-align: left; }
+        .ed-area:focus-visible { box-shadow: inset 0 0 0 2px rgba(255,215,0,0.5); }
+        .console { background: #0d1117; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 14px; min-height: 140px;
+                   max-height: 420px; overflow: auto; direction: ltr; text-align: left; font-family: Consolas, "Courier New", monospace;
+                   font-size: 0.9rem; line-height: 1.55; white-space: pre-wrap; color: #c8e6c9; }
+        .console .err { color: #ff8a80; }
+        .console .info { color: #8892b0; }
+        .ed-btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .ed-btn { font-family: inherit; font-size: 0.9rem; border-radius: 9px; padding: 8px 16px; cursor: pointer; border: 1px solid rgba(255,215,0,0.35);
+                  background: #151515; color: #eee; display: inline-flex; gap: 8px; align-items: center; }
+        .ed-btn.primary { background: linear-gradient(90deg, var(--primary-dark), var(--primary)); color: #000; font-weight: 700; border: 0; }
+        .ed-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ed-btn:focus-visible, .ed-select:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .ed-select { font-family: inherit; background: #111; color: #eee; border: 1px solid rgba(255,215,0,0.25); border-radius: 9px; padding: 8px 10px; }
+        .ed-label { color: #bbb; font-size: 0.85rem; margin: 12px 0 6px; display: block; }
+        .stdin-area { width: 100%; min-height: 70px; background: #0b0b0b; color: #eee; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;
+                      padding: 8px 12px; font-family: Consolas, "Courier New", monospace; direction: ltr; text-align: left; }
+        kbd { background: #222; border: 1px solid #444; border-radius: 4px; padding: 0 5px; font-size: 0.8em; direction: ltr; display: inline-block; }
+
+    </style>
+</head>
+<body>
+    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+
+    <nav class="navbar">
+        <a class="logo" href="../index.html" style="text-decoration:none;">
+            <i class="fas fa-code"></i>
+            <span>CodeWay</span>
+        </a>
+        <div class="nav-links">
+            <a href="../projects/index.html"><i class="fas fa-folder-open"></i> المشاريع</a>
+            <a href="../resources/links.html"><i class="fas fa-book"></i> المراجع</a>
+            <a href="../resources/cheatsheets.html"><i class="fas fa-file-alt"></i> الاختصارات</a>
+            <a href="index.html" class="active"><i class="fas fa-code"></i> المحرر</a>
+            <a href="../challenges/index.html"><i class="fas fa-puzzle-piece"></i> التحديات</a>
+        </div>
+    </nav>
+
+    <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
+
+    <section class="hub-hero">
+        <div class="crumb"><a href="../index.html">مسار بايثون</a> / المحرر</div>
+        <h1><i class="fas fa-code"></i> محرر أكواد Python</h1>
+        <p>اكتب كود بايثون وشغّله مباشرة في متصفحك، بلا تثبيت. جرّب أمثلة الدروس، أو اختبر فكرة سريعة قبل كتابتها في مشروعك.</p>
+        <div class="hub-stats"><span>Python <b>3.12</b></span><span>يعمل <b>داخل المتصفح</b></span><span><b>بلا</b> تثبيت</span></div>
+    </section>
+
+    <div class="container">
+        <div class="section-box">
+            <div class="ed-btns" style="justify-content: space-between; margin-bottom: 12px;">
+                <div class="ed-btns">
+                    <button class="ed-btn primary" id="runBtn" type="button"><i class="fas fa-play"></i> تشغيل</button>
+                    <button class="ed-btn" id="stopBtn" type="button"><i class="fas fa-stop"></i> إيقاف</button>
+                    <button class="ed-btn" id="clearBtn" type="button"><i class="fas fa-eraser"></i> مسح المخرجات</button>
+                    <button class="ed-btn" id="downloadBtn" type="button"><i class="fas fa-download"></i> تنزيل main.py</button>
+                </div>
+                <label class="ed-btns"><span style="color:#bbb; font-size:0.9rem;">مثال جاهز:</span>
+                    <select class="ed-select" id="exampleSel"><option value="">اختر…</option><option value="hello">مرحبا بالعالم</option><option value="input">قراءة المدخلات</option><option value="loops">الحلقات وجدول الضرب</option><option value="functions">الدوال</option><option value="dict">القواميس وعدّ الكلمات</option><option value="class">الكلاسات</option><option value="error">قراءة رسالة خطأ</option><option value="pandas">pandas (يحتاج إنترنت)</option></select>
+                </label>
+            </div>
+            <div class="ed-wrap">
+                <div class="ed-gutter" id="gutter" aria-hidden="true">1</div>
+                <textarea class="ed-area" id="code" spellcheck="false" aria-label="محرر الكود" autocomplete="off"></textarea>
+            </div>
+            <label class="ed-label" for="stdin"><i class="fas fa-keyboard"></i> مدخلات البرنامج (سطر لكل <code>input()</code>):</label>
+            <textarea class="stdin-area" id="stdin" spellcheck="false"></textarea>
+            <div class="ed-btns" style="justify-content: space-between; margin: 14px 0 6px;">
+                <strong style="color: var(--primary);"><i class="fas fa-terminal"></i> المخرجات</strong>
+                <span class="py-status" id="pyStatus" data-s="idle"><span class="dot"></span><span>يُحمَّل Python عند أول تشغيل</span></span>
+            </div>
+            <div class="console" id="console" role="log" aria-live="polite"></div>
+            <p style="color:#999; font-size:0.85rem; margin-top:10px;">
+                اختصارات: <kbd>Ctrl</kbd> + <kbd>Enter</kbd> للتشغيل، و <kbd>Tab</kbd> لإزاحة أربع مسافات. الكود يُحفظ تلقائيًا في متصفحك.
+            </p>
+        </div>
+
+        <div class="section-box">
+            <h2><i class="fas fa-info-circle"></i> كيف يعمل المحرر؟</h2>
+            <p>
+                الكود يعمل <strong>داخل متصفحك</strong> باستخدام Pyodide، وهو Python حقيقي (الإصدار 3.12) مبني لـ WebAssembly، فلا يُرسل كودك إلى أي خادم.
+                أول تشغيل يُنزّل Python (بضعة ميجابايتات) ثم يحفظه المتصفح، فتصبح المرات التالية أسرع.
+            </p>
+            <div class="route">
+                <div><b>يعمل</b><small>كل اللغة والمكتبة القياسية: الدوال، والكلاسات، و json، و datetime، و re، و collections، و math…</small></div>
+                <div><b>مكتبات إضافية</b><small>numpy و pandas وغيرها تُحمّل تلقائيًا عند استيرادها (تحتاج اتصالًا بالإنترنت).</small></div>
+                <div><b>المدخلات</b><small><code>input()</code> يقرأ من مربع «مدخلات البرنامج»، سطرًا لكل استدعاء.</small></div>
+                <div><b>لا يعمل</b><small>الاتصال بالشبكة عبر socket، والملفات الحقيقية على جهازك، والنوافذ الرسومية مثل tkinter.</small></div>
+            </div>
+            <p style="margin-top:12px;">
+                الحلقة اللانهائية لا تجمّد الصفحة: اضغط «إيقاف»، أو ستتوقف تلقائيًا بعد 15 ثانية. وللمشاريع الكبيرة استخدم محررًا على جهازك مثل VS Code أو Thonny.
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        © 2025 CodeWay — مسار Python · المحرر
+    </footer>
+
+    <script>
+    window.addEventListener('scroll', () => {
+        const h = document.documentElement;
+        const bar = document.getElementById('progressBar');
+        if (bar) bar.style.width = (h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight) * 100) + '%';
+        document.getElementById('backToTop').classList.toggle('active', h.scrollTop > 300);
+    });
+    document.getElementById('backToTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+
+    // ===== البحث والتصفية =====
+    (function () {
+        const search = document.getElementById('hubSearch');
+        const chips = document.querySelectorAll('.chip');
+        const cards = document.querySelectorAll('[data-cat]');
+        const empty = document.getElementById('hubEmpty');
+        let active = 'all';
+        const norm = s => s.toLowerCase().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي');
+        function apply() {
+            const q = norm(search ? search.value.trim() : '');
+            let shown = 0;
+            cards.forEach(card => {
+                const okCat = active === 'all' || card.dataset.cat.split(' ').includes(active);
+                const okText = !q || norm(card.textContent).includes(q);
+                card.style.display = okCat && okText ? '' : 'none';
+                if (okCat && okText) shown++;
+            });
+            document.querySelectorAll('[data-group]').forEach(g => {
+                const any = [...g.querySelectorAll('[data-cat]')].some(c => c.style.display !== 'none');
+                g.style.display = any ? '' : 'none';
+            });
+            if (empty) empty.style.display = shown ? 'none' : 'block';
+            const counter = document.getElementById('hubCount');
+            if (counter) counter.textContent = shown;
+        }
+        chips.forEach(chip => chip.addEventListener('click', () => {
+            chips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            active = chip.dataset.filter;
+            apply();
+        }));
+        if (search) search.addEventListener('input', apply);
+        apply();
+    })();
+
+    // ===== نسخ الكود =====
+    document.querySelectorAll('.copy-btn').forEach(btn => btn.addEventListener('click', () => {
+        const code = btn.closest('.code-block').querySelector('pre').innerText;
+        const done = () => { btn.textContent = 'تم النسخ ✓'; btn.classList.add('done');
+                             setTimeout(() => { btn.textContent = 'نسخ'; btn.classList.remove('done'); }, 1500); };
+        if (navigator.clipboard) navigator.clipboard.writeText(code).then(done, () => {});
+    }));
+
+
+    // ===== تشغيل بايثون داخل المتصفح (Pyodide في Web Worker) =====
+    const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
+    const WORKER_SRC = `
+        importScripts('${PYODIDE_URL}pyodide.js');
+        let py = null;
+        const ready = loadPyodide({ indexURL: '${PYODIDE_URL}' }).then(p => { py = p; postMessage({ type: 'ready' }); })
+            .catch(e => postMessage({ type: 'fatal', text: String(e) }));
+        function cleanError(msg) {
+            const lines = msg.split('\\n'), keep = [];
+            for (let i = 0; i < lines.length; i++) {
+                const m = lines[i].match(/^\\s*File "([^"]+)"/);
+                if (m && m[1] !== 'main.py' && m[1] !== '<exec>') {
+                    if (lines[i + 1] && /^\\s{4}/.test(lines[i + 1])) i++;
+                    while (lines[i + 1] && /^\\s+[~^]+\\s*$/.test(lines[i + 1])) i++;
+                    continue;
+                }
+                keep.push(lines[i].replace('"<exec>"', '"main.py"'));
+            }
+            return keep.join('\\n').trim();
+        }
+        onmessage = async (e) => {
+            await ready;
+            const { id, code, stdin, harness } = e.data;
+            const lines = (stdin || '').split('\\n');
+            let k = 0;
+            py.setStdin({ stdin: () => (k < lines.length && !(k === lines.length - 1 && lines[k] === '')) ? lines[k++] : null });
+            py.setStdout({ batched: s => postMessage({ type: 'out', id, text: s }) });
+            py.setStderr({ batched: s => postMessage({ type: 'err', id, text: s }) });
+            try {
+                await py.loadPackagesFromImports(code, { messageCallback: m => postMessage({ type: 'info', id, text: m }) });
+            } catch (err) { /* الحزمة غير متوفرة: سيظهر ImportError عند التشغيل */ }
+            const ns = py.globals.get('dict')();
+            let ok = true, result = null;
+            try {
+                await py.runPythonAsync(code, { globals: ns, filename: 'main.py' });
+                if (harness) result = py.runPython(harness, { globals: ns });
+            } catch (err) {
+                ok = false;
+                postMessage({ type: 'err', id, text: cleanError(String(err.message || err)) });
+            } finally {
+                ns.destroy();
+            }
+            postMessage({ type: 'done', id, ok, result });
+        };
+    `;
+
+    const PyRunner = (() => {
+        let worker = null, readyPromise = null, pending = null, seq = 0;
+        const listeners = new Set();
+        const notify = s => listeners.forEach(fn => fn(s));
+        function start() {
+            const url = URL.createObjectURL(new Blob([WORKER_SRC], { type: 'text/javascript' }));
+            worker = new Worker(url);
+            notify('loading');
+            readyPromise = new Promise((resolve, reject) => {
+                worker.onmessage = e => {
+                    const msg = e.data;
+                    if (msg.type === 'ready') { notify('ready'); resolve(); return; }
+                    if (msg.type === 'fatal') { notify('error'); reject(new Error(msg.text)); return; }
+                    if (!pending || msg.id !== pending.id) return;
+                    if (msg.type === 'done') { const p = pending; pending = null; clearTimeout(p.timer); p.resolve(msg); }
+                    else p_handlers(msg);
+                };
+                worker.onerror = () => { notify('error'); reject(new Error('تعذّر تحميل Python')); };
+            });
+            return readyPromise;
+        }
+        function p_handlers(msg) {
+            if (msg.type === 'out') pending.onOut(msg.text);
+            else if (msg.type === 'err') pending.onErr(msg.text);
+            else if (msg.type === 'info') pending.onInfo && pending.onInfo(msg.text);
+        }
+        function stop(reason) {
+            if (worker) worker.terminate();
+            worker = null; readyPromise = null;
+            if (pending) { const p = pending; pending = null; clearTimeout(p.timer); p.resolve({ ok: false, stopped: reason || 'stopped' }); }
+            notify('stopped');
+        }
+        async function run(code, opts = {}) {
+            if (!worker) start();
+            await readyPromise;
+            if (pending) stop('replaced');
+            if (!worker) { start(); await readyPromise; }
+            const id = ++seq;
+            return new Promise(resolve => {
+                pending = { id, resolve, onOut: opts.onOut || (() => {}), onErr: opts.onErr || (() => {}), onInfo: opts.onInfo,
+                            timer: setTimeout(() => stop('timeout'), opts.timeout || 15000) };
+                notify('running');
+                worker.postMessage({ id, code, stdin: opts.stdin || '', harness: opts.harness || null });
+            }).finally(() => notify(worker ? 'ready' : 'stopped'));
+        }
+        return { run, stop, warm: () => { if (!worker) start(); return readyPromise; }, onStatus: fn => listeners.add(fn) };
+    })();
+
+    function setupEditor(area, gutter, onRun) {
+        const sync = () => {
+            const n = area.value.split('\n').length;
+            gutter.textContent = Array.from({ length: n }, (_, i) => i + 1).join('\n');
+            gutter.scrollTop = area.scrollTop;
+        };
+        area.addEventListener('input', sync);
+        area.addEventListener('scroll', () => { gutter.scrollTop = area.scrollTop; });
+        area.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); onRun(); return; }
+            if (e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault();
+                const s = area.selectionStart, t = area.selectionEnd;
+                area.setRangeText('    ', s, t, 'end');
+                sync();
+            }
+            if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
+                const s = area.selectionStart;
+                const line = area.value.slice(area.value.lastIndexOf('\n', s - 1) + 1, s);
+                let indent = line.match(/^\s*/)[0];
+                if (/:\s*$/.test(line)) indent += '    ';
+                if (indent) { e.preventDefault(); area.setRangeText('\n' + indent, s, area.selectionEnd, 'end'); sync(); }
+            }
+        });
+        sync();
+        return sync;
+    }
+
+    function appendConsole(box, text, cls) {
+        const span = document.createElement('span');
+        if (cls) span.className = cls;
+        span.textContent = text.endsWith('\n') ? text : text + '\n';
+        box.appendChild(span);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function bindStatus(el) {
+        const labels = { loading: 'جارٍ تحميل Python (أول مرة فقط)…', ready: 'Python جاهز', running: 'يعمل…',
+                         stopped: 'متوقف — سيُعاد التحميل عند التشغيل', error: 'تعذّر تحميل Python — تحقق من الاتصال بالإنترنت' };
+        PyRunner.onStatus(s => { el.dataset.s = s; el.querySelector('span:last-child').textContent = labels[s] || s; });
+    }
+
+    const EXAMPLES = {"hello": {"title": "مرحبا بالعالم", "code": "name = \"CodeWay\"\nprint(f\"مرحبًا من {name}!\")\nprint(\"2 + 3 =\", 2 + 3)", "stdin": ""}, "input": {"title": "قراءة المدخلات", "code": "# اكتب المدخلات في مربع «مدخلات البرنامج» — سطر لكل input()\nname = input(\"ما اسمك؟ \")\nage = int(input(\"كم عمرك؟ \"))\nprint(f\"أهلًا {name}، بعد 10 سنوات سيكون عمرك {age + 10}\")", "stdin": "سارة\n21\n"}, "loops": {"title": "الحلقات وجدول الضرب", "code": "for i in range(1, 6):\n    row = [f\"{i * j:3}\" for j in range(1, 6)]\n    print(\" \".join(row))", "stdin": ""}, "functions": {"title": "الدوال", "code": "def average(numbers):\n    \"\"\"متوسط قائمة أرقام.\"\"\"\n    return sum(numbers) / len(numbers)\n\nmarks = [88, 92, 79, 95]\nprint(\"المتوسط:\", round(average(marks), 2))\nprint(\"الأعلى:\", max(marks))", "stdin": ""}, "dict": {"title": "القواميس وعدّ الكلمات", "code": "text = \"بايثون سهلة و بايثون قوية و بايثون ممتعة\"\ncounts = {}\nfor word in text.split():\n    counts[word] = counts.get(word, 0) + 1\n\nfor word, n in sorted(counts.items(), key=lambda kv: -kv[1]):\n    print(word, n)", "stdin": ""}, "class": {"title": "الكلاسات", "code": "class Account:\n    def __init__(self, owner, balance=0):\n        self.owner = owner\n        self.balance = balance\n\n    def deposit(self, amount):\n        if amount <= 0:\n            raise ValueError(\"المبلغ يجب أن يكون موجبًا\")\n        self.balance += amount\n\nacc = Account(\"سارة\", 100)\nacc.deposit(50)\nprint(acc.owner, acc.balance)", "stdin": ""}, "error": {"title": "قراءة رسالة خطأ", "code": "prices = {\"قلم\": 5, \"دفتر\": 12}\n\ndef total(items):\n    return sum(prices[item] for item in items)\n\nprint(total([\"قلم\", \"دفتر\"]))\nprint(total([\"قلم\", \"مسطرة\"]))   # ماذا سيحدث؟", "stdin": ""}, "pandas": {"title": "pandas (يحتاج إنترنت)", "code": "import pandas as pd\n\ndf = pd.DataFrame({\n    \"الفرع\": [\"الرياض\", \"جدة\", \"الرياض\", \"الدمام\"],\n    \"المبيعات\": [480, 395, 510, 218],\n})\nprint(df.groupby(\"الفرع\")[\"المبيعات\"].sum().sort_values(ascending=False))", "stdin": ""}};
+    const codeEl = document.getElementById('code'), consoleEl = document.getElementById('console');
+    const stdinEl = document.getElementById('stdin'), runBtn = document.getElementById('runBtn');
+    const STORE = 'codeway-editor-v1';
+    const load = k => { try { return localStorage.getItem(STORE + k); } catch (e) { return null; } };
+    const save = (k, v) => { try { localStorage.setItem(STORE + k, v); } catch (e) {} };
+
+    codeEl.value = load(':code') ?? EXAMPLES.hello.code;
+    stdinEl.value = load(':stdin') ?? '';
+    const sync = setupEditor(codeEl, document.getElementById('gutter'), runCode);
+    codeEl.addEventListener('input', () => save(':code', codeEl.value));
+    stdinEl.addEventListener('input', () => save(':stdin', stdinEl.value));
+    bindStatus(document.getElementById('pyStatus'));
+
+    document.getElementById('exampleSel').addEventListener('change', e => {
+        const ex = EXAMPLES[e.target.value];
+        if (!ex) return;
+        codeEl.value = ex.code;
+        stdinEl.value = ex.stdin || '';
+        save(':code', codeEl.value); save(':stdin', stdinEl.value);
+        sync();
+        e.target.value = '';
+    });
+
+    async function runCode() {
+        consoleEl.textContent = '';
+        runBtn.disabled = true;
+        const started = performance.now();
+        try {
+            const res = await PyRunner.run(codeEl.value, {
+                stdin: stdinEl.value,
+                onOut: t => appendConsole(consoleEl, t),
+                onErr: t => {
+                    appendConsole(consoleEl, t, 'err');
+                    if (t.includes('EOFError')) appendConsole(consoleEl, '💡 البرنامج طلب input() ولا توجد قيمة: اكتبها في مربع «مدخلات البرنامج»، سطرًا لكل input().', 'info');
+                },
+                onInfo: t => appendConsole(consoleEl, t, 'info'),
+            });
+            const secs = ((performance.now() - started) / 1000).toFixed(2);
+            if (res.stopped === 'timeout') appendConsole(consoleEl, '⏱ توقف البرنامج بعد 15 ثانية. هل توجد حلقة لا نهائية؟', 'err');
+            else if (res.stopped) appendConsole(consoleEl, '■ أُوقف البرنامج.', 'err');
+            else appendConsole(consoleEl, res.ok ? `✔ انتهى بنجاح (${secs} ث)` : '✘ انتهى بخطأ — اقرأ آخر سطر في الرسالة أولًا', 'info');
+        } catch (e) {
+            appendConsole(consoleEl, 'تعذّر تحميل Python. تحقق من اتصالك بالإنترنت ثم حاول مجددًا.', 'err');
+        } finally {
+            runBtn.disabled = false;
+        }
+    }
+
+    runBtn.addEventListener('click', runCode);
+    document.getElementById('stopBtn').addEventListener('click', () => PyRunner.stop('stopped'));
+    document.getElementById('clearBtn').addEventListener('click', () => { consoleEl.textContent = ''; });
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([codeEl.value], { type: 'text/x-python' }));
+        a.download = 'main.py';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+
+    </script>
+</body>
+</html>
