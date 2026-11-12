@@ -53,6 +53,7 @@ js/gd-interp.js       محاكي Godot: مفسّر GDScript (Godot 4) وشجرة
 js/cs-interp.js       مفسّر C# (ووضع C++ لـ Unreal): أصناف وخصائص و List و Dictionary ومكررات و float بـ 32 بت وأخطاء الترجمة الشائعة
 js/unity-sim.js       محاكي Unity: GameObjects ومكوّنات ودورة حياة MonoBehaviour والفيزياء و Input و Coroutines والمشاهد والواجهة و Animator
 js/bp-interp.js       Blueprints نصية (كل سطر عقدة) تُترجم لنفس شجرة التنفيذ، و js/unreal-sim.js محاكي Unreal: Actors ومكوّنات و Delay و Timers و UE_LOG
+js/linux-sim.js       طرفية Linux محاكاة (Ubuntu 24.04): ملفات بصلاحيات، ومستخدمون و sudo، و apt، وعمليات، و systemd، وشبكة، و SSH، و ufw
 js/test-runner.js     مشغّل اختبارات في إطار معزول: واجهة Vitest و Testing Library و Playwright ومحاكاة GitHub Actions
 js/next-sim.js        محاكي Next.js (App Router): توجيه بالملفات ومكونات خادم وعميل و Server Actions و Route Handlers وتخزين مؤقت
 js/tw-runner.js       معاينة Tailwind الحقيقي (js/vendor/tailwind-src.js) في إطار معزول، مع فحص للأنماط المحسوبة
@@ -96,6 +97,8 @@ js/*.js               سكربت لكل صفحة
 | Godot | ✅ مكتملة: وحدتان، 5 دروس بمحاكي Godot تعليمي (مفسّر GDScript وفيزياء مبسطة، وليس محرك Godot نفسه) |
 | Unity | ✅ مكتملة: 5 وحدات، 14 درساً بمحاكي Unity تعليمي (مفسّر C# وفيزياء ثنائية الأبعاد مبسطة، وليس محرر Unity نفسه) |
 | Unreal Engine | ✅ مكتملة: 3 وحدات، 6 دروس بمحاكي Unreal تعليمي: Blueprints مكتوبة نصاً ومجموعة من C++ بأسلوب Unreal على مستوى جانبي (وليس Unreal نفسه) |
+| أساسيات الشبكات | ✅ مكتملة: 3 وحدات، 9 دروس بـ Python (struct و ipaddress و cryptography): الطبقات والحزم والعناوين و TCP/UDP و DNS و HTTP والموجهات والجدران النارية و VPN |
+| Linux | ⏳ جزئية: وحدتان من 4 (6 دروس من 12) على طرفية Linux المحاكاة |
 | بقية الدورات | الهيكل جاهز والمحتوى قيد الإعداد |
 
 ### كتابة الدروس
