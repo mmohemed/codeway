@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدرس: إعداد بيئة التطوير | مسار تعلم C++</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        /* رأس الدرس */
+        .lesson-header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .lesson-title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .lesson-meta {
+            display: flex;
+            gap: 30px;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .lesson-meta i {
+            color: #667eea;
+            margin-left: 5px;
+        }
+
+        /* محتوى الدرس */
+        .lesson-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+
+        .section h3 {
+            font-size: 1.4em;
+            color: #444;
+            margin: 20px 0 15px;
+        }
+
+        .section p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Consolas', monospace;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .code-block .keyword {
+            color: #569cd6;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .code-block .function {
+            color: #dcdcaa;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #333;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #667eea;
+        }
+
+        .note-box {
+            background: #fff3cd;
+            border-right: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .tip-box {
+            background: #d4edda;
+            border-right: 5px solid #28a745;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .warning-box {
+            background: #f8d7da;
+            border-right: 5px solid #dc3545;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        /* الفيديو */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* التمرين التفاعلي */
+        .exercise-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .exercise-question {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .exercise-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .exercise-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .exercise-option:hover {
+            background: #e9ecef;
+        }
+
+        .exercise-option.correct {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+
+        .exercise-option.wrong {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+        }
+
+        .check-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* أزرار التنقل بين الدروس */
+        .lesson-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+        }
+
+        .nav-btn {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .complete-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            display: block;
+            width: fit-content;
+            margin: 30px auto;
+        }
+
+        .complete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .complete-btn i {
+            margin-left: 10px;
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* التجاوب */
+        @media (max-width: 768px) {
+            .lesson-title {
+                font-size: 2em;
+            }
+            
+            .lesson-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .lesson-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* شريط التقدم في الدرس */
+        .progress-indicator {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-indicator i {
+            font-size: 1.5em;
+            color: #667eea;
+        }
+
+        .back-home-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .back-home-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <div class="container">
+        <nav class="navbar">
+            <a href="../../index.php" class="logo">
+                <i class="fas fa-code"></i> C++ Mastery
+            </a>
+            <div class="nav-links">
+                <a href="../../index.php">الرئيسية</a>
+                <a href="../../index.php#path">المسار</a>
+                <a href="../../index.php#resources">الموارد</a>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container">
+        <!-- رأس الدرس -->
+        <div class="lesson-header">
+            <h1 class="lesson-title">إعداد بيئة التطوير (IDE)</h1>
+            <div class="lesson-meta">
+                <span><i class="fas fa-clock"></i> المدة: 30 دقيقة</span>
+                <span><i class="fas fa-signal"></i> المستوى: مبتدئ</span>
+                <span><i class="fas fa-file-code"></i> الدرس: 2 من 28</span>
+            </div>
+        </div>
+
+        <!-- شريط التقدم في الدرس -->
+        <div class="progress-indicator">
+            <i class="fas fa-check-circle" style="color: #28a745;"></i>
+            <span>تقدمك في الدرس: <strong>50%</strong> (تمت مشاهدة 3 من 6 أقسام)</span>
+        </div>
+
+        <!-- محتوى الدرس -->
+        <div class="lesson-content">
+            <!-- ماذا نحتاج -->
+            <section class="section">
+                <h2>📚 ماذا نحتاج لنكتب برامج C++؟</h2>
+                <p>قبل أن تكتب أي برنامج، تحتاج إلى أداتين أساسيتين:</p>
+                <ul style="list-style: none; padding-right: 20px;">
+                    <li style="margin-bottom: 15px;"><i class="fas fa-check" style="color: #28a745; margin-left: 10px;"></i><strong>محرر نصوص</strong> تكتب فيه الكود وتحفظه في ملف امتداده <code>.cpp</code>.</li>
+                    <li style="margin-bottom: 15px;"><i class="fas fa-check" style="color: #28a745; margin-left: 10px;"></i><strong>مُترجِم (Compiler)</strong> يحوّل الكود الذي كتبته إلى برنامج تنفيذي يفهمه الحاسوب، مثل <code>g++</code> أو مترجم Microsoft.</li>
+                </ul>
+                <p>و<strong>بيئة التطوير المتكاملة (IDE)</strong> برنامج واحد يجمع المحرر والمترجم وأداة تتبّع الأخطاء (Debugger)، فتكتب وتشغّل بضغطة زر.</p>
+                <div class="note-box">
+                    <i class="fas fa-lightbulb" style="color: #ffc107; margin-left: 10px;"></i>
+                    <strong>كيف يعمل البرنامج؟</strong> تكتب الكود في <code>main.cpp</code> ← يترجمه المترجم ← ينتج ملفًا تنفيذيًا (<code>main.exe</code> في Windows، أو <code>main</code> في Linux و macOS) ← تشغّله. على عكس Python، لا يعمل كود C++ قبل ترجمته.
+                </div>
+            </section>
+
+            <!-- الخيارات -->
+            <section class="section">
+                <h2>🧰 أي بيئة أختار؟</h2>
+                <ul style="list-style: none; padding-right: 20px;">
+                    <li style="margin-bottom: 15px;"><i class="fas fa-star" style="color: #ffc107; margin-left: 10px;"></i><strong>Visual Studio Community</strong> (Windows، مجاني): بيئة متكاملة جاهزة فيها المترجم. الأسهل للمبتدئ على Windows.</li>
+                    <li style="margin-bottom: 15px;"><i class="fas fa-star" style="color: #ffc107; margin-left: 10px;"></i><strong>VS Code مع المترجم g++</strong> (كل الأنظمة، مجاني): محرر خفيف ومنتشر، تضيف له إضافة C/C++ من Microsoft ومترجمًا منفصلًا.</li>
+                    <li style="margin-bottom: 15px;"><i class="fas fa-star" style="color: #ffc107; margin-left: 10px;"></i><strong>Code::Blocks</strong> (كل الأنظمة، مجاني): بيئة بسيطة، ولها نسخة تثبيت لـ Windows تحتوي المترجم MinGW.</li>
+                    <li style="margin-bottom: 15px;"><i class="fas fa-star" style="color: #ffc107; margin-left: 10px;"></i><strong>مترجم على الإنترنت</strong> مثل OnlineGDB أو Compiler Explorer: لتجربة سريعة بلا تثبيت، لكنه لا يغني عن بيئة على جهازك للمشاريع.</li>
+                </ul>
+            </section>
+
+            <!-- Windows -->
+            <section class="section">
+                <h2>🪟 التثبيت على Windows: Visual Studio</h2>
+                <ol style="padding-right: 25px; line-height: 2.2;">
+                    <li>نزّل <strong>Visual Studio Community</strong> من موقع Microsoft الرسمي وشغّل المثبّت.</li>
+                    <li>في شاشة اختيار المكوّنات (Workloads) اختر <strong>Desktop development with C++</strong> ثم اضغط Install.</li>
+                    <li>بعد التثبيت افتح Visual Studio واختر <strong>Create a new project</strong> ثم <strong>Console App</strong> (بلغة C++).</li>
+                    <li>اكتب الكود في الملف المفتوح، ثم اضغط <code>Ctrl + F5</code> للتشغيل دون Debugger، فتظهر نافذة الناتج.</li>
+                </ol>
+                <div class="tip-box">
+                    <i class="fas fa-info-circle" style="color: #28a745; margin-left: 10px;"></i>
+                    إذا فضّلت <strong>VS Code</strong> على Windows، فثبّت المترجم <strong>MinGW-w64</strong> (مثلًا عبر MSYS2) وأضف مجلد <code>bin</code> الخاص به إلى متغير <code>PATH</code>، ثم تأكد بالأمر <code>g++ --version</code> في موجه الأوامر.
+                </div>
+            </section>
+
+            <!-- Linux و macOS -->
+            <section class="section">
+                <h2>🐧 التثبيت على Linux و macOS</h2>
+                <p>على <strong>Ubuntu و Debian</strong> ثبّت أدوات البناء بأمر واحد في الطرفية:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    <pre>sudo apt update
+sudo apt install build-essential</pre>
+                </div>
+                <p>وعلى <strong>macOS</strong> ثبّت أدوات المطوّر من Apple (تحتوي المترجم clang، ويمكن استدعاؤه بالأمر g++):</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    <pre>xcode-select --install</pre>
+                </div>
+                <p>ثم تأكد أن المترجم يعمل:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    <pre>g++ --version</pre>
+                </div>
+            </section>
+
+            <!-- الترجمة والتشغيل -->
+            <section class="section">
+                <h2>💻 ترجمة البرنامج وتشغيله من الطرفية</h2>
+                <p>احفظ الكود التالي في ملف اسمه <code>hello.cpp</code>:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    <pre>
+<span class="keyword">#include</span> <span class="string">&lt;iostream&gt;</span>
+
+<span class="function">int</span> main() {
+    std::cout &lt;&lt; <span class="string">"Hello, C++!"</span> &lt;&lt; std::endl;
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</pre>
+                </div>
+                <p>ثم افتح الطرفية في مجلد الملف، وترجمه وشغّله:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> نسخ</button>
+                    <pre>g++ hello.cpp -o hello      <span class="comment"># الترجمة: ينتج برنامجًا اسمه hello</span>
+./hello                     <span class="comment"># التشغيل في Linux و macOS</span>
+hello.exe                   <span class="comment"># التشغيل في Windows</span></pre>
+                </div>
+                <p>الناتج: <code>Hello, C++!</code></p>
+                <div class="tip-box">
+                    <i class="fas fa-info-circle" style="color: #28a745; margin-left: 10px;"></i>
+                    <strong>خيارات مفيدة للمترجم:</strong>
+                    <ul style="margin-top: 10px;">
+                        <li><code>-o اسم</code> يحدد اسم البرنامج الناتج (بدونه يكون <code>a.out</code> أو <code>a.exe</code>).</li>
+                        <li><code>-Wall</code> يعرض التحذيرات التي تكشف أخطاء شائعة مبكرًا.</li>
+                        <li><code>-std=c++17</code> يحدد إصدار اللغة المستخدم.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- الأخطاء الشائعة -->
+            <section class="section">
+                <h2>⚠️ أخطاء شائعة عند البداية</h2>
+                <div class="warning-box">
+                    <ul style="padding-right: 20px; line-height: 2;">
+                        <li><strong>'g++' is not recognized</strong>: المترجم غير مثبت أو مجلده غير مضاف إلى <code>PATH</code>. أغلق الطرفية وافتحها من جديد بعد إضافته.</li>
+                        <li><strong>expected ';' before ...</strong>: نسيت الفاصلة المنقوطة في نهاية سطر. اقرأ رقم السطر في رسالة الخطأ.</li>
+                        <li><strong>التعديل لا يظهر</strong>: نسيت حفظ الملف، أو شغّلت البرنامج القديم دون إعادة الترجمة.</li>
+                        <li><strong>النافذة تُغلق فورًا</strong> عند تشغيل البرنامج بالنقر المزدوج: شغّله من الطرفية، أو بـ <code>Ctrl + F5</code> في Visual Studio.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- قسم تمرين تفاعلي -->
+            <section class="section">
+                <h2>✏️ تمرين تفاعلي</h2>
+                <div class="exercise-box">
+                    <p class="exercise-question">أي أمر يترجم الملف <code>main.cpp</code> إلى برنامج اسمه <code>app</code>؟</p>
+
+                    <div class="exercise-options" id="exerciseOptions">
+                        <label class="exercise-option">
+                            <input type="radio" name="exercise" value="1">
+                            run main.cpp app
+                        </label>
+                        <label class="exercise-option">
+                            <input type="radio" name="exercise" value="2">
+                            g++ main.cpp -o app
+                        </label>
+                        <label class="exercise-option">
+                            <input type="radio" name="exercise" value="3">
+                            g++ app -o main.cpp
+                        </label>
+                        <label class="exercise-option">
+                            <input type="radio" name="exercise" value="4">
+                            cout main.cpp &gt; app
+                        </label>
+                    </div>
+
+                    <button class="check-btn" onclick="checkExercise()">تحقق من الإجابة</button>
+                    <div id="exerciseResult" style="margin-top: 20px;"></div>
+                </div>
+            </section>
+
+            <!-- قسم الملخص -->
+            <section class="section">
+                <h2>📝 ملخص الدرس</h2>
+                <ul>
+                    <li>كود C++ يُكتب في ملف <code>.cpp</code> ثم يُترجم إلى برنامج تنفيذي قبل تشغيله.</li>
+                    <li>على Windows: Visual Studio Community مع «Desktop development with C++» هو الأسهل للبداية.</li>
+                    <li>على Linux: <code>build-essential</code>، وعلى macOS: <code>xcode-select --install</code>.</li>
+                    <li>الترجمة بـ <code>g++ ملف.cpp -o اسم</code> ثم تشغيل البرنامج الناتج.</li>
+                    <li>اقرأ رسالة الخطأ ورقم السطر: هي دليلك الأول لإصلاح المشكلة.</li>
+                </ul>
+            </section>
+            <!-- زر إكمال الدرس -->
+            <button class="complete-btn" onclick="completeLesson()">
+                <i class="fas fa-check-circle"></i>
+                تأكيد إكمال الدرس والعودة للرئيسية
+            </button>
+        </div>
+
+        <!-- التنقل بين الدروس -->
+        <div class="lesson-navigation">
+            <a href="lesson1.html" class="nav-btn">
+                <i class="fas fa-arrow-right"></i>
+                الدرس السابق: مقدمة عن لغة C++
+            </a>
+            <a href="lesson3.html" class="nav-btn">
+                الدرس التالي: المتغيرات وأنواع البيانات
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+
+        <!-- تذييل الصفحة -->
+        <footer class="footer">
+            <p>© 2024 مسار تعلم C++ المتكامل | جميع الحقوق محفوظة</p>
+        </footer>
+    </div>
+
+    <!-- زر العودة للرئيسية -->
+    <a href="../../index.php" class="back-home-btn">
+        <i class="fas fa-arrow-right"></i>
+        العودة للرئيسية
+    </a>
+
+    <script>
+        // نسخ الكود
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                button.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+                setTimeout(() => {
+                    button.innerHTML = '<i class="far fa-copy"></i> نسخ';
+                }, 2000);
+            });
+        }
+
+        // التحقق من التمرين
+        function checkExercise() {
+            const selectedOption = document.querySelector('input[name="exercise"]:checked');
+            const resultDiv = document.getElementById('exerciseResult');
+            
+            if (!selectedOption) {
+                resultDiv.innerHTML = '<div class="warning-box">الرجاء اختيار إجابة أولاً!</div>';
+                return;
+            }
+
+            const options = document.querySelectorAll('.exercise-option');
+            options.forEach(opt => opt.classList.remove('correct', 'wrong'));
+
+            if (selectedOption.value === '2') {
+                selectedOption.parentElement.classList.add('correct');
+                resultDiv.innerHTML = '<div class="tip-box">✅ إجابة صحيحة! أحسنت</div>';
+            } else {
+                selectedOption.parentElement.classList.add('wrong');
+                resultDiv.innerHTML = '<div class="warning-box">❌ إجابة خاطئة. حاول مرة أخرى</div>';
+            }
+        }
+
+        // إكمال الدرس
+        function completeLesson() {
+            // نعود للصفحة الرئيسية مع إشارة بأن الدرس مكتمل
+            window.location.href = '../../index.php?completed=lesson2';
+        }
+
+        // تتبع تقدم المشاهدة
+        let viewedSections = new Set();
+        
+        function markSectionAsViewed(sectionId) {
+            viewedSections.add(sectionId);
+            updateProgress();
+        }
+
+        function updateProgress() {
+            // تحديث شريط التقدم حسب الأقسام التي تمت مشاهدتها
+            const totalSections = 8; // عدد أقسام الدرس
+            const progress = Math.round((viewedSections.size / totalSections) * 100);
+            document.querySelector('.progress-indicator span').textContent = progress + '%';
+        }
+
+        // مراقبة أقسام الصفحة التي تمت مشاهدتها
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const sectionId = entry.target.id || 'section-' + Math.random();
+                    markSectionAsViewed(sectionId);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        // مراقبة جميع الأقسام
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        console.log('مرحباً بك في الدرس! استمتع بالتعلم');
+    </script>
+</body>
+</html>
