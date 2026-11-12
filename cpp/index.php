@@ -695,11 +695,11 @@
     <!-- شريط التنقل -->
     <div class="container">
         <nav class="navbar" data-aos="fade-down">
-            <a href="index.html" class="logo">
+            <a href="../index.html" class="logo">
                 <i class="fas fa-crown"></i> C++ Academy
             </a>
             <div class="nav-links">
-                <a href="index.html">الرئيسية</a>
+                <a href="../index.html">الرئيسية</a>
                 <a href="#path">المسار</a>
                 <a href="#resources">الموارد</a>
                 <a href="#skills">المهارات</a>
@@ -802,7 +802,7 @@
     </div>
 
     <!-- زر العودة -->
-    <a href="index.html" class="back-home">
+    <a href="../index.html" class="back-home">
         <i class="fas fa-arrow-right"></i>
         العودة للرئيسية
     </a>
@@ -852,7 +852,7 @@
                     { name: 'تعدد الأشكال (Polymorphism)', page: 'lesson18.html' },
                     { name: 'التغليف (Encapsulation)', page: 'lesson19.html' },
                     { name: 'الصديقات (Friend Functions)', page: 'lesson20.html' },
-                    { name: 'نظام إدارة طلاب', page: 'project1.html' }
+                    { name: 'نظام إدارة طلاب', page: 'project1.html', soon: true }   // صفحة المشروع لم تُنشأ بعد
                 ]
             },
             {
@@ -884,7 +884,12 @@
                         <h3 class="level-title">${module.title}</h3>
                     </div>
                     <div class="level-lessons">
-                        ${module.lessons.map(lesson => `
+                        ${module.lessons.map(lesson => lesson.soon ? `
+                            <span class="lesson-btn" style="opacity:.55; cursor:default;" title="قريبًا">
+                                <i class="fas fa-hourglass-half"></i>
+                                <span class="lesson-text">${lesson.name} (قريبًا)</span>
+                            </span>
+                        ` : `
                             <a href="lessons/${module.basePath}/${lesson.page}" class="lesson-btn">
                                 <i class="fas fa-play-circle"></i>
                                 <span class="lesson-text">${lesson.name}</span>

@@ -50,10 +50,10 @@
 
                 <div class="popular">
                     <span>الأكثر بحثاً:</span>
-                    <a href="languages/python/index.html">Python</a>
+                    <a href="course.html?id=python">Python</a>
                     <a href="fields/web/index.html">تطوير الويب</a>
-                    <a href="ai/index.html">الذكاء الاصطناعي</a>
-                    <a href="languages/javascript/index.html">JavaScript</a>
+                    <a href="field.html?id=ai">الذكاء الاصطناعي</a>
+                    <a href="course.html?id=javascript">JavaScript</a>
                 </div>
 
                 <div class="hero-stats">
@@ -182,7 +182,7 @@
                     <p>ابدأ الآن مجاناً، وتقدّم بالسرعة التي تناسبك.</p>
                 </div>
                 <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-                    <a href="languages/python/index.html" class="btn btn-light"><i class="fab fa-python"></i> ابدأ بـ Python</a>
+                    <a href="course.html?id=python" class="btn btn-light"><i class="fab fa-python"></i> ابدأ بـ Python</a>
                     <a href="start.html" class="btn btn-ghost-dark"><i class="fas fa-compass"></i> ساعدني في الاختيار</a>
                 </div>
             </div>
@@ -244,7 +244,7 @@
         const fields = [
             { name: 'تطوير الويب',       key: 'web',       icon: 'fas fa-globe',          desc: 'ابنِ مواقع وتطبيقات ويب حديثة من الواجهة حتى الخادم', tracks: 4, href: 'fields/web/index.html' },
             { name: 'تطبيقات الجوال',    key: 'mobile',    icon: 'fas fa-mobile-screen',  desc: 'طوّر تطبيقات أندرويد وآيفون بلغات وأدوات حديثة', tracks: 3, href: 'fields/mobile/index.html' },
-            { name: 'الذكاء الاصطناعي',  key: 'ai',        icon: 'fas fa-brain',          desc: 'تعلم الآلة والتعلم العميق ومعالجة اللغة والرؤية الحاسوبية', tracks: 6, href: 'ai/index.html' },
+            { name: 'الذكاء الاصطناعي',  key: 'ai',        icon: 'fas fa-brain',          desc: 'تعلم الآلة والتعلم العميق ومعالجة اللغة والرؤية الحاسوبية', tracks: 6, href: 'field.html?id=ai' },
             { name: 'الأمن السيبراني',   key: 'security',  icon: 'fas fa-shield-halved',  desc: 'احمِ الأنظمة والشبكات، وتعلّم اختبار الاختراق الأخلاقي', tracks: 3, href: 'fields/security/index.html' },
             { name: 'علم البيانات',      key: 'data',      icon: 'fas fa-chart-pie',      desc: 'حلّل البيانات واستخرج منها رؤى تساعد على اتخاذ القرار', tracks: 2, href: 'fields/data/index.html' },
             { name: 'تطوير الألعاب',     key: 'games',     icon: 'fas fa-gamepad',        desc: 'صمّم ألعابك ثنائية وثلاثية الأبعاد بمحركات احترافية', tracks: 2, href: 'fields/games/index.html' },
@@ -266,9 +266,12 @@
 
         const levelNames = { beginner: 'مبتدئ', intermediate: 'متوسط', advanced: 'متقدم' };
 
+        // صفحة كل لغة: الأكاديمية الخاصة إن وُجدت، وإلا صفحة الدورة
+        const langHref = key => ({ cpp: 'cpp/index.php' })[key] || `course.html?id=${key}`;
+
         // ===== رسم اللغات =====
         document.getElementById('langGrid').innerHTML = languages.map(l => `
-            <a href="languages/${l.key}/index.html" class="card lang c-${l.key}">
+            <a href="${langHref(l.key)}" class="card lang c-${l.key}">
                 ${l.ready ? '' : '<span class="badge badge-soon">قريباً</span>'}
                 <div class="icon-box"><i class="${l.icon}"></i></div>
                 <b>${l.name}</b>
@@ -303,7 +306,7 @@
 
         // ===== روابط الفوتر =====
         document.getElementById('footLangs').innerHTML = languages.filter(l => l.ready).slice(0, 6)
-            .map(l => `<a href="languages/${l.key}/index.html">${l.name}</a>`).join('');
+            .map(l => `<a href="${langHref(l.key)}">${l.name}</a>`).join('');
         document.getElementById('footFields').innerHTML = fields.slice(0, 6).map(f => `<a href="${f.href}">${f.name}</a>`).join('');
         document.getElementById('footTracks').innerHTML = tracks.map(t => `<a href="${t.href}">${t.name}</a>`).join('');
 
@@ -316,15 +319,15 @@
 
         // ===== البحث =====
         const searchItems = [
-            ...languages.map(l => ({ name: l.name, type: 'لغة برمجة', icon: l.icon, key: l.key, href: `languages/${l.key}/index.html` })),
+            ...languages.map(l => ({ name: l.name, type: 'لغة برمجة', icon: l.icon, key: l.key, href: langHref(l.key) })),
             ...fields.map(f => ({ name: f.name, type: 'مجال', icon: f.icon, key: f.key, href: f.href })),
             ...tracks.map(t => ({ name: t.name, type: 'مسار مهني', icon: t.icon, key: t.key, href: t.href })),
-            { name: 'تعلم الآلة', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-robot', key: 'ai', href: 'ai/subfields/ml/index.html' },
-            { name: 'التعلم العميق', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-network-wired', key: 'ai', href: 'ai/subfields/dl/index.html' },
-            { name: 'معالجة اللغة الطبيعية', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-language', key: 'ai', href: 'ai/subfields/nlp/index.html' },
-            { name: 'الرؤية الحاسوبية', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-eye', key: 'ai', href: 'ai/subfields/cv/index.html' },
-            { name: 'التعلم المعزز', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-gamepad', key: 'ai', href: 'ai/subfields/rl/index.html' },
-            { name: 'الذكاء التوليدي', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-wand-magic-sparkles', key: 'ai', href: 'ai/subfields/genai/index.html' }
+            { name: 'تعلم الآلة', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-robot', key: 'ai', href: 'course.html?id=sklearn' },
+            { name: 'التعلم العميق', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-network-wired', key: 'ai', href: 'course.html?id=pytorch' },
+            { name: 'معالجة اللغة الطبيعية', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-language', key: 'ai', href: 'course.html?id=huggingface' },
+            { name: 'الرؤية الحاسوبية', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-eye', key: 'ai', href: 'course.html?id=opencv' },
+            { name: 'التعلم المعزز', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-gamepad', key: 'ai', href: 'field.html?id=ai' },
+            { name: 'الذكاء التوليدي', type: 'كورس في الذكاء الاصطناعي', icon: 'fas fa-wand-magic-sparkles', key: 'ai', href: 'course.html?id=genai' }
         ];
         const searchInput = document.getElementById('search');
         const results = document.getElementById('results');
@@ -349,12 +352,12 @@
         // كل مسار يحفظ دروسه المنتهية بمفتاح خاص به (نفس المفتاح في صفحات الدروس)
         //  total = عدد الدروس + عدد المشاريع في المسار
         const progressSources = [
-            { key: 'codeway-ml-done', name: 'تعلم الآلة', total: 70, color: 'ai', icon: 'fas fa-robot', href: 'ai/subfields/ml/index.html' },
-            { key: 'codeway-dl-done', name: 'التعلم العميق', total: 68, color: 'ai', icon: 'fas fa-network-wired', href: 'ai/subfields/dl/index.html' },
-            { key: 'codeway-nlp-done', name: 'معالجة اللغة الطبيعية', total: 71, color: 'ai', icon: 'fas fa-language', href: 'ai/subfields/nlp/index.html' },
-            { key: 'codeway-cv-done', name: 'الرؤية الحاسوبية', total: 83, color: 'ai', icon: 'fas fa-eye', href: 'ai/subfields/cv/index.html' },
-            { key: 'codeway-rl-done', name: 'التعلم المعزز', total: 70, color: 'ai', icon: 'fas fa-gamepad', href: 'ai/subfields/rl/index.html' },
-            { key: 'codeway-genai-done', name: 'الذكاء التوليدي', total: 112, color: 'ai', icon: 'fas fa-wand-magic-sparkles', href: 'ai/subfields/genai/index.html' }
+            { key: 'codeway-ml-done', name: 'تعلم الآلة', total: 70, color: 'ai', icon: 'fas fa-robot', href: 'course.html?id=sklearn' },
+            { key: 'codeway-dl-done', name: 'التعلم العميق', total: 68, color: 'ai', icon: 'fas fa-network-wired', href: 'course.html?id=pytorch' },
+            { key: 'codeway-nlp-done', name: 'معالجة اللغة الطبيعية', total: 71, color: 'ai', icon: 'fas fa-language', href: 'course.html?id=huggingface' },
+            { key: 'codeway-cv-done', name: 'الرؤية الحاسوبية', total: 83, color: 'ai', icon: 'fas fa-eye', href: 'course.html?id=opencv' },
+            { key: 'codeway-rl-done', name: 'التعلم المعزز', total: 70, color: 'ai', icon: 'fas fa-gamepad', href: 'field.html?id=ai' },
+            { key: 'codeway-genai-done', name: 'الذكاء التوليدي', total: 112, color: 'ai', icon: 'fas fa-wand-magic-sparkles', href: 'course.html?id=genai' }
         ];
         try {
             const active = progressSources

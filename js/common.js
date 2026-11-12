@@ -187,7 +187,7 @@
           ${col("اللغات", CW.languages.slice(0, 5).map(c => ["course.html?id=" + c.id, c.name]))}
           ${col("المجالات", CW.fields.slice(0, 5).map(f => ["field.html?id=" + f.id, f.name]))}
           ${col("المسارات", CW.paths.slice(0, 5).map(p => ["path.html?id=" + p.id, p.name]))}
-          ${col("المنصة", [["index.html#pricing", "الأسعار"], ["index.html#faq", "الأسئلة الشائعة"], ["#", "المدونة"], ["#", "تواصل معنا"], ["#", "الشروط والخصوصية"]])}
+          ${col("المنصة", [["index.html#pricing", "الأسعار"], ["faq.html", "الأسئلة الشائعة"], ["contact.html", "تواصل معنا"], ["terms.html", "الشروط والأحكام"], ["privacy.html", "سياسة الخصوصية"]])}
         </div>
         <div class="footer-bottom">
           <span>© ${new Date().getFullYear()} CodeWay. جميع الحقوق محفوظة.</span>
