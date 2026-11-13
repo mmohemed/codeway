@@ -22,6 +22,8 @@
   // دورات لها أكاديمية مستقلة بصفحات دروس جاهزة: روابطها تذهب إلى الأكاديمية مباشرة
   CW.academy = { python: "python/index.html", cpp: "cpp/index.php", csharp: "csharp/index.html" };
   CW.courseHref = id => CW.academy[id] || "course.html?id=" + id;
+  // المجالات في التذييل: الذكاء الاصطناعي والأمن السيبراني أولاً
+  CW.footerFields = () => ["ai", "security", "frontend", "backend", "data"].map(id => CW.fields.find(f => f.id === id)).filter(Boolean);
   CW.lessonCount = c => c.modules.reduce((n, m) => n + m.l.length, 0);
   CW.param = name => new URLSearchParams(location.search).get(name);
   CW.esc = s => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
@@ -116,6 +118,21 @@
       </a>`;
   };
 
+  // بطاقة أكاديمية/تخصص كامل (root: بادئة المسار للصفحات الفرعية)
+  CW.academyCard = (a, root = "") => `
+    <a class="card tinted" style="--c:${a.color}" href="${root}${a.href}">
+      <div class="card-top">
+        <span class="lang-badge" style="background:${a.color}">${CW.esc(a.short)}</span>
+        <div><h3>${CW.esc(a.name)}</h3><span class="muted" style="font-size:13px">دورة كاملة على CodeWay</span></div>
+      </div>
+      <p>${CW.esc(a.desc)}</p>
+      <div class="meta">
+        <span class="tag tag-primary">${a.level}</span>
+        <span class="tag">${a.lessons} ${a.lessons > 10 ? "درساً" : a.lessons > 2 ? "دروس" : "درس"}</span>
+        ${a.soon ? `<span class="tag">قيد الإعداد</span>` : `<span class="tag tag-green">📘 دروس جاهزة</span>`}
+      </div>
+    </a>`;
+
   CW.fieldCard = f => `
     <a class="card tinted" style="--c:${f.color}" href="field.html?id=${f.id}">
       <div class="card-top"><span class="field-icon" style="background:${f.color}1f">${f.icon}</span><h3>${CW.esc(f.name)}</h3></div>
@@ -189,7 +206,7 @@
             <p class="muted">طريقك من أول سطر برمجي إلى أول وظيفة. لغات ومجالات ومسارات مهنية كاملة باللغة العربية.</p>
           </div>
           ${col("اللغات", CW.languages.slice(0, 5).map(c => [CW.courseHref(c.id), c.name]))}
-          ${col("المجالات", CW.fields.slice(0, 5).map(f => ["field.html?id=" + f.id, f.name]))}
+          ${col("المجالات", CW.footerFields().map(f => ["field.html?id=" + f.id, f.name]))}
           ${col("المسارات", CW.paths.slice(0, 5).map(p => ["path.html?id=" + p.id, p.name]))}
           ${col("المنصة", [["index.html#pricing", "الأسعار"], ["faq.html", "الأسئلة الشائعة"], ["contact.html", "تواصل معنا"], ["terms.html", "الشروط والأحكام"], ["privacy.html", "سياسة الخصوصية"]])}
         </div>

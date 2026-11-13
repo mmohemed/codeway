@@ -9,6 +9,7 @@
   document.title = f.name + " | CodeWay";
   const langs = f.languages.map(CW.getCourse);
   const tools = f.tools.map(CW.getCourse);
+  const academies = (CW.academies || []).filter(a => a.fields.includes(f.id));
   const paths = CW.paths.filter(p => p.field === f.id || p.steps.some(s => f.tools.includes(s)));
   CW.applyBrand(f.color);
   const lessons = langs.concat(tools).reduce((n, c) => n + CW.lessonCount(c), 0);
@@ -37,7 +38,10 @@
       </div>
     </div>
     <div class="page-body"><div class="container">
-      <h2>اللغات المستخدمة في هذا المجال</h2>
+      ${academies.length ? `<h2>دورات كاملة على CodeWay</h2>
+      <p class="muted" style="margin:-6px 0 16px">أكاديميات وتخصصات بدروس جاهزة تبدأ بها في هذا المجال الآن.</p>
+      <div class="grid grid-3">${academies.map(a => CW.academyCard(a)).join("")}</div>
+      <h2 style="margin-top:40px">اللغات المستخدمة في هذا المجال</h2>` : `<h2>اللغات المستخدمة في هذا المجال</h2>`}
       <div class="grid grid-3">${langs.map(CW.courseCard).join("")}</div>
       <h2 style="margin-top:40px">الأدوات والمكتبات وأطر العمل</h2>
       <div class="grid grid-3">${tools.map(CW.courseCard).join("")}</div>

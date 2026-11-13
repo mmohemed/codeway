@@ -546,3 +546,29 @@ CW.fields = [
     languages: ["c", "python", "java"],
     tools: ["dsa", "clean-code", "os-basics", "git", "qa-automation"] }
 ];
+
+// الأكاديميات والتخصصات الكاملة الموجودة على المنصة، وربطها بالمجالات
+// href نسبي إلى جذر الموقع؛ fields تستخدم معرّفات CW.fields
+CW.academies = [
+  { id: "python", name: "أكاديمية Python", short: "Py", color: "#3776ab", href: "python/index.html", lessons: 52, level: "من الصفر",
+    desc: "مسار كامل من الأساسيات حتى المستوى المتقدم، مع محرر تفاعلي وتمارين.",
+    fields: ["backend", "data", "ai", "devops", "security", "embedded", "cs"] },
+  { id: "py-web", name: "تخصص تطوير الويب بـ Python", short: "Web", color: "#0b815a", href: "python/specializations/web/index.html", lessons: 20, level: "متوسط",
+    desc: "بناء مواقع وواجهات برمجية بإطاري Flask و Django.",
+    fields: ["backend", "frontend"] },
+  { id: "py-data", name: "تخصص علم البيانات بـ Python", short: "DS", color: "#07819e", href: "python/specializations/data_science/index.html", lessons: 12, level: "متوسط",
+    desc: "تحليل البيانات وتنظيفها وتصويرها، والخطوات الأولى نحو تعلم الآلة.",
+    fields: ["data", "ai"] },
+  { id: "py-auto", name: "تخصص الأتمتة بـ Python", short: "Auto", color: "#c35305", href: "python/specializations/automation/index.html", lessons: 10, level: "متوسط",
+    desc: "أتمتة المهام المتكررة: الملفات والجداول والمواقع والجدولة.",
+    fields: ["devops"] },
+  { id: "py-sec", name: "تخصص الأمن السيبراني بـ Python", short: "Sec", color: "#c0392b", href: "python/specializations/cybersecurity/index.html", lessons: 1, level: "متوسط", soon: true,
+    desc: "مدخل إلى الأمن السيبراني باستخدام Python. بقية الدروس قيد الإعداد.",
+    fields: ["security"] },
+  { id: "cpp", name: "أكاديمية C++", short: "C++", color: "#00599c", href: "cpp/index.php", lessons: 27, level: "من الصفر",
+    desc: "من الأساسيات إلى البرمجة الكائنية والمفاهيم المتقدمة في C++.",
+    fields: ["games", "embedded", "cs"] },
+  { id: "csharp", name: "أكاديمية C#", short: "C#", color: "#68217a", href: "csharp/index.html", lessons: 35, level: "من الصفر",
+    desc: "من أول برنامج إلى ASP.NET Core و Entity Framework ومشاريع عملية.",
+    fields: ["backend", "games"] }
+];

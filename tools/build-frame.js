@@ -9,7 +9,7 @@ const academy = vm.runInNewContext("(" + common.match(/CW\.academy = (\{[^}]*\})
 const href = id => academy[id] || "course.html?id=" + id;
 const DATA = {
   langs: ctx.CW.languages.slice(0, 5).map(c => [href(c.id), c.name]),
-  fields: ctx.CW.fields.slice(0, 5).map(f => ["field.html?id=" + f.id, f.name]),
+  fields: ["ai", "security", "frontend", "backend", "data"].map(id => ctx.CW.fields.find(f => f.id === id)).map(f => ["field.html?id=" + f.id, f.name]),
   paths: ctx.CW.paths.slice(0, 5).map(p => ["path.html?id=" + p.id, p.name]),
   platform: [["index.html#pricing", "الأسعار"], ["faq.html", "الأسئلة الشائعة"], ["contact.html", "تواصل معنا"], ["terms.html", "الشروط والأحكام"], ["privacy.html", "سياسة الخصوصية"]]
 };
