@@ -169,7 +169,7 @@
           <form class="nav-search" action="catalog.html">
             <input type="search" name="q" placeholder="ابحث عن لغة أو أداة..." aria-label="بحث">
           </form>
-          <a class="btn btn-ghost" href="#">دخول</a>
+          <a class="btn btn-ghost" href="start.html">من أين أبدأ؟</a>
           <a class="btn btn-primary" href="catalog.html">ابدأ مجاناً</a>
         </div>
       </div>`;
